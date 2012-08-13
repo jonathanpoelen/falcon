@@ -1,0 +1,111 @@
+little_endian et big_endian non vérifier
+number.hpp pas finalisée
+voir les TODO et NOTE de endian.hpp
+
+fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_construct.h (+implementation qui ne fait pas de destruction en passant par exemple un no_garbage_collector_t ou en indiquand dans le nom uninitialized_without_garbage_collector qui retourne un objet avec l'exceptions ou non et l'iterator de fin). fichier à mettre dans memory
+
+rendre operator.hpp un peu compatible c++89
+
+FALCON_MEMBER_GETTER mal utilisais dans les iterateurs, ne pas l'utilisais ! faire les fonction en dur et utilisais 4 fonctions avec [const](reference|pointer) à la place
+
+fonction get<std::size_t, std::initilizer_list>(std::initilizer_list) (fichier get_initializer_list ?). Grace a ça, std::initilizer_list doit fonctionner avec tuple_call<>().
+
+modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le soncond argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
+
+Essayer d'enlever un maximum de __VA_ARGS__
+
+faire un allocator (compatible C++89) qui fonctionne comme une pile et ne delete jamais (boost::pool_allocator ?)
+
+objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionne avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
+
+iota(begin(), end(), first_value): le faire avec iota(container, first_value)
+
+bit_iterator (et ceux qui utilise des iterator sur bit) doivent être de vrai iterator (possibilité de changer la valeur). 2 implémentations, pour constant ou non. (see std::vector<bool>). Une partie dans enum/enumerator.hpp pourrait être extrait.
+Faire une bit_reference.
+
+un objet de rangement de bit, genre 2 bit puis 3 etc…
+
+flag.hpp: doit possèder un constructeur avec avec initializer_list. flag_position qui s'occupe de faire un décalage de bits
+
+utilisé <iosfwd> dans ostream, flag et autre si besoin.
+
+optimiser recursive_iterator (et l'algo de recurtion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
+
+faire un algorithmfwd.hpp pour bien nommer les champs
+
+grid_cross et surement d'autre: ne pas utiliser 0b pour définir les bits (extension gcc)
+
+fairer des macros comme BOOST pour la gestion des flux: FALCON_FLUX(ostream) -> std::basic_ostream<typename _CharT, typename _CharTraits> avec des sous macro pour le "paramètrage"
+
+optimisation de taille des enum class: enum class E : typename std::conditional<l.size() == 2, bool, int>::type {…}; (minimal_int<>::type ?)
+
+Mettre constexpr pour les classe d'operateur et enum/operator
+
+ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?)
+
+constexpr pour [c][r](begin|end), nottament quand tableau ?
+
+faudrait penser à vérifier les itérateurs (au niveau de typedef et category)
+
+ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp (via héritage, plus simple). Faire un not1 et not2 comme la std.
+
+faire un iterator qui itère sur plusieur -à la manière de multiple_iterator- mais ne fait les comparaison que sur le premier (le merger avec multiple_iterator via des type_traits ?) (le nommer group_iterator ?).
+
+ajouter des ostream (et istream) pour tuple, pair et autres containers. Les mettres dans un namespace falcon::[i|o|io]stream::type
+
+refaire les fonctions de bits/ostream_insert.h ? deja mi dans ostream/ostream_insert.hpp ? (toutes ?)
+
+finaliser les tests pour enumeration.cpp. Mettre a jour la doc de enum/enumerator.hpp et y extraire NOTE et TODO
+
+revoir btree et btree_base et réactiver les tests
+
+ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?)
+
+ostream::join gérer la taille de plusieurs colonne via un intermediaire. (ex avec std::cout.width(5): join(std::cout, {0,1,2}) -> "    0,1,2", join(std::cout << intermediaire, {0,1,2}) -> "    0,    1,    2"). L'objet intermediaire est un objet à part resetant les valeurs width, fill, left, right, etc quand modifier ?
+
+dans container_wrapper.hpp, ajouter des fonctions comme reverse_container, const_container, etc.
+
+faire des traits char_traits qui transforme tout en majuscule, en minuscule et élimine les accents. Faire un string qui fait des comparaisons insensibles à la case.
+
+ne pas oublier le suport de char16_t et char32_t
+
+le hash dans basic_cstring a externaliser dans un hash.hpp. Faire un hash_byte() comme la std.
+
+mettre tous les operator()(...) des foncteurs en const (si cela est possible).
+
+basic_string_repetition<_String>{_String, size_t} ? (os << string_repetition('a', 4) -> "aaaa"). faire std::to_string()
+
+ostream::repetition(_Obj, size_t) et ostream::repetition(_Obj, size_t, _CharT separator) ; avec _CharT = _Obj::char_type
+
+si on active les exceptions des flux, comment ce comporte les fonctions lié (ignore, ignore_all, etc) ? Le state est bien setter à badbit et non égal à good.
+
+les lambda doivent pouvoir supporter le manipulateur de flux sans explicitement utiliser resolve_manipulator… (lambda(std::cout) << resolve_manipulator(std::endl))
+
+proxy_iterator: le _IsRef doit etre a l'interieur de la classe et non dans son template
+
+infinite: begin, end => min, max. Revoir comment est faite la classe est ces enfants.
+
+un functeur qui permet de répartir les valeurs de plusieurs iterateurs. foreah(first, last, ???(it1, it2, it3)) -> ???::f(*it, *it1, *it2, *it3); ++it1,++it2,++it3.
+
+renommer pointer_iterator_iterator en pointer_iterator.
+renommer not_iterator en fake_iterator
+
+faire des functors qui font des comparaisons sur les valeurs d'un pointeur: pointer_less -> (*a < *b).
+
+ajouter first_value, second_value et argument_type pour les functors de operators (heriter de std::unary_function et std::binary_function pour ce faire).
+
+toutes les classes surchargeant des iterators ont bien une fonction base() ? les tags sont bien definit ? ajouter le tag a not_iterator (en template avec par defaut random_iterator_tag)
+il manque les operators mathematique sur les iterators Le operator+() manquait dans proxy_iterator, c'est donc surement le cas autre part et avec aussi d'autres operateurs. Faire une macro qui les crés à inclure dans chaque iterator…
+
+un foncteur ???<_Functor, std::tuple<_Elements>, parameter_index<...> ou indexes-tag>.
+
+structure englopant un type et pour chaque operateur suceptible de changer le type (pour les type scalaire < int) fait un static_cast. (force_type<_T> ? force_scalar<> ?)
+
+un iterateur qui execute une fonction apres avoir atteint une valeur (autre iterateur ou compteur (2 classes ?)). Permet par exemple de boucler en une fois sur une zone d'un rectangle.
+padding_iterator: pour par exemple iterer sur un sous retangle.
+un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
+
+remplacer dans static_new et memory_stack construct(emplace_t,...) par un constructeur construct_emplace()
+trouver le moyen de construir un _T par l'intermediaire d'un objet (ex: tuple). construct_adapter(_Adapter, ...) ? avec _Adapter un foncteur prenant le pointeur de la structure a initialiser.
+
+amélioré algorithm.hpp en y mettant en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractère jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.

@@ -1,0 +1,12 @@
+#ifndef _FALCON_PREPROCESSOR_D_PREFIX_HPP
+#define _FALCON_PREPROCESSOR_D_PREFIX_HPP
+
+#define FALCON_PP_D_PREFIX_char
+#define FALCON_PP_D_PREFIX_wchar_t L
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+# define FALCON_PP_D_PREFIX_char16_t u
+# define FALCON_PP_D_PREFIX_char32_t U
+#endif
+
+#endif

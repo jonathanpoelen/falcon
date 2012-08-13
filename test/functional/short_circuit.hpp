@@ -1,0 +1,6 @@
+#ifndef _FALCON_TEST_FUNCTIONAL_SHORT_CIRCUIT_HPP
+#define _FALCON_TEST_FUNCTIONAL_SHORT_CIRCUIT_HPP
+
+void short_circuit_test();
+
+#endif

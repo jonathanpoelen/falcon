@@ -1,0 +1,65 @@
+function(add_exec_test name file)
+	add_executable(${name} ${file})
+	add_test(test_${name} ${name})
+endfunction(add_exec_test)
+
+function(create_exec_test name)
+	add_exec_test(${name} ${name}.cpp)
+endfunction(create_exec_test)
+
+add_definitions(
+	-Wnon-virtual-dtor
+	-Wno-long-long
+	-Wundef
+	-Wcast-align
+	-Wchar-subscripts
+	-Wall
+	-Wextra
+	-Wpointer-arith
+	-Wformat-security
+# 	-fno-exceptions
+# 	-fno-check-new
+# 	-fno-common
+# 	-Werror=return-type
+	-Woverloaded-virtual
+# 	-fno-threadsafe-statics
+# 	-fvisibility=hidden
+# 	-fvisibility-inlines-hidden
+	-Wold-style-cast
+	-Wunreachable-code
+	-Wformat
+	-Wformat=2
+	-Werror-implicit-function-declaration
+	-Wmain
+	-Wparentheses
+	-Wsequence-point
+	-Wreturn-type
+	-Wunused
+	-Wfloat-equal
+	-Wshadow
+	-Wpointer-arith
+	-Wconversion
+	-Wsign-compare
+	-Wmissing-declarations
+	-Wmissing-noreturn
+	-Wmissing-format-attribute
+	-Wpacked
+	-Wredundant-decls
+	-Winline
+	-Wdouble-promotion
+	-Winit-self
+	-Wcast-qual
+
+	-Wtrampolines
+	-fstrict-overflow
+	-Wstrict-overflow=5
+	-Wno-overflow
+
+#	-Wno-unused-function
+
+	-Werror
+
+	-std=c++0x
+
+# 	-Wfatal-errors
+)

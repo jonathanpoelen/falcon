@@ -1,0 +1,6 @@
+#ifndef _FALCON_TEST_LOOP_TEMPLATE_HPP
+#define _FALCON_TEST_LOOP_TEMPLATE_HPP
+
+void loop_template_test();
+
+#endif //_FALCON_TEST_LOOP_TEMPLATE_HPP

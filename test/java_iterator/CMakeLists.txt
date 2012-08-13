@@ -1,0 +1,10 @@
+include(../../CMakeDefinitions.txt)
+include_directories(.. ../..)
+
+create_exec_test(counting_iterator)
+create_exec_test(filter_iterator)
+# create_exec_test(java_iterator_iterator)
+create_exec_test(range_iterator)
+# create_exec_test(recursive_java_iterator)
+create_exec_test(stepping_iterator)
+create_exec_test(until_iterator)
