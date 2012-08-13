@@ -437,7 +437,7 @@ _FALCON_CREATE_FUNCTIONAL_OPERATORS(decrement, --)
 	struct name\
 	{\
 		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, op(a))\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a), op(a))\
+		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a) const, op(a))\
 	};\
 	template<>\
 	struct name<late_parameter_t>\
@@ -445,7 +445,7 @@ _FALCON_CREATE_FUNCTIONAL_OPERATORS(decrement, --)
 		template<typename _T>\
 		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, op(a))\
 		template<typename _T>\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a), op(a))\
+		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a) const, op(a))\
 	};
 
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(address    , &)

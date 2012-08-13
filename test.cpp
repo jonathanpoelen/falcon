@@ -52,14 +52,31 @@
 // 	}
 // };
 
-#include <falcon/memory/static_new.hpp>
-#include <falcon/accessor.hpp>
-#include <test/A.h>
+// #include <falcon/memory/static_new.hpp>
+// #include <falcon/accessor.hpp>
+// #include <test/A.h>
 
-static constexpr int f(){return 0;}
+// static constexpr int f(){return 0;}
+
+#include <falcon/iterator/not_iterator.hpp>
+#include <falcon/functional/operators.hpp>
+#include <falcon/functional/compose.hpp>
 
 int main()
 {
+	typedef falcon::iterator::not_iterator<int> iterator;
+	typedef falcon::increment<int> unary1;
+	typedef falcon::pointer<iterator> unary2;
+	typedef falcon::unary_compose<unary1, unary2> unary3;
+
+	iterator it(2);
+
+	std::cout << "*it: " << *it << '\n';
+	std::cout << "*it: " << unary2()(it) << '\n';
+	std::cout << "*it: " << unary1()(*it) << '\n';
+	std::cout << "*it: " << unary1()(unary2()(it)) << '\n';
+	std::cout << "*it: " << unary3()(it) << '\n';
+
 // 	const int i = 6;
 // 	auto f = falcon::compose<>(A(), A(), A(), A());
 // 	std::cout << "f: " << f(i) << '\n';
@@ -73,11 +90,11 @@ int main()
 // 	(falcon::parameter_index<0,1,2>(), f, t);
 
 
-	falcon::static_new<A[2]> snew;
-	snew.construct(falcon::emplace);
-
-	std::cout << snew.get()[0] << '\n';
-	std::cout << snew.get()[1] << '\n';
+// 	falcon::static_new<A[2]> snew;
+// 	snew.construct(falcon::emplace);
+//
+// 	std::cout << snew.get()[0] << '\n';
+// 	std::cout << snew.get()[1] << '\n';
 
 // 	snew.destroy();
 

@@ -286,7 +286,9 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 #define __FALCON_PP_LIST_ENUM_RULE_START_lbit(start) (start)
 #define __FALCON_PP_LIST_ENUM_RULE_START_rbit(start) (start)
 
-///TODO utilisais un not_iterator<const enum_t> ?
+///TODO utiliser un not_iterator est vraiment util ?
+
+///TODO utiliser un not_iterator<const enum_t> ?
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_default(rule)\
 	::falcon::iterator::nexter_iterator<\
 		::falcon::iterator::not_iterator<enum_t>,\

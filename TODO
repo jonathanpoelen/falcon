@@ -59,8 +59,6 @@ finaliser les tests pour enumeration.cpp. Mettre a jour la doc de enum/enumerato
 
 revoir btree et btree_base et réactiver les tests
 
-ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?)
-
 ostream::join gérer la taille de plusieurs colonne via un intermediaire. (ex avec std::cout.width(5): join(std::cout, {0,1,2}) -> "    0,1,2", join(std::cout << intermediaire, {0,1,2}) -> "    0,    1,    2"). L'objet intermediaire est un objet à part resetant les valeurs width, fill, left, right, etc quand modifier ?
 
 dans container_wrapper.hpp, ajouter des fonctions comme reverse_container, const_container, etc.
@@ -99,7 +97,9 @@ il manque les operators mathematique sur les iterators Le operator+() manquait d
 
 un foncteur ???<_Functor, std::tuple<_Elements>, parameter_index<...> ou indexes-tag>.
 
-structure englopant un type et pour chaque operateur suceptible de changer le type (pour les type scalaire < int) fait un static_cast. (force_type<_T> ? force_scalar<> ?)
+structure englopant un type et pour chaque operateur suceptible de changer le type (pour les type scalaire < int) fait un static_cast. (force_type<_T> ? force_type_wrapper<> ? force_scalar<> ? integral_wrapper<> ?). Cas particulier pour l'incrementation et decrementation sur enum.
+Permet ainsi de s'affranchir des enum_* en passant par les foncteurs sur operateurs: enum_plus<enum_t> -> plus<integral_wrapper<enum_t>>, enum_increment<enum_t> -> increment<integral_wrapper<enum_t&>>
+ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?). La classe generique heriter des operateurs de la fonçon décrit au-dessus.
 
 un iterateur qui execute une fonction apres avoir atteint une valeur (autre iterateur ou compteur (2 classes ?)). Permet par exemple de boucler en une fois sur une zone d'un rectangle.
 padding_iterator: pour par exemple iterer sur un sous retangle.
@@ -109,3 +109,5 @@ remplacer dans static_new et memory_stack construct(emplace_t,...) par un constr
 trouver le moyen de construir un _T par l'intermediaire d'un objet (ex: tuple). construct_adapter(_Adapter, ...) ? avec _Adapter un foncteur prenant le pointeur de la structure a initialiser.
 
 amélioré algorithm.hpp en y mettant en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractère jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
+
+dans les literaux, gerer l'overflow des nombres (on peut les passer en template au lieu de paramètre ?). Sinon via un tableau de char…
