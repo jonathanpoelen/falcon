@@ -58,6 +58,12 @@ struct placeholder
 		return CPP0X(late_affect{}, v);
 	}
 
+	template<typename _T>
+	inline constexpr ___lambda<late_affect, placeholder<_Num>, _T> operator=(_T&& v)
+	{
+		return CPP0X(late_affect{}, v);
+	}
+
 	template<int _Num2>
 	inline constexpr ___lambda<late_affect, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
 	{
@@ -419,6 +425,83 @@ namespace placeholders {
 
 #define __FALCON_NAME_OPERATOR late_logical_or
 #define __FALCON_SIGN_OPERATOR ||
+#include <falcon/lambda/binary_operator.tcc>
+#undef __FALCON_NAME_OPERATOR
+#undef __FALCON_SIGN_OPERATOR
+//@}
+
+
+//@{
+struct ___lambda_comma
+{
+	template<typename _T, typename _U>
+	auto operator()(_T& a, _U& b) -> decltype(b())
+	{
+		a();
+		return b();
+	}
+};
+
+template<typename _FuncL, typename _Left, typename _Right, typename _FuncL2, typename _Left2, typename _Right2>
+struct ___lambda<___lambda_comma, ___lambda<_FuncL, _Left, _Right>, ___lambda<_FuncL2, _Left2, _Right2> >
+{
+	___lambda_comma f;
+	___lambda<_FuncL, _Left, _Right> left;
+	___lambda<_FuncL2, _Left2, _Right2> right;
+
+	template<typename... _Args>
+	auto operator()(_Args&&... args)
+	-> decltype(right(std::forward<_Args>(args)...))
+	{
+		left(std::forward<_Args>(args)...);
+		return right(std::forward<_Args>(args)...);
+	}
+};
+
+template<typename _FuncL, typename _Left, typename _Right, std::size_t _Num>
+struct ___lambda<___lambda_comma, ___lambda<_FuncL, _Left, _Right>, placeholder<_Num> >
+{
+	___lambda_comma f;
+	___lambda<_FuncL, _Left, _Right> left;
+
+	template<typename... _Args>
+	auto operator()(_Args&&... args)
+	-> decltype(arg<_Num-1>(args...))
+	{
+		left(std::forward<_Args>(args)...);
+		return arg<_Num-1>(args...);
+	}
+};
+
+template<typename _FuncL, typename _Left, typename _Right, std::size_t _Num>
+struct ___lambda<___lambda_comma, placeholder<_Num>, ___lambda<_FuncL, _Left, _Right> >
+{
+	___lambda_comma f;
+	___lambda<_FuncL, _Left, _Right> right;
+
+	template<typename... _Args>
+	auto operator()(_Args&&... args)
+	-> decltype(right(std::forward<_Args>(args)...))
+	{
+		return right(std::forward<_Args>(args)...);
+	}
+};
+
+template<std::size_t _Num, std::size_t _Num2>
+struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
+{
+	___lambda_comma f;
+
+	template<typename... _Args>
+	auto operator()(_Args&&... args)
+	-> decltype(arg<_Num2-1>(args...))
+	{
+		return arg<_Num2-1>(args...);
+	}
+};
+
+#define __FALCON_NAME_OPERATOR ___lambda_comma
+#define __FALCON_SIGN_OPERATOR ,
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
