@@ -66,7 +66,7 @@ void lambda_test() {
 		LAMBDA_TEST(3, f, v);
 		LAMBDA_TEST(5, phr::_1 = 5, index);
 		LAMBDA_TEST(6, f, v);
-		LAMBDA_TEST(9, phr::_1->*&std::vector<int>::size, v);
+		LAMBDA_TEST(9u, phr::_1->*&std::vector<int>::size, v);
 	}
 	{
 		B b;
@@ -173,6 +173,53 @@ void lambda_test() {
 		CHECK_EQUAL_VALUE(ss.str(), "4\n4\n");
 		if (wss.str() != L"4\n4\n")
 			throw std::runtime_error(BOOST_PP_STRINGIZE(__LINE__));
+	}
+
+	{
+		using namespace falcon::lambda;
+		using namespace placeholders;
+
+		{
+			//Fibonacci
+			auto f = while_loop(
+				--_1 > 0,
+				(_2 = _3 + _4,
+				 _3 = _4,
+				 _4 = _2)
+			);
+			int n = 10, a = 0, b = 1, tmp;
+			f(int(n), tmp, a, b);
+			CHECK_EQUAL_VALUE(a, 34);
+			CHECK_EQUAL_VALUE(b, 55);
+		}
+		{
+			//Fibonacci
+			auto f = for_loop(
+				lambda(10),
+				_1 > 0,
+				(_2 = _3 + _4,
+				 _3 = _4,
+				 _4 = _2),
+				 --_1
+			);
+			int a = 0, b = 1, tmp;
+			f(tmp, a, b);
+			CHECK_EQUAL_VALUE(a, 55);
+			CHECK_EQUAL_VALUE(b, 89);
+		}
+		{
+			std::stringstream ss;
+			auto p3 = lambda(ss) << _1 << std::endl;
+			p3(56);
+			CHECK_EQUAL_VALUE(ss.str(), "56\n");
+		}
+		{
+			std::wstringstream wss;
+			auto p3 = lambda(wss) << _1 << std::endl;
+			p3(56);
+			if (wss.str() != L"56\n")
+				throw std::runtime_error(BOOST_PP_STRINGIZE(__LINE__));
+		}
 	}
 }
 

@@ -7,6 +7,7 @@
 #include <falcon/parameter/keep_parameter_index.hpp>
 #include <falcon/arg/arg.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
+#include <falcon/iostream/is_ios.hpp>
 
 namespace falcon {
 namespace lambda {
@@ -15,6 +16,7 @@ class binder;
 }
 
 class __placearg;
+class __force_placearg;
 
 template<typename _T, typename _U>
 class __pair;
@@ -76,7 +78,7 @@ struct placeholder
 	}
 
 	template<typename _T, typename _Class>
-	inline constexpr ___lambda<decltype(std::mem_fn(std::declval<_T _Class::*>())), placeholder<_Num>> operator FALCON_PP_NOT_IDE_PARSER(->*)(_T _Class::* mem)
+	inline constexpr ___lambda<decltype(std::mem_fn(std::declval<_T _Class::*>())), placeholder<_Num>, __force_placearg> operator FALCON_PP_NOT_IDE_PARSER(->*)(_T _Class::* mem)
 	{
 		return CPP0X(std::mem_fn(mem));
 	}
@@ -155,28 +157,28 @@ struct ___lambda<_Func, _T, ___lambda<_FuncL, _Left, _Right> >
 	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, right(std::forward<_Args>(args)...)))
 };
 
-// template<typename _Func, int _Num>
-// struct ___lambda<_Func, placeholder<_Num>, __placearg>
-// {
-// 	_Func function;
-//
-// 	template<typename... _Args>
-// 	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), call<_Func&>(
-// 		typename keep_parameter_index<
-// 			ignore_parameter_index_tag<_Num, 1>,
-// 			sizeof...(_Args)+1
-// 		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
-// 	)
-// };
-//
-// template<typename _Func, int _Num>
-// struct ___lambda<_Func, placeholder<1>, __placearg>
-// {
-// 	_Func function;
-//
-// 	template<typename _T, typename... _Args>
-// 	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
-// };
+template<typename _Func, int _Num>
+struct ___lambda<_Func, placeholder<_Num>, __force_placearg>
+{
+	_Func function;
+
+	template<typename... _Args>
+	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), call<_Func&>(
+		typename keep_parameter_index<
+			ignore_parameter_index_tag<_Num, 1>,
+			sizeof...(_Args)+1
+		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
+	)
+};
+
+template<typename _Func>
+struct ___lambda<_Func, placeholder<1>, __force_placearg>
+{
+	_Func function;
+
+	template<typename _T, typename... _Args>
+	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
+};
 
 template<typename _Func, int _Num>
 struct ___lambda<_Func, placeholder<_Num>, __placearg>
@@ -654,6 +656,138 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 //@}
+
+
+//support manipulator ios
+namespace operators {
+
+template<typename _T,
+bool = is_istream<_T>::value,
+bool = is_ostream<_T>::value,
+bool = is_ios<_T>::value>
+struct __deduce_iostream_lambda
+{
+	static const bool __value = false;
+	typedef void __iomanip_type;
+};
+
+template<template<class, class> class _T, typename _Char, typename _Traits>
+struct __deduce_iostream_lambda<_T<_Char, _Traits>, true, false, true>
+{
+	static const bool __value = true;
+	typedef std::basic_istream<_Char, _Traits> __ios_type;
+	typedef __ios_type&(*__iomanip_type)(__ios_type&);
+};
+
+template<template<class, class> class _T, typename _Char, typename _Traits>
+struct __deduce_iostream_lambda<_T<_Char, _Traits>, false, true, true>
+{
+	static const bool __value = true;
+	typedef std::basic_ostream<_Char, _Traits> __ios_type;
+	typedef __ios_type&(*__iomanip_type)(__ios_type&);
+};
+
+template<template<class, class> class _T, typename _Char, typename _Traits>
+struct __deduce_iostream_lambda<_T<_Char, _Traits>, false, false, true>
+{
+	static const bool __value = true;
+	typedef std::basic_ios<_Char, _Traits> __ios_type;
+	typedef __ios_type&(*__iomanip_type)(__ios_type&);
+};
+
+template<template<class, class, class> class _T, typename _Char, typename _Traits, typename _Allocator>
+struct __deduce_iostream_lambda<_T<_Char, _Traits, _Allocator>, true, false, true>
+{
+	static const bool __value = true;
+	typedef std::basic_istream<_Char, _Traits> __ios_type;
+	typedef __ios_type&(*__iomanip_type)(__ios_type&);
+};
+
+template<template<class, class, class> class _T, typename _Char, typename _Traits, typename _Allocator>
+struct __deduce_iostream_lambda<_T<_Char, _Traits, _Allocator>, false, true, true>
+{
+	static const bool __value = true;
+	typedef std::basic_ostream<_Char, _Traits> __ios_type;
+	typedef __ios_type&(*__iomanip_type)(__ios_type&);
+};
+
+template<template<class, class, class> class _T, typename _Char, typename _Traits, typename _Allocator>
+struct __deduce_iostream_lambda<_T<_Char, _Traits, _Allocator>, false, false, true>
+{
+	static const bool __value = true;
+	typedef std::basic_ios<_Char, _Traits> __ios_type;
+	typedef __ios_type&(*__iomanip_type)(__ios_type&);
+};
+
+typedef __deduce_iostream_lambda<void, false, false, false> __bad_ios_lambda;
+
+
+template<typename _Lambda>
+struct __is_ostream_lambda
+: __bad_ios_lambda
+{};
+
+template<typename _T>
+struct __is_ostream_lambda<___lambda<void, _T&>>
+: __deduce_iostream_lambda<_T, false, is_ostream<_T>::value>
+{};
+
+template<typename _Lambda1, typename _Lambda2>
+struct __is_ostream_lambda<___lambda<late_left_shift, _Lambda1, _Lambda2>>
+: __is_ostream_lambda<_Lambda1>
+{};
+
+
+template<typename _Lambda>
+struct __is_istream_lambda
+: __bad_ios_lambda
+{};
+
+template<typename _T>
+struct __is_istream_lambda<___lambda<void, _T&>>
+: __deduce_iostream_lambda<_T, is_istream<_T>::value, false>
+{};
+
+template<typename _Lambda1, typename _Lambda2>
+struct __is_istream_lambda<___lambda<late_left_shift, _Lambda1, _Lambda2>>
+: __is_istream_lambda<_Lambda1>
+{};
+
+template<typename _Operation, typename _TL, typename _TR>
+inline typename std::enable_if<
+	__is_ostream_lambda<
+		___lambda<_Operation, _TL, _TR>
+	>::__value,
+	___lambda<
+		late_left_shift,
+		___lambda<_Operation, _TL, _TR>,
+		typename __is_ostream_lambda<
+			___lambda<_Operation, _TL, _TR>
+		>::__iomanip_type
+	>
+>::type
+operator<<(___lambda<_Operation, _TL, _TR> l,
+		   typename __is_ostream_lambda<___lambda<_Operation, _TL, _TR>>::__iomanip_type __pf)
+{ return {late_left_shift(), l, __pf}; }
+
+template<typename _Operation, typename _TL, typename _TR>
+inline typename std::enable_if<
+	__is_istream_lambda<
+		___lambda<_Operation, _TL, _TR>
+	>::__value,
+	___lambda<
+		late_right_shift,
+		___lambda<_Operation, _TL, _TR>,
+		typename __is_istream_lambda<
+			___lambda<_Operation, _TL, _TR>
+		>::__iomanip_type
+	>
+>::type
+operator>>(___lambda<_Operation, _TL, _TR> l,
+		   typename __is_istream_lambda<___lambda<_Operation, _TL, _TR>>::__iomanip_type __pf)
+{ return {late_right_shift(), l, __pf}; }
+
+}
 
 
 template<typename _T>
