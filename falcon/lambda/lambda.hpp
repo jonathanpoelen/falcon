@@ -155,51 +155,65 @@ struct ___lambda<_Func, _T, ___lambda<_FuncL, _Left, _Right> >
 	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, right(std::forward<_Args>(args)...)))
 };
 
+// template<typename _Func, int _Num>
+// struct ___lambda<_Func, placeholder<_Num>, __placearg>
+// {
+// 	_Func function;
+//
+// 	template<typename... _Args>
+// 	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), call<_Func&>(
+// 		typename keep_parameter_index<
+// 			ignore_parameter_index_tag<_Num, 1>,
+// 			sizeof...(_Args)+1
+// 		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
+// 	)
+// };
+//
+// template<typename _Func, int _Num>
+// struct ___lambda<_Func, placeholder<1>, __placearg>
+// {
+// 	_Func function;
+//
+// 	template<typename _T, typename... _Args>
+// 	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
+// };
+
 template<typename _Func, int _Num>
 struct ___lambda<_Func, placeholder<_Num>, __placearg>
 {
 	_Func function;
 
-	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), call<_Func&>(
-		typename keep_parameter_index<
-			ignore_parameter_index_tag<_Num, 1>,
-			sizeof...(_Args)+1
-		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
-	)
-};
-
-template<typename _Func>
-struct ___lambda<_Func, placeholder<1>, __placearg>
-{
-	_Func function;
-
 	template<typename _T, typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
+	auto operator()(_T&& a, _Args&&... args)
+	-> decltype(function(a))
+	{
+		return function(a);
+		(void)sizeof...(args);
+	}
 };
 
-template<typename _Func, int _Num>
-struct ___lambda<_Func, __placearg, placeholder<_Num> >
-{
-	_Func function;
-
-	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args),call<_Func&>(
-		typename keep_parameter_index<
-			ignore_parameter_index_tag<_Num, 1>,
-			sizeof...(_Args)+1
-		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
-	)
-};
-
-template<typename _Func>
-struct ___lambda<_Func, __placearg, placeholder<1> >
-{
-	_Func function;
-
-	template<typename _T, typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
-};
+// template<typename _Func, int _Num>
+// struct ___lambda<_Func, __placearg, placeholder<_Num> >
+// {
+// 	_Func function;
+//
+// 	template<typename... _Args>
+// 	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args),call<_Func&>(
+// 		typename keep_parameter_index<
+// 			ignore_parameter_index_tag<_Num, 1>,
+// 			sizeof...(_Args)+1
+// 		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
+// 	)
+// };
+//
+// template<typename _Func>
+// struct ___lambda<_Func, __placearg, placeholder<1> >
+// {
+// 	_Func function;
+//
+// 	template<typename _T, typename... _Args>
+// 	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
+// };
 
 template<typename _Func, int _Num, typename _Right>
 struct ___lambda<_Func, placeholder<_Num>, _Right>
@@ -458,7 +472,7 @@ struct ___lambda<___lambda_comma, ___lambda<_FuncL, _Left, _Right>, ___lambda<_F
 	}
 };
 
-template<typename _FuncL, typename _Left, typename _Right, std::size_t _Num>
+template<typename _FuncL, typename _Left, typename _Right, int _Num>
 struct ___lambda<___lambda_comma, ___lambda<_FuncL, _Left, _Right>, placeholder<_Num> >
 {
 	___lambda_comma f;
@@ -473,7 +487,7 @@ struct ___lambda<___lambda_comma, ___lambda<_FuncL, _Left, _Right>, placeholder<
 	}
 };
 
-template<typename _FuncL, typename _Left, typename _Right, std::size_t _Num>
+template<typename _FuncL, typename _Left, typename _Right, int _Num>
 struct ___lambda<___lambda_comma, placeholder<_Num>, ___lambda<_FuncL, _Left, _Right> >
 {
 	___lambda_comma f;
