@@ -11,13 +11,12 @@ struct F
 	:v(__v)
 	{}
 
-	template<typename _U>
-	bool operator==(_U __v)
+	bool operator==(_T __v) const
 	{
 		return __v >= v && __v <= v;
 	}
 
-	operator _T()
+	operator _T() const
 	{ return v; }
 };
 
@@ -51,7 +50,7 @@ void swap_proxy_test()
 		float f = 4.448f;
 
 		falcon::swap_proxy<double, float, int>(d, f);
-		CHECK_EQUAL_VALUE(F<double>(float(4.448)), d);
+		CHECK_EQUAL_VALUE(F<double>(4.448f), d);
 		CHECK_EQUAL_VALUE(F<float>(484), f);
 	}
 	{

@@ -19,7 +19,17 @@ inline typename __resolve_manipulator<_CharT, _Traits>::__type resolve_manipulat
 }
 
 template<typename _CharT, typename _Traits>
-inline typename __resolve_manipulator<_CharT, _Traits>::__type resolve_manipulator(std::basic_ostream<_CharT, _Traits>&, typename __resolve_manipulator<_CharT, _Traits>::__type f)
+inline typename __resolve_manipulator<_CharT, _Traits>::__type resolve_manipulator(const std::basic_ostream<_CharT, _Traits>&, typename __resolve_manipulator<_CharT, _Traits>::__type f)
+{
+	return f;
+}
+
+inline std::ostream&(*ostream_manipulator(std::ostream&(*f)(std::ostream&)))(std::ostream&)
+{
+	return f;
+}
+
+inline std::wostream&(*wostream_manipulator(std::wostream&(*f)(std::wostream&)))(std::wostream&)
 {
 	return f;
 }

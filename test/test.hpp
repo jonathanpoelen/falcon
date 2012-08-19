@@ -50,11 +50,23 @@
 	throw std::runtime_error(_Oss.str());\
 } __END_CHECK
 
-#define CHECK_VALUE(op, a, ...) if (!((a) op (__VA_ARGS__))){\
+template<typename _T>
+std::ostream& __show_value_test(std::ostream& oss, const _T& v)
+{ return oss << v; }
+
+inline std::ostream& __show_value_test(std::ostream& oss, std::nullptr_t&)
+{ return oss << "null"; }
+
+#define CHECK_VALUE(op, a, ...) do{\
+auto tmp_CHECK_VALUE = (a);\
+auto tmp_CHECK_VALUE2 = (__VA_ARGS__);\
+if (!(tmp_CHECK_VALUE op tmp_CHECK_VALUE2)){\
 	std::stringstream _Oss;\
-	_Oss << "bad check for op " #op " in " __FILE__ " line " << __LINE__ << "\n value is: " << (a) << "\n------------------------\nresult is: " << (__VA_ARGS__);\
+	_Oss << "bad check for op " #op " in " __FILE__ " line " << __LINE__ << "\n value is: ";\
+	__show_value_test(_Oss, tmp_CHECK_VALUE) << "\n------------------------\nresult is: ";\
+	__show_value_test(_Oss, tmp_CHECK_VALUE2);\
 	throw std::runtime_error(_Oss.str());\
-} __END_CHECK
+} __END_CHECK;}while(0)
 
 #define CHECK_EQUAL_VALUE(a, ...) CHECK_VALUE(==, a, __VA_ARGS__)
 

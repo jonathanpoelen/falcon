@@ -27,7 +27,7 @@ void store_if_test()
 		 it != end && store(*it); ++it)
 		 ;
 
-	CHECK_EQUAL_VALUE(0, store.get());
+	CHECK_EQUAL_VALUE(0, *store.get());
 
 }
 FALCON_TEST_TO_MAIN(store_if_test)

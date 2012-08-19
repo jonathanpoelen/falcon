@@ -10,6 +10,7 @@ if [ $# = 2 ];then
 	shift 1
 	defbase=$d'_'
 	cmakelist=$d/CMakeLists.txt
+	mmain=FALCON_TEST_TO_MAIN
 	if [ ! -d $d ];then
 		[ -e $d ] && echo $d is not directory && exit 3
 		mkdir $d
@@ -21,6 +22,7 @@ else
 	d=
 	defbase=
 	cmakelist=CMakeLists.txt
+	mmain=FALCON_GROUP_TEST_TO_MAIN
 fi
 
 h="$d/$1.hpp"
@@ -38,8 +40,8 @@ void $1_test();
 
 #endif" > $h
 
-echo "#include <falcon/$h>
-#include \"test.hpp\"
+echo "#include <test/test.hpp>
+#include <falcon/$h>
 #include \"$1.hpp\"
 
 void $1_test()
@@ -47,7 +49,7 @@ void $1_test()
 
 }
 
-FALCON_GROUP_TEST_TO_MAIN($1_test)" > $s
+$mmain($1_test)" > $s
 
 echo create_exec_test"($1)" >> $cmakelist
 

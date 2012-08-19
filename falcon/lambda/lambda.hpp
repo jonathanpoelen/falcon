@@ -661,21 +661,16 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 //support manipulator ios
 namespace operators {
 
-<<<<<<< HEAD
 template<typename _T,
 bool = is_istream<_T>::value,
 bool = is_ostream<_T>::value,
 bool = is_ios<_T>::value>
-=======
-template<typename _T, bool, bool>
->>>>>>> a95c013d7ee4366053cbc72a31e3855a64f5a23c
 struct __deduce_iostream_lambda
 {
 	static const bool __value = false;
 	typedef void __iomanip_type;
 };
 
-<<<<<<< HEAD
 template<template<class, class> class _T, typename _Char, typename _Traits>
 struct __deduce_iostream_lambda<_T<_Char, _Traits>, true, false, true>
 {
@@ -725,16 +720,6 @@ struct __deduce_iostream_lambda<_T<_Char, _Traits, _Allocator>, false, false, tr
 };
 
 typedef __deduce_iostream_lambda<void, false, false, false> __bad_ios_lambda;
-=======
-template<typename _T, bool _IsOStream>
-struct __deduce_iostream_lambda<_T, _IsOStream, true>
-{
-	static const bool __value = true;
-	typedef _T&(*__iomanip_type)(_T&);
-};
-
-typedef __deduce_iostream_lambda<void, false, false> __bad_ios_lambda;
->>>>>>> a95c013d7ee4366053cbc72a31e3855a64f5a23c
 
 
 template<typename _Lambda>
@@ -744,11 +729,7 @@ struct __is_ostream_lambda
 
 template<typename _T>
 struct __is_ostream_lambda<___lambda<void, _T&>>
-<<<<<<< HEAD
 : __deduce_iostream_lambda<_T, false, is_ostream<_T>::value>
-=======
-: __deduce_iostream_lambda<_T, is_ostream<_T>::value, is_ios<_T>::value>
->>>>>>> a95c013d7ee4366053cbc72a31e3855a64f5a23c
 {};
 
 template<typename _Lambda1, typename _Lambda2>
@@ -764,11 +745,7 @@ struct __is_istream_lambda
 
 template<typename _T>
 struct __is_istream_lambda<___lambda<void, _T&>>
-<<<<<<< HEAD
 : __deduce_iostream_lambda<_T, is_istream<_T>::value, false>
-=======
-: __deduce_iostream_lambda<_T, is_istream<_T>::value, is_ios<_T>::value>
->>>>>>> a95c013d7ee4366053cbc72a31e3855a64f5a23c
 {};
 
 template<typename _Lambda1, typename _Lambda2>

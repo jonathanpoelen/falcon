@@ -7,12 +7,9 @@
 
 struct unless_functor
 {
-	template<typename _T>
-	const _T& operator()(const _T& a) const
-	{ return a; }
-
-	void operator()() const
-	{}
+	template<typename... _Args>
+	void operator()(const _Args&... args) const
+	{ (void)sizeof...(args); }
 };
 
 void tuple_compose_test()

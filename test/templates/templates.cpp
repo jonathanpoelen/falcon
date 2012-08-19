@@ -27,7 +27,7 @@ void templates_test()
 
 	STATIC_CHECK_VALUE(1, falcon::template_to_val<std::rank>::filter<int[]>);
 
-	CHECK_EQUAL_VALUE(6, falcon::template_binary<
+	CHECK_EQUAL_VALUE(6u, falcon::template_binary<
 		falcon::late_multiplies,
 		falcon::template_to_val<
 			std::rank

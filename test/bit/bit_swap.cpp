@@ -40,14 +40,14 @@ void bit_swap_test()
 			uint32_t l2;
 		};
 		Test i = {0x00000001,0x00000001};
-		CHECK_EQUAL_VALUE(0x00000001, i.l);
-		CHECK_EQUAL_VALUE(0x00000001, i.l2);
+		CHECK_EQUAL_VALUE(0x00000001u, i.l);
+		CHECK_EQUAL_VALUE(0x00000001u, i.l2);
 		falcon::bit_swap(i);
 		CHECK_EQUAL_VALUE(0x80000000, i.l);
 		CHECK_EQUAL_VALUE(0x80000000, i.l2);
 		falcon::bit_swap(i);
-		CHECK_EQUAL_VALUE(0x00000001, i.l);
-		CHECK_EQUAL_VALUE(0x00000001, i.l2);
+		CHECK_EQUAL_VALUE(0x00000001u, i.l);
+		CHECK_EQUAL_VALUE(0x00000001u, i.l2);
 	}
 }
 FALCON_TEST_TO_MAIN(bit_swap_test)

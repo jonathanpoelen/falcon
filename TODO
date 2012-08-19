@@ -111,3 +111,11 @@ trouver le moyen de construir un _T par l'intermediaire d'un objet (ex: tuple). 
 amélioré algorithm.hpp en y mettant en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractère jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
 
 dans les literaux, gerer l'overflow des nombres (on peut les passer en template au lieu de paramètre ?). Sinon via un tableau de char…
+
+singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _N>
+
+container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des condition à la compilation,
+
+les lambda toujours par reference ou il faut des fois utiliser std::ref ? Pas le cas pour while_loop et co...
+
+

@@ -17,8 +17,8 @@ void recursive_template_test()
 			remove_pointer
 		> remove_all_extents_wrapper;
 		CHECK_TYPE(int, remove_all_extents_wrapper::type_wrapper<int***>);
-		CHECK_EQUAL_VALUE(5, remove_all_extents_wrapper::value_wrapper<int***>::value);
-		CHECK_EQUAL_VALUE(4, remove_all_extents_wrapper::type_wrapper<int***>::depth);
+		CHECK_EQUAL_VALUE(5u, remove_all_extents_wrapper::value_wrapper<int***>::value);
+		CHECK_EQUAL_VALUE(4u, remove_all_extents_wrapper::type_wrapper<int***>::depth);
 	}
 	{
 		typedef falcon::recursive_template<
@@ -27,8 +27,8 @@ void recursive_template_test()
 			2
 		> remove_all_extents_wrapper;
 		CHECK_TYPE(int*, remove_all_extents_wrapper::type_wrapper<int***>);
-		CHECK_EQUAL_VALUE(5, remove_all_extents_wrapper::value_wrapper<int***>::value);
-		CHECK_EQUAL_VALUE(2, remove_all_extents_wrapper::type_wrapper<int***>::depth);
+		CHECK_EQUAL_VALUE(5u, remove_all_extents_wrapper::value_wrapper<int***>::value);
+		CHECK_EQUAL_VALUE(2u, remove_all_extents_wrapper::type_wrapper<int***>::depth);
 	}
 	/*{
 		//NOTE force assertion error

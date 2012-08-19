@@ -58,24 +58,48 @@
 
 // static constexpr int f(){return 0;}
 
-#include <falcon/iterator/not_iterator.hpp>
-#include <falcon/functional/operators.hpp>
-#include <falcon/functional/compose.hpp>
+#include <falcon/lambda/loops.hpp>
 
 int main()
 {
-	typedef falcon::iterator::not_iterator<int> iterator;
-	typedef falcon::increment<int> unary1;
-	typedef falcon::pointer<iterator> unary2;
-	typedef falcon::unary_compose<unary1, unary2> unary3;
+	using namespace falcon::lambda;
+	using namespace placeholders;
 
-	iterator it(2);
-
-	std::cout << "*it: " << *it << '\n';
-	std::cout << "*it: " << unary2()(it) << '\n';
-	std::cout << "*it: " << unary1()(*it) << '\n';
-	std::cout << "*it: " << unary1()(unary2()(it)) << '\n';
-	std::cout << "*it: " << unary3()(it) << '\n';
+	{
+		//Fibonacci
+		auto f = while_loop(
+			--_1 > 0,
+			(_2 = _3 + _4,
+			_3 = _4,
+			_4 = _2)
+		);
+		int n = 10, a = 0, b = 1, tmp;
+		f(int(n), tmp, a, b);
+		std::cout << n << ' ' << a << ' ' << b << '\n';
+	}
+	{
+		//Fibonacci
+		auto f = for_loop(
+			lambda(10),
+			_1 > 0,
+			(_2 = _3 + _4,
+			_3 = _4,
+			_4 = _2),
+			--_1
+		);
+		int n = 10, a = 0, b = 1, tmp;
+		f(tmp, a, b);
+		std::cout << n << ' ' << a << ' ' << b << '\n';
+	}
+	{
+		auto p = lambda(std::cout) << _1;
+		p(56) << std::endl;
+		auto p2 = lambda(std::cout) << std::endl;
+		p2(56);
+		auto p3 = lambda(std::cout) << _1 << std::endl;
+		p3(56);
+// 		_Endl() << std::endl;
+	}
 
 // 	const int i = 6;
 // 	auto f = falcon::compose<>(A(), A(), A(), A());

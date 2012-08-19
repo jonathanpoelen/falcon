@@ -39,9 +39,9 @@ void flag_test()
 		falcon::flag32 flag(0xff);
 		flag += 0xff00;
 		flag -= 0x0001L;
-		CHECK_EQUAL_VALUE(flag.get(), 0xfffe);
+		CHECK_EQUAL_VALUE(flag.get(), 0xfffeu);
 		flag <<= 4;
-		CHECK_EQUAL_VALUE(flag.get(), 0xfffe0);
+		CHECK_EQUAL_VALUE(flag.get(), 0xfffe0u);
 	}
 	{
 		falcon::flag128 flag = falcon::flag128::full();
@@ -57,7 +57,7 @@ void flag_test()
 
 		flag <<= 100;
 		CHECK_EQUAL_VALUE(falcon::flag64::full() << 40, falcon::flag64(flag[0]));
-		CHECK_EQUAL_VALUE(0, flag[1]);
+		CHECK_EQUAL_VALUE(0u, flag[1]);
 
 		flag = falcon::flag128::full();
 
@@ -85,9 +85,9 @@ void flag_test()
 
 		flag <<= 200;
 		CHECK_EQUAL_VALUE(falcon::flag64::full() << (204%64), falcon::flag64(flag[0]));
-		CHECK_EQUAL_VALUE(0, flag[1]);
-		CHECK_EQUAL_VALUE(0, flag[2]);
-		CHECK_EQUAL_VALUE(0, flag[3]);
+		CHECK_EQUAL_VALUE(0u, flag[1]);
+		CHECK_EQUAL_VALUE(0u, flag[2]);
+		CHECK_EQUAL_VALUE(0u, flag[3]);
 
 		flag = falcon::flag256::full();
 
