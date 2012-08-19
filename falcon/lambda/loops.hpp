@@ -53,19 +53,19 @@ struct do_whileloop
 };
 
 template<typename _Init, typename _Functor, typename _End, typename _State>
-inline ___lambda<operators::binder, forloop<_Init, _Functor, _End, _State> > for_loop(_Init init, _Functor condition, _End endf, _State f)
+inline ___lambda<operators::binder, forloop<_Init, _Functor, _End, _State>, void> for_loop(_Init init, _Functor condition, _End endf, _State f)
 {
 	return {{init, condition, endf, f}};
 }
 
 template<typename _Functor, typename _State>
-inline ___lambda<operators::binder, whileloop<_Functor, _State> > while_loop(_Functor condition, _State f)
+inline ___lambda<operators::binder, whileloop<_Functor, _State>, void> while_loop(_Functor condition, _State f)
 {
 	return {{condition, f}};
 }
 
 template<typename _Functor, typename _State>
-inline ___lambda<operators::binder, do_whileloop<_Functor, _State> > do_while_loop(_Functor condition, _State f)
+inline ___lambda<operators::binder, do_whileloop<_Functor, _State>, void> do_while_loop(_Functor condition, _State f)
 {
 	return {{condition, f}};
 }
