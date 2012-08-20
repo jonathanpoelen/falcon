@@ -110,7 +110,7 @@ int main()
 // 	f(5, ' ', 55);
 
 // 	const auto t = std::make_tuple<>(5, ' ', 55);
-// 	falcon::tuple_call<const falcon::basic_ostream_functor<char>&>
+// 	falcon::tuple_apply<const falcon::basic_ostream_functor<char>&>
 // 	(falcon::parameter_index<0,1,2>(), f, t);
 
 

@@ -2,7 +2,7 @@
 #define FALCON_RANGE_RANGE_HPP
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-# include <falcon/tuple/tuple_call.hpp>
+# include <falcon/tuple/tuple_apply.hpp>
 # include <falcon/utility/maker.hpp>
 #endif
 #include <utility> //std::swap, std::pair
@@ -100,8 +100,8 @@ struct range
 
 	template<class... _Args1, class... _Args2>
 	constexpr range(std::piecewise_construct_t, std::tuple<_Args1...> __left, std::tuple<_Args2...> __right)
-	: left(tuple_call(__right, maker<_T>()))
-	, right(tuple_call(__left, maker<_T>()))
+	: left(tuple_apply(__right, maker<_T>()))
+	, right(tuple_apply(__left, maker<_T>()))
 	{}
 
 	range<_T>& operator=(range<_T>&& __r)

@@ -77,8 +77,6 @@ ostream::repetition(_Obj, size_t) et ostream::repetition(_Obj, size_t, _CharT se
 
 si on active les exceptions des flux, comment ce comporte les fonctions lié (ignore, ignore_all, etc) ? Le state est bien setter à badbit et non égal à good.
 
-les lambda doivent pouvoir supporter le manipulateur de flux sans explicitement utiliser resolve_manipulator… (lambda(std::cout) << resolve_manipulator(std::endl))
-
 proxy_iterator: le _IsRef doit etre a l'interieur de la classe et non dans son template
 
 infinite: begin, end => min, max. Revoir comment est faite la classe est ces enfants.
@@ -118,4 +116,4 @@ container trier de façon static. version map et set et unordered. Faire un stat
 
 les lambda toujours par reference ou il faut des fois utiliser std::ref ? Pas le cas pour while_loop et co...
 
-
+pb avec le decalage de bit de flag

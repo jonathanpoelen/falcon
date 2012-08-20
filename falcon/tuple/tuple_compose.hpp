@@ -2,7 +2,7 @@
 #define _FALCON_TUPLE_TUPLE_COMPOSE_HPP
 
 #include <tuple>
-#include <falcon/tuple/tuple_call.hpp>
+#include <falcon/tuple/tuple_apply.hpp>
 #include <falcon/type_traits/cv_selector.hpp>
 #include <falcon/c++0x/syntax.hpp>
 
@@ -32,7 +32,7 @@ struct __tuple_compose
 		typedef typename __impl:: template _Result_type<
 			_Args...,
 			decltype(
-				tuple_call<__func_type&>(_Indexes(),
+				tuple_apply<__func_type&>(_Indexes(),
 										 std::declval<__func_type&>(), std::declval<_TupleArgs&>()
 										)
 					)
@@ -48,7 +48,7 @@ struct __tuple_compose
 	{
 		return __impl::__call(__func, __t, __targs,
 							  std::forward<_Args>(__args)...,
-							  tuple_call<__func_type&>(_Indexes(),
+							  tuple_apply<__func_type&>(_Indexes(),
 													   std::get<_I>(__t),
 													   __targs));
 	}
