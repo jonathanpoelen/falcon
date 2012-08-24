@@ -18,9 +18,9 @@ struct caller_partial_recursive_param_loop_tag {};
 
 
 /**
- * \brief Functor for used \link call-arguments call and call_*\endlink
+ * \brief Functor for used \link call-arguments \p call(), \p call_partial_param_loop() and \p call_partial_recursive_param_loop() \endlink
  *
- * Tag are \p caller_partial_param_loop_tag for used call_partial_param_loop(), \p caller_partial_recursive_param_loop_tag for used \p call_partial_recursive_param_loop(), each tag of \link indexes-tag indexes-tag \endlink and \p parameter_index
+ * Tag is \p caller_partial_param_loop_tag for used \p call_partial_param_loop(), \p caller_partial_recursive_param_loop_tag for used \p call_partial_recursive_param_loop(), each tag of \link indexes-tag indexes-tag \endlink or \p parameter_index
  * @{
  */
 template <typename _Functor, typename _Tag = full_parameter_index_tag>

@@ -84,7 +84,9 @@ struct __tuple_compose<_N, _N, _Function, _Tuple, _TupleArgs, _Indexes>
  * \param targs tuple arguments for each element of @p t
  *
  * \code
- * int answer = (tuple_compose(parameter_index<0,2>, f,g1,g2,g3))(x,y,z);
+ * int answer = (tuple_compose(parameter_index<0,2>(),
+ *                             f, std::forward_as_tuple(g1,g2,g3),
+ *                             std::forward_as_tuple(x,y,z));
  * \endcode
  * is equivalent to
  * \code

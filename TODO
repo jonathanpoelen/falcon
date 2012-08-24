@@ -25,7 +25,9 @@ Faire une bit_reference.
 
 un objet de rangement de bit, genre 2 bit puis 3 etc…
 
-flag.hpp: doit possèder un constructeur avec avec initializer_list. flag_position qui s'occupe de faire un décalage de bits
+flag.hpp: doit possèder un constructeur avec avec initializer_list. flag_position qui s'occupe de faire un décalage de bits. Ou un int ?
+
+flag<>::operator[int]:bit_wrapper<_T>{_T*}
 
 utilisé <iosfwd> dans ostream, flag et autre si besoin.
 
@@ -117,3 +119,26 @@ container trier de façon static. version map et set et unordered. Faire un stat
 les lambda toujours par reference ou il faut des fois utiliser std::ref ? Pas le cas pour while_loop et co...
 
 pb avec le decalage de bit de flag
+
+foncteur pour utilisé tuple_apply. Utilise indexes-tag pour définir le parameter_index<...> (tuple_applier<_Functor, _Tag = full_parameter_index_tag> ?).
+
+faire un make_caller() et un make_tuple_applier().
+
+temporary_tuple_cat
+
+mettre pour les fonction dans tuple/ l'attribut parameter_index<> en premier.
+
+tuple_organizer<_Tag, bool no_tuple_parameter_is_tuple = true> pour faire une agglomération de tuple et filtrer les éléments non voulut. tuple_organizer<_Functor, _Tag> avec _Tag parameter-tag, parameter_index<> ou wrapper avec organizer_for_each_tag (ex organizer_for_each_tag<_Tag>) qui va s'appliquer indépendament sur chaque tuple. Passer par un traits pour faire appliquer ces tags: organizer_tag_to_parameter_index<_Tag, _Tuples>::type
+
+les tuple_* doivent fonctionner avec std::pair<>
+
+unary_compose et binary_compose doivent pouvoir deviné le type des fonctions
+
+faire en sorte que mulary_compose passe par héritage au lieu de tuple. Le bool passé en template ne doit pas existé autrement qu'en interne.
+mulary_compose doit hériter et compose retourner unary_compose ou binary_compose quand cela est possible.
+
+unary_compose, binary_compose et mulary_compose supporte falcon::ignore quand on les construits
+
+faire un function_compose<...> (+ fonction composef()) comme mulary_compose mais prend un nombre de paramètre allant de 0 à infinit.
+
+
