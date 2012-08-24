@@ -466,7 +466,7 @@ public:
 
 template<class _Operation, class... _Operations>
 constexpr inline mulary_compose<_Operation, std::tuple<_Operations...>>
-compose(_Operation&& __fn1, _Operations&&... __fns)
+composex(_Operation&& __fn1, _Operations&&... __fns)
 {
 	return {
 		std::forward<_Operation>(__fn1),
@@ -476,7 +476,7 @@ compose(_Operation&& __fn1, _Operations&&... __fns)
 
 template<class _Operation, class... _Operations>
 constexpr inline mulary_compose<_Operation, std::tuple<_Operations...>>
-compose(_Operation&& __fn1, std::tuple<_Operations...>&& __fns)
+composxe(_Operation&& __fn1, std::tuple<_Operations...>&& __fns)
 {
 	return {
 		std::forward<_Operation>(__fn1),
@@ -486,7 +486,7 @@ compose(_Operation&& __fn1, std::tuple<_Operations...>&& __fns)
 
 template<class _Operation, class... _Operations>
 constexpr inline mulary_compose<_Operation, std::tuple<_Operations...>>
-compose(_Operation&& __fn1, std::tuple<_Operations&&...> __fns)
+composex(_Operation&& __fn1, std::tuple<_Operations&&...> __fns)
 {
 	return {
 		std::forward<_Operation>(__fn1),
