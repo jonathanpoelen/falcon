@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 #include <falcon/functional/call_partial_param_loop.hpp>
-#include <falcon/functional/placeholder_functor.hpp>
+#include <falcon/functional/placeholder_for_argument.hpp>
 #include <falcon/functional/operators.hpp>
 
 namespace falcon {
@@ -16,7 +16,7 @@ template<typename _CharT, typename _Traits, typename... _Args>
 std::basic_ostream<_CharT, _Traits>& put(std::basic_ostream<_CharT, _Traits>& os, const _Args&... args)
 {
 	return call_partial_param_loop<1>(
-		placeholder_functor<
+		placeholder_for_argument<
 			0,
 			left_shift<
 				std::basic_ostream<_CharT, _Traits>&,
@@ -32,7 +32,7 @@ template<typename _CharT, typename _Traits, typename... _Args>
 std::basic_istream<_CharT, _Traits>& get(std::basic_istream<_CharT, _Traits>& is, _Args&... args)
 {
 	return call_partial_param_loop<1>(
-		placeholder_functor<
+		placeholder_for_argument<
 			0,
 			right_shift<
 				std::basic_istream<_CharT, _Traits>&,

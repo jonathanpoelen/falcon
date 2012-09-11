@@ -4,7 +4,7 @@
 #include <falcon/iterator/not_iterator.hpp>
 #include <falcon/iterator/nexter_iterator.hpp>
 #include <falcon/functional/operators.hpp>
-#include <falcon/functional/placeholder_functor.hpp>
+#include <falcon/functional/placeholder_for_argument.hpp>
 #include <falcon/range/range.hpp>
 
 namespace falcon {
@@ -20,7 +20,7 @@ struct __crange_traits
 
 	typedef falcon::iterator::nexter_iterator<
 		__iterator_base,
-		falcon::placeholder_functor<
+		falcon::placeholder_for_argument<
 			1,
 			falcon::plus_equal<__iterator_base, unsigned>,
 			unsigned

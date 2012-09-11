@@ -1,6 +1,6 @@
 #ifndef _FALCON_TEST_FUNCTIONAL_PLACEHOLDER_FUNCTOR_HPP
 #define _FALCON_TEST_FUNCTIONAL_PLACEHOLDER_FUNCTOR_HPP
 
-void placeholder_functor_test();
+void placeholder_for_argument_test();
 
 #endif

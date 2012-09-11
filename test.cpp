@@ -3,7 +3,7 @@
 // #include <falcon/algorithm.hpp>
 // #include <falcon/iostream/iostream.hpp>
 // #include <falcon/functional/call_inserted_param.hpp>
-// #include <falcon/functional/placeholder_functor.hpp>
+// #include <falcon/functional/placeholder_for_argument.hpp>
 // #include <falcon/functional/caller.hpp>
 // #include <falcon/utility/to_cref.hpp>
 //
@@ -39,7 +39,6 @@
 // 	int f(){return n;}
 // };
 
-// #include <falcon/functional/compose.hpp>
 // #include <falcon/functional/operators.hpp>
 //
 // struct A
@@ -58,49 +57,28 @@
 
 // static constexpr int f(){return 0;}
 
-#include <falcon/lambda/loops.hpp>
+// #include <falcon/functional/compose.hpp>
+#include <falcon/functional/placeholder_for_argument.hpp>
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <map>
+#include <random>
 
 int main()
 {
-	using namespace falcon::lambda;
-	using namespace placeholders;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	// perform 4 trials, each succeeds 1 in 2 times
+	std::binomial_distribution<> d(4, 0.5);
 
-	{
-		//Fibonacci
-		auto f = while_loop(
-			--_1 > 0,
-			(_2 = _3 + _4,
-			_3 = _4,
-			_4 = _2)
-		);
-		int n = 10, a = 0, b = 1, tmp;
-		f(int(n), tmp, a, b);
-		std::cout << n << ' ' << a << ' ' << b << '\n';
-	}
-	{
-		//Fibonacci
-		auto f = for_loop(
-			lambda(10),
-			_1 > 0,
-			(_2 = _3 + _4,
-			_3 = _4,
-			_4 = _2),
-			--_1
-		);
-		int n = 10, a = 0, b = 1, tmp;
-		f(tmp, a, b);
-		std::cout << n << ' ' << a << ' ' << b << '\n';
-	}
-	{
-		auto p = lambda(std::cout) << _1;
-		p(56) << std::endl;
-		auto p2 = lambda(std::cout) << std::endl;
-		p2(56);
-		auto p3 = lambda(std::cout) << _1 << std::endl;
-		p3(56);
-// 		_Endl() << std::endl;
-	}
+	falcon::placeholder_for_argument<0, std::binomial_distribution<>&, std::mt19937&> r(gen, d);
 
+	std::map<int, int> hist;
+	for(int n=0; n<10000; ++n)
+		++hist[r()];
+	for(auto p : hist)
+		std::cout << p.first << ' ' << std::string(p.second/100, '*') << '\n';
 // 	const int i = 6;
 // 	auto f = falcon::compose<>(A(), A(), A(), A());
 // 	std::cout << "f: " << f(i) << '\n';
@@ -123,12 +101,12 @@ int main()
 // 	snew.destroy();
 
 // 	{
-// 		falcon::caller<Out, char, falcon::placeholder_functor<1,Out,char>> f('<');
+// 		falcon::caller<Out, char, falcon::placeholder_for_argument<1,Out,char>> f('<');
 // 		f(0,0);
 // 	}
 // 	{
 // 		int a[] = {0, 1, 2, 3, 4, 2, 5, 6, 7, 8, 9, 10};
-// 		typedef falcon::placeholder_functor<3, std::greater<int>, int> functor_type;
+// 		typedef falcon::placeholder_for_argument<3, std::greater<int>, int> functor_type;
 // 		functor_type func(3);
 // 		std::cout
 // 		<< *falcon::find_if(a, falcon::short_circuit<functor_type&>(4, func)) << '\n'

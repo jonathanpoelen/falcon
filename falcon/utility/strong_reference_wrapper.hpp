@@ -56,6 +56,37 @@ public:
 	}
 };
 
+
+/// Denotes a reference should be taken to a variable.
+template<typename _Tp>
+inline strong_reference_wrapper<_Tp>
+sref(_Tp& __t)
+{ return strong_reference_wrapper<_Tp>(__t); }
+
+/// Denotes a const reference should be taken to a variable.
+template<typename _Tp>
+inline strong_reference_wrapper<const _Tp>
+csref(const _Tp& __t)
+{ return strong_reference_wrapper<const _Tp>(__t); }
+
+template<typename _Tp>
+void sref(const _Tp&&) = delete;
+
+template<typename _Tp>
+void csref(const _Tp&&) = delete;
+
+/// Partial specialization.
+template<typename _Tp>
+inline strong_reference_wrapper<_Tp>
+sref(strong_reference_wrapper<_Tp> __t)
+{ return sref(__t.get()); }
+
+/// Partial specialization.
+template<typename _Tp>
+inline strong_reference_wrapper<const _Tp>
+csref(strong_reference_wrapper<_Tp> __t)
+{ return csref(__t.get()); }
+
 }
 
 #endif

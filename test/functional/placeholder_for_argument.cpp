@@ -1,5 +1,5 @@
 #include <functional>
-#include <falcon/functional/placeholder_functor.hpp>
+#include <falcon/functional/placeholder_for_argument.hpp>
 #include <falcon/utility/to_cref.hpp>
 #include <falcon/iostream/iostream.hpp>
 #include <test/test.hpp>

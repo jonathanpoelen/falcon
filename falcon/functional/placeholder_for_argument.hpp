@@ -1,5 +1,5 @@
-#ifndef _FALCON_FUNCTIONAL_PLACEHOLDER_FUNCTOR_HPP
-#define _FALCON_FUNCTIONAL_PLACEHOLDER_FUNCTOR_HPP
+#ifndef _FALCON_FUNCTIONAL_PLACEHOLDER_FOR_ARGUMENT_HPP
+#define _FALCON_FUNCTIONAL_PLACEHOLDER_FOR_ARGUMENT_HPP
 
 #include <utility>
 #include <falcon/functional/call.hpp>
@@ -9,41 +9,39 @@
 
 namespace falcon {
 
-template <int _LeftPosition, typename _Functor, typename _T>
-struct placeholder_functor
+template <int _Position, typename _Functor, typename _T>
+struct placeholder_for_argument
 {
 	typedef _Functor functor_type;
 	typedef _T first_type;
 
-	static const int position = _LeftPosition;
+	static const int position = _Position;
 
 private:
 	_T _M_data;
 	_Functor _M_functor;
 
-	typedef const _Functor const_functor_type;
-
 public:
-	constexpr placeholder_functor() = default;
+	constexpr placeholder_for_argument() = default;
 
-	constexpr placeholder_functor(typename add_const_reference<_T>::type __data)
+	constexpr placeholder_for_argument(typename add_const_reference<_T>::type __data)
 	: _M_data(__data)
 	, _M_functor()
 	{}
 
-	constexpr placeholder_functor(typename add_const_reference<_T>::type __data, _Functor func)
+	constexpr placeholder_for_argument(typename add_const_reference<_T>::type __data, _Functor func)
 	: _M_data(__data)
 	, _M_functor(func)
 	{}
 
 	template<typename... _Args>
-	constexpr placeholder_functor(typename add_const_reference<_T>::type __data, _Args&&... args)
+	constexpr placeholder_for_argument(typename add_const_reference<_T>::type __data, _Args&&... args)
 	: _M_data(__data)
 	, FALCON_PP_NOT_IDE_PARSER(_M_functor{std::forward<_Args>(args)...})
 	{}
 
 	template<typename... _Args,
-		std::size_t _CutPosition = (sizeof...(_Args) < _LeftPosition ? sizeof...(_Args) : _LeftPosition) + 1,
+		std::size_t _CutPosition = (sizeof...(_Args) < _Position ? sizeof...(_Args) : _Position) + 1,
 		typename _Indexes = typename parameter_index_cat<
 			typename build_range_parameter_index<1, _CutPosition>::type,
 			parameter_index<0>,
@@ -51,7 +49,7 @@ public:
 		>::type
 	>
 	constexpr typename parameter::result_pack_of<
-		const_functor_type,
+		const _Functor&,
 		typename parameter::pack_element<
 			parameter_pack<const _T&, _Args&&...>,
 			_Indexes
@@ -63,7 +61,7 @@ public:
 	}
 
 	template<typename... _Args,
-		std::size_t _CutPosition = (sizeof...(_Args) < _LeftPosition ? sizeof...(_Args) : _LeftPosition) + 1,
+		std::size_t _CutPosition = (sizeof...(_Args) < _Position ? sizeof...(_Args) : _Position) + 1,
 		typename _Indexes = typename parameter_index_cat<
 			typename build_range_parameter_index<1, _CutPosition>::type,
 			parameter_index<0>,
@@ -71,7 +69,7 @@ public:
 		>::type
 	>
 	typename parameter::result_pack_of<
-		_Functor,
+		_Functor&,
 		typename parameter::pack_element<
 			parameter_pack<_T&, _Args&&...>,
 			_Indexes
@@ -92,19 +90,27 @@ public:
 	constexpr const first_type& data() const
 	{ return _M_data; }
 
-	void swap(placeholder_functor& other)
+	void swap(placeholder_for_argument& other)
 	{
 		std::swap(other._M_data, _M_data);
 		std::swap(other._M_functor, _M_functor);
 	}
 };
 
+template<std::size_t _Position, typename _Functor, typename _T>
+placeholder_for_argument<_Position, _Functor, _T> bound_argument(_Functor&& func, _T&& arg)
+{
+	return placeholder_for_argument<_Position, _Functor, _T>(
+		std::forward<_Functor>(func), std::forward<_T>(arg)
+	);
+}
+
 }
 
 namespace std {
 
-template <int _LeftPosition, typename _Functor, typename _T>
-void swap(falcon::placeholder_functor<_LeftPosition, _Functor, _T>& a, falcon::placeholder_functor<_LeftPosition, _Functor, _T>& b)
+template <int _Position, typename _Functor, typename _T>
+void swap(falcon::placeholder_for_argument<_Position, _Functor, _T>& a, falcon::placeholder_for_argument<_Position, _Functor, _T>& b)
 { a.swap(b); }
 
 }

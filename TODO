@@ -25,7 +25,10 @@ Faire une bit_reference.
 
 un objet de rangement de bit, genre 2 bit puis 3 etc…
 
-flag.hpp: doit possèder un constructeur avec avec initializer_list. flag_position qui s'occupe de faire un décalage de bits. Ou un int ?
+flag.hpp: doit possèder un constructeur avec avec initializer_list.
+flag<>::operator[n] : bit_flag<> ?
+flag_position qui s'occupe de faire un décalage de bits. Ou un int ? bit_wrapper<_T>{_T*}
+
 
 flag<>::operator[int]:bit_wrapper<_T>{_T*}
 
@@ -60,8 +63,6 @@ refaire les fonctions de bits/ostream_insert.h ? deja mi dans ostream/ostream_in
 finaliser les tests pour enumeration.cpp. Mettre a jour la doc de enum/enumerator.hpp et y extraire NOTE et TODO
 
 revoir btree et btree_base et réactiver les tests
-
-ostream::join gérer la taille de plusieurs colonne via un intermediaire. (ex avec std::cout.width(5): join(std::cout, {0,1,2}) -> "    0,1,2", join(std::cout << intermediaire, {0,1,2}) -> "    0,    1,    2"). L'objet intermediaire est un objet à part resetant les valeurs width, fill, left, right, etc quand modifier ?
 
 dans container_wrapper.hpp, ajouter des fonctions comme reverse_container, const_container, etc.
 
@@ -141,4 +142,12 @@ unary_compose, binary_compose et mulary_compose supporte falcon::ignore quand on
 
 faire un function_compose<...> (+ fonction composef()) comme mulary_compose mais prend un nombre de paramètre allant de 0 à infinit.
 
+dans enumerator faire une allocation de la chaîne en tant que expression constante (déjà fait ?)
 
+tester les compose() avec les distribution (voir random_device ? (exemple dans cppreference.com avec les distrtibutions))
+
+renommer placeholder_functor en placeholder_for_argument ?
+
+les compose() devrais pouvoir fonctionenr avec les références (pas le cas actuellement). Fonctionne avec std::ref() sans perte de perf (même binaire) ?
+
+strong_reference_wrapper::operator()const : mettre un const _T& dans le temaplte de result_of ? faire des tests
