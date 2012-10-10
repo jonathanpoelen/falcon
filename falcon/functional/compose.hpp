@@ -127,24 +127,9 @@ public:
 
 	constexpr unary_compose() = default;
 
-	constexpr unary_compose(_Operation1&& __x, const _Operation2& __y)
-	: _M_fn1(std::forward<_Operation1>(__x))
-	, _M_fn2(__y)
-	{}
-
-	constexpr unary_compose(const _Operation1& __x, _Operation2&& __y)
-	: _M_fn1(__x)
-	, _M_fn2(std::forward<_Operation2>(__y))
-	{}
-
-	constexpr unary_compose(_Operation1&& __x, _Operation2&& __y)
-	: _M_fn1(std::forward<_Operation1>(__x))
-	, _M_fn2(std::forward<_Operation2>(__y))
-	{}
-
 	template<typename _T>
-	constexpr typename std::result_of<const _Operation1&(
-		typename std::result_of<const _Operation2&(_T&)>::type
+	constexpr typename std::result_of<_Operation1&(
+		typename std::result_of<_Operation2&(_T&)>::type
 	)>::type operator()(_T& __x) const
 	{ return _M_fn1(_M_fn2(__x)); }
 
@@ -272,13 +257,6 @@ public:
 	{}
 
 	constexpr binary_compose() = default;
-
-	constexpr binary_compose(_Operation1&& __x, _Operation2&& __y,
-							 _Operation3&& __z)
-	: _M_fn1(std::forward<_Operation1>(__x))
-	, _M_fn2(std::forward<_Operation2>(__y))
-	, _M_fn3(std::forward<_Operation2>(__z))
-	{}
 
 	template<typename _T>
 	constexpr typename std::result_of<const _Operation1&(

@@ -5,21 +5,6 @@
 // #include <falcon/functional/call_inserted_param.hpp>
 // #include <falcon/functional/placeholder_for_argument.hpp>
 // #include <falcon/functional/caller.hpp>
-// #include <falcon/utility/to_cref.hpp>
-//
-// struct Out
-// {
-// 	template<typename... _Args>
-// 	void operator()(const _Args&... args)
-// 	{
-// 		falcon::print(args...) << '\n';
-// 	}
-// 	template<typename... _Args>
-// 	void operator()(const _Args&... args) const
-// 	{
-// 		falcon::print(args...) << " const\n";
-// 	}
-// };
 
 // #include <falcon/memory/construct.hpp>
 // #include <array>
@@ -57,8 +42,9 @@
 
 // static constexpr int f(){return 0;}
 
-// #include <falcon/functional/compose.hpp>
+#include <falcon/functional/compose.hpp>
 #include <falcon/functional/placeholder_for_argument.hpp>
+#include <falcon/functional/operators.hpp>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -72,11 +58,20 @@ int main()
 	// perform 4 trials, each succeeds 1 in 2 times
 	std::binomial_distribution<> d(4, 0.5);
 
-	falcon::placeholder_for_argument<0, std::binomial_distribution<>&, std::mt19937&> r(gen, d);
+// 	falcon::placeholder_for_argument<0, std::binomial_distribution<>&, std::mt19937&> r(gen, d);
 
 	std::map<int, int> hist;
+	falcon::placeholder_for_argument<0, falcon::late_index, std::map<int, int>&> a(hist);
+
+	///TODO error if references
+	///TODO error if false is not passing
+	falcon::unary_compose<decltype((a)), std::binomial_distribution<>&, false> a2(a, d);
+	falcon::unary_compose<falcon::late_increment, decltype(a2), false> a3(falcon::late_increment(), a2);
+
+	falcon::placeholder_for_argument<0, decltype((a3)), std::mt19937&> f(gen, a3);
+
 	for(int n=0; n<10000; ++n)
-		++hist[r()];
+		f();
 	for(auto p : hist)
 		std::cout << p.first << ' ' << std::string(p.second/100, '*') << '\n';
 // 	const int i = 6;
@@ -99,19 +94,6 @@ int main()
 // 	std::cout << snew.get()[1] << '\n';
 
 // 	snew.destroy();
-
-// 	{
-// 		falcon::caller<Out, char, falcon::placeholder_for_argument<1,Out,char>> f('<');
-// 		f(0,0);
-// 	}
-// 	{
-// 		int a[] = {0, 1, 2, 3, 4, 2, 5, 6, 7, 8, 9, 10};
-// 		typedef falcon::placeholder_for_argument<3, std::greater<int>, int> functor_type;
-// 		functor_type func(3);
-// 		std::cout
-// 		<< *falcon::find_if(a, falcon::short_circuit<functor_type&>(4, func)) << '\n'
-// 		<< *falcon::find_if(a, std::ref(func)) << '\n';
-// 	}
 
 	return 0;
 }
