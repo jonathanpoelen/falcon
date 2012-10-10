@@ -23,7 +23,7 @@
 #include <falcon/functional/compose.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/enum/operators.hpp>
-#include <falcon/container/container_wrapper.hpp>
+#include <falcon/container/static_container_wrapper.hpp>
 
 /**
  * struct Enumerator

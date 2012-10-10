@@ -162,4 +162,3 @@ ajouter les fonctions base() si inexistante et des fonctions fn() pour celles ut
 unreliable_pointer_cast -> reinterpret_cast
 
 
-

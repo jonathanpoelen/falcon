@@ -85,7 +85,7 @@
 	CPP0X_DELEGATE_FUNCTION(_Name(std::initializer_list<_InitializerT> initializer __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(initializer.begin(), initializer.end() __FALCON_ALGORITHM_##VAR##_VAR))\
 	\
 	template<typename _Container, typename _Traits __FALCON_ALGORITHM_PARTIAL_TEMPLATE(TEMPLATE)>\
-	CPP0X_DELEGATE_FUNCTION(_Name(container_wrapper<_Container, _Traits> cont __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(cont.begin(), cont.end() __FALCON_ALGORITHM_##VAR##_VAR))
+	CPP0X_DELEGATE_FUNCTION(_Name(container_wrapper<_Container, _Traits>&& cont __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(cont.begin(), cont.end() __FALCON_ALGORITHM_##VAR##_VAR))
 
 #define __FALCON_ALGORITHM_NOT_CLASS_IS_CALL_POSSIBLE(_Name, TEMPLATE, ARG, VAR)\
 	__FALCON_ALGORITHM_DELEGATE(_Name, TEMPLATE, ARG, VAR)\
