@@ -26,13 +26,12 @@ struct __inherit_from<const _T, _Inherit>
  */
 template<typename _T, typename _Inherit>
 struct inherit_from
-: private __inherit_from<_T, _Inherit>
 {
 	static const bool value = is_yes_type<
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-		decltype(__test(std::declval<_T&>()))
+		decltype(__inherit_from<_T, _Inherit>::__test(std::declval<_T&>()))
 #else
-		typeof(__test(*static_cast<_T*>(static_cast<void*>(0))))
+		typeof(__inherit_from<_T, _Inherit>::__test(*static_cast<_T*>(static_cast<void*>(0))))
 #endif
 	>::value;
 };
