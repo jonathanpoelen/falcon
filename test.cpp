@@ -63,10 +63,9 @@ int main()
 	std::map<int, int> hist;
 	falcon::placeholder_for_argument<0, falcon::late_index, std::map<int, int>&> a(hist);
 
-	///TODO error if references
 	///TODO error if false is not passing
 	falcon::unary_compose<decltype((a)), std::binomial_distribution<>&, false> a2(a, d);
-	falcon::unary_compose<falcon::late_increment, decltype(a2), false> a3(falcon::late_increment(), a2);
+	falcon::unary_compose<falcon::late_increment, decltype((a2)), false> a3(falcon::late_increment(), a2);
 
 	falcon::placeholder_for_argument<0, decltype((a3)), std::mt19937&> f(gen, a3);
 

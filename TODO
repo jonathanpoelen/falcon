@@ -161,4 +161,8 @@ ajouter les fonctions base() si inexistante et des fonctions fn() pour celles ut
 
 unreliable_pointer_cast -> reinterpret_cast
 
+ostream/join.hpp est devenu trop complexe, simplifier !
+
+inherit_from<> -> is_instance_of<> : an instantiation of a B, or A derives from an instantiation of B
+
 

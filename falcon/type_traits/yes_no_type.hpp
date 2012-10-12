@@ -2,10 +2,9 @@
 #define FALCON_TYPE_TRAITS_YES_NO_TYPE_HPP
 
 namespace falcon {
+
 typedef char yes_type;
-typedef struct {
-	char a[2];
-} no_type;
+typedef struct { char a[2]; } no_type;
 
 template <bool>
 struct bool_to_yes_no_type

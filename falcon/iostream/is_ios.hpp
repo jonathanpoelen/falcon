@@ -2,7 +2,7 @@
 #define _FALCON_IOSTREAM_IS_IOS_HPP
 
 #include <iosfwd>
-#include <falcon/type_traits/inherit_from.hpp>
+#include <falcon/type_traits/is_instance_of.hpp>
 #include <falcon/helper/has_char_type.hpp>
 #include <falcon/helper/has_traits_type.hpp>
 #include <falcon/helper/has_allocator_type.hpp>
@@ -23,7 +23,7 @@ class __is_ios
 
 	template<typename _Stream>
 	struct __is_ios_impl<_Stream, true>
-	: inherit_from<_T, _StreamConvert<
+	: is_instance_of<_T, _StreamConvert<
 		typename _Stream::char_type,
 		typename _Stream::traits_type
 	> >
@@ -49,7 +49,7 @@ class __is_iostrings
 
 	template<typename _Stream>
 	struct __is_iostrings_impl<_Stream, true>
-	: inherit_from<_T, _StringStreamConvert<
+	: is_instance_of<_T, _StringStreamConvert<
 		typename _Stream::char_type,
 		typename _Stream::traits_type,
 		typename _Stream::allocator_type

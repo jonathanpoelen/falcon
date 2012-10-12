@@ -9,16 +9,14 @@ namespace sfinae {
 template <typename U, U>
 struct helper;
 
-/*struct sfinae
-{
-	typedef yes_type yes;
-	typedef no_type no;
-
-	template <typename U, U>
-	struct helper;
-};*/
-
 }
+
+struct sfinae_type
+{
+	typedef yes_type one;
+	typedef no_type two;
+};
+
 }
 
 #endif
