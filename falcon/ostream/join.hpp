@@ -200,10 +200,14 @@ join_wrapper<_CharT, const _CharT*, _Container> join(const _Container& container
 template<typename _CharT, typename _Container, bool = is_ostream<_Container>::value>
 struct __dispatch_join
 {
-	typedef void __result_type;
-	static void __join(_Container& os, const _CharT& cont)
+	typedef std::basic_ostream<
+		typename _Container::char_type,
+		typename _Container::traits_type
+	> __ostream_type;
+	typedef __ostream_type& __result_type;
+	static __result_type __join(_Container& os, const _CharT& cont)
 	{
-		join(static_cast<std::basic_ostream<typename _Container::char_type, typename _Container::traits_type>&>(os), cont);
+		return join(static_cast<__result_type>(os), cont);
 	}
 };
 

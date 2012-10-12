@@ -10,6 +10,9 @@ void __join_test(_T& arr)
 	std::stringstream ss;
 	std::string s;
 
+	falcon::ostream::join<>(ss, arr) << std::endl;
+	s += "18,19,0,1\n";
+
 	ss.width(4);
 	falcon::ostream::join<>(ss, arr, ':') << std::endl;
 	s += "  18:  19:   0:   1\n";
