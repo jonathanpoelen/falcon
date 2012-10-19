@@ -9,7 +9,7 @@ template <typename _Tuple, std::size_t _N>
 struct tuple_get_accessor
 {
 	typedef typename std::tuple_element<_N, _Tuple>::type value_type;
-	static constexpr std::size_t position = _N;
+	static constexpr std::size_t index = _N;
 
 	value_type& operator()(_Tuple &t) const
 	{

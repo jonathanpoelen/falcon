@@ -48,7 +48,6 @@ public:
 		return *this;
 	}
 
-	FALCON_MEMBER_GETTER(value_type, get, _value)
 	FALCON_MEMBER_GETTER(value_type, operator*, _value)
 	FALCON_MEMBER_GETTER(pointer, operator->, &_value)
 

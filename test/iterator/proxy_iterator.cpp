@@ -11,7 +11,7 @@ void proxy_iterator_test()
 	typedef typename container_type::iterator iterator;
 	container_type cont = {&a,&b,&c,&d,&e};
 
-	typedef falcon::iterator::proxy_iterator<iterator, falcon::pointer<int*>/*, int*/> pointer_iterator;
+	typedef falcon::iterator::proxy_iterator<iterator, falcon::pointer<int*>> pointer_iterator;
 	pointer_iterator it(cont.begin());
 	pointer_iterator end(cont.end());
 

@@ -2,7 +2,7 @@ little_endian et big_endian non vérifier
 number.hpp pas finalisée
 voir les TODO et NOTE de endian.hpp
 
-fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_construct.h (+implementation qui ne fait pas de destruction en passant par exemple un no_garbage_collector_t ou en indiquand dans le nom uninitialized_without_garbage_collector qui retourne un objet avec l'exceptions ou non et l'iterator de fin). fichier à mettre dans memory
+fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_construct.h (+implementation qui ne fait pas de destruction en passant par exemple un no_garbage_collector_t ou en indiquand dans le nom uninitialized_without_garbage_collector qui retourne un objet avec l'exceptions ou non et l'iterator de fin). fichier à mettre dans memory. Trouver un autre nom que garbage_collector.
 
 rendre operator.hpp un peu compatible c++89
 
@@ -26,11 +26,8 @@ Faire une bit_reference.
 un objet de rangement de bit, genre 2 bit puis 3 etc…
 
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
-flag<>::operator[n] : bit_flag<> ?
+flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
 flag_position qui s'occupe de faire un décalage de bits. Ou un int ? bit_wrapper<_T>{_T*}
-
-
-flag<>::operator[int]:bit_wrapper<_T>{_T*}
 
 utilisé <iosfwd> dans ostream, flag et autre si besoin.
 
@@ -48,15 +45,11 @@ Mettre constexpr pour les classe d'operateur et enum/operator
 
 ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?)
 
-constexpr pour [c][r](begin|end), nottament quand tableau ?
-
 faudrait penser à vérifier les itérateurs (au niveau de typedef et category)
 
 ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp (via héritage, plus simple). Faire un not1 et not2 comme la std.
 
 faire un iterator qui itère sur plusieur -à la manière de multiple_iterator- mais ne fait les comparaison que sur le premier (le merger avec multiple_iterator via des type_traits ?) (le nommer group_iterator ?).
-
-ajouter des ostream (et istream) pour tuple, pair et autres containers. Les mettres dans un namespace falcon::[i|o|io]stream::type
 
 refaire les fonctions de bits/ostream_insert.h ? deja mi dans ostream/ostream_insert.hpp ? (toutes ?)
 
@@ -76,7 +69,7 @@ mettre tous les operator()(...) des foncteurs en const (si cela est possible).
 
 basic_string_repetition<_String>{_String, size_t} ? (os << string_repetition('a', 4) -> "aaaa"). faire std::to_string()
 
-ostream::repetition(_Obj, size_t) et ostream::repetition(_Obj, size_t, _CharT separator) ; avec _CharT = _Obj::char_type
+ostream::repetition(_Obj, size_t) et ostream::repetition(_Obj, size_t, _CharT separator) ; avec _CharT = _Obj::char_type. Idem pour les ostream
 
 si on active les exceptions des flux, comment ce comporte les fonctions lié (ignore, ignore_all, etc) ? Le state est bien setter à badbit et non égal à good.
 
@@ -87,14 +80,10 @@ infinite: begin, end => min, max. Revoir comment est faite la classe est ces enf
 un functeur qui permet de répartir les valeurs de plusieurs iterateurs. foreah(first, last, ???(it1, it2, it3)) -> ???::f(*it, *it1, *it2, *it3); ++it1,++it2,++it3.
 
 renommer pointer_iterator_iterator en indirect_iterator
-renommer not_iterator en fake_iterator
 
 faire des functors qui font des comparaisons sur les valeurs d'un pointeur: pointer_less -> (*a < *b).
 
 ajouter first_value, second_value et argument_type pour les functors de operators (heriter de std::unary_function et std::binary_function pour ce faire).
-
-toutes les classes surchargeant des iterators ont bien une fonction base() ? les tags sont bien definit ? ajouter le tag a not_iterator (en template avec par defaut random_iterator_tag)
-il manque les operators mathematique sur les iterators Le operator+() manquait dans proxy_iterator, c'est donc surement le cas autre part et avec aussi d'autres operateurs. Faire une macro qui les crés à inclure dans chaque iterator…
 
 un foncteur ???<_Functor, std::tuple<_Elements>, parameter_index<...> ou indexes-tag>.
 
@@ -102,30 +91,26 @@ structure englopant un type et pour chaque operateur suceptible de changer le ty
 Permet ainsi de s'affranchir des enum_* en passant par les foncteurs sur operateurs: enum_plus<enum_t> -> plus<integral_wrapper<enum_t>>, enum_increment<enum_t> -> increment<integral_wrapper<enum_t&>>
 ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?). La classe generique heriter des operateurs de la fonçon décrit au-dessus.
 
-un iterateur qui execute une fonction apres avoir atteint une valeur (autre iterateur ou compteur (2 classes ?)). Permet par exemple de boucler en une fois sur une zone d'un rectangle.
-padding_iterator: pour par exemple iterer sur un sous retangle.
-un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
-
 remplacer dans static_new et memory_stack construct(emplace_t,...) par un constructeur construct_emplace()
 trouver le moyen de construir un _T par l'intermediaire d'un objet (ex: tuple). construct_adapter(_Adapter, ...) ? avec _Adapter un foncteur prenant le pointeur de la structure a initialiser.
 
-amélioré algorithm.hpp en y mettant en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractère jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
+amélioré algorithm.hpp en y mettant en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
 
 dans les literaux, gerer l'overflow des nombres (on peut les passer en template au lieu de paramètre ?). Sinon via un tableau de char…
 
-singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _N>
+singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>
 
 container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des condition à la compilation,
 
 les lambda toujours par reference ou il faut des fois utiliser std::ref ? Pas le cas pour while_loop et co...
 
-pb avec le decalage de bit de flag
+flag.hpp: pb avec le decalage de bit de flag
 
 foncteur pour utilisé tuple_apply. Utilise indexes-tag pour définir le parameter_index<...> (tuple_applier<_Functor, _Tag = full_parameter_index_tag> ?).
 
 faire un make_caller() et un make_tuple_applier().
 
-temporary_tuple_cat
+temporary_tuple_cat (tuple concatener par reference ?)
 
 mettre pour les fonction dans tuple/ l'attribut parameter_index<> en premier.
 
@@ -144,13 +129,11 @@ faire un function_compose<...> (+ fonction composef()) comme mulary_compose mais
 
 dans enumerator faire une allocation de la chaîne en tant que expression constante (déjà fait ?)
 
-tester les compose() avec les distribution (voir random_device ? (exemple dans cppreference.com avec les distrtibutions))
-
-renommer placeholder_functor en placeholder_for_argument ?
+tester les compose() avec les distributions (voir random_device ? (exemple dans cppreference.com avec les distrtibutions))
 
 les compose() devrais pouvoir fonctionenr avec les références (pas le cas actuellement). Fonctionne avec std::ref() sans perte de perf (même binaire) ?
 
-strong_reference_wrapper::operator()const : mettre un const _T& dans le temaplte de result_of ? faire des tests
+strong_reference_wrapper: faire des tests
 
 une sorte de unary_compose mais sans arguments -> f(g()). (ancien delegate_result -> delegate_wrapper ?). Il y en a pas déjà une qui prend plusieurs foncteurs ?
 
@@ -159,10 +142,17 @@ enlever les doubles underscore car reservé. Idem pour les underscores suivit de
 Vérifier les types tag dans les iterateurs.
 ajouter les fonctions base() si inexistante et des fonctions fn() pour celles utilisant des foncteurs. Si 2 fn ajouter un suffixe (ou prefixe)
 
-unreliable_pointer_cast -> reinterpret_cast
-
 ostream/join.hpp est devenu trop complexe, simplifier !
 
-inherit_from<> -> is_instance_of<> : an instantiation of a B, or A derives from an instantiation of B
+algorithm.hpp : ne prend pas en compte les containers constant…
+
+un iterateur qui execute une fonction apres avoir atteint une valeur (autre iterateur ou compteur (2 classes ?)). Permet par exemple de boucler en une fois sur une zone d'un rectangle.
+padding_iterator: pour par exemple iterer sur un sous retangle.
+un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
+
+toutes les classes iterators ont bien une fonction base() ? les tags sont bien definit ? ajouter le tag a not_iterator (en template avec par defaut random_iterator_tag)
+il manque les operators mathematique sur les iterators Le operator+() manquait dans proxy_iterator, c'est donc surement le cas autre part et avec aussi d'autres operateurs. Faire une macro qui les crés à inclure dans chaque iterator… Le mieux est de paser par une classe (amie?) qui s'occupe de faire les operateurs et (des static_assert ?). Classe amie surcharger pour les cas particuliers (foncteur sur valeurs) ou via traits + surcharge
+
+tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ?
 
 

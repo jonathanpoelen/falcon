@@ -1,325 +1,116 @@
-#ifndef _FALCON_ITERATOR_PROXY_ITERATOR_HPP
-#define _FALCON_ITERATOR_PROXY_ITERATOR_HPP
+#ifndef FALCON_ITERATOR_PROXY_ITERATOR_HPP
+#define FALCON_ITERATOR_PROXY_ITERATOR_HPP
 
-#include <utility>
-#include <falcon/c++0x/keywords.hpp>
-// #include <falcon/preprocessor/incremental.hpp>
-#include <falcon/preprocessor/comparison.hpp>
-#include <falcon/preprocessor/getter.hpp>
-#include <falcon/iterator/detail/to_iterator_traits.hpp>
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+# include <type_traits>
+#else
+# include <boost/type_traits/remove_reference.hpp>
+#endif
+#include <falcon/iterator/detail/handler_iterator.hpp>
 
 namespace falcon {
+namespace iterator {
+	template <typename _Iterator, typename _Proxy>
+	class proxy_iterator;
+}}
 
+namespace std
+{
+	template <typename _Iterator, typename _Proxy>
+	struct iterator_traits< ::falcon::iterator::proxy_iterator<_Iterator, _Proxy> >
+	: iterator_traits<_Iterator>
+	{
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		typedef typename std::result_of<
+			const _Proxy&(decltype(*std::declval<_Iterator&>()))
+		>::type reference;
+		typedef typename std::remove_reference<reference>::type value_type;
+#else
+		typedef typename _Proxy::value_type reference;
+		typedef typename boost::remove_reference<reference>::type value_type;
+#endif
+		typedef value_type* pointer;
+	};
+}
+
+namespace falcon {
 namespace iterator {
 
-template <typename _Iterator, typename _Proxy, typename _T = typename std::result_of<_Proxy(decltype(*std::declval<_Iterator&>()))>::type, bool = std::is_reference<_T>::value>
+template<typename>
+class __proxy_iterator_traits;
+
+template<typename _Iterator, typename _Proxy>
+struct __proxy_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
+: detail::handler_iterator_trait<proxy_iterator<_Iterator, _Proxy>, _Iterator>
+{
+	typedef proxy_iterator<_Iterator, _Proxy> __proxy_iterator;
+	typedef detail::handler_iterator_trait<__proxy_iterator, _Iterator> __base;
+
+	static typename __base::reference dereference(__proxy_iterator& it)
+	{ return it.proxy()(*it._M_current); }
+
+	using __base::next;
+	static __proxy_iterator next(const __proxy_iterator& it, int n, int)
+	{ return __proxy_iterator(it._M_current + n, it.proxy()); }
+
+	using __base::prev;
+	static __proxy_iterator prev(const __proxy_iterator& it, int n, int)
+	{ return __proxy_iterator(it._M_current - n, it.proxy()); }
+};
+
+
+template <typename _Iterator, typename _Proxy>
 class proxy_iterator
+: public detail::handler_iterator<
+	proxy_iterator<_Iterator, _Proxy>,
+	_Iterator,
+	__proxy_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
+>
 {
-	typedef proxy_iterator<_Iterator, _Proxy, _T, true> self_type;
-	typedef typename detail::to_iterator_traits<_Iterator>::type iterator_traits;
+	typedef detail::handler_iterator<
+		proxy_iterator<_Iterator, _Proxy>,
+		_Iterator,
+		__proxy_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
+	> __base;
+
+	_Proxy _proxy;
 
 public:
+	typedef typename __base::iterator_type iterator_type;
 	typedef _Proxy proxy_type;
-	typedef _Iterator iterator;
-	typedef typename std::remove_reference<_T>::type value_type;
-	typedef _T reference;
-	typedef const value_type& const_reference;
-	typedef value_type* pointer;
-	typedef const value_type* const_pointer;
-	typedef typename iterator_traits::difference_type difference_type;
-	typedef typename iterator_traits::iterator_category iterator_category;
-
-private:
-	iterator _it;
-	proxy_type _proxy;
 
 public:
 	proxy_iterator()
-	: _it()
+	: __base()
 	, _proxy()
 	{}
 
-	proxy_iterator(const iterator& it)
-	: _it(it)
+	explicit proxy_iterator(iterator_type __x)
+	: __base(__x)
 	, _proxy()
 	{}
 
-	proxy_iterator(const iterator& it, const proxy_type& proxy)
-	: _it(it)
-	, _proxy(proxy)
+	explicit proxy_iterator(iterator_type __x, const proxy_type& __proxy)
+	: __base(__x)
+	, _proxy(__proxy)
 	{}
 
-	/*proxy_iterator(const proxy_type& proxy, const iterator& it)
-	: _it(it)
-	, _proxy(proxy)
-	{}*/
-
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-	template<typename... _Args>
-	proxy_iterator(const std::piecewise_construct_t&, const iterator& it, _Args&&... args)
-	: _it(it)
-	, _proxy(std::forward<_Args>(args)...)
-	{}
-#endif
-
-	proxy_iterator(const self_type& other)
-	: _it(other._it)
-	, _proxy(other._proxy)
+	proxy_iterator(const proxy_iterator& __x)
+	: __base(__x._M_current)
+	, _proxy(__x._proxy)
 	{}
 
-	self_type& operator=(const self_type& oher)
-	{
-		_it = oher._it;
-		_proxy = oher._proxy;
-		return *this;
-	}
+	using __base::operator=;
 
-	self_type& operator=(const iterator& it)
-	{
-		_it = it;
-		return *this;
-	}
-
-	self_type& operator=(const proxy_type& proxy)
-	{
-		_proxy = proxy;
-		return *this;
-	}
-
-	FALCON_MEMBER_GETTER(iterator, base, _it)
-
-	/*const proxy_type& proxy() const
+	const _Proxy& proxy() const
 	{ return _proxy; }
-	proxy_type& proxy()
-	{ return _proxy; }
-
-	void proxy(const proxy_type& proxy)
-	{ _proxy = proxy; }*/
-
-	reference operator*()
-	{ return _proxy(*_it); }
-	const_reference operator*() const
-	{ return _proxy(*_it); }
-
-	pointer operator->()
-	{ return &_proxy(*_it); }
-	const_pointer operator->() const
-	{ return &_proxy(*_it); }
 };
 
-template <typename _Iterator, typename _Proxy, typename _T>
-class proxy_iterator<_Iterator, _Proxy, _T, false>
-{
-	typedef proxy_iterator<_Iterator, _Proxy, _T, false> self_type;
-	typedef typename detail::to_iterator_traits<_Iterator>::type iterator_traits;
+template <typename _Iterator, typename _Proxy>
+proxy_iterator<_Iterator, _Proxy>
+make_proxy_iterator(const _Iterator& begin, const _Proxy& proxy)
+{ return proxy_iterator<_Iterator, _Proxy>(begin, proxy); }
 
-public:
-	typedef _Proxy proxy_type;
-	typedef _Iterator iterator;
-	typedef _T value_type;
-	typedef _T reference;
-	typedef _T pointer;
-	typedef typename iterator_traits::difference_type difference_type;
-	typedef typename iterator_traits::iterator_category iterator_category;
-
-private:
-	iterator _it;
-	proxy_type _proxy;
-
-public:
-	proxy_iterator()
-	: _it()
-	, _proxy()
-	{}
-
-	proxy_iterator(const iterator& it)
-	: _it(it)
-	, _proxy()
-	{}
-
-	proxy_iterator(const iterator& it, const proxy_type& proxy)
-	: _it(it)
-	, _proxy(proxy)
-	{}
-
-	proxy_iterator(const proxy_type& proxy, const iterator& it)
-	: _it(it)
-	, _proxy(proxy)
-	{}
-
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-	template<typename... _Args>
-	proxy_iterator(const iterator& it, _Args&&... args)
-	: _it(it)
-	, _proxy(std::forward<_Args>(args)...)
-	{}
-#endif
-
-	proxy_iterator(const self_type& other)
-	: _it(other._it)
-	, _proxy(other._proxy)
-	{}
-
-	self_type& operator=(const self_type& oher)
-	{
-		_it = oher._it;
-		_proxy = oher._proxy;
-		return *this;
-	}
-
-	self_type& operator=(const iterator& it)
-	{
-		_it = it;
-		return *this;
-	}
-
-	self_type& operator=(const proxy_type& proxy)
-	{
-		_proxy = proxy;
-		return *this;
-	}
-
-	FALCON_MEMBER_GETTER(iterator, base, _it)
-
-	/*const proxy_type& proxy() const
-	{ return _proxy; }
-	proxy_type& proxy()
-	{ return _proxy; }
-
-	void proxy(const proxy_type& proxy)
-	{ _proxy = proxy; }*/
-
-	reference operator*()
-	{ return _proxy(*_it); }
-	reference operator*() const
-	{ return _proxy(*_it); }
-
-	pointer operator->()
-	{ return _proxy(*_it); }
-	pointer operator->() const
-	{ return _proxy(*_it); }
-};
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& operator++(proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& it)
-{
-	++it.base();
-	return it;
-}
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef> operator++(const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& it, int)
-{
-	proxy_iterator<_Iterator, _Proxy, _T, _IsRef> ret(it);
-	++ret;
-	return ret;
-}
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& operator--(proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& it)
-{
-	--it.base();
-	return it;
-}
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef> operator--(const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& it, int)
-{
-	proxy_iterator<_Iterator, _Proxy, _T, _IsRef> ret(it);
-	--ret;
-	return ret;
-}
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator == (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & b)
-{ return a.base() == b.base(); }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator < (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & b)
-{ return a.base() < b.base(); }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator <= (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & b)
-{ return a.base() <= b.base(); }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator > (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & b)
-{ return a.base() > b.base(); }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator >= (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & b)
-{ return a.base() >= b.base(); }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator != (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & b)
-{ return a.base() != b.base(); }
-
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator == (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const typename proxy_iterator<_Iterator, _Proxy, _T, _IsRef>::iterator & b)
-{ return a.base() == b; }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator < (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const typename proxy_iterator<_Iterator, _Proxy, _T, _IsRef>::iterator& b)
-{ return a.base() < b; }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator <= (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const typename proxy_iterator<_Iterator, _Proxy, _T, _IsRef>::iterator & b)
-{ return a.base() <= b; }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator > (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const typename proxy_iterator<_Iterator, _Proxy, _T, _IsRef>::iterator& b)
-{ return a.base() > b; }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator >= (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const typename proxy_iterator<_Iterator, _Proxy, _T, _IsRef>::iterator & b)
-{ return a.base() >= b; }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-bool operator != (const proxy_iterator<_Iterator, _Proxy, _T, _IsRef> & a, const typename proxy_iterator<_Iterator, _Proxy, _T, _IsRef>::iterator & b)
-{ return a.base() != b; }
-
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& operator+=(proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& it, std::size_t n)
-{
-	it.base() += n;
-	return it;
-}
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& operator-=(const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& it, std::size_t n)
-{
-	it.base() -= n;
-	return it;
-}
-
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-typename proxy_iterator<_Iterator, _Proxy, _T, _IsRef>::difference_type operator-(const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& b)
-{ return a.base() - b.base(); }
-
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef> operator-(const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& a, std::size_t n)
-{ return a.base() - n; }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef> operator+(const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& a, const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& b)
-{ return a.base() + b.base(); }
-
-template <typename _Iterator, typename _Proxy, typename _T, bool _IsRef>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef> operator+(const proxy_iterator<_Iterator, _Proxy, _T, _IsRef>& a, std::size_t n)
-{ return a.base() + n; }
-
-
-template <typename _Iterator, typename _Proxy, typename _T = typename std::remove_reference<typename std::result_of<_Proxy(_Iterator&)>::type>::type, bool _IsRef = std::is_reference<_T>::value>
-proxy_iterator<_Iterator, _Proxy, _T, _IsRef> make_proxy_iterator(const _Iterator& begin, const _Proxy& proxy) {
-	return proxy_iterator<_Iterator, _Proxy, _T, _IsRef>(begin, proxy);
-}
-
-}
-
-}
+}}
 
 #endif

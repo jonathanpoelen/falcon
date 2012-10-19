@@ -1,7 +1,7 @@
 #ifndef _FALCON_RANGE_CRANGE_HPP
 #define _FALCON_RANGE_CRANGE_HPP
 
-#include <falcon/iterator/not_iterator.hpp>
+#include <falcon/iterator/fake_iterator.hpp>
 #include <falcon/iterator/nexter_iterator.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/functional/placeholder_for_argument.hpp>
@@ -12,9 +12,9 @@ namespace falcon {
 template<typename _T>
 struct __crange_traits
 {
-	typedef falcon::iterator::not_iterator<
+	typedef falcon::iterator::fake_iterator<
 		_T,
-		falcon::iterator::not_iterator_comparison_less_tag
+		falcon::iterator::fake_iterator_less_comparison_tag
 	> __iterator_base;
 	typedef falcon::range<__iterator_base> __type_range;
 
@@ -48,10 +48,13 @@ struct __crange_traits
  * }
  * @endcode
  */
-inline constexpr typename __crange_traits<int>::__type_range
+inline /*constexpr*/ typename __crange_traits<int>::__type_range
 crange(int first, int last)
 {
-	return {{first}, {last}};
+	return {
+		__crange_traits<int>::__iterator_base(first),
+		__crange_traits<int>::__iterator_base(last)
+	};
 }
 
 
@@ -73,10 +76,13 @@ crange(int first, int last)
  * }
  * @endcode
  */
-inline constexpr typename __crange_traits<int>::__type_range_step
+inline /*constexpr*/ typename __crange_traits<int>::__type_range_step
 crange(int first, int last, unsigned step)
 {
-	return {{first, step}, {last, step}};
+	return {
+		{__crange_traits<int>::__iterator_base(first), step},
+		{__crange_traits<int>::__iterator_base(last), step}
+	};
 }
 
 }

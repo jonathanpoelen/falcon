@@ -8,9 +8,6 @@
 
 namespace falcon {
 
-/**
- *
- */
 //@{
 template<typename _CharT, typename _Traits, typename... _Args>
 std::basic_ostream<_CharT, _Traits>& put(std::basic_ostream<_CharT, _Traits>& os, const _Args&... args)

@@ -6,8 +6,6 @@
 
 namespace falcon {
 
-/**
-*/
 //@{
 template<typename... _Args>
 std::istream& scan(_Args&... args)

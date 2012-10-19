@@ -68,25 +68,25 @@ struct to_iterator_category<_T*>
 template <typename _T>
 struct to_iterator_value<_T*>
 {
-	typedef typename std::iterator_traits<_T*>::iterator_value type;
+	typedef typename std::iterator_traits<_T*>::value_type type;
 };
 
 template <typename _T>
 struct to_iterator_difference<_T*>
 {
-	typedef typename std::iterator_traits<_T*>::iterator_difference type;
+	typedef typename std::iterator_traits<_T*>::difference_type type;
 };
 
 template <typename _T>
 struct to_iterator_pointer<_T*>
 {
-	typedef typename std::iterator_traits<_T*>::iterator_pointer type;
+	typedef typename std::iterator_traits<_T*>::pointer type;
 };
 
 template <typename _T>
 struct to_iterator_reference<_T*>
 {
-	typedef typename std::iterator_traits<_T*>::iterator_reference type;
+	typedef typename std::iterator_traits<_T*>::reference type;
 };
 
 template <typename _Iterator>
