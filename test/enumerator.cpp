@@ -37,7 +37,7 @@ FALCON_PP_ENUMERATOR(my_enum_class16, linear(0), A,B,C); //default
 FALCON_PP_ENUMERATOR(my_enum_class17, step(1), A,B,C); //default
 //@}
 
-///NOTE ne compile pas est c'est normal, car une valeur est donné à A
+///NOTE ne compile pas et c'est normal car une valeur est donné à A
 //FALCON_PP_ENUMERATOR(my_enum_classX, default, (A=1, "a"));
 ///NOTE ne compile pas car pas de valeur d'enum
 //FALCON_PP_ENUMERATOR(my_enum_classX, default);
@@ -57,8 +57,6 @@ static void EnumClassTestImpl(_Ostream& cout, _Ostream2& cerr)
 
 	typedef typename _Enum::enumeration enumeration_container;
 	typedef typename enumeration_container::iterator enumeration_iterator;
-
-	cout << typeid(_Enum).name() << ": ";
 
 	string_container strings;
 	string_iterator it = strings.begin();
@@ -117,23 +115,23 @@ void enumerator_test()
 		//std::cout.exceptions(std::ios::badbit | std::ios::failbit);
 		//std::wcout.exceptions(std::ios::badbit | std::ios::failbit);
 
-		EnumClassTest<my_enum_class1>("14my_enum_class1: [A]A=0,[b]b=1,[C]C=2,[D]D=3,");
-		EnumClassTest<my_enum_class2>("14my_enum_class2: [A]A=5,[b]b=6,[C]C=7,[D]D=8,");
-		EnumClassTest<my_enum_class3>("14my_enum_class3: [A]A=0,[b]b=1,[C]C=2,[D]D=4,");
-		EnumClassTest<my_enum_class4>("14my_enum_class4: [A]A=2048,[b]b=4096,[C]C=8192,[D]D=16384,");
-		EnumClassTest<my_enum_class5>("14my_enum_class5: [A]A=1024,[b]b=512,[C]C=256,[D]D=128,");
-		EnumClassTest<my_enum_class6>("14my_enum_class6: [A]A=2048,[b]b=1024,[C]C=512,[D]D=256,");
-		EnumClassTest<my_enum_class7>("14my_enum_class7: [A]A=0,[b]b=2,[C]C=4,[D]D=6,");
-		EnumClassTest<my_enum_class8>("14my_enum_class8: [A]A=5,[b]b=7,[C]C=9,[D]D=11,");
-		EnumClassTest<my_enum_class9>(L"14my_enum_class9: [A]A=0,[b]b=1,");
-		EnumClassTest<my_enum_class10>("15my_enum_class10: [A]A=0,");
-		EnumClassTest<my_enum_class11>("15my_enum_class11: [A]A=0,");
-		EnumClassTest<my_enum_class12>("15my_enum_class12: [a]a=0,");
-		EnumClassTest<my_enum_class13>("15my_enum_class13: [A]A=0,[B]B=2,[C]C=4,");
-		EnumClassTest<my_enum_class14>("15my_enum_class14: [A]A=5,[B]B=6,[C]C=7,");
-		EnumClassTest<my_enum_class15>("15my_enum_class15: [A]A=0,[B]B=1,[C]C=2,");
-		EnumClassTest<my_enum_class16>("15my_enum_class16: [A]A=0,[B]B=1,[C]C=2,");
-		EnumClassTest<my_enum_class17>("15my_enum_class17: [A]A=0,[B]B=1,[C]C=2,");
+		EnumClassTest<my_enum_class1>("[A]A=0,[b]b=1,[C]C=2,[D]D=3,");
+		EnumClassTest<my_enum_class2>("[A]A=5,[b]b=6,[C]C=7,[D]D=8,");
+		EnumClassTest<my_enum_class3>("[A]A=0,[b]b=1,[C]C=2,[D]D=4,");
+		EnumClassTest<my_enum_class4>("[A]A=2048,[b]b=4096,[C]C=8192,[D]D=16384,");
+		EnumClassTest<my_enum_class5>("[A]A=1024,[b]b=512,[C]C=256,[D]D=128,");
+		EnumClassTest<my_enum_class6>("[A]A=2048,[b]b=1024,[C]C=512,[D]D=256,");
+		EnumClassTest<my_enum_class7>("[A]A=0,[b]b=2,[C]C=4,[D]D=6,");
+		EnumClassTest<my_enum_class8>("[A]A=5,[b]b=7,[C]C=9,[D]D=11,");
+		EnumClassTest<my_enum_class9>(L"[A]A=0,[b]b=1,");
+		EnumClassTest<my_enum_class10>("[A]A=0,");
+		EnumClassTest<my_enum_class11>("[A]A=0,");
+		EnumClassTest<my_enum_class12>("[a]a=0,");
+		EnumClassTest<my_enum_class13>("[A]A=0,[B]B=2,[C]C=4,");
+		EnumClassTest<my_enum_class14>("[A]A=5,[B]B=6,[C]C=7,");
+		EnumClassTest<my_enum_class15>("[A]A=0,[B]B=1,[C]C=2,");
+		EnumClassTest<my_enum_class16>("[A]A=0,[B]B=1,[C]C=2,");
+		EnumClassTest<my_enum_class17>("[A]A=0,[B]B=1,[C]C=2,");
 	}
 	{
 		typedef my_enum_class::strings::iterator iterator;

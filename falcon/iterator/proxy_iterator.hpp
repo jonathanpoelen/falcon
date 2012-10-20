@@ -46,6 +46,9 @@ struct __proxy_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
 	typedef proxy_iterator<_Iterator, _Proxy> __proxy_iterator;
 	typedef detail::handler_iterator_trait<__proxy_iterator, _Iterator> __base;
 
+	static typename __base::reference dereference(const __proxy_iterator& it)
+	{ return it.proxy()(*it._M_current); }
+
 	static typename __base::reference dereference(__proxy_iterator& it)
 	{ return it.proxy()(*it._M_current); }
 
@@ -103,6 +106,9 @@ public:
 	using __base::operator=;
 
 	const _Proxy& proxy() const
+	{ return _proxy; }
+
+	_Proxy& proxy()
 	{ return _proxy; }
 };
 

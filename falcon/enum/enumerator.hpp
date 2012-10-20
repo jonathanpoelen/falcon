@@ -19,7 +19,7 @@
 #include <falcon/preprocessor/variatic/has_parenthesis.hpp>
 
 #include <falcon/iterator/nexter_iterator.hpp>
-#include <falcon/iterator/not_iterator.hpp>
+#include <falcon/iterator/fake_iterator.hpp>
 #include <falcon/functional/compose.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/enum/operators.hpp>
@@ -286,15 +286,15 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 #define __FALCON_PP_LIST_ENUM_RULE_START_lbit(start) (start)
 #define __FALCON_PP_LIST_ENUM_RULE_START_rbit(start) (start)
 
-///TODO utiliser un not_iterator est vraiment utile ?
+///TODO utiliser un fake_iterator est vraiment utile ?
 
-///TODO utiliser un not_iterator<const enum_t> ?
+///TODO utiliser un fake_iterator<const enum_t> ?
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_default(rule)\
 	::falcon::iterator::nexter_iterator<\
-		::falcon::iterator::not_iterator<enum_t>,\
+		::falcon::iterator::fake_iterator<enum_t>,\
 		::falcon::unary_compose<\
 			::falcon::enum_increment<enum_t>,\
-			::falcon::pointer<falcon::iterator::not_iterator<enum_t> >\
+			::falcon::pointer<falcon::iterator::fake_iterator<enum_t> >\
 		>\
 	>
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_linear(n)\
@@ -302,9 +302,9 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step(n) __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step_I
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step_I(rule)\
 	::falcon::iterator::nexter_iterator<\
-		::falcon::iterator::not_iterator<enum_t>,\
+		::falcon::iterator::fake_iterator<enum_t>,\
 		::falcon::detail::enum_class::__nexter_step<\
-			::falcon::iterator::not_iterator<enum_t>,\
+			::falcon::iterator::fake_iterator<enum_t>,\
 			__FALCON_PP_LIST_ENUM_RULE_STEP_ ## rule\
 		>\
 	>

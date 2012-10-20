@@ -153,6 +153,7 @@ un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonct
 toutes les classes iterators ont bien une fonction base() ? les tags sont bien definit ? ajouter le tag a not_iterator (en template avec par defaut random_iterator_tag)
 il manque les operators mathematique sur les iterators Le operator+() manquait dans proxy_iterator, c'est donc surement le cas autre part et avec aussi d'autres operateurs. Faire une macro qui les crés à inclure dans chaque iterator… Le mieux est de paser par une classe (amie?) qui s'occupe de faire les operateurs et (des static_assert ?). Classe amie surcharger pour les cas particuliers (foncteur sur valeurs) ou via traits + surcharge
 
-tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ?
+tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ? getx_accessor ?
+
 
 

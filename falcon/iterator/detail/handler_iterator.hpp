@@ -76,7 +76,13 @@ public:
 	reference operator*()
 	{ return _Traits::dereference(downcast()); }
 
+	reference operator*() const
+	{ return _Traits::dereference(downcast()); }
+
 	pointer operator->()
+	{ return &(operator*()); }
+
+	pointer operator->() const
 	{ return &(operator*()); }
 
 	_Iterator& operator++()
@@ -192,7 +198,7 @@ public:
 	typedef typename __traits::pointer pointer;
 	typedef typename __traits::reference reference;
 
-	static reference dereference(_Iterator& it)
+	static reference dereference(const _Iterator& it)
 	{ return *it._M_current; }
 };
 

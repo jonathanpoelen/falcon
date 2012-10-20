@@ -51,6 +51,9 @@ struct __fake_iterator_traits_base
 
 	static reference dereference(__fake_iterator& it)
 	{ return it._M_current; }
+
+	static reference dereference(const __fake_iterator& it)
+	{ return it._M_current; }
 };
 
 template<typename>
@@ -87,14 +90,12 @@ class fake_iterator
 	__fake_iterator_traits<fake_iterator<_T, _ComparisonTag> >
 >
 {
-	typedef detail::handler_iterator<
-		fake_iterator<_T, _ComparisonTag>,
-		_T,
-		__fake_iterator_traits<fake_iterator<_T, _ComparisonTag> >
-	> __base;
+	typedef __fake_iterator_traits<fake_iterator> __traits;
+	typedef detail::handler_iterator<fake_iterator, _T, __traits> __base;
 
 public:
 	typedef typename __base::iterator_type iterator_type;
+	typedef typename __base::value_type value_type;
 
 public:
 	fake_iterator()
@@ -106,22 +107,32 @@ public:
 	{}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	explicit fake_iterator(_T&& value)
+	/*explicit*/ fake_iterator(_T&& value)
 	: __base(value)
 	{}
 
 	template<typename _U, class _Enable = typename
 	std::enable_if<!std::is_reference<iterator_type>::value && std::is_convertible<_U, iterator_type>::value>::type>
-	explicit fake_iterator(_U&& value)
+	/*explicit*/ fake_iterator(_U&& value)
 	: __base(std::forward<_U>(value))
 	{}
 #else
-	explicit fake_iterator(const _T& value)
+	/*explicit*/ fake_iterator(const _T& value)
 	: __base(value, 1)
 	{}
 #endif
 
 	using __base::operator=;
+
+	const value_type& operator*() const
+	{ return __traits::dereference(this->downcast()); }
+
+	using __base::operator*;
+
+	const value_type* operator->() const
+	{ return &(operator*()); }
+
+	using __base::operator->;
 };
 
 template <typename _T, typename _ComparisonTag>
