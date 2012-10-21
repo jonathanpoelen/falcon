@@ -49,7 +49,7 @@ faudrait penser à vérifier les itérateurs (au niveau de typedef et category)
 
 ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp (via héritage, plus simple). Faire un not1 et not2 comme la std.
 
-faire un iterator qui itère sur plusieur -à la manière de multiple_iterator- mais ne fait les comparaison que sur le premier (le merger avec multiple_iterator via des type_traits ?) (le nommer group_iterator ?).
+faire un iterator qui itère sur plusieur -à la manière de multiple_iterator- mais ne fait les comparaisons que sur le premier (le merger avec multiple_iterator via des type_traits ?) (le nommer group_iterator ?).
 
 refaire les fonctions de bits/ostream_insert.h ? deja mi dans ostream/ostream_insert.hpp ? (toutes ?)
 
@@ -150,10 +150,10 @@ un iterateur qui execute une fonction apres avoir atteint une valeur (autre iter
 padding_iterator: pour par exemple iterer sur un sous retangle.
 un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
 
-toutes les classes iterators ont bien une fonction base() ? les tags sont bien definit ? ajouter le tag a not_iterator (en template avec par defaut random_iterator_tag)
+toutes les classes iterators ont bien une fonction base() ? la categorie est bien definit ?
 il manque les operators mathematique sur les iterators Le operator+() manquait dans proxy_iterator, c'est donc surement le cas autre part et avec aussi d'autres operateurs. Faire une macro qui les crés à inclure dans chaque iterator… Le mieux est de paser par une classe (amie?) qui s'occupe de faire les operateurs et (des static_assert ?). Classe amie surcharger pour les cas particuliers (foncteur sur valeurs) ou via traits + surcharge
 
 tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ? getx_accessor ?
 
-
+simplifier store_if en passant par traits privé
 

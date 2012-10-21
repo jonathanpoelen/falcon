@@ -2,6 +2,11 @@ project(falcon)
 
 cmake_minimum_required(VERSION 2.8)
 
+# if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	include(CMakeForceCompiler)
+	CMAKE_FORCE_CXX_COMPILER(g++-4.7 GNU-4.7)
+# endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+
 include(CMakeDefinitions.txt)
 include_directories(.)
 

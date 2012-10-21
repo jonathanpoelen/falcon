@@ -5,14 +5,15 @@
 
 void compose_test()
 {
-	typedef falcon::increment<int> unary1;
-	typedef falcon::pointer<int*> unary2;
-	typedef falcon::unary_compose<unary1, unary2> unary3;
+	typedef falcon::increment<int> increment;
+	typedef falcon::pointer<int*> pointer;
+	typedef falcon::unary_compose<increment, pointer> unary1;
 
 	int i = 5;
 	int * p = &i;
 
-	CHECK_EQUAL_VALUE(unary3()(p), 6);
+	CHECK_EQUAL_VALUE(unary1()(p), 6);
+	CHECK_EQUAL_VALUE(falcon::compose1<>(increment(), pointer())(p), 7);
 }
 
 FALCON_TEST_TO_MAIN(compose_test)

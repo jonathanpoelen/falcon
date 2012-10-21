@@ -30,8 +30,8 @@ s="$d/$1.cpp"
 ( [ -e $h ] && echo $h exists || [ -e $s ] && echo $s exists ) && exit 2
 
 def=$defbase$1
-#with bash: ${def^^*}
-def=_FALCON_TEST_$(echo $def | tr -s '[a-z]' '[A-Z]')_HPP
+#with bash: ${def^^*}, with zsh: $def:u
+def=FALCON_TEST_$(echo $def | tr -s '[a-z]' '[A-Z]')_HPP
 
 echo "#ifndef $def
 #define $def

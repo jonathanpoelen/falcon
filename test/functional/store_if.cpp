@@ -10,7 +10,7 @@ void store_if_test()
 	typedef std::array<int, 6> container_type;
 	typedef typename container_type::iterator iterator;
 
-	falcon::store_if_not<int, falcon::maker<bool> > store;
+	falcon::store_if_not<int, falcon::maker<int> > store;
 	container_type c CPP0X(CPP0X(1,2,3,0,4,5));
 
 	for (iterator it = c.begin(), end = c.end();
@@ -27,7 +27,7 @@ void store_if_test()
 		 it != end && store(*it); ++it)
 		 ;
 
-	CHECK_EQUAL_VALUE(0, *store.get());
+	CHECK(0 == store.get());
 
 }
 FALCON_TEST_TO_MAIN(store_if_test)

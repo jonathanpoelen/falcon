@@ -15,7 +15,7 @@ struct A{
 	A(const A&a):i(a.i) { std::cout << "const A&" << std::endl; }
 	A(int ii=0):i(ii) { std::cout << "A(" << ii << ')' << std::endl; }
 
-	~A() { std::cout << "~A" << std::endl; }
+	~A() { std::cout << "~A(" << i << ')' << std::endl; }
 
 	A& operator=(const A&a) {i=a.i; std::cout << BOOST_CURRENT_FUNCTION << std::endl; return *this;}
 	A& operator+=(int _i) {i+=_i; std::cout << BOOST_CURRENT_FUNCTION << std::endl; return *this; }

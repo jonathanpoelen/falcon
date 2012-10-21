@@ -18,8 +18,12 @@ template <class _WrapArgument, class _WrapResult>
 struct __compose_check_type
 {
 	static const bool value = (
-		helper::has_argument_type<_WrapArgument>::value
-		&& helper::has_result_type<_WrapResult>::value
+		helper::has_argument_type<
+			typename std::remove_reference<_WrapArgument>::type
+		>::value
+		&& helper::has_result_type<
+			typename std::remove_reference<_WrapResult>::type
+		>::value
 	);
 };
 #endif
@@ -454,7 +458,7 @@ composex(_Operation&& __fn1, _Operations&&... __fns)
 
 template<class _Operation, class... _Operations>
 constexpr inline mulary_compose<_Operation, std::tuple<_Operations...>>
-composxe(_Operation&& __fn1, std::tuple<_Operations...>&& __fns)
+composex(_Operation&& __fn1, std::tuple<_Operations...>&& __fns)
 {
 	return {
 		std::forward<_Operation>(__fn1),
