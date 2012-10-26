@@ -104,8 +104,6 @@ container trier de façon static. version map et set et unordered. Faire un stat
 
 les lambda toujours par reference ou il faut des fois utiliser std::ref ? Pas le cas pour while_loop et co...
 
-flag.hpp: pb avec le decalage de bit de flag
-
 foncteur pour utilisé tuple_apply. Utilise indexes-tag pour définir le parameter_index<...> (tuple_applier<_Functor, _Tag = full_parameter_index_tag> ?).
 
 faire un make_caller() et un make_tuple_applier().
@@ -156,4 +154,6 @@ il manque les operators mathematique sur les iterators Le operator+() manquait d
 tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ? getx_accessor ?
 
 simplifier store_if en passant par traits privé
+
+flag.hpp: pb avec le decalage de bit de flag. flag.cpp: god for gcc-4.7, fail with gcc-4.6…
 

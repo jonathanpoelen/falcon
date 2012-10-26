@@ -1,88 +1,123 @@
 #ifndef _FALCON_ITERATOR_DELEGATE_COMPARISON_ITERATOR_HPP
 #define _FALCON_ITERATOR_DELEGATE_COMPARISON_ITERATOR_HPP
 
-#include <falcon/preprocessor/comparison.hpp>
-#include <falcon/preprocessor/incremental.hpp>
-#include <falcon/preprocessor/getter.hpp>
-#include <falcon/iterator/detail/to_iterator_traits.hpp>
+#include <falcon/iterator/detail/handler_iterator.hpp>
 
 namespace falcon {
-
 namespace iterator {
+	template <typename _Iterator, typename _ComparisonIterator>
+	class delegate_comparison_iterator;
+}}
+
+namespace std
+{
+	template <typename _Iterator, typename _Proxy>
+	struct iterator_traits<
+		::falcon::iterator::delegate_comparison_iterator<_Iterator, _Proxy>
+	> : iterator_traits<_Iterator>
+	{};
+}
+
+namespace falcon {
+namespace iterator {
+
+template<typename>
+class __delegate_comparison_iterator_traits;
+
+template<typename _Iterator, typename _ComparisonIterator>
+struct __delegate_comparison_iterator_traits<
+	delegate_comparison_iterator<_Iterator, _ComparisonIterator>
+> : detail::handler_iterator_trait<
+	delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
+	_Iterator
+>
+{
+	typedef delegate_comparison_iterator<_Iterator, _ComparisonIterator> __iterator;
+
+	static bool eq(const __iterator& a, const __iterator& b)
+	{ return a.comparison_iterator() == b.comparison_iterator(); }
+
+	static bool lt(const __iterator& a, const __iterator& b)
+	{ return a.comparison_iterator() < b.comparison_iterator(); }
+
+	static void next(__iterator& it)
+	{ ++it._M_current; ++it.comparison_iterator(); }
+
+	static void next(__iterator& it, int n)
+	{ it._M_current += n; it.comparison_iterator() += n; }
+
+	static __iterator next(const __iterator& it, int n, int)
+	{ return __iterator(it._M_current + n, it.comparison_iterator() + n); }
+
+	static void prev(__iterator& it)
+	{ --it._M_current; --it.comparison_iterator(); }
+
+	static void prev(__iterator& it, int n)
+	{ it._M_current -= n; it.comparison_iterator() -= n; }
+
+	static __iterator prev(const __iterator& it, int n, int)
+	{ return __iterator(it._M_current - n, it.comparison_iterator() - n); }
+};
+
 
 template <typename _Iterator, typename _ComparisonIterator>
 class delegate_comparison_iterator
+: public detail::handler_iterator<
+	delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
+	_Iterator,
+	__delegate_comparison_iterator_traits<
+		delegate_comparison_iterator<_Iterator, _ComparisonIterator>
+	>
+>
 {
-	typedef delegate_comparison_iterator<_Iterator, _ComparisonIterator> self_type;
-	typedef typename detail::to_iterator_traits<_Iterator>::type iterator_traits;
+	typedef detail::handler_iterator<
+		delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
+		_Iterator,
+		__delegate_comparison_iterator_traits<
+			delegate_comparison_iterator<_Iterator, _ComparisonIterator>
+		>
+	> __base;
+
+	_ComparisonIterator _comparison_iterator;
 
 public:
-	typedef _ComparisonIterator comparison_iterator;
-	typedef _Iterator iterator;
-	typedef typename iterator_traits::value_type value_type;
-	//typedef typename iterator_traits::pointer pointer;
-	typedef iterator pointer;
-	typedef typename iterator_traits::reference reference;
-	typedef typename iterator_traits::difference_type difference_type;
-	typedef typename iterator_traits::iterator_category iterator_category;
-
-private:
-	iterator _it;
-	comparison_iterator _comparison;
+	typedef typename __base::iterator_type iterator_type;
+	typedef _ComparisonIterator comparison_iterator_type;
 
 public:
-	delegate_comparison_iterator(const comparison_iterator& __comparison)
-	: _it()
-	, _comparison(__comparison)
+	delegate_comparison_iterator()
+	: __base()
+	, _comparison_iterator()
 	{}
 
-	delegate_comparison_iterator(const iterator& it, const comparison_iterator& __comparison)
-	: _it(it)
-	, _comparison(__comparison)
+	explicit delegate_comparison_iterator(comparison_iterator_type __comparison_iterator)
+	: __base()
+	, _comparison_iterator(__comparison_iterator)
 	{}
 
-	delegate_comparison_iterator(const self_type& other)
-	: _it(other._it)
-	, _comparison(other._comparison)
+	explicit delegate_comparison_iterator(iterator_type __x, const comparison_iterator_type& __comparison_iterator)
+	: __base(__x)
+	, _comparison_iterator(__comparison_iterator)
 	{}
 
-	self_type& operator=(const self_type& oher)
-	{
-		_it = oher._it;
-		_comparison = oher._comparison;
-		return *this;
-	}
+	delegate_comparison_iterator(const delegate_comparison_iterator& __x)
+	: __base(__x._M_current)
+	, _comparison_iterator(__x._comparison_iterator)
+	{}
 
-	self_type& operator=(const iterator& it)
-	{
-		_it = it;
-		return *this;
-	}
+	using __base::operator=;
 
-	comparison_iterator& comparison()
-	{ return _comparison; }
-	const comparison_iterator& comparison() const
-	{ return _comparison; }
+	const comparison_iterator_type& comparison_iterator() const
+	{ return _comparison_iterator; }
 
-	FALCON_MEMBER_GETTER(iterator, inner_iterator, _it)
-	FALCON_MEMBER_GETTER(comparison_iterator, inner_comparison_iterator, _comparison)
-
-	FALCON_MEMBER_GETTER(reference, operator*, *_it)
-	FALCON_MEMBER_GETTER(pointer, operator->, *_it)
-
-	FALCON_MEMBER_INCREMENT(self_type, ++_it; ++_comparison)
-	FALCON_MEMBER_DECREMENT(self_type, --_it; --_comparison)
-
-	FALCON_MEMBER_COMPARISON2_ALL_OPERATOR(self_type, _comparison, other._comparison)
+	comparison_iterator_type& comparison_iterator()
+	{ return _comparison_iterator; }
 };
 
 template <typename _Iterator, typename _ComparisonIterator>
-iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator> make_delegate_comparison_iterator(const _Iterator& begin, const _ComparisonIterator& comparison) {
-	return iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator>(begin, comparison);
-}
+iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator> make_delegate_comparison_iterator(const _Iterator& begin, const _ComparisonIterator& compare)
+{ return iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator>(begin, compare); }
 
-}
-
-}
+}}
 
 #endif

@@ -67,6 +67,7 @@ void flag_test()
 
 		flag >>= 100;
 		CHECK_EQUAL_VALUE(falcon::flag64(flag[0]), 0);
+		///BUG god for gcc-4.7, fail with gcc-4.6…
 		CHECK_EQUAL_VALUE(falcon::flag64::full() >> 40, falcon::flag64(flag[1]));
 	}
 	{
