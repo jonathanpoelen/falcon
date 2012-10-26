@@ -116,6 +116,9 @@ public:
 
 	const _Iterator& downcast() const
 	{ return static_cast<const _Iterator&>(*this); }
+
+	reference operator[](difference_type n)
+	{ return *(*this += n); }
 };
 
 
@@ -187,7 +190,23 @@ template<typename _Iterator, typename _Base, typename _Tag = typename std::itera
 class handler_iterator_trait;
 
 template<typename _Iterator, typename _Base>
-class handler_iterator_trait<_Iterator, _Base, std::input_iterator_tag>
+struct handler_iterator_trait<_Iterator, _Base, std::output_iterator_tag>
+{
+	typedef typename std::iterator_traits<_Iterator> __traits;
+
+public:
+	typedef typename __traits::iterator_category iterator_category;
+	typedef void value_type;
+	typedef void difference_type;
+	typedef void pointer;
+	typedef void reference;
+
+	static void next(const _Iterator&)
+	{}
+};
+
+template<typename _Iterator, typename _Base>
+struct handler_iterator_trait<_Iterator, _Base, std::input_iterator_tag>
 {
 	typedef typename std::iterator_traits<_Iterator> __traits;
 
@@ -201,11 +220,6 @@ public:
 	static reference dereference(const _Iterator& it)
 	{ return *it._M_current; }
 };
-
-template<typename _Iterator, typename _Base>
-struct handler_iterator_trait<_Iterator, _Base, std::output_iterator_tag>
-: handler_iterator_trait<_Iterator, _Base, std::input_iterator_tag>
-{};
 
 template<typename _Iterator, typename _Base>
 struct handler_iterator_trait<_Iterator, _Base, std::forward_iterator_tag>

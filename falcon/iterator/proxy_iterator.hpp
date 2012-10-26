@@ -26,7 +26,7 @@ namespace std
 		>::type reference;
 		typedef typename std::remove_reference<reference>::type value_type;
 #else
-		typedef typename _Proxy::value_type reference;
+		typedef typename _Proxy::result_type reference;
 		typedef typename boost::remove_reference<reference>::type value_type;
 #endif
 		typedef value_type* pointer;

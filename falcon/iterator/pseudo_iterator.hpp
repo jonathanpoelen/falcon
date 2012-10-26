@@ -17,6 +17,7 @@ struct pseudo_iterator
 	typedef value_type* pointer;
 	typedef value_type& reference;
 	typedef std::random_access_iterator_tag iterator_category;
+	typedef std::ptrdiff_t difference_type;
 
 private:
 	typedef pseudo_iterator<_T> self_type;
@@ -51,7 +52,7 @@ public:
 	FALCON_MEMBER_GETTER(value_type, operator*, _value)
 	FALCON_MEMBER_GETTER(pointer, operator->, &_value)
 
-	FALCON_CAST_GETTER(value_type, _value)
+	FALCON_MEMBER_GETTER(value_type, base, _value)
 
 	inline self_type& operator++()
 	{ return *this; }
@@ -73,6 +74,9 @@ public:
 
 	inline bool operator != (const self_type & ) const
 	{ return true; }
+
+	inline difference_type operator - (const self_type & ) const
+	{ return 0; }
 };
 
 template <typename _T>

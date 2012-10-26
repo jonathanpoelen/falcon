@@ -79,8 +79,6 @@ infinite: begin, end => min, max. Revoir comment est faite la classe est ces enf
 
 un functeur qui permet de répartir les valeurs de plusieurs iterateurs. foreah(first, last, ???(it1, it2, it3)) -> ???::f(*it, *it1, *it2, *it3); ++it1,++it2,++it3.
 
-renommer pointer_iterator_iterator en indirect_iterator
-
 faire des functors qui font des comparaisons sur les valeurs d'un pointeur: pointer_less -> (*a < *b).
 
 ajouter first_value, second_value et argument_type pour les functors de operators (heriter de std::unary_function et std::binary_function pour ce faire).
@@ -157,3 +155,4 @@ simplifier store_if en passant par traits privé
 
 flag.hpp: pb avec le decalage de bit de flag. flag.cpp: god for gcc-4.7, fail with gcc-4.6…
 
+enlever pseudo_iterator et faire [in|out]put_iterator_base
