@@ -75,8 +75,6 @@ si on active les exceptions des flux, comment ce comporte les fonctions lié (ig
 
 proxy_iterator: le _IsRef doit etre a l'interieur de la classe et non dans son template
 
-infinite: begin, end => min, max. Revoir comment est faite la classe est ces enfants.
-
 un functeur qui permet de répartir les valeurs de plusieurs iterateurs. foreah(first, last, ???(it1, it2, it3)) -> ???::f(*it, *it1, *it2, *it3); ++it1,++it2,++it3.
 
 faire des functors qui font des comparaisons sur les valeurs d'un pointeur: pointer_less -> (*a < *b).
@@ -156,3 +154,7 @@ simplifier store_if en passant par traits privé
 flag.hpp: pb avec le decalage de bit de flag. flag.cpp: god for gcc-4.7, fail with gcc-4.6…
 
 enlever pseudo_iterator et faire [in|out]put_iterator_base
+
+rendre optionnel la specification de std ::iterator_traits pour les iterators. le handler_iterator_trait prendrait un iterator_traits en template = std::iterator_traits<_Iterator> ?
+
+late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…) { return _FunctorAllocator(…) } ; _FunctorAllocator -> return _ClassTemplate<_T>()

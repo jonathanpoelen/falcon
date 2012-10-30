@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/preprocessor/incremental.hpp>
-#include <falcon/preprocessor/comparison.hpp>
 #include <falcon/preprocessor/getter.hpp>
 
 namespace falcon {
@@ -15,45 +14,24 @@ struct infinite_base
 	typedef _T value_type;
 
 protected:
-	value_type _it, _first, _last;
+	value_type _current, _first, _last;
 
-	typedef infinite_base<_T> self_type;
 
 public:
 	CPP_CONSTEXPR infinite_base(const value_type& first, const value_type& last)
-	: _it(first)
+	: _current(first)
 	, _first(first)
 	, _last(last)
 	{}
 
-	CPP_CONSTEXPR infinite_base(const value_type& first, const value_type& it, const value_type& last)
-	: _it(it)
+	CPP_CONSTEXPR infinite_base(const value_type& first, const value_type& x, const value_type& last)
+	: _current(x)
 	, _first(first)
 	, _last(last)
 	{}
 
-	CPP_CONSTEXPR infinite_base(const self_type& other)
-	: _it(other._it)
-	, _first(other._first)
-	, _last(other._last)
-	{}
-
-	self_type& operator=(const self_type& other)
-	{
-		_it = other._it;
-		_first = other._first;
-		_last = other._last;
-		return *this;
-	}
-
-	self_type& operator=(const value_type& it)
-	{
-		_it = it;
-		return *this;
-	}
-
-	bool empty() const
-	{ return _first == _last; }
+	void current(const value_type& x)
+	{ _current = x; }
 
 	const value_type& begin() const
 	{ return _first; }
@@ -61,81 +39,67 @@ public:
 	const value_type& end() const
 	{ return _last; }
 
-	const value_type& current() const
-	{ return _it; }
-
-	const value_type& rcurrent() const
-	{ return _it; }
-
-	value_type& rcurrent()
-	{ return _it; }
-
 	void begin(const value_type& first)
 	{ _first = first; }
 
 	void end(const value_type& last)
 	{ _last = last; }
 
-	void current(const value_type& it)
-	{ _it = it; }
-
-	bool operator==(const self_type& other) const
-	{ return _it == other._it; }
-
-	bool operator<(const self_type& other) const
-	{ return _it < other._it; }
-
-	FALCON_MEMBER_COMPARISON_OTHER_OPERATOR(self_type)
-
 protected:
+	const value_type& current() const
+	{ return _current; }
+
+	const value_type& rcurrent() const
+	{ return _current; }
+
+	value_type& rcurrent()
+	{ return _current; }
+
 	void next()
 	{
-		if (++_it == _last)
-			_it = _first;
+		if (++_current == _last)
+			_current = _first;
 	}
 
 	void prev()
 	{
-		if (_it == _first)
-			_it = _last;
-		--_it;
+		if (_current == _first)
+			_current = _last;
+		--_current;
 	}
 
 private:
-	template<typename _U>
-	inline void _move_n(_U& n, const _T& d)
+	inline void _move_n(_T& n, const _T& d)
 	{
 		d = _last - _first;
 		while (d <= n)
 			n -= d;
 	}
 
-	template<typename _U>
-	inline void _plus(const _U& n)
+	inline void _plus(const _T& n)
 	{
-		_T d = _last - _it;
+		_T d = _last - _current;
 		if (d <= n)
 		{
-			_U cn = n - d;
+			_T cn = static_cast<_T>(n - d);
 			_move_n(cn, d);
-			_it = cn;
+			_current = cn;
 		}
 		else
-			_it += n;
+			_current += n;
 	}
 
-	template<typename _U>
-	inline void _minus(_U& n)
+	inline void _minus(_T& n)
 	{
-		_T d = _it - _first;
+		_T d = _current - _first;
 		if (d <= n)
 		{
 			n -= d;
 			_move_n(n, d);
-			_it = _last - n;
+			_current = static_cast<_T>(_last - n);
 		}
 		else
-			_it -= n;
+			_current -= n;
 	}
 
 protected:
@@ -162,9 +126,11 @@ protected:
 	}
 };
 
+
 template <typename _T>
-class infinite : public infinite_base<_T>
+struct infinite : public infinite_base<_T>
 {
+private:
 	typedef infinite_base<_T> base_type;
 	typedef infinite<_T> self_type;
 
@@ -176,33 +142,22 @@ public:
 	: base_type(first, last)
 	{}
 
-	CPP_CONSTEXPR infinite(const value_type& first, const value_type& it, const value_type& last)
-	: base_type(first, it, last)
+	CPP_CONSTEXPR infinite(const value_type& first, const value_type& x, const value_type& last)
+	: base_type(first, x, last)
 	{}
 
-	CPP_CONSTEXPR infinite(const self_type& other)
-	: base_type(other)
-	{}
+	FALCON_MEMBER_GETTER(value_type, operator->, base_type::_current)
 
-	FALCON_MEMBER_GETTER(value_type, operator->, base_type::_it)
+	operator const value_type &() const
+	{ return current(); }
 
-	FALCON_CAST_GETTER(value_type, base_type::_it)
-
-	using infinite_base<_T>::operator=;
-
-	FALCON_MEMBER_INCREMENT(self_type, base_type::next())
-	FALCON_MEMBER_DECREMENT(self_type, base_type::prev())
-
-#if 0
+	using base_type::current;
+	using base_type::rcurrent;
 	using base_type::next;
 	using base_type::prev;
 
-	self_type& operator+=(const _T& n)
-	{ base_type::plus(n); }
-
-	self_type& operator-=(const _T& n)
-	{ base_type::minus(n); }
-#endif
+	FALCON_MEMBER_INCREMENT(infinite<_T>, next())
+	FALCON_MEMBER_DECREMENT(infinite<_T>, prev())
 };
 
 }

@@ -58,7 +58,7 @@ class indirect_iterator
 	> __base;
 
 public:
-	indirect_iterator(const _Iterator& __x)
+	explicit indirect_iterator(const _Iterator& __x)
 	: __base(__x)
 	{}
 

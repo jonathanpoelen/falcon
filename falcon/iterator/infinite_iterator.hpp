@@ -3,26 +3,21 @@
 
 #include <falcon/infinite.hpp>
 #include <falcon/preprocessor/incremental.hpp>
-#include <falcon/preprocessor/getter.hpp>
-#include <falcon/iterator/detail/to_iterator_traits.hpp>
 #include <falcon/container/range_access.hpp>
 
 namespace falcon {
-
 namespace iterator {
 
 template <typename _Iterator>
-class infinite_iterator
-: public infinite_base<_Iterator>
+struct infinite_iterator
+: infinite_base<_Iterator>
 {
-	typedef infinite_base<_Iterator> base_type;
-	typedef infinite_iterator<_Iterator> self_type;
-
-public:
-	typedef typename base_type::value_type iterator;
+	typedef _Iterator iterator_type;
 
 private:
-	typedef typename detail::to_iterator_traits<_Iterator>::type iterator_traits;
+	typedef infinite_base<_Iterator> base_type;
+	typedef infinite_iterator<_Iterator> self_type;
+	typedef std::iterator_traits<_Iterator> iterator_traits;
 
 public:
 	typedef typename iterator_traits::value_type value_type;
@@ -32,39 +27,51 @@ public:
 	typedef typename iterator_traits::iterator_category iterator_category;
 
 public:
-	infinite_iterator(const iterator& begin, const iterator& end)
+	infinite_iterator(iterator_type begin, iterator_type end)
 	: base_type(begin, end)
 	{}
 
-	infinite_iterator(const iterator& begin, const iterator& it, const iterator& end)
+	infinite_iterator(iterator_type begin, iterator_type it, iterator_type end)
 	: base_type(begin, it, end)
 	{}
 
 	template <typename _Container>
-	infinite_iterator(_Container& container)
-	: base_type(begin(container), end(container))
+	explicit infinite_iterator(_Container& container)
+	: base_type(falcon::begin(container), falcon::end(container))
 	{}
 
+	infinite_iterator& operator=(const infinite_iterator& other)
+	{
+		base_type::_current = other._current;
+		return *this;
+	}
+
+	infinite_iterator& operator=(const iterator_type& other)
+	{
+		base_type::_current = other;
+		return *this;
+	}
+
 	template <typename _Container>
-	infinite_iterator(_Container& container, const iterator& it)
-	: base_type(begin(container), it, end(container))
+	infinite_iterator(_Container& container, iterator_type it)
+	: base_type(falcon::begin(container), it, falcon::end(container))
 	{}
 
 	infinite_iterator(const self_type& other)
 	: base_type(other)
 	{}
 
-	self_type& operator=(const iterator& it)
-	{
-		base_type::operator=(it);
-		return *this;
-	}
+	reference operator*() const
+	{ return *base_type::_current; }
 
-	FALCON_MEMBER_GETTER(reference, operator*, *base_type::_it)
-	FALCON_MEMBER_GETTER(pointer, operator->, base_type::_it.operator->())
+	reference operator*()
+	{ return *base_type::_current; }
 
-	using infinite_base<_Iterator>::next;
-	using infinite_base<_Iterator>::prev;
+	pointer operator->() const
+	{ return base_type::_current.operator->(); }
+
+	pointer operator->()
+	{ return base_type::_current.operator->(); }
 
 	FALCON_MEMBER_INCREMENT(self_type, base_type::next())
 	FALCON_MEMBER_DECREMENT(self_type, base_type::prev())
@@ -73,30 +80,43 @@ public:
 	{ return false; }
 	bool operator!=(const self_type&)
 	{ return true; }
+
+	iterator_type base() const
+	{ return base_type::_current; }
 };
 
-template <typename _Container, typename _Iterator = typename _Container::iterator>
-iterator::infinite_iterator<_Iterator> make_infinite_iterator(_Container& c) {
-	return iterator::infinite_iterator<_Iterator>(c);
-}
-
-template <typename _Container, typename _Iterator = typename _Container::iterator>
-iterator::infinite_iterator<_Iterator> make_infinite_iterator(_Container& c, const _Iterator& it) {
-	return iterator::infinite_iterator<_Iterator>(c, it);
-}
+template <typename _Iterator>
+bool operator==(const infinite_iterator<_Iterator>&,
+				const infinite_iterator<_Iterator>&)
+{ return false; }
 
 template <typename _Iterator>
-iterator::infinite_iterator<_Iterator> make_infinite_iterator(const _Iterator& begin, const _Iterator& end) {
-	return iterator::infinite_iterator<_Iterator>(begin, end);
-}
+bool operator!=(const infinite_iterator<_Iterator>&,
+				const infinite_iterator<_Iterator>&)
+{ return true; }
 
 template <typename _Iterator>
-iterator::infinite_iterator<_Iterator> make_infinite_iterator(const _Iterator& begin, _Iterator it, const _Iterator& end) {
-	return iterator::infinite_iterator<_Iterator>(begin, it, end);
-}
+bool operator<(const infinite_iterator<_Iterator>&,
+			   const infinite_iterator<_Iterator>&)
+{ return false; }
 
-}
 
-}
+template <typename _Container, typename _Iterator = typename range_access_iterator<_Container>::type>
+infinite_iterator<_Iterator> make_infinite_iterator(_Container& c)
+{ return infinite_iterator<_Iterator>(c); }
+
+template <typename _Container, typename _Iterator = typename range_access_iterator<_Container>::type>
+infinite_iterator<_Iterator> make_infinite_iterator(_Container& c, _Iterator it)
+{ return infinite_iterator<_Iterator>(c, it); }
+
+template <typename _Iterator>
+infinite_iterator<_Iterator> make_infinite_iterator(_Iterator begin, _Iterator end)
+{ return infinite_iterator<_Iterator>(begin, end); }
+
+template <typename _Iterator>
+infinite_iterator<_Iterator> make_infinite_iterator(_Iterator begin, _Iterator it, _Iterator end)
+{ return infinite_iterator<_Iterator>(begin, it, end); }
+
+}}
 
 #endif
