@@ -19,7 +19,7 @@ include_directories(.. ../..)
 " > $cmakelist
 	fi
 else
-	d=
+	d='.'
 	defbase=
 	cmakelist=CMakeLists.txt
 	mmain=FALCON_GROUP_TEST_TO_MAIN
