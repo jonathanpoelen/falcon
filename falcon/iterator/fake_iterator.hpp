@@ -6,18 +6,18 @@
 
 namespace falcon {
 namespace iterator {
-	struct fake_iterator_full_comparison_tag {};
-	struct fake_iterator_less_comparison_tag {};
-	struct fake_iterator_equal_to_comparison_tag {};
 
-	template <typename _T, typename _ComparisonTag = fake_iterator_full_comparison_tag>
-	class fake_iterator;
-}}
+struct fake_iterator_full_comparison_tag {};
+struct fake_iterator_less_comparison_tag {};
+struct fake_iterator_equal_to_comparison_tag {};
 
-namespace std
+template <typename _T, typename _ComparisonTag = fake_iterator_full_comparison_tag>
+class fake_iterator;
+
+namespace detail
 {
 	template <typename _T, typename _ComparisonTag>
-	struct iterator_traits< ::falcon::iterator::fake_iterator<_T, _ComparisonTag> >
+	struct fake_iterator_base
 	{
 		typedef typename ::falcon::difference<_T>::type difference_type;
 		///TODO not always
@@ -28,7 +28,7 @@ namespace std
 	};
 
 	template <typename _T, typename _ComparisonTag>
-	struct iterator_traits< ::falcon::iterator::fake_iterator<_T&, _ComparisonTag> >
+	struct fake_iterator_base<_T&, _ComparisonTag>
 	{
 		typedef typename ::falcon::difference<_T>::type difference_type;
 		///TODO not always
@@ -39,12 +39,9 @@ namespace std
 	};
 }
 
-namespace falcon {
-namespace iterator {
-
 template<typename _T, typename _ComparisonTag>
 struct __fake_iterator_traits_base
-: detail::handler_iterator_trait<fake_iterator<_T, _ComparisonTag>, _T>
+: detail::handler_iterator_traits<fake_iterator<_T, _ComparisonTag> >
 {
 	typedef fake_iterator<_T, _ComparisonTag> __fake_iterator;
 	typedef typename std::iterator_traits<__fake_iterator>::reference reference;
@@ -84,11 +81,17 @@ class fake_iterator
 : public detail::handler_iterator<
 	fake_iterator<_T, _ComparisonTag>,
 	_T,
-	__fake_iterator_traits<_T, _ComparisonTag>
+	__fake_iterator_traits<_T, _ComparisonTag>,
+	detail::fake_iterator_base<_T, _ComparisonTag>
 >
 {
 	typedef __fake_iterator_traits<_T, _ComparisonTag> __traits;
-	typedef detail::handler_iterator<fake_iterator, _T, __traits> __base;
+	typedef detail::handler_iterator<
+		fake_iterator,
+		_T,
+		__traits,
+		detail::fake_iterator_base<_T, _ComparisonTag>
+	> __base;
 
 public:
 	typedef typename __base::iterator_type iterator_type;

@@ -5,27 +5,14 @@
 
 namespace falcon {
 namespace iterator {
-	template <typename _Iterator, typename _ComparisonIterator>
-	class delegate_comparison_iterator;
-}}
 
-namespace std
-{
-	template <typename _Iterator, typename _Proxy>
-	struct iterator_traits<
-		::falcon::iterator::delegate_comparison_iterator<_Iterator, _Proxy>
-	> : iterator_traits<_Iterator>
-	{};
-}
-
-namespace falcon {
-namespace iterator {
+template <typename _Iterator, typename _ComparisonIterator>
+class delegate_comparison_iterator;
 
 template<typename _Iterator, typename _ComparisonIterator>
 struct __delegate_comparison_iterator_traits
-: detail::handler_iterator_trait<
-	delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
-	_Iterator
+: detail::handler_iterator_traits<
+	delegate_comparison_iterator<_Iterator, _ComparisonIterator>
 >
 {
 	typedef delegate_comparison_iterator<_Iterator, _ComparisonIterator> __iterator;

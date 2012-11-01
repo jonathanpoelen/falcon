@@ -8,45 +8,40 @@
 
 namespace falcon {
 namespace iterator {
-	template <typename _Iterator, typename _T = typename std::iterator_traits<_Iterator>::pointer>
-	struct __bit_iterator_is_const
-	: true_type
-	{};
 
-	template <typename _Iterator, typename _T>
-	struct __bit_iterator_is_const<_Iterator, const _T *>
-	: false_type
-	{};
+template <typename _Iterator, typename _T = typename std::iterator_traits<_Iterator>::pointer>
+struct __bit_iterator_is_const
+: true_type
+{};
 
-	template <typename _Iterator, bool _IsConst = false>
-	class bit_iterator;
+template <typename _Iterator, typename _T>
+struct __bit_iterator_is_const<_Iterator, const _T *>
+: false_type
+{};
 
-	template <typename _Iterator>
-	struct __bit_iterator_traits_base
+template <typename _Iterator, bool _IsConst = false>
+class bit_iterator;
+
+namespace detail
+{
+	template <typename _Iterator, bool>
+	struct bit_iterator_base
 	: std::iterator_traits<
 		std::iterator<
 			typename std::iterator_traits<_Iterator>::iterator_category,
 			bool
 		>
 	>
-	{};
-}}
-
-namespace std
-{
-	template <typename _Iterator>
-	struct iterator_traits< ::falcon::iterator::bit_iterator<_Iterator, false> >
-	: falcon::iterator::__bit_iterator_traits_base<_Iterator>
 	{
 		typedef falcon::basic_bit_reference<
-			typename iterator_traits<_Iterator>::value_type
+			typename std::iterator_traits<_Iterator>::value_type
 		> reference;
 		typedef reference* pointer;
 	};
 
 	template <typename _Iterator>
-	struct iterator_traits< ::falcon::iterator::bit_iterator<_Iterator, true> >
-	: falcon::iterator::__bit_iterator_traits_base<_Iterator>
+	struct bit_iterator_base<_Iterator, true>
+	: bit_iterator_base<_Iterator, false>
 	{
 		typedef bool        reference;
 		typedef bool        const_reference;
@@ -54,15 +49,12 @@ namespace std
 	};
 }
 
-namespace falcon {
-namespace iterator {
-
 template<typename _Iterator, bool _IsConst>
 struct __bit_iterator_traits
-: detail::handler_iterator_trait<bit_iterator<_Iterator, _IsConst>, _Iterator>
+: detail::handler_iterator_traits<bit_iterator<_Iterator, _IsConst>>
 {
 	typedef bit_iterator<_Iterator, _IsConst> __bit_iterator;
-	typedef detail::handler_iterator_trait<__bit_iterator, _Iterator> __base;
+	typedef detail::handler_iterator_traits<__bit_iterator> __base;
 	typedef typename std::iterator_traits<_Iterator>::value_type __value_type;
 	typedef typename __base::reference __reference;
 	static const unsigned _S_word_bit = bit_size<__value_type>::value;
@@ -136,13 +128,15 @@ class bit_iterator
 : public detail::handler_iterator<
 	bit_iterator<_Iterator, _IsConst>,
 	_Iterator,
-	__bit_iterator_traits<_Iterator, _IsConst>
+	__bit_iterator_traits<_Iterator, _IsConst>,
+	detail::bit_iterator_base<_Iterator, _IsConst>
 >
 {
 	typedef detail::handler_iterator<
 		bit_iterator<_Iterator, _IsConst>,
 		_Iterator,
-		__bit_iterator_traits<_Iterator, _IsConst>
+		__bit_iterator_traits<_Iterator, _IsConst>,
+		detail::bit_iterator_base<_Iterator, _IsConst>
 	> __base;
 
 public:

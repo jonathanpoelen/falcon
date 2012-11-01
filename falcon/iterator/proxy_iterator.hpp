@@ -10,15 +10,15 @@
 
 namespace falcon {
 namespace iterator {
-	template <typename _Iterator, typename _Proxy>
-	class proxy_iterator;
-}}
 
-namespace std
+template <typename _Iterator, typename _Proxy>
+class proxy_iterator;
+
+namespace detail
 {
 	template <typename _Iterator, typename _Proxy>
-	struct iterator_traits< ::falcon::iterator::proxy_iterator<_Iterator, _Proxy> >
-	: iterator_traits<_Iterator>
+	struct proxy_iterator_base
+	: std::iterator_traits<_Iterator>
 	{
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 		typedef typename std::result_of<
@@ -33,15 +33,12 @@ namespace std
 	};
 }
 
-namespace falcon {
-namespace iterator {
-
 template<typename _Iterator, typename _Proxy>
 struct __proxy_iterator_traits
-: detail::handler_iterator_trait<proxy_iterator<_Iterator, _Proxy>, _Iterator>
+: detail::handler_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
 {
 	typedef proxy_iterator<_Iterator, _Proxy> __proxy_iterator;
-	typedef detail::handler_iterator_trait<__proxy_iterator, _Iterator> __base;
+	typedef detail::handler_iterator_traits<__proxy_iterator> __base;
 
 	static typename __base::reference dereference(const __proxy_iterator& it)
 	{ return it.proxy()(*it._M_current); }
@@ -64,13 +61,15 @@ class proxy_iterator
 : public detail::handler_iterator<
 	proxy_iterator<_Iterator, _Proxy>,
 	_Iterator,
-	__proxy_iterator_traits<_Iterator, _Proxy>
+	__proxy_iterator_traits<_Iterator, _Proxy>,
+	detail::proxy_iterator_base<_Iterator, _Proxy>
 >
 {
 	typedef detail::handler_iterator<
 		proxy_iterator<_Iterator, _Proxy>,
 		_Iterator,
-		__proxy_iterator_traits<_Iterator, _Proxy>
+		__proxy_iterator_traits<_Iterator, _Proxy>,
+		detail::proxy_iterator_base<_Iterator, _Proxy>
 	> __base;
 
 	_Proxy _proxy;

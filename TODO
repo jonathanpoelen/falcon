@@ -156,7 +156,7 @@ late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…
 
 __CHAR_BIT__ standard ? À utiliser pour définir la taille des types dans bit/bit_size.hpp, bit/bit_swap.hpp et bit/detail/bit_swap.hpp
 
-
+classe qui change le nom d'un type en type, exemple use_pointer<class>::type pour par exemple récupéré le type pointer d'un iterator_traits.
 
 
 

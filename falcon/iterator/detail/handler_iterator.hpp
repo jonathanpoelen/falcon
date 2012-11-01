@@ -5,29 +5,31 @@
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # include <utility>
 #endif
+#include <falcon/type_traits/use_default.hpp>
+#include <falcon/type_traits/use_type.hpp>
+#include <falcon/type_traits/is_same.hpp>
 
 namespace falcon {
 namespace iterator {
 namespace detail {
 
-template<typename _Iterator, typename _Base, typename _Traits>
-class handler_iterator
-: public std::iterator<
-	typename _Traits::iterator_category,
-	typename _Traits::value_type,
-	typename _Traits::difference_type,
-	typename _Traits::pointer,
-	typename _Traits::reference
+template<
+	typename _Iterator,
+	typename _IteratorBase,
+	typename _Traits,
+	typename _Base = std::iterator_traits<_IteratorBase>
 >
+class handler_iterator
+: public _Base
 {
 public:
-	_Base _M_current;
+	_IteratorBase _M_current;
 
 public:
-	typedef _Base iterator_type;
-	typedef typename _Traits::difference_type difference_type;
-	typedef typename _Traits::pointer pointer;
-	typedef typename _Traits::reference reference;
+	typedef _IteratorBase iterator_type;
+	typedef typename _Base::difference_type difference_type;
+	typedef typename _Base::pointer pointer;
+	typedef typename _Base::reference reference;
 
 
 public:
@@ -122,75 +124,75 @@ public:
 };
 
 
-template <typename _Iterator, typename _Base, typename _Traits>
-bool operator==(const handler_iterator<_Iterator, _Base, _Traits>& a,
-				const handler_iterator<_Iterator, _Base, _Traits>& b)
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
+bool operator==(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a,
+				const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& b)
 { return _Traits::eq(a.downcast(), b.downcast()); }
 
-template <typename _Iterator, typename _Base, typename _Traits>
-bool operator<(const handler_iterator<_Iterator, _Base, _Traits>& a,
-			   const handler_iterator<_Iterator, _Base, _Traits>& b)
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
+bool operator<(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a,
+			   const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& b)
 { return _Traits::lt(a.downcast(), b.downcast()); }
 
-template <typename _Iterator, typename _Base, typename _Traits>
-bool operator!=(const handler_iterator<_Iterator, _Base, _Traits>& a,
-				const handler_iterator<_Iterator, _Base, _Traits>& b)
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
+bool operator!=(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a,
+				const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& b)
 { return !(a==b); }
 
-template <typename _Iterator, typename _Base, typename _Traits>
-bool operator<=(const handler_iterator<_Iterator, _Base, _Traits>& a,
-				const handler_iterator<_Iterator, _Base, _Traits>& b)
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
+bool operator<=(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a,
+				const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& b)
 { return !(b<a); }
 
-template <typename _Iterator, typename _Base, typename _Traits>
-bool operator>(const handler_iterator<_Iterator, _Base, _Traits>& a,
-				const handler_iterator<_Iterator, _Base, _Traits>& b)
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
+bool operator>(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a,
+			   const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& b)
 { return (b<a); }
 
-template <typename _Iterator, typename _Base, typename _Traits>
-bool operator>=(const handler_iterator<_Iterator, _Base, _Traits>& a,
-				const handler_iterator<_Iterator, _Base, _Traits>& b)
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
+bool operator>=(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a,
+				const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& b)
 { return !(a<b); }
 
 
-template <typename _Iterator, typename _Base, typename _Traits>
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
 _Iterator&
-operator+=(handler_iterator<_Iterator, _Base, _Traits>& a, int n)
+operator+=(handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a, int n)
 {
 	_Traits::next(a.downcast(), n);
 	return a.downcast();
 }
 
-template <typename _Iterator, typename _Base, typename _Traits>
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
 _Iterator&
-operator-=(handler_iterator<_Iterator, _Base, _Traits>& a, int n)
+operator-=(handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a, int n)
 {
 	_Traits::prev(a.downcast(), n);
 	return a.downcast();
 }
 
-template <typename _Iterator, typename _Base, typename _Traits>
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
 _Iterator
-operator+(const handler_iterator<_Iterator, _Base, _Traits>& a, int n)
+operator+(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a, int n)
 { return _Traits::next(a.downcast(), n, 1); }
 
-template <typename _Iterator, typename _Base, typename _Traits>
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
 _Iterator
-operator-(const handler_iterator<_Iterator, _Base, _Traits>& a, int n)
+operator-(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a, int n)
 { return _Traits::prev(a.downcast(), n, 1); }
 
-template <typename _Iterator, typename _Base, typename _Traits>
+template <typename _Iterator, typename _IteratorBase, typename _Traits, typename _Base>
 typename _Traits::difference_type
-operator-(const handler_iterator<_Iterator, _Base, _Traits>& a,
-		  const handler_iterator<_Iterator, _Base, _Traits>& b)
+operator-(const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& a,
+		  const handler_iterator<_Iterator, _IteratorBase, _Traits, _Base>& b)
 { return _Traits::diff(a.downcast(), b.downcast()); }
 
 
-template<typename _Iterator, typename _Base, typename _Tag = typename std::iterator_traits<_Iterator>::iterator_category>
-class handler_iterator_trait;
+template<typename _Iterator, typename _Tag = typename std::iterator_traits<_Iterator>::iterator_category>
+class handler_iterator_traits;
 
-template<typename _Iterator, typename _Base>
-struct handler_iterator_trait<_Iterator, _Base, std::output_iterator_tag>
+template<typename _Iterator>
+struct handler_iterator_traits<_Iterator, std::output_iterator_tag>
 {
 	typedef typename std::iterator_traits<_Iterator> __traits;
 
@@ -205,8 +207,8 @@ public:
 	{}
 };
 
-template<typename _Iterator, typename _Base>
-struct handler_iterator_trait<_Iterator, _Base, std::input_iterator_tag>
+template<typename _Iterator>
+struct handler_iterator_traits<_Iterator, std::input_iterator_tag>
 {
 	typedef typename std::iterator_traits<_Iterator> __traits;
 
@@ -221,9 +223,9 @@ public:
 	{ return *it._M_current; }
 };
 
-template<typename _Iterator, typename _Base>
-struct handler_iterator_trait<_Iterator, _Base, std::forward_iterator_tag>
-: handler_iterator_trait<_Iterator, _Base, std::input_iterator_tag>
+template<typename _Iterator>
+struct handler_iterator_traits<_Iterator, std::forward_iterator_tag>
+: handler_iterator_traits<_Iterator, std::input_iterator_tag>
 {
 	static void next(_Iterator& it)
 	{ ++it._M_current; }
@@ -239,17 +241,17 @@ struct handler_iterator_trait<_Iterator, _Base, std::forward_iterator_tag>
 	{ return a._M_current - b._M_current; }
 };
 
-template<typename _Iterator, typename _Base>
-struct handler_iterator_trait<_Iterator, _Base, std::bidirectional_iterator_tag>
-: handler_iterator_trait<_Iterator, _Base, std::forward_iterator_tag>
+template<typename _Iterator>
+struct handler_iterator_traits<_Iterator, std::bidirectional_iterator_tag>
+: handler_iterator_traits<_Iterator, std::forward_iterator_tag>
 {
 	static void prev(_Iterator& it)
 	{ --it._M_current; }
 };
 
-template<typename _Iterator, typename _Base>
-struct handler_iterator_trait<_Iterator, _Base, std::random_access_iterator_tag>
-: handler_iterator_trait<_Iterator, _Base, std::bidirectional_iterator_tag>
+template<typename _Iterator>
+struct handler_iterator_traits<_Iterator, std::random_access_iterator_tag>
+: handler_iterator_traits<_Iterator, std::bidirectional_iterator_tag>
 {
 	static void next(_Iterator& it)
 	{ ++it._M_current; }

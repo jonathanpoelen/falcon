@@ -6,6 +6,8 @@
 namespace falcon {
 namespace iterator {
 
+typedef std::iterator<std::output_iterator_tag, void, void, void, void> output_iterator;
+
 template<typename _Self>
 struct output_iterator_base
 : std::iterator<std::output_iterator_tag, void, void, void, void>
@@ -25,7 +27,8 @@ struct output_iterator_base
 private:
 	_Self& downcast()
 	{ static_cast<_Self&>(*this); }
-}
+};
+
 }}
 
 #endif
