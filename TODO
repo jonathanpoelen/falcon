@@ -20,11 +20,6 @@ objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, 
 
 iota(begin(), end(), first_value): le faire avec iota(container, first_value)
 
-bit_iterator (et ceux qui utilise des iterator sur bit) doivent être de vrai iterator (possibilité de changer la valeur). 2 implémentations, pour constant ou non. (see std::vector<bool>). Une partie dans enum/enumerator.hpp pourrait être extrait.
-Faire une bit_reference.
-
-un objet de rangement de bit, genre 2 bit puis 3 etc…
-
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
 flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
 flag_position qui s'occupe de faire un décalage de bits. Ou un int ? bit_wrapper<_T>{_T*}
@@ -158,3 +153,12 @@ enlever pseudo_iterator et faire [in|out]put_iterator_base
 rendre optionnel la specification de std ::iterator_traits pour les iterators. le handler_iterator_trait prendrait un iterator_traits en template = std::iterator_traits<_Iterator> ?
 
 late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…) { return _FunctorAllocator(…) } ; _FunctorAllocator -> return _ClassTemplate<_T>()
+
+__CHAR_BIT__ standard ? À utiliser pour définir la taille des types dans bit/bit_size.hpp, bit/bit_swap.hpp et bit/detail/bit_swap.hpp
+
+
+
+
+
+
+

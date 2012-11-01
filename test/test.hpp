@@ -62,7 +62,7 @@ auto tmp_CHECK_VALUE = (a);\
 auto tmp_CHECK_VALUE2 = (__VA_ARGS__);\
 if (!(tmp_CHECK_VALUE op tmp_CHECK_VALUE2)){\
 	std::stringstream _Oss;\
-	_Oss << "bad check for op " #op " in " __FILE__ " line " << __LINE__ << "\n value is: ";\
+	_Oss << "bad check for [ " #a " " #op " " #__VA_ARGS__ " ] in " __FILE__ " at line " << __LINE__ << "\n value is: ";\
 	__show_value_test(_Oss, tmp_CHECK_VALUE) << "\n------------------------\nresult is: ";\
 	__show_value_test(_Oss, tmp_CHECK_VALUE2);\
 	throw std::runtime_error(_Oss.str());\

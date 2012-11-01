@@ -73,9 +73,8 @@ public:
 
 
 template <typename _Iterator>
-indirect_iterator<_Iterator>
-make_indirect_iterator(_Iterator it)
-{ return indirect_iterator<_Iterator>(it); }
+indirect_iterator<_Iterator> make_indirect_iterator(_Iterator x)
+{ return indirect_iterator<_Iterator>(x); }
 
 }}
 

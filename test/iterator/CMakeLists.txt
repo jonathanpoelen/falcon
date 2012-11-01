@@ -2,7 +2,6 @@ include(../../CMakeDefinitions.txt)
 include_directories(.. ../..)
 
 create_exec_test(bit_iterator)
-create_exec_test(bit_iterator_iterator)
 create_exec_test(delegate_comparison_iterator)
 create_exec_test(infinite_iterator)
 # create_exec_test(multiple_iterator)

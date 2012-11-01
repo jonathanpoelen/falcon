@@ -56,16 +56,13 @@ struct __fake_iterator_traits_base
 	{ return it._M_current; }
 };
 
-template<typename>
-class __fake_iterator_traits;
-
 template<typename _T, typename _ComparisonTag>
-struct __fake_iterator_traits<fake_iterator<_T, _ComparisonTag> >
+struct __fake_iterator_traits
 : __fake_iterator_traits_base<_T, _ComparisonTag>
 {};
 
 template<typename _T>
-struct __fake_iterator_traits<fake_iterator<_T, fake_iterator_equal_to_comparison_tag> >
+struct __fake_iterator_traits<_T, fake_iterator_equal_to_comparison_tag>
 : __fake_iterator_traits_base<_T, fake_iterator_equal_to_comparison_tag>
 {
 	typedef fake_iterator<_T, fake_iterator_equal_to_comparison_tag> __fake_iterator;
@@ -73,7 +70,7 @@ struct __fake_iterator_traits<fake_iterator<_T, fake_iterator_equal_to_compariso
 };
 
 template<typename _T>
-struct __fake_iterator_traits<fake_iterator<_T, fake_iterator_less_comparison_tag> >
+struct __fake_iterator_traits<_T, fake_iterator_less_comparison_tag>
 : __fake_iterator_traits_base<_T, fake_iterator_less_comparison_tag>
 {
 	typedef fake_iterator<_T, fake_iterator_less_comparison_tag> __fake_iterator;
@@ -87,10 +84,10 @@ class fake_iterator
 : public detail::handler_iterator<
 	fake_iterator<_T, _ComparisonTag>,
 	_T,
-	__fake_iterator_traits<fake_iterator<_T, _ComparisonTag> >
+	__fake_iterator_traits<_T, _ComparisonTag>
 >
 {
-	typedef __fake_iterator_traits<fake_iterator> __traits;
+	typedef __fake_iterator_traits<_T, _ComparisonTag> __traits;
 	typedef detail::handler_iterator<fake_iterator, _T, __traits> __base;
 
 public:

@@ -1,59 +1,66 @@
+#include <vector>
 #include <test/test.hpp>
 #include <falcon/iterator/bit_iterator.hpp>
 #include "bit_iterator.hpp"
 
 void bit_iterator_test()
 {
+	typedef std::vector<unsigned char> container_type;
+	typedef typename container_type::iterator iterator;
+	container_type v = {0xff, 0x0f, 0xf0, 0x80};
+
+	falcon::iterator::bit_iterator<iterator> it(v.begin(), 0);
+	falcon::iterator::bit_iterator<iterator> end(v.end(), 0);
+
+	for (int i = 0; i < 8 + 4; ++i, ++it)
 	{
-		typedef falcon::iterator::bit_iterator<unsigned char> iterator_type;
-		iterator_type it(1<<7/*iterator_type::first_value*/);
-		iterator_type end;
-
-		CHECK_EQUAL_VALUE(0, *end);
-		CHECK(it != end);
-		CHECK_EQUAL_VALUE(1<<7, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<6, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<5, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<4, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<3, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<2, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<1, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1, *it);
-		CHECK(++it == end);
-		CHECK_EQUAL_VALUE(0, *it);
+		CHECK_EQUAL_VALUE(true, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
 	}
-
+	for (int i = 0; i < 8; ++i, ++it)
 	{
-		typedef falcon::iterator::reverse_bit_iterator<unsigned char> iterator_type;
-		iterator_type it(1);
-		iterator_type end(1u<<8);
-
-		//CHECK_EQUAL_VALUE(0, *end);
-		CHECK(it != end);
-		CHECK_EQUAL_VALUE(1, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<1, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<2, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<3, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<4, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<5, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<6, *it);
-		CHECK(++it != end);
-		CHECK_EQUAL_VALUE(1<<7, *it);
-		CHECK(++it == end);
-		//CHECK_EQUAL_VALUE(0, *it);
+		CHECK_EQUAL_VALUE(false, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
 	}
+	for (int i = 0; i < 4; ++i, ++it)
+	{
+		CHECK_EQUAL_VALUE(true, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
+	}
+	for (int i = 0; i < 7; ++i, ++it)
+	{
+		CHECK_EQUAL_VALUE(false, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
+	}
+	CHECK_EQUAL_VALUE(true, *it);
+	CHECK_EQUAL_VALUE(true, end == ++it);
+
+	CHECK_EQUAL_VALUE(true, end != --it);
+	end = falcon::iterator::bit_iterator<iterator>(v.begin() - 1, 7);
+	CHECK_EQUAL_VALUE(true, *it);
+	*it = false;
+	CHECK_EQUAL_VALUE(false, *it);
+	--it;
+	for (int i = 0; i < 7; ++i, --it)
+	{
+		CHECK_EQUAL_VALUE(false, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
+	}
+	for (int i = 0; i < 4; ++i, --it)
+	{
+		CHECK_EQUAL_VALUE(true, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
+	}
+	for (int i = 0; i < 8; ++i, --it)
+	{
+		CHECK_EQUAL_VALUE(false, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
+	}
+	for (int i = 0; i < 8 + 4; ++i, --it)
+	{
+		CHECK_EQUAL_VALUE(true, *it);
+		CHECK_EQUAL_VALUE(true, end != it);
+	}
+	CHECK_EQUAL_VALUE(true, end == it);
 }
 FALCON_TEST_TO_MAIN(bit_iterator_test)

@@ -1,123 +1,183 @@
 #ifndef _FALCON_ITERATOR_BIT_ITERATOR_HPP
 #define _FALCON_ITERATOR_BIT_ITERATOR_HPP
 
-#include <falcon/preprocessor/incremental.hpp>
-#include <falcon/preprocessor/comparison.hpp>
-#include <falcon/bit/edge_bit.hpp>
-#include <falcon/iterator/detail/to_iterator_traits.hpp>
-#include <falcon/endian.hpp>
+#include <falcon/iterator/detail/handler_iterator.hpp>
+#include <falcon/bit/bit_size.hpp>
+#include <falcon/bit/bit_reference.hpp>
+#include <falcon/type_traits/integral_constant.hpp>
 
 namespace falcon {
+namespace iterator {
+	template <typename _Iterator, typename _T = typename std::iterator_traits<_Iterator>::pointer>
+	struct __bit_iterator_is_const
+	: true_type
+	{};
 
+	template <typename _Iterator, typename _T>
+	struct __bit_iterator_is_const<_Iterator, const _T *>
+	: false_type
+	{};
+
+	template <typename _Iterator, bool _IsConst = false>
+	class bit_iterator;
+
+	template <typename _Iterator>
+	struct __bit_iterator_traits_base
+	: std::iterator_traits<
+		std::iterator<
+			typename std::iterator_traits<_Iterator>::iterator_category,
+			bool
+		>
+	>
+	{};
+}}
+
+namespace std
+{
+	template <typename _Iterator>
+	struct iterator_traits< ::falcon::iterator::bit_iterator<_Iterator, false> >
+	: falcon::iterator::__bit_iterator_traits_base<_Iterator>
+	{
+		typedef falcon::basic_bit_reference<
+			typename iterator_traits<_Iterator>::value_type
+		> reference;
+		typedef reference* pointer;
+	};
+
+	template <typename _Iterator>
+	struct iterator_traits< ::falcon::iterator::bit_iterator<_Iterator, true> >
+	: falcon::iterator::__bit_iterator_traits_base<_Iterator>
+	{
+		typedef bool        reference;
+		typedef bool        const_reference;
+		typedef const bool* pointer;
+	};
+}
+
+namespace falcon {
 namespace iterator {
 
-template<typename _T>
-class __bit_iterator_base
+template<typename _Iterator, bool _IsConst>
+struct __bit_iterator_traits
+: detail::handler_iterator_trait<bit_iterator<_Iterator, _IsConst>, _Iterator>
 {
-	typedef __bit_iterator_base<_T> self_type;
+	typedef bit_iterator<_Iterator, _IsConst> __bit_iterator;
+	typedef detail::handler_iterator_trait<__bit_iterator, _Iterator> __base;
+	typedef typename std::iterator_traits<_Iterator>::value_type __value_type;
+	typedef typename __base::reference __reference;
+	static const unsigned _S_word_bit = bit_size<__value_type>::value;
 
-public:
-	typedef _T value_type;
+	static __reference dereference(const __bit_iterator& it)
+	{ return __reference(&*it._M_current, static_cast<__value_type>(1UL << it._M_offset)); }
 
-protected:
-	/*value_type*/ long _mask;
+	static __reference dereference(__bit_iterator& it)
+	{ return __reference(&*it._M_current, static_cast<__value_type>(1UL << it._M_offset)); }
 
-public:
-	__bit_iterator_base()
-	: _mask()
-	{}
-
-	__bit_iterator_base(const /*value_type*/long& mask)
-	: _mask(mask)
-	{}
-
-	self_type& operator=(const self_type& other)
+	static void next(__bit_iterator& it)
 	{
-		_mask = other._mask;
-		return *this;
+		if (it._M_offset++ == _S_word_bit - 1u)
+		{
+			it._M_offset = 0;
+			++it._M_current;
+		}
 	}
 
-	self_type& operator=(const value_type& other)
+	static void next(__bit_iterator& it, int n)
+	{ incr(it, n); }
+
+	static __bit_iterator next(const __bit_iterator& it, int n, int)
 	{
-		_mask = other;
-		return *this;
+		__bit_iterator ret(it);
+		incr(ret, n);
+		return ret;
 	}
 
-	const /*value_type*/long& operator*() const
-	{ return _mask; }
+	static void prev(__bit_iterator& it)
+	{
+		if (it._M_offset-- == 0)
+		{
+			it._M_offset = _S_word_bit - 1u;
+			--it._M_current;
+		}
+	}
 
-	FALCON_MEMBER_COMPARISON2_ALL_OPERATOR(self_type, _mask, other._mask)
+	static void prev(__bit_iterator& it, int n)
+	{ incr(it, -n); }
 
-	template<typename _BitIterator>
-	bool operator&&(const __bit_iterator_base<_BitIterator>& other) const
-	{ return operator*() && *other; }
+	static __bit_iterator prev(const __bit_iterator& it, int n, int)
+	{
+		__bit_iterator ret(it);
+		incr(ret, -n);
+		return ret;
+	}
 
-	template<typename _BitIterator>
-	bool operator||(const __bit_iterator_base<_BitIterator>& other) const
-	{ return operator*() || *other; }
+	static void incr(__bit_iterator& it, ptrdiff_t __i)
+	{
+		typename __base::difference_type __n = __i + it._M_offset;
+		it._M_current += __n / int(_S_word_bit);
+		__n = __n % int(_S_word_bit);
+		if (__n < 0)
+		{
+			__n += int(_S_word_bit);
+			--it._M_current;
+		}
+		it._M_offset = static_cast<unsigned>(__n);
+	}
 
-	/*value_type*/long operator~() const
-	{ return ~_mask; }
+	static bool eq(const __bit_iterator& a, const __bit_iterator& b)
+	{ return a._M_current == b._M_current && a._M_offset == b._M_offset; }
 
-	bool valid() const
-	{ return _mask; }
+	static bool lt(const __bit_iterator& a, const __bit_iterator& b)
+	{ return a._M_current < b._M_current || (a._M_current == b._M_current && a._M_offset < b._M_offset); }
 };
 
-template<typename _T>
-class bit_iterator : public __bit_iterator_base<_T>
+template<typename _Iterator, bool _IsConst>
+class bit_iterator
+: public detail::handler_iterator<
+	bit_iterator<_Iterator, _IsConst>,
+	_Iterator,
+	__bit_iterator_traits<_Iterator, _IsConst>
+>
 {
-	typedef bit_iterator<_T> self_type;
-	typedef __bit_iterator_base<_T> base_type;
-	using base_type::_mask;
+	typedef detail::handler_iterator<
+		bit_iterator<_Iterator, _IsConst>,
+		_Iterator,
+		__bit_iterator_traits<_Iterator, _IsConst>
+	> __base;
 
 public:
-	typedef typename base_type::value_type value_type;
-	//static const value_type begin = right_bit<value_type>::value;
-	//static const value_type end = left_bit<value_type>::value;
-	static const value_type first_value = left_bit<value_type>::value;
-	static const value_type last_value = 0;
+	unsigned _M_offset;
 
-public:
-	bit_iterator(const value_type& mask)
-	: base_type(mask)
+	typedef typename __base::iterator_type iterator_type;
+
+
+	bit_iterator(iterator_type __x, unsigned offset)
+	: __base(__x), _M_offset(offset)
 	{}
 
 	bit_iterator()
-	: base_type()
+	: __base(), _M_offset(0)
 	{}
 
-	FALCON_MEMBER_INCREMENT(self_type, _mask >>= 1)
-	FALCON_MEMBER_DECREMENT(self_type, _mask <<= 1)
+	bit_iterator(const bit_iterator& __x)
+	: __base(__x), _M_offset(__x._M_offset)
+	{}
 };
 
-template<typename _T>
-class reverse_bit_iterator : public __bit_iterator_base<_T>
-{
-	typedef reverse_bit_iterator<_T> self_type;
-	typedef __bit_iterator_base<_T> base_type;
-	using base_type::_mask;
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+template <typename _Iterator>
+using const_bit_iterator = bit_iterator<_Iterator, true>;
+#endif
 
-public:
-	typedef typename base_type::value_type value_type;
-	//static const value_type begin = left_bit<value_type>::value;
-	//static const value_type end = right_bit<value_type>::value;
-	static const value_type first_value = right_bit<value_type>::value;
-	static const value_type last_value = 0;
 
-public:
-	reverse_bit_iterator(/*value_type*/long mask)
-	: base_type(mask)
-	{}
+template <typename _Iterator>
+bit_iterator<_Iterator> make_bit_iterator(_Iterator x, unsigned offset)
+{ return bit_iterator<_Iterator>(x, offset); }
 
-	reverse_bit_iterator()
-	: base_type()
-	{}
+template <typename _Iterator>
+bit_iterator<_Iterator, true> make_const_bit_iterator(_Iterator x, unsigned offset)
+{ return bit_iterator<_Iterator, true>(x, offset); }
 
-	FALCON_MEMBER_INCREMENT(self_type, _mask <<= 1)
-	FALCON_MEMBER_DECREMENT(self_type, _mask >>= 1)};
-
-}
-
-}
+}}
 
 #endif

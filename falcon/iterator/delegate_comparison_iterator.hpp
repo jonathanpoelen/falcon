@@ -21,13 +21,9 @@ namespace std
 namespace falcon {
 namespace iterator {
 
-template<typename>
-class __delegate_comparison_iterator_traits;
-
 template<typename _Iterator, typename _ComparisonIterator>
-struct __delegate_comparison_iterator_traits<
-	delegate_comparison_iterator<_Iterator, _ComparisonIterator>
-> : detail::handler_iterator_trait<
+struct __delegate_comparison_iterator_traits
+: detail::handler_iterator_trait<
 	delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
 	_Iterator
 >
@@ -65,17 +61,13 @@ class delegate_comparison_iterator
 : public detail::handler_iterator<
 	delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
 	_Iterator,
-	__delegate_comparison_iterator_traits<
-		delegate_comparison_iterator<_Iterator, _ComparisonIterator>
-	>
+	__delegate_comparison_iterator_traits<_Iterator, _ComparisonIterator>
 >
 {
 	typedef detail::handler_iterator<
 		delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
 		_Iterator,
-		__delegate_comparison_iterator_traits<
-			delegate_comparison_iterator<_Iterator, _ComparisonIterator>
-		>
+		__delegate_comparison_iterator_traits<_Iterator, _ComparisonIterator>
 	> __base;
 
 	_ComparisonIterator _comparison_iterator;
@@ -115,8 +107,8 @@ public:
 };
 
 template <typename _Iterator, typename _ComparisonIterator>
-iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator> make_delegate_comparison_iterator(const _Iterator& begin, const _ComparisonIterator& compare)
-{ return iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator>(begin, compare); }
+iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator> make_delegate_comparison_iterator(_Iterator x, const _ComparisonIterator& compare)
+{ return iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator>(x, compare); }
 
 }}
 

@@ -36,11 +36,8 @@ namespace std
 namespace falcon {
 namespace iterator {
 
-template<typename>
-class __proxy_iterator_traits;
-
 template<typename _Iterator, typename _Proxy>
-struct __proxy_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
+struct __proxy_iterator_traits
 : detail::handler_iterator_trait<proxy_iterator<_Iterator, _Proxy>, _Iterator>
 {
 	typedef proxy_iterator<_Iterator, _Proxy> __proxy_iterator;
@@ -67,13 +64,13 @@ class proxy_iterator
 : public detail::handler_iterator<
 	proxy_iterator<_Iterator, _Proxy>,
 	_Iterator,
-	__proxy_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
+	__proxy_iterator_traits<_Iterator, _Proxy>
 >
 {
 	typedef detail::handler_iterator<
 		proxy_iterator<_Iterator, _Proxy>,
 		_Iterator,
-		__proxy_iterator_traits<proxy_iterator<_Iterator, _Proxy> >
+		__proxy_iterator_traits<_Iterator, _Proxy>
 	> __base;
 
 	_Proxy _proxy;
@@ -114,8 +111,8 @@ public:
 
 template <typename _Iterator, typename _Proxy>
 proxy_iterator<_Iterator, _Proxy>
-make_proxy_iterator(const _Iterator& begin, const _Proxy& proxy)
-{ return proxy_iterator<_Iterator, _Proxy>(begin, proxy); }
+make_proxy_iterator(_Iterator x, const _Proxy& proxy)
+{ return proxy_iterator<_Iterator, _Proxy>(x, proxy); }
 
 }}
 

@@ -101,7 +101,7 @@ public:
 	_Iterator& operator--()
 	{
 		_Traits::prev(downcast());
-		return *this;
+		return downcast();
 	}
 
 	_Iterator operator--(int)
