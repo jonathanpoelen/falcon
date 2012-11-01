@@ -158,6 +158,7 @@ __CHAR_BIT__ standard ? À utiliser pour définir la taille des types dans bit/b
 
 classe qui change le nom d'un type en type, exemple use_pointer<class>::type pour par exemple récupéré le type pointer d'un iterator_traits.
 
+utiliser use_type, if_ et eval_if quand possible, nottament dans les has et autre classe de sélection de type (les macros *CHOOSE_* et *HAS_* ?).
 
 
 
