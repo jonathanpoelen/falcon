@@ -22,5 +22,7 @@
 #include <falcon/type_traits/subtype.hpp>
 #include <falcon/type_traits/unqualified.hpp>
 #include <falcon/type_traits/unspecified_type.hpp>
+#include <falcon/type_traits/use_default.hpp>
+#include <falcon/type_traits/use_type.hpp>
 
 #endif

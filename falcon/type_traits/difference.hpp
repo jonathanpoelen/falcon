@@ -13,19 +13,18 @@ struct difference
 #else
 # include <cstddef>
 # include <boost/type_traits/remove_cv.hpp
-# include <falcon/helper/has_difference_type.hpp
-# include <falcon/sfinae/choose_has_type.hpp>
+# include <falcon/type_traits/use_type.hpp>
+# include <falcon/type_traits/use_if.hpp>
 
 namespace falcon {
 
 template <typename _T>
-class difference
-{
-	FALCON_CLASS_CHOOSE_TYPE(_T, typename _T::difference_type, typename boost::remove_cv<_T>::type);
-
-public:
-	typedef FALCON_CALL_CHOOSE_HAS_TYPE(_T, difference_type) type;
-};
+struct difference
+: use_if<
+	use_difference_type<_T>,
+	boost::remove_cv<_T>
+>
+{};
 
 template <typename _T>
 struct difference<_T*>
