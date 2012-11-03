@@ -1,18 +1,20 @@
 #ifndef FALCON_TYPE_TRAITS_USE_TYPE_HPP
 #define FALCON_TYPE_TRAITS_USE_TYPE_HPP
 
+#include <falcon/type_traits/has.hpp>
+
 namespace falcon
 {
-
-template <typename _T>
-struct use
-{ typedef _T type; };
 
 #define FALCON_CONVERT_NAME_TYPE(name)\
 template <typename _T>\
 struct use_##name\
-{ typedef typename _T::name type; }
+{\
+	typedef typename _T::name type;\
+	static const bool value = has_##name<_T>::value;\
+}
 
+FALCON_CONVERT_NAME_TYPE(type);
 FALCON_CONVERT_NAME_TYPE(value_type);
 FALCON_CONVERT_NAME_TYPE(reference);
 FALCON_CONVERT_NAME_TYPE(const_reference);
@@ -35,7 +37,6 @@ FALCON_CONVERT_NAME_TYPE(key_compare);
 FALCON_CONVERT_NAME_TYPE(compare_type);
 FALCON_CONVERT_NAME_TYPE(accessor_type);
 FALCON_CONVERT_NAME_TYPE(functor_type);
-FALCON_CONVERT_NAME_TYPE(compare_type);
 FALCON_CONVERT_NAME_TYPE(traits_type);
 FALCON_CONVERT_NAME_TYPE(char_type);
 FALCON_CONVERT_NAME_TYPE(int_type);

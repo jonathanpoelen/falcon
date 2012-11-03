@@ -13,7 +13,6 @@ struct difference
 #else
 # include <cstddef>
 # include <boost/type_traits/remove_cv.hpp
-# include <falcon/type_traits/use_type.hpp>
 # include <falcon/type_traits/use_if.hpp>
 
 namespace falcon {

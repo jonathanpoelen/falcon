@@ -1,19 +1,13 @@
 #ifndef _FALCON_SFINAE_HEADER_CHOOSE_TYPE_HPP
 #define _FALCON_SFINAE_HEADER_CHOOSE_TYPE_HPP
 
-#define FALCON_HEADER_CHOOSE_TYPE_TRUE(_Name)\
-	template<bool, typename _Falcon_Unused_T = void> struct _Name\
- 
-#define FALCON_HEADER_CHOOSE_TYPE_FALSE(_Name)\
-	template<typename _Falcon_Unused_T> struct _Name<false, _Falcon_Unused_T>
+#include <falcon/type_traits/if.hpp>
 
 #define FALCON_CREATE_CHOOSE_TYPE(_Name, _TypeTrue, _TypeFalse)\
-	FALCON_HEADER_CHOOSE_TYPE_TRUE(_Name){\
-		typedef _TypeTrue type;\
-	};\
-	FALCON_HEADER_CHOOSE_TYPE_FALSE(_Name){\
-		typedef _TypeFalse type;\
-	}
+	template<bool b, typename _Falcon_Unused_T = void>\
+	struct _Name\
+	: falcon::if_<b, _TypeTrue, _TypeFalse>\
+	{}
 
 #define FALCON_CHOOSE_TYPE_NAME(_TypeName) _TypeName##_choose_type
 

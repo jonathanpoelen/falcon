@@ -7,8 +7,7 @@
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # include <falcon/arg/arg.hpp>
 # include <falcon/tuple/tuple_compose.hpp>
-# include <falcon/helper/has_result_type.hpp>
-# include <falcon/helper/has_argument_type.hpp>
+# include <falcon/type_traits/has.hpp>
 #endif
 
 namespace falcon {
@@ -18,10 +17,10 @@ template <class _WrapArgument, class _WrapResult>
 struct __compose_check_type
 {
 	static const bool value = (
-		helper::has_argument_type<
+		has_argument_type<
 			typename std::remove_reference<_WrapArgument>::type
 		>::value
-		&& helper::has_result_type<
+		&& has_result_type<
 			typename std::remove_reference<_WrapResult>::type
 		>::value
 	);

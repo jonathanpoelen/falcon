@@ -16,7 +16,7 @@ struct is_unspecified
 : public false_type { };
 
 template<>
-struct is_unspecified<unspecified>
+struct is_unspecified<unspecified_t>
 : public true_type { };
 
 }

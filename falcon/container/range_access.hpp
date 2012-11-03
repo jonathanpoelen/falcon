@@ -54,18 +54,14 @@ namespace falcon {
 #else
 
 # include <cstddef>
-# include <falcon/sfinae/choose_has_type.hpp>
+# include <falcon/type_traits/use_if.hpp>
 
 namespace falcon {
 
 	template <typename _Container>
-	class range_access_iterator
-	{
-		FALCON_CLASS_CHOOSE_HAS_TYPE(_Container, iterator, typename _Container::const_iterator);
-
-	public:
-		typedef FALCON_CALL_CHOOSE_HAS_TYPE(_Container, iterator) type;
-	};
+	struct range_access_iterator
+	: use_if<use_iterator<_Container>, use_const_iterator<_Container> >
+	{};
 
 	template <typename _T, std::size_t _N>
 	struct range_access_iterator<_T[_N]>
@@ -74,22 +70,14 @@ namespace falcon {
 	};
 
 	template <typename _Container>
-	class range_access_iterator<const _Container>
-	{
-		FALCON_CLASS_CHOOSE_HAS_TYPE(_Container, const_iterator, typename _Container::iterator);
-
-	public:
-		typedef FALCON_CALL_CHOOSE_HAS_TYPE(_Container, const_iterator) type;
-	};
+	struct range_access_iterator<const _Container>
+	: use_if<use_const_iterator<_Container>, use_iterator<_Container> >
+	{};
 
 	template <typename _Container>
 	struct range_access_reverse_iterator
-	{
-		FALCON_CLASS_CHOOSE_HAS_TYPE(_Container, reverse_iterator, typename _Container::const_reverse_iterator);
-
-	public:
-		typedef FALCON_CALL_CHOOSE_HAS_TYPE(_Container, reverse_iterator) type;
-	};
+	: use_if<use_reverse_iterator<_Container>, use_const_reverse_iterator<_Container> >
+	{};
 
 	template <typename _T, std::size_t _N>
 	struct range_access_reverse_iterator<_T[_N]>
@@ -98,13 +86,9 @@ namespace falcon {
 	};
 
 	template <typename _Container>
-	class range_access_reverse_iterator<const _Container>
-	{
-		FALCON_CLASS_CHOOSE_HAS_TYPE(_Container, const_reverse_iterator, typename _Container::reverse_iterator);
-
-	public:
-		typedef FALCON_CALL_CHOOSE_HAS_TYPE(_Container, const_reverse_iterator) type;
-	};
+	struct range_access_reverse_iterator<const _Container>
+	: use_if<use_const_reverse_iterator<_Container>, use_reverse_iterator<_Container> >
+	{};
 
 	template<typename _Container>
 	inline typename range_access_iterator<_Container>::type begin(_Container& cont)

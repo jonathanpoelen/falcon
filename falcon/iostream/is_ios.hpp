@@ -3,9 +3,7 @@
 
 #include <iosfwd>
 #include <falcon/type_traits/is_instance_of.hpp>
-#include <falcon/helper/has_char_type.hpp>
-#include <falcon/helper/has_traits_type.hpp>
-#include <falcon/helper/has_allocator_type.hpp>
+#include <falcon/type_traits/has.hpp>
 
 namespace falcon {
 
@@ -13,8 +11,8 @@ template<typename _T, template<class _Char, class _Traits> class _StreamConvert>
 class __is_ios
 {
 	template<typename _Stream, bool _HasTypeStream =
-		falcon::helper::has_char_type<_T>::value
-		&& falcon::helper::has_traits_type<_T>::value
+		falcon::has_char_type<_T>::value
+		&& falcon::has_traits_type<_T>::value
 	>
 	struct __is_ios_impl
 	{
@@ -38,9 +36,9 @@ template<typename _T, template<class _Char, class _Traits, class _Alloc> class _
 class __is_iostrings
 {
 	template<typename _Stream, bool _HasTypeStream =
-		falcon::helper::has_char_type<_T>::value
-		&& falcon::helper::has_traits_type<_T>::value
-		&& falcon::helper::has_allocator_type<_T>::value
+		falcon::has_char_type<_T>::value
+		&& falcon::has_traits_type<_T>::value
+		&& falcon::has_allocator_type<_T>::value
 	>
 	struct __is_iostrings_impl
 	{

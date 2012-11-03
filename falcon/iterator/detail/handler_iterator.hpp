@@ -5,8 +5,6 @@
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # include <utility>
 #endif
-#include <falcon/type_traits/use_default.hpp>
-#include <falcon/type_traits/use_type.hpp>
 #include <falcon/type_traits/is_same.hpp>
 
 namespace falcon {
