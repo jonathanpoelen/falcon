@@ -1,7 +1,7 @@
 #ifndef FALCON_TYPE_TRAITS_HPP
 #define FALCON_TYPE_TRAITS_HPP
 
-#include <falcon/type_traits/add_const_reference.hpp>
+#include <falcon/type_traits/add_const_if_reference.hpp>
 #include <falcon/type_traits/add_n_pointer.hpp>
 #include <falcon/type_traits/declval.hpp>
 #include <falcon/type_traits/difference.hpp>

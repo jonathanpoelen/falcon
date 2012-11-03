@@ -5,17 +5,17 @@
 
 namespace falcon {
 
-template <typename _Class, typename _T = typename _Class::value_type>
+template <typename _Class, typename _T = typename _Class::value_type&>
 struct next_accessor
 {
-	typedef _T value_type;
+	typedef _T result_type;
 
-	value_type& operator()(_Class& cont) const
+	result_type operator()(_Class& cont) const
 	{
 		return cont.next();
 	}
 
-	CPP_CONSTEXPR value_type& operator()(const _Class& cont) const
+	CPP_CONSTEXPR result_type operator()(const _Class& cont) const
 	{
 		return cont.next();
 	}

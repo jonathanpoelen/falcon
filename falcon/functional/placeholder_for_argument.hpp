@@ -4,7 +4,6 @@
 #include <utility>
 #include <falcon/functional/call.hpp>
 #include <falcon/type_traits/declval.hpp>
-#include <falcon/type_traits/add_const_reference.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
 
 namespace falcon {
@@ -24,18 +23,18 @@ private:
 public:
 	constexpr placeholder_for_argument() = default;
 
-	constexpr placeholder_for_argument(typename add_const_reference<_T>::type __data)
+	constexpr placeholder_for_argument(const _T& __data)
 	: _M_data(__data)
 	, _M_functor()
 	{}
 
-	constexpr placeholder_for_argument(typename add_const_reference<_T>::type __data, _Functor func)
+	constexpr placeholder_for_argument(const _T& __data, _Functor func)
 	: _M_data(__data)
 	, _M_functor(func)
 	{}
 
 	template<typename... _Args>
-	constexpr placeholder_for_argument(typename add_const_reference<_T>::type __data, _Args&&... args)
+	constexpr placeholder_for_argument(const _T& __data, _Args&&... args)
 	: _M_data(__data)
 	, FALCON_PP_NOT_IDE_PARSER(_M_functor{std::forward<_Args>(args)...})
 	{}

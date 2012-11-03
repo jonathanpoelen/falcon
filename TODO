@@ -160,6 +160,7 @@ classe qui change le nom d'un type en type, exemple use_pointer<class>::type pou
 
 utiliser use_type, if_ et eval_if quand possible, nottament dans les has et autre classe de sélection de type (les macros *CHOOSE_* et *HAS_* ?).
 
+readonly, writeonly et readwrite. permet de getter setter avec operator() et en priver avec classe ami, les valeurs sont accessible via get(). Possible de donner des référence pour ainssi faire des accesseur avec un nom différent que la variable. Un operateur de cast implicit (ainssi que ->) serait accessible pour la classe ami
 
-
+dans les classes accesseur ajouter des typedef argument_type ou fitst_argument_type et  second_argument_type
 

@@ -5,17 +5,17 @@
 
 namespace falcon {
 
-template <typename _Class, typename _T = typename _Class::base_type>
+template <typename _Class, typename _T = typename _Class::base_type&>
 struct base_accessor
 {
-	typedef _T value_type;
+	typedef _T result_type;
 
-	value_type& operator()(_Class& cont) const
+	result_type operator()(_Class& cont) const
 	{
 		return cont.base();
 	}
 
-	CPP_USE_CONSTEXPR value_type& operator()(const _Class& cont) const
+	CPP_USE_CONSTEXPR result_type operator()(const _Class& cont) const
 	{
 		return cont.base();
 	}

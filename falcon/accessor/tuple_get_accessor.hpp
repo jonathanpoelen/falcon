@@ -8,15 +8,15 @@ namespace falcon {
 template <typename _Tuple, std::size_t _N>
 struct tuple_get_accessor
 {
-	typedef typename std::tuple_element<_N, _Tuple>::type value_type;
+	typedef typename std::tuple_element<_N, _Tuple>::type& result_type;
 	static constexpr std::size_t index = _N;
 
-	value_type& operator()(_Tuple &t) const
+	result_type operator()(_Tuple &t) const
 	{
 		return std::get<_N>(t);
 	}
 
-	constexpr value_type& operator()(const _Tuple &t) const
+	constexpr const result_type operator()(const _Tuple &t) const
 	{
 		return std::get<_N>(t);
 	}

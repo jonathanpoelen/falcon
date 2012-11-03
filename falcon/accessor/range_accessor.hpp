@@ -11,8 +11,9 @@ struct begin_accessor
 	typedef _RangeAccessTraits traits_type;
 	typedef typename traits_type::container_type container_type;
 	typedef typename traits_type::iterator iterator;
+	typedef iterator result_type;
 
-	CPP_CONSTEXPR iterator operator()(container_type& cont) const
+	CPP_CONSTEXPR result_type operator()(container_type& cont) const
 	{
 		return traits_type::begin(cont);
 	}
@@ -24,8 +25,9 @@ struct end_accessor
 	typedef _RangeAccessTraits traits_type;
 	typedef typename traits_type::container_type container_type;
 	typedef typename traits_type::iterator iterator;
+	typedef iterator result_type;
 
-	CPP_CONSTEXPR iterator operator()(container_type& cont) const
+	CPP_CONSTEXPR result_type operator()(container_type& cont) const
 	{
 		return traits_type::end(cont);
 	}

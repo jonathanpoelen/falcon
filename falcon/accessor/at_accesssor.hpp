@@ -5,22 +5,22 @@
 
 namespace falcon {
 
-	template <typename _Class, typename _Posiion, typename _T = typename _Class::value_type>
-	struct at_accessor
+template <typename _Class, typename _Position, typename _T = typename _Class::value_type&>
+struct at_accessor
+{
+	typedef _T result_type;
+
+	result_type operator()(_Class& cont, const _Position& pos) const
 	{
-		typedef _T value_type;
+		return cont.at(pos);
+	}
 
-		value_type& operator()(_Class& cont, const _Posiion& pos) const
-		{
-			return cont.at(pos);
-		}
-
-		CPP_USE_CONSTEXPR value_type& operator()(const _Class& cont,
-												 const _Posiion& pos) const
-		{
-			return cont.at();
-		}
-	};
+	CPP_USE_CONSTEXPR result_type operator()(const _Class& cont,
+												const _Position& pos) const
+	{
+		return cont.at();
+	}
+};
 
 }
 

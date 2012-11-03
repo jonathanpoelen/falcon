@@ -12,13 +12,13 @@ namespace falcon
 template<bool c, typename _TrueType, typename _FalseType>
 struct if_
 {
-	typedef typename _TrueType type;
+	typedef _TrueType type;
 };
 
 template<typename _TrueType, typename _FalseType>
 struct if_<false, _TrueType, _FalseType>
 {
-	typedef typename _FalseType type;
+	typedef _FalseType type;
 };
 
 /**
