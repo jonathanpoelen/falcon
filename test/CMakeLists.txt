@@ -9,6 +9,7 @@ set(EXECUTABLES
 	lambda
 	logical
 	node
+	property
 )
 foreach (executable IN ITEMS ${EXECUTABLES})
 	create_exec_test(${executable})

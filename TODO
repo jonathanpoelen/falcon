@@ -131,7 +131,7 @@ enlever les doubles underscore car reservé. Idem pour les underscores suivit de
 Vérifier les types tag dans les iterateurs.
 ajouter les fonctions base() si inexistante et des fonctions fn() pour celles utilisant des foncteurs. Si 2 fn ajouter un suffixe (ou prefixe)
 
-ostream/join.hpp est devenu trop complexe, simplifier !
+ostream/join.hpp est devenu trop complexe, simplifier ! Idem pour istream/ignore.hpp ?
 
 algorithm.hpp : ne prend pas en compte les containers constant…
 
@@ -156,6 +156,6 @@ __CHAR_BIT__ standard ? À utiliser pour définir la taille des types dans bit/b
 
 dans les classes accesseur ajouter des typedef argument_type ou fitst_argument_type et  second_argument_type
 
-
+synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). (Utilise par multiple_iterator ? Le remplace ?). Sera utilisé par delegate_comparison_iterator. Basé sur synchronous.
 
 
