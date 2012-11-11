@@ -20,22 +20,25 @@ private:
 	typedef typename parameter_index_or_tag_to_tag<_Tag>::type __tag;
 
 public:
-	template<typename... _Args, typename _BuildIndexes = typename keep_parameter_index<__tag, sizeof...(_Args)>::type>
-	constexpr auto operator()(_Args&&... args) const
-	-> decltype(tuple_apply<const _Functor&>(_BuildIndexes(), _M_func,
-											 std::forward<_Args>(args)...))
+	template<typename _T, typename _BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<_T>::value>::type>
+	constexpr auto operator()(_T&& t) const
+	-> decltype(tuple_apply<const _Functor&>(_BuildIndexes(), std::forward<_T>(t),
+											 _M_func))
 	{
-		return tuple_apply<const _Functor&>(_BuildIndexes(), _M_func,
-											std::forward<_Args>(args)...);
+		return tuple_apply<const _Functor&>(_BuildIndexes(), std::forward<_T>(t),
+											_M_func);
 	}
 
-	template<typename... _Args, typename _BuildIndexes = typename keep_parameter_index<__tag, sizeof...(_Args)>::type>
-	auto operator()(_Args&&... args)
-	-> decltype(tuple_apply<_Functor&>(_BuildIndexes(), _M_func,
-									   std::forward<_Args>(args)...))
+	template<typename _T, typename _BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<_T>::value>::type>
+	auto operator()(_T&& t)
+	-> decltype(tuple_apply<_Functor&>(_BuildIndexes(), std::forward<_T>(t), _M_func))
 	{
-		return tuple_apply<_Functor&>(_BuildIndexes(), _M_func,
-									  std::forward<_Args>(args)...);
+		return tuple_apply<_Functor&>(_BuildIndexes(), std::forward<_T>(t), _M_func);
+	}
+
+	void swap(tuple_applier& other)
+	{
+		std::swap(_M_func, other._M_func);
 	}
 };
 
@@ -45,9 +48,7 @@ namespace std {
 template <typename _Functor, typename _Tag>
 void swap(falcon::tuple_applier<_Functor, _Tag>& a,
 		  falcon::tuple_applier<_Functor, _Tag>& b)
-{
-	std::swap(a._M_func, b._M_func);
-}
+{ (a.swap(b); }
 }
 
 #endif

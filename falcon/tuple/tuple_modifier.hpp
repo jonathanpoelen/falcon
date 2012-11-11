@@ -6,13 +6,19 @@
 
 namespace falcon {
 
-template <template<class...> class _Modifier, typename _Tuple>
+template <template<class...> class _Modifier, typename _Tuple,
+	typename _Indexes = typename build_parameter_index<
+		std::tuple_size<_Tuple>::value
+	>::type
+>
 struct tuple_modifier
 {
 	typedef typename parameter_pack_to_tuple<
 		typename parameter::pack_modifier<
 			_Modifier,
-			typename tuple_to_parameter_pack<_Tuple>::type
+			typename tuple_to_parameter_pack_with_parameter_index<
+				_Tuple, _Indexes
+			>::type
 		>::type
 	>::type type;
 };

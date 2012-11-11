@@ -1,11 +1,13 @@
 #ifndef _FALCON_TUPLE_HPP
 #define _FALCON_TUPLE_HPP
 
+#include <tuple>
 #include <falcon/tuple/iostream.hpp>
 #include <falcon/tuple/to_tuple_pointer.hpp>
 #include <falcon/tuple/to_tuple_reference.hpp>
-#include <falcon/tuple/tuple_apply.hpp>
-#include <falcon/tuple/tuple_cut.hpp>
+#include <falcon/tuple/tuple_applier.hpp>
+#include <falcon/tuple/tuple_assign.hpp>
+#include <falcon/tuple/tuple_compose.hpp>
 #include <falcon/tuple/tuple_for_each.hpp>
 #include <falcon/tuple/tuple_modifier.hpp>
 #include <falcon/tuple/tuple_pack.hpp>

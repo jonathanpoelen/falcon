@@ -1,47 +1,48 @@
 #ifndef _FALCON_TUPLE_TO_TUPLE_REFERENCE_HPP
 #define _FALCON_TUPLE_TO_TUPLE_REFERENCE_HPP
 
-#include <falcon/parameter/pack_element.hpp>
-#include <falcon/tuple/parameter_pack.hpp>
+#include <tuple>
+#include <falcon/tuple/parameter_index.hpp>
+#include <falcon/tuple/build_tuple_reference.hpp>
 
 namespace falcon {
 
 ///Reference tuple element
-template <typename... _Elements, std::size_t... _Indexes>
-constexpr typename parameter_pack_to_tuple<
-	typename parameter::pack_element<
-		parameter_pack<const _Elements&...>,
-		parameter_index<_Indexes...>
-	>::type
->::type
-to_tuple_reference(const std::tuple<_Elements...>& t,
-				   const parameter_index<_Indexes...>&)
-{ return std::tuple<const _Elements&...>(std::get<_Indexes>(t)...); }
-
-template <typename... _Elements, std::size_t... _Indexes>
-constexpr typename parameter_pack_to_tuple<
-	typename parameter::pack_element<
-		parameter_pack<_Elements&...>,
-		parameter_index<_Indexes...>
-	>::type
->::type
-to_tuple_reference(std::tuple<_Elements...>& t,
-				   const parameter_index<_Indexes...>&)
-{ return std::tuple<_Elements&...>(std::get<_Indexes>(t)...); }
-
-template <typename... _Elements>
-constexpr std::tuple<const _Elements&...>
-to_tuple_reference(const std::tuple<_Elements...>& t)
+template <typename _T, std::size_t... _Indexes>
+constexpr typename build_tuple_const_reference<_T, parameter_index<_Indexes...>>::type
+to_tuple_reference(const _T& t, const parameter_index<_Indexes...>&)
 {
-	typedef typename build_parameter_index<sizeof...(_Elements)>::type _BuildIndexes;
+	return typename build_tuple_const_reference<_T, parameter_index<_Indexes...>>::type
+	(std::get<_Indexes>(t)...);
+}
+
+template <typename _T, std::size_t... _Indexes>
+constexpr typename build_tuple_reference<_T, parameter_index<_Indexes...>>::type
+to_tuple_reference(_T& t, const parameter_index<_Indexes...>&)
+{
+	return typename build_tuple_reference<_T, parameter_index<_Indexes...>>::type
+	(std::get<_Indexes>(t)...);
+}
+
+
+template <typename _T>
+constexpr typename build_tuple_const_reference<
+	_T, typename build_tuple_index<_T>::type
+>::type
+to_tuple_reference(const _T& t)
+{
+	typedef typename build_tuple_index<_T>::type _BuildIndexes;
 	return to_tuple_reference(t, _BuildIndexes());
 }
 
-template <typename... _Elements>
-constexpr std::tuple<_Elements&...>
-to_tuple_reference(std::tuple<_Elements...>& t)
+template <typename _T>
+constexpr typename build_tuple_reference<
+	_T,
+	typename build_tuple_index<_T>::type
+>::type
+to_tuple_reference(_T& t)
 {
-	typedef typename build_parameter_index<sizeof...(_Elements)>::type _BuildIndexes;
+	typedef typename build_tuple_index<_T>::type _BuildIndexes;
 	return to_tuple_reference(t, _BuildIndexes());
 }
 

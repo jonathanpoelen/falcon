@@ -413,7 +413,7 @@ public:
 	{}
 
 	template<typename _T>
-	constexpr typename __tuple_compose<
+	constexpr typename __tuple_compose_base<
 		0, sizeof...(_Operations), const _Operation,
 		const std::tuple<_Operations...>,
 		const std::tuple<_T&>,
@@ -429,7 +429,7 @@ public:
 	}
 
 	template<typename _T>
-	typename __tuple_compose<
+	typename __tuple_compose_base<
 		0, sizeof...(_Operations), _Operation,
 		std::tuple<_Operations...>,
 		const std::tuple<_T&>,
