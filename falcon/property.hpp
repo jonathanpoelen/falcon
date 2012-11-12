@@ -29,7 +29,7 @@ using __get_property = reference_accessor<_T>;
 
 
 template<typename _T>
-struct __set_property_functor
+struct __set_property_assign
 {
 	template<typename _U>
 	void operator()(_T& oldvalue, const _U& newvalue)
@@ -37,7 +37,7 @@ struct __set_property_functor
 };
 
 template<typename _T, typename _Assign>
-struct __set_property
+struct __set_property_through_get
 {
 	_Assign assign = _Assign();
 
@@ -47,10 +47,10 @@ struct __set_property
 };
 
 template<typename _T, typename _Assign = use_default>
-struct __set_base_property
+struct __set_property_through_base
 {
 	typedef typename default_or_type<
-		use<__set_property_functor<_T>>,
+		use<__set_property_assign<_T>>,
 		_Assign
 	>::type __functor_type;
 
@@ -72,14 +72,14 @@ struct __get_property_traits
 {};
 
 template<typename _T, typename _Get, typename _Set>
-struct __set_property_traits
+struct __set_property_through_get_traits
 : if_c<
 	std::is_void<_Set>,
 	void,
-	__set_property<
+	__set_property_through_get<
 		_T,
 		typename default_or_type<
-			use<__set_property_functor<_T>>,
+			use<__set_property_assign<_T>>,
 			_Set
 		>::type
 	>
@@ -87,18 +87,18 @@ struct __set_property_traits
 {};
 
 template<typename _T, typename _Set>
-struct __set_property_traits<_T, void, _Set>
-: use<__set_base_property<_T, _Set>>
+struct __set_property_through_get_traits<_T, void, _Set>
+: use<__set_property_through_base<_T, _Set>>
 {};
 
 template<typename _T, typename _Get, typename _Set>
-struct __set_property_traits<_T, _Get, set_by_base<_Set>>
-: use<__set_base_property<_T, _Set>>
+struct __set_property_through_get_traits<_T, _Get, set_by_base<_Set>>
+: use<__set_property_through_base<_T, _Set>>
 {};
 
 template<typename _T, typename _Set>
-struct __set_property_traits<_T, void, set_by_base<_Set>>
-: use<__set_base_property<_T, _Set>>
+struct __set_property_through_get_traits<_T, void, set_by_base<_Set>>
+: use<__set_property_through_base<_T, _Set>>
 {};
 
 
@@ -106,7 +106,7 @@ template<properties_t _Properties, typename _T, typename _Get, typename _Set>
 struct __property_traits
 {
 	typedef typename __get_property_traits<_T, _Get>::type __getter_type;
-	typedef typename __set_property_traits<_T, __getter_type, _Set>::type __setter_type;
+	typedef typename __set_property_through_get_traits<_T, __getter_type, _Set>::type __setter_type;
 
 	typedef typename if_c<
 		std::is_void<__getter_type>,
@@ -195,12 +195,10 @@ public:
 
 private:
 	template<typename _G>
-	auto dispatch_get(_G&)
-	-> decltype(this->getter(this->base()));
+	auto dispatch_get(_G&) -> decltype(this->getter(this->base()));
 
 	template<typename _G>
-	auto dispatch_get(const _G&) const
-	-> decltype(this->getter(this->base()));
+	auto dispatch_get(const _G&) const -> decltype(this->getter(this->base()));
 
 	void dispatch_get(std::nullptr_t) const;
 
