@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_FUNCTIONAL_ARGUMENTS_WRAPER_HPP
+#define FALCON_TEST_FUNCTIONAL_ARGUMENTS_WRAPER_HPP
+
+void arguments_wrapper_test();
+
+#endif
