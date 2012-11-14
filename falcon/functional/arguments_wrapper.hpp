@@ -143,9 +143,9 @@ template<typename... _Elements>
 constexpr arguments_wrapper<typename decay_and_strip<_Elements>::type...>
 make_arguments(_Elements&&... __args)
 {
-	typedef arguments_wrapper<typename decay_and_strip<_Elements>::__type...>
-	__result_type;
-	return __result_type(std::forward<_Elements>(__args)...);
+	return arguments_wrapper<
+		typename decay_and_strip<_Elements>::type...
+	>(std::forward<_Elements>(__args)...);
 }
 
 template<typename... _Elements>

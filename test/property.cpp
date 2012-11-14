@@ -12,17 +12,17 @@ void property_test()
 	public:
 		//class_property<properties::attribute, int, falcon::use_default, void> num = n;
 		//readonly_property<properties::attribute, int> num = n;
-		read_attr<int> num = n;
-		get_attr<int> num2 = n;
+		attr_read<int> num = n;
+		attr_get<int> num2 = n;
 
-#define READ_ATTR(name, value) read_attr<decltype(value)> name = value
+#define READ_ATTR(name, value) attr_read<decltype(value)> name = value
 		READ_ATTR(num3, n);
 #undef READ_ATTR
 
 		void f()
 		{ ++n; }
 
-		set_attr<int> set_num = n;
+		attr_set<int> set_num = n;
 	};
 
 	A a;

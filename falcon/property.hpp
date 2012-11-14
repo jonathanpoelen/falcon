@@ -254,23 +254,23 @@ using writeonly_property = class_property<_Properties, _T, void, _Set>;
 
 
 template <typename _T, typename _Get = use_default>
-using get_attr = class_property<properties::by_reference, _T, _Get, void>;
+using attr_get = class_property<properties::by_reference, _T, _Get, void>;
 
 template <typename _T, typename _Set = use_default>
-using set_attr = class_property<properties::by_reference, _T, void, _Set>;
+using attr_set = class_property<properties::by_reference, _T, void, _Set>;
 
 template <typename _T, typename _Get = use_default, typename _Set = use_default>
-using access_attr = class_property<properties::by_reference, _T, _Get, _Set>;
+using attr_access = class_property<properties::by_reference, _T, _Get, _Set>;
 
 
 template <typename _T, typename _Get = use_default>
-using read_attr = class_property<properties::attribute, _T, _Get, void>;
+using attr_read = class_property<properties::attribute, _T, _Get, void>;
 
 template <typename _T, typename _Set = use_default>
-using write_attr = class_property<properties::attribute, _T, void, _Set>;
+using attr_write = class_property<properties::attribute, _T, void, _Set>;
 
 template <typename _T, typename _Get = use_default, typename _Set = use_default>
-using rw_attr = class_property<properties::attribute, _T, _Get, _Set>;
+using attr_rw = class_property<properties::attribute, _T, _Get, _Set>;
 
 }}
 
