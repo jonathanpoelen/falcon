@@ -5,7 +5,6 @@
 #include <type_traits>
 #include <falcon/tuple/tuple_apply.hpp>
 #include <falcon/type_traits/cv_selector.hpp>
-#include <falcon/tuple/parameter_index.hpp>
 
 namespace falcon {
 
@@ -41,9 +40,8 @@ struct __tuple_compose_base
 	typedef typename _Result_type<>::__type __result_type;
 
 	template<typename... _Args>
-	constexpr static __result_type
-	__call(_Function& __func, _Tuple& __t,
-		   _TupleArgs& __targs, _Args&&... __args)
+	constexpr static typename _Result_type<_Args...>::__type
+	__call(_Function& __func, _Tuple& __t, _TupleArgs& __targs, _Args&&... __args)
 	{
 		return __impl::__call(__func, __t, __targs,
 							  std::forward<_Args>(__args)...,
@@ -65,17 +63,14 @@ struct __tuple_compose_base<_N, _N, _Function, _Tuple, _TupleArgs, _Indexes>
 	};
 
 	template<typename... _Args>
-	constexpr static decltype(std::declval<_Function&>()(std::declval<_Args&&>()...))
-	__call(_Function& __func, _Tuple&,
-		   _TupleArgs&, _Args&&... __args)
-	{
-		return __func(std::forward<_Args>(__args)...);
-	}
+	constexpr static typename _Result_type<_Args...>::__type
+	__call(_Function& __func, _Tuple&, _TupleArgs&, _Args&&... __args)
+	{ return __func(std::forward<_Args>(__args)...); }
 };
 
 
-template <typename _OperationsForSize,
-	typename _Operations, typename _Function, typename _ArgElements,
+template <typename _Operations,
+	typename _Function, typename _ArgElements,
 	typename _Indexes = typename build_tuple_index<_ArgElements>::type
 >
 struct __tuple_compose
@@ -112,14 +107,14 @@ struct __tuple_compose
 template <typename _Function, typename _Operations,
 	typename _ArgElements, std::size_t... _Indexes>
 constexpr typename __tuple_compose<
-	_Operations, _Operations, _Function, _ArgElements,
+	_Operations, _Function, _ArgElements,
 	parameter_index<_Indexes...>
 >::__result_type
 tuple_compose(const parameter_index<_Indexes...>&, _Function __func,
-			  _Operations& __t, _ArgElements& __targs)
+			  _Operations __t, _ArgElements& __targs)
 {
 	return __tuple_compose<
-		_Operations, _Operations, _Function, _ArgElements,
+		_Operations, _Function, _ArgElements,
 		parameter_index<_Indexes...>
 	>::__call(__func, __t, __targs);
 }
@@ -127,44 +122,14 @@ tuple_compose(const parameter_index<_Indexes...>&, _Function __func,
 template <typename _Function, typename _Operations,
 	typename _ArgElements, std::size_t... _Indexes>
 constexpr typename __tuple_compose<
-	_Operations, const _Operations, _Function, _ArgElements,
+	_Operations, _Function, const _ArgElements,
 	parameter_index<_Indexes...>
 >::__result_type
 tuple_compose(const parameter_index<_Indexes...>&, _Function __func,
-			  const _Operations& __t, _ArgElements& __targs)
+			  _Operations __t, const _ArgElements& __targs)
 {
 	return __tuple_compose<
-		_Operations, const _Operations, _Function, _ArgElements,
-		parameter_index<_Indexes...>
-	>::__call(__func, __t, __targs);
-}
-
-template <typename _Function, typename _Operations,
-	typename _ArgElements, std::size_t... _Indexes>
-constexpr typename __tuple_compose<
-	_Operations, _Operations, _Function, const _ArgElements,
-	parameter_index<_Indexes...>
->::__result_type
-tuple_compose(const parameter_index<_Indexes...>&, _Function __func,
-			  _Operations& __t, const _ArgElements& __targs)
-{
-	return __tuple_compose<
-		_Operations, _Operations, _Function, const _ArgElements,
-		parameter_index<_Indexes...>
-	>::__call(__func, __t, __targs);
-}
-
-template <typename _Function, typename _Operations,
-	typename _ArgElements, std::size_t... _Indexes>
-constexpr typename __tuple_compose<
-	_Operations, const _Operations, _Function, const _ArgElements,
-	parameter_index<_Indexes...>
->::__result_type
-tuple_compose(const parameter_index<_Indexes...>&, _Function __func,
-			  const _Operations& __t, const _ArgElements& __targs)
-{
-	return __tuple_compose<
-		_Operations, const _Operations, _Function, const _ArgElements,
+		_Operations, _Function, const _ArgElements,
 		parameter_index<_Indexes...>
 	>::__call(__func, __t, __targs);
 }
@@ -172,23 +137,12 @@ tuple_compose(const parameter_index<_Indexes...>&, _Function __func,
 
 template <typename _Function, typename _Operations>
 constexpr typename __tuple_compose<
-	_Operations, _Operations, _Function, const std::tuple<>
+	_Operations, _Function, const std::tuple<>
 >::__result_type
-tuple_compose(_Function __func, _Operations& __t)
+tuple_compose(_Function __func, _Operations __t)
 {
 	return __tuple_compose<
-		_Operations, _Operations, _Function, const std::tuple<>
-	>::__call(__func, __t, std::tuple<>());
-}
-
-template <typename _Function, typename _Operations>
-constexpr typename __tuple_compose<
-	_Operations, const _Operations, _Function, const std::tuple<>
->::__result_type
-tuple_compose(_Function __func, const _Operations& __t)
-{
-	return __tuple_compose<
-		_Operations, const _Operations, _Function, const std::tuple<>
+		_Operations, _Function, const std::tuple<>
 	>::__call(__func, __t, std::tuple<>());
 }
 
@@ -196,48 +150,24 @@ tuple_compose(_Function __func, const _Operations& __t)
 template <typename _Function, typename _Operations,
 	typename _ArgElements>
 constexpr typename __tuple_compose<
-	_Operations, _Operations, _Function, _ArgElements
+	_Operations, _Function, _ArgElements
 >::__result_type
-tuple_compose(_Function __func, _Operations& __t, _ArgElements& __targs)
+tuple_compose(_Function __func, _Operations __t, _ArgElements& __targs)
 {
 	return __tuple_compose<
-		_Operations, _Operations, _Function, _ArgElements
+		_Operations, _Function, _ArgElements
 	>::__call(__func, __t, __targs);
 }
 
 template <typename _Function, typename _Operations,
 	typename _ArgElements>
 constexpr typename __tuple_compose<
-	_Operations, const _Operations, _Function, _ArgElements
+	_Operations, _Function, const _ArgElements
 >::__result_type
-tuple_compose(_Function __func, const _Operations& __t, _ArgElements& __targs)
+tuple_compose(_Function __func, _Operations __t, const _ArgElements& __targs)
 {
 	return __tuple_compose<
-		_Operations, const _Operations, _Function, _ArgElements
-	>::__call(__func, __t, __targs);
-}
-
-template <typename _Function, typename _Operations,
-	typename _ArgElements>
-constexpr typename __tuple_compose<
-	_Operations, _Operations, _Function, const _ArgElements
->::__result_type
-tuple_compose(_Function __func, _Operations& __t, const _ArgElements& __targs)
-{
-	return __tuple_compose<
-		_Operations, _Operations, _Function, const _ArgElements
-	>::__call(__func, __t, __targs);
-}
-
-template <typename _Function, typename _Operations,
-	typename _ArgElements>
-constexpr typename __tuple_compose<
-	_Operations, const _Operations, _Function, const _ArgElements
->::__result_type
-tuple_compose(_Function __func, const _Operations& __t, const _ArgElements& __targs)
-{
-	return __tuple_compose<
-		_Operations, const _Operations, _Function, const _ArgElements
+		_Operations, _Function, const _ArgElements
 	>::__call(__func, __t, __targs);
 }
 //@}
