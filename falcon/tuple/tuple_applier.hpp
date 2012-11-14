@@ -22,18 +22,18 @@ private:
 public:
 	template<typename _T, typename _BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<_T>::value>::type>
 	constexpr auto operator()(_T&& t) const
-	-> decltype(tuple_apply<const _Functor&>(_BuildIndexes(), std::forward<_T>(t),
-											 _M_func))
+	-> decltype(tuple_apply<const _Functor&>(_BuildIndexes(), _M_func,
+											 std::forward<_T>(t),))
 	{
-		return tuple_apply<const _Functor&>(_BuildIndexes(), std::forward<_T>(t),
-											_M_func);
+		return tuple_apply<const _Functor&>(_BuildIndexes(), _M_func,
+											std::forward<_T>(t));
 	}
 
 	template<typename _T, typename _BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<_T>::value>::type>
 	auto operator()(_T&& t)
-	-> decltype(tuple_apply<_Functor&>(_BuildIndexes(), std::forward<_T>(t), _M_func))
+	-> decltype(tuple_apply<_Functor&>(_BuildIndexes(), _M_func, std::forward<_T>(t)))
 	{
-		return tuple_apply<_Functor&>(_BuildIndexes(), std::forward<_T>(t), _M_func);
+		return tuple_apply<_Functor&>(_BuildIndexes(), _M_func, std::forward<_T>(t));
 	}
 
 	void swap(tuple_applier& other)

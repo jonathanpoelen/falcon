@@ -33,7 +33,7 @@ struct __tuple_compose_base
 		typedef typename __impl:: template _Result_type<
 			_Args...,
 			decltype(tuple_apply<__func_type&>(
-				_Indexes(), std::declval<_TupleArgs&>(), std::declval<__func_type&>()
+				_Indexes(), std::declval<__func_type&>(), std::declval<_TupleArgs&>()
 			))
 		>::__type __type;
 	};
@@ -48,8 +48,8 @@ struct __tuple_compose_base
 		return __impl::__call(__func, __t, __targs,
 							  std::forward<_Args>(__args)...,
 							  tuple_apply<__func_type&>(_Indexes(),
-														__targs,
-														std::get<_I>(__t)));
+														std::get<_I>(__t),
+														__targs));
 	}
 };
 

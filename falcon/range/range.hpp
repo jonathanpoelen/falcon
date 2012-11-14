@@ -100,8 +100,8 @@ struct range
 
 	template<class... _Args1, class... _Args2>
 	constexpr range(std::piecewise_construct_t, std::tuple<_Args1...> __left, std::tuple<_Args2...> __right)
-	: left(tuple_apply(__right, maker<_T>()))
-	, right(tuple_apply(__left, maker<_T>()))
+	: left(tuple_apply(maker<_T>(), __right))
+	, right(tuple_apply(maker<_T>(), __left))
 	{}
 
 	range<_T>& operator=(range<_T>&& __r)

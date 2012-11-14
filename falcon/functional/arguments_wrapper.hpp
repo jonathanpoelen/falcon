@@ -117,23 +117,23 @@ public:
 
 	template<typename _Functor>
 	auto operator()(_Functor func) const
-	-> decltype(tuple_apply<_Functor&>(this->tuple(), func))
-	{ return tuple_apply<_Functor&>(tuple(), func); }
+	-> decltype(tuple_apply<_Functor&>(func, this->tuple()))
+	{ return tuple_apply<_Functor&>(func, tuple()); }
 
 	template<typename _Functor>
 	auto operator()(_Functor func)
-	-> decltype(tuple_apply<_Functor&>(this->tuple(), func))
-	{ return tuple_apply<_Functor&>(tuple(), func); }
+	-> decltype(tuple_apply<_Functor&>(func, this->tuple()))
+	{ return tuple_apply<_Functor&>(func, tuple()); }
 
 	template<typename _Functor, std::size_t... _Indexes>
 	auto operator()(const parameter_index<_Indexes...>& indexes, _Functor func) const
-	-> decltype(tuple_apply<_Functor&>(indexes, this->tuple(), func))
-	{ return tuple_apply<_Functor&>(indexes, tuple(), func); }
+	-> decltype(tuple_apply<_Functor&>(indexes, func, this->tuple()))
+	{ return tuple_apply<_Functor&>(indexes, func, tuple()); }
 
 	template<typename _Functor, std::size_t... _Indexes>
 	auto operator()(const parameter_index<_Indexes...>& indexes, _Functor func)
-	-> decltype(tuple_apply<_Functor&>(indexes, this->tuple(), func))
-	{ return tuple_apply<_Functor&>(indexes, tuple(), func); }
+	-> decltype(tuple_apply<_Functor&>(indexes, func, this->tuple()))
+	{ return tuple_apply<_Functor&>(indexes, func, tuple()); }
 
 	void swap(arguments_wrapper& other)
 	{ std::swap(tuple(), other.tuple()); }
