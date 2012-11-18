@@ -3,18 +3,18 @@
 
 namespace falcon {
 
-	/// Wrapper for const_cast
-	template <typename _Cast>
-	struct const_caster
-	{
-		template<typename _T>
-		_Cast operator()(_T& d)
-		{ return const_cast<_Cast>(d); }
+/// Wrapper for const_cast
+template <typename _Cast>
+struct const_caster
+{
+	template<typename _T>
+	_Cast operator()(_T& d) const
+	{ return const_cast<_Cast>(d); }
 
-		template<typename _T>
-		_Cast operator()(const _T& d)
-		{ return const_cast<_Cast>(d); }
-	};
+	template<typename _T>
+	_Cast operator()(const _T& d) const
+	{ return const_cast<_Cast>(d); }
+};
 
 }
 

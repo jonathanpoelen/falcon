@@ -3,9 +3,9 @@
 
 namespace falcon {
 
-	template<typename _T>
-	_T* unreliable_pointer_cast(void *p)
-	{ return static_cast<_T*>(p); }
+template<typename _T>
+_T* unreliable_pointer_cast(void *p)
+{ return static_cast<_T*>(p); }
 
 }
 
