@@ -1,0 +1,9 @@
+#ifndef FALCON_PREPROCESSOR_STRINGIZE_LINE_HPP
+#define FALCON_PREPROCESSOR_STRINGIZE_LINE_HPP
+
+#include <boost/preprocessor/stringize.hpp>
+
+#define FALCON_PP_STRINGIZE_LINE() BOOST_PP_STRINGIZE(__LINE__)
+
+
+#endif

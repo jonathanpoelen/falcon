@@ -6,8 +6,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <boost/static_assert.hpp>
-#include <falcon/c++0x/keywords.hpp>
-
+#include <falcon/preprocessor/stringize_line.hpp>
 
 #define __FALCON_TEST_TO_MAIN(func_test_name) int main() { func_test_name(); return 0;}
 #define __FALCON_USELESS_TEST_TO_MAIN(func_test_name)
@@ -44,10 +43,18 @@
 
 #define __END_CHECK else PASSED()
 
+struct test_failed
+: std::runtime_error
+{
+	explicit test_failed(const std::string& str)
+	: std::runtime_error(str)
+	{}
+};
+
 #define CHECK(r) if (!(r)){\
 	std::stringstream _Oss;\
-	_Oss << "bad check in " __FILE__ " line " << __LINE__;\
-	throw std::runtime_error(_Oss.str());\
+	_Oss << "bad check for [ " #r " ] in " __FILE__ " at line " FALCON_PP_STRINGIZE_LINE();\
+	throw test_failed(_Oss.str());\
 } __END_CHECK
 
 template<typename _T>
@@ -62,10 +69,10 @@ auto tmp_CHECK_VALUE = (a);\
 auto tmp_CHECK_VALUE2 = (__VA_ARGS__);\
 if (!(tmp_CHECK_VALUE op tmp_CHECK_VALUE2)){\
 	std::stringstream _Oss;\
-	_Oss << "bad check for [ " #a " " #op " " #__VA_ARGS__ " ] in " __FILE__ " at line " << __LINE__ << "\n value is: ";\
+	_Oss << "bad check for [ " #a " " #op " " #__VA_ARGS__ " ] in " __FILE__ " at line " FALCON_PP_STRINGIZE_LINE() "\n value is: ";\
 	__show_value_test(_Oss, tmp_CHECK_VALUE) << "\n------------------------\nresult is: ";\
 	__show_value_test(_Oss, tmp_CHECK_VALUE2);\
-	throw std::runtime_error(_Oss.str());\
+	throw test_failed(_Oss.str());\
 } __END_CHECK;}while(0)
 
 #define CHECK_EQUAL_VALUE(a, ...) CHECK_VALUE(==, a, __VA_ARGS__)

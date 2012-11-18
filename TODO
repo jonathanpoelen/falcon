@@ -144,8 +144,6 @@ il manque les operators mathematique sur les iterators Le operator+() manquait d
 
 tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ? getx_accessor ?
 
-simplifier store_if en passant par traits privé
-
 flag.hpp: pb avec le decalage de bit de flag. flag.cpp: god for gcc-4.7, fail with gcc-4.6…
 
 enlever pseudo_iterator et faire [in|out]put_iterator_base
@@ -157,5 +155,9 @@ __CHAR_BIT__ standard ? À utiliser pour définir la taille des types dans bit/b
 dans les classes accesseur ajouter des typedef argument_type ou fitst_argument_type et  second_argument_type
 
 synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). (Utilise par multiple_iterator ? Le remplace ?). Sera utilisé par delegate_comparison_iterator. Basé sur synchronous.
+
+merger indirect_iterator et proxy_iterator avec par defaut le comportement de indirect_iterator
+
+ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
 
 
