@@ -10,7 +10,7 @@
 namespace falcon {
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-template<typename _T, typename _Tag = typename detail::construct_category<_T>::type>
+template<typename _T, typename _Tag = typename ::falcon::detail::construct_category<_T>::type>
 struct __delegate_maker
 {
 	template<typename... _Args>
@@ -63,14 +63,14 @@ struct maker
 	CPP_CONSTEXPR _Tp operator()(const _Tp& v) const
 	{ return _Tp(v); }
 
-	template<typename _U>
-	CPP_CONSTEXPR _Tp operator()(const _U& v) const
-	{ return _Tp(v); }
-
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 	template<typename... _Args>
 	constexpr _Tp operator()(_Args&&... args) const
 	{ return __delegate_maker<_Tp>::__impl(args...); }
+#else
+	template<typename _U>
+	_Tp operator()(const _U& v) const
+	{ return _Tp(v); }
 #endif
 };
 
