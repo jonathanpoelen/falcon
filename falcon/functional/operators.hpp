@@ -239,7 +239,14 @@ typedef affect<late_parameter_t, late_parameter_t> late_affect;
  */
 template<typename _T, typename _U>
 struct comma;
+template<typename _T, typename _Member>
+struct pointer_to_member;
+template<typename _T>
+struct parenthesis;
+
 typedef comma<late_parameter_t, late_parameter_t> late_comma;
+typedef pointer_to_member<late_parameter_t, late_parameter_t> late_pointer_to_member;
+typedef parenthesis<late_parameter_t> late_parenthesis;
 //@}
 
 
@@ -539,30 +546,6 @@ struct post_decrement<late_parameter_t>
 	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a--)
 };
 
-/*template<typename _T>
-struct plus_1
-{
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a) const, a+1)
-};
-template<>
-struct plus_1<late_parameter_t>
-{
-	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a+1)
-};
-
-template<typename _T>
-struct minus_1
-{
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a) const, a-1)
-};
-template<>
-struct minus_1<late_parameter_t>
-{
-	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a-1)
-};*/
-
 template<typename _T>
 struct arrow
 {
@@ -626,6 +609,7 @@ struct index_emulation<late_parameter_t, late_parameter_t>
 	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
 };
 
+
 template<typename _T, typename _U>
 struct comma
 {
@@ -651,6 +635,70 @@ struct comma<late_parameter_t, late_parameter_t>
 {
 	template<typename _T, typename _U>
 	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
+};
+
+template<typename _T, typename _Member>
+struct pointer_to_member
+{
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
+
+	template<typename... _Args>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
+};
+template<typename _T>
+struct pointer_to_member<_T, late_parameter_t>
+{
+	template<typename _Member>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
+
+	template<typename _Member, typename... _Args>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
+};
+template<>
+struct pointer_to_member<late_parameter_t, late_parameter_t>
+{
+	template<typename _T, typename _Member>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
+
+	template<typename _T, typename _Member, typename... _Args>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
+};
+template<typename _Result, typename _T, typename... _Args>
+struct pointer_to_member<late_parameter_t, _Result(_T::*)(_Args...)>
+: pointer_to_member<_T, _Result(_T::*)(_Args...)>
+{};
+template<typename _Result, typename _T, typename... _Args>
+struct pointer_to_member<late_parameter_t, _Result(_T::*)(_Args...) const>
+: pointer_to_member<_T, _Result(_T::*)(_Args...) const>
+{};
+
+template<typename _T>
+struct parenthesis
+{
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f) const, f())
+
+	template<typename... _Args>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
+
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f) const, f())
+
+	template<typename... _Args>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
+};
+template<>
+struct parenthesis<late_parameter_t>
+{
+	template<typename _T>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f) const, f())
+
+	template<typename _T, typename... _Args>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
+
+	template<typename _T>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f) const, f())
+
+	template<typename _T, typename... _Args>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
 };
 
 }
