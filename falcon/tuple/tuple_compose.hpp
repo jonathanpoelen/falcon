@@ -4,14 +4,15 @@
 #include <tuple>
 #include <type_traits>
 #include <falcon/tuple/tuple_apply.hpp>
+#include <falcon/type_traits/use_type.hpp>
 #include <falcon/type_traits/cv_selector.hpp>
+#include <falcon/parameter/result_pack_of.hpp>
+#include <falcon/parameter/manip.hpp>
 
 namespace falcon {
 
-template <std::size_t _I, std::size_t _N, typename _Function,
-	typename _Tuple, typename _TupleArgs, typename _Indexes
->
-struct __tuple_compose_base
+template <std::size_t _I, typename _Tuple>
+struct __tuple_compose_function
 {
 	typedef typename match_cv_qualifiers<
 		_Tuple,
@@ -19,51 +20,69 @@ struct __tuple_compose_base
 			_I,
 			typename std::remove_cv<_Tuple>::type
 		>::type
-	>::type __func_type;
-	typedef __tuple_compose_base<
-		_I+1, _N,
-		_Function, _Tuple,
-		_TupleArgs, _Indexes
-	> __impl;
+	>::type __type;
+};
 
-	template<typename... _Args>
-	struct _Result_type
+template<typename _Function, typename _Tuple, typename _TupleArgs, typename _Indexes,
+	typename _IndexElements = typename build_tuple_index<_Tuple>::type>
+class __tuple_compose_result;
+
+template<typename _Function, typename _Tuple, typename _TupleArgs, typename _Indexes,
+	std::size_t... _IndexElements>
+struct __tuple_compose_result<
+	_Function, _Tuple, _TupleArgs, _Indexes, parameter_index<_IndexElements...>>
+{
+	template<std::size_t _I>
+	struct __result_element
 	{
-		typedef typename __impl:: template _Result_type<
-			_Args...,
-			decltype(tuple_apply<__func_type&>(
-				_Indexes(), std::declval<__func_type&>(), std::declval<_TupleArgs&>()
-			))
-		>::__type __type;
+		typedef typename __tuple_compose_function<_I, _Tuple>::__type __func_type2;
+		typedef decltype(tuple_apply<__func_type2&>(
+			_Indexes(), std::declval<__func_type2&>(), std::declval<_TupleArgs&>()
+		)) type;
 	};
 
-	typedef typename _Result_type<>::__type __result_type;
+	typedef typename parameter::pack_modifier<
+		use_type,
+		parameter_pack<__result_element<_IndexElements>...>
+	>::type __pack;
+	typedef typename parameter::result_pack_of<_Function&, __pack>::type __type;
+};
+
+template <std::size_t _I, std::size_t _N, typename _Function,
+	typename _Tuple, typename _TupleArgs, typename _Indexes,
+	typename _Result = typename __tuple_compose_result<
+		_Function, _Tuple, _TupleArgs, _Indexes
+	>::__type
+>
+struct __tuple_compose_base
+{
+	typedef _Result __result_type;
+	typedef typename __tuple_compose_function<_I, _Tuple>::__type __func_type;
 
 	template<typename... _Args>
-	constexpr static typename _Result_type<_Args...>::__type
+	constexpr static _Result
 	__call(_Function& __func, _Tuple& __t, _TupleArgs& __targs, _Args&&... __args)
 	{
-		return __impl::__call(__func, __t, __targs,
-							  std::forward<_Args>(__args)...,
-							  tuple_apply<__func_type&>(_Indexes(),
-														std::get<_I>(__t),
-														__targs));
+		return __tuple_compose_base<
+			_I+1, _N,
+			_Function, _Tuple,
+			_TupleArgs, _Indexes,
+			_Result
+		>::__call(__func, __t, __targs,
+				  std::forward<_Args>(__args)...,
+				  tuple_apply<__func_type&>(_Indexes(), std::get<_I>(__t), __targs));
 	}
 };
 
 template <std::size_t _N, typename _Function,
-	typename _Tuple, typename _TupleArgs, typename _Indexes
+	typename _Tuple, typename _TupleArgs, typename _Indexes, typename _Result
 >
-struct __tuple_compose_base<_N, _N, _Function, _Tuple, _TupleArgs, _Indexes>
+struct __tuple_compose_base<_N, _N, _Function, _Tuple, _TupleArgs, _Indexes, _Result>
 {
-	template<typename... _Args>
-	struct _Result_type
-	{
-		typedef decltype(std::declval<_Function&>()(std::declval<_Args&&>()...)) __type;
-	};
+	typedef _Result __result_type;
 
 	template<typename... _Args>
-	constexpr static typename _Result_type<_Args...>::__type
+	constexpr static _Result
 	__call(_Function& __func, _Tuple&, _TupleArgs&, _Args&&... __args)
 	{ return __func(std::forward<_Args>(__args)...); }
 };

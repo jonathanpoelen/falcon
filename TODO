@@ -160,4 +160,6 @@ merger indirect_iterator et proxy_iterator avec par defaut le comportement de in
 
 ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
 
+ajouter l'operator ->* ds operators.hpp (pointer_to_member)
 
+placeholder_for_argument: déduire par défaut le type de la donnée.

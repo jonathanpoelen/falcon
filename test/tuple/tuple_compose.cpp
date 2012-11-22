@@ -1,6 +1,7 @@
 #include <test/test.hpp>
 #include <falcon/tuple/tuple_compose.hpp>
 #include <falcon/iostream/put_and_get.hpp>
+#include <falcon/utility/maker.hpp>
 #include "tuple_compose.hpp"
 
 #include <sstream>
@@ -9,7 +10,7 @@ struct unless_functor
 {
 	template<typename... _Args>
 	void operator()(const _Args&... args) const
-	{ (void)sizeof...(args); }
+	{ STATIC_ASSERT(sizeof...(args) == 2); }
 };
 
 void tuple_compose_test()
@@ -25,6 +26,22 @@ void tuple_compose_test()
 	);
 
 	CHECK_EQUAL_VALUE(os.str(), "5 555 55");
+
+	falcon::tuple_compose<>(
+		unless_functor(),
+		std::make_tuple<>(
+			falcon::maker<int>(),
+			falcon::maker<int>()
+		)
+	);
+
+	falcon::tuple_compose<>(
+		falcon::maker<std::pair<int,int>>(),
+		std::make_tuple<>(
+			falcon::maker<int>(),
+			falcon::maker<int>()
+		)
+	);
 }
 
 FALCON_TEST_TO_MAIN(tuple_compose_test)
