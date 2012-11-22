@@ -37,12 +37,9 @@ struct late_maker
 	constexpr late_maker(const late_maker<_UTemplate>&)
 	{}
 
-	constexpr _Template<> operator()() const
-	{ return _Template<>(); }
-
 	template<typename... _Args>
 	constexpr _Template<_Args...> operator()(_Args&&... args) const
-	{ return __delegate_maker<_Template<_Args...>>::__impl(args...); }
+	{ return __delegate_maker<_Template<_Args...>>::__impl(std::forward<_Args>(args)...); }
 };
 #endif
 
@@ -50,6 +47,8 @@ struct late_maker
 template<typename _Tp>
 struct maker
 {
+	typedef _Tp result_type;
+
 	CPP_CONSTEXPR maker()
 	{}
 
@@ -66,7 +65,7 @@ struct maker
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 	template<typename... _Args>
 	constexpr _Tp operator()(_Args&&... args) const
-	{ return __delegate_maker<_Tp>::__impl(args...); }
+	{ return __delegate_maker<_Tp>::__impl(std::forward<_Args>(args)...); }
 #else
 	template<typename _U>
 	_Tp operator()(const _U& v) const
