@@ -100,7 +100,7 @@ template<std::size_t _Position, typename _Functor, typename _T>
 placeholder_for_argument<_Position, _Functor, _T> bound_argument(_Functor&& func, _T&& arg)
 {
 	return placeholder_for_argument<_Position, _Functor, _T>(
-		std::forward<_Functor>(func), std::forward<_T>(arg)
+		std::forward<_T>(arg), std::forward<_Functor>(func)
 	);
 }
 

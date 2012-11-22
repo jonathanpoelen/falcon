@@ -24,6 +24,10 @@ void placeholder_for_argument_test()
 {
 	std::ostringstream oss;
 	{
+		falcon::placeholder_for_argument<0, Out, char>('[', &oss)(']');
+		falcon::placeholder_for_argument<1, Out, char>(')', &oss)('(');
+	}
+	{
 		falcon::placeholder_for_argument<0, Out, char> f('<', &oss);
 		f(0,1);
 	}
@@ -54,11 +58,15 @@ void placeholder_for_argument_test()
 		c = '#';
 		f(2,3);
 	}
-	CHECK_EQUAL_VALUE("<012-345>@<01@2-3@45>$01#23", oss.str());
+	CHECK_EQUAL_VALUE("[]()<012-345>@<01@2-3@45>$01#23", oss.str());
 
 	CHECK_EQUAL_VALUE(4, falcon::placeholder_for_argument<0, falcon::late_divides, int>(20)(5));
 	CHECK_EQUAL_VALUE(4, falcon::placeholder_for_argument<1, falcon::late_divides, int>(5)(20));
 	CHECK_EQUAL_VALUE(4, falcon::placeholder_for_argument<-1, falcon::late_divides, int>(5)(20));
+
+	int n = 3;
+	falcon::placeholder_for_argument<1, falcon::plus_equal<int>, int>(4)(n);
+	CHECK_EQUAL_VALUE(n, 7);
 }
 
 FALCON_TEST_TO_MAIN(placeholder_for_argument_test)
