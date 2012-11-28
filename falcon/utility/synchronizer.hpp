@@ -115,8 +115,7 @@ public:
 	tuple_type& tuple()
 	{ return *this; }
 
-///TODO
-// private:
+private:
 	template <typename _T>
 	struct __build_functor_type
 	{ typedef _T __type; };
@@ -135,9 +134,10 @@ public:
 		{}
 
 		template<typename... _Args>
-		auto operator()(_Args&&... args)
-		-> decltype(_Functor()(this->value, std::forward<_Args>(args)...))
-		{ return _Functor()(value, std::forward<_Args>(args)...); }
+		CPP0X_DELEGATE_FUNCTION(
+			operator()(_Args&&... args),
+			_Functor()(this->value, std::forward<_Args>(args)...)
+		)
 	};
 
 	typedef typename tuple_to_parameter_pack<__base>::type __parameter_pack;
@@ -172,9 +172,10 @@ public:
 		typedef __delegate_to_tuple<__tuple, _Tuple, std::is_same<late_tupe, _Maker>::value> __to_tuple;
 
 		template<typename _TupleParameter>
-		static auto __impl(_Tuple& t, _TupleParameter parameters)
-		-> decltype(tuple_compose<>(_Maker(), __to_tuple::__impl(t), parameters))
-		{ return tuple_compose<>(_Maker(), __to_tuple::__impl(t), parameters); }
+		CPP0X_DELEGATE_FUNCTION(
+			static __impl(_Tuple& t, _TupleParameter parameters),
+			tuple_compose<>(_Maker(), __to_tuple::__impl(t), parameters)
+		)
 	};
 
 	template<typename _Maker, typename _Functor>
@@ -183,14 +184,16 @@ public:
 	{};
 
 	template<typename _Function, typename _TupleParameter, typename _Maker = late_tupe>
-	auto __call(_TupleParameter parameters, _Maker = _Maker())
-	-> decltype(__delegate<_Maker, _Function>::__impl(this->tuple(), parameters))
-	{ return __delegate<_Maker, _Function>::__impl(tuple(), parameters); }
+	CPP0X_DELEGATE_FUNCTION(
+		__call(_TupleParameter parameters, _Maker = _Maker()),
+		__delegate<_Maker, _Function>::__impl(this->tuple(), parameters)
+	)
 
 	template<typename _Function, typename _TupleParameter, typename _Maker = late_tupe>
-	auto __call(_TupleParameter parameters, _Maker = _Maker()) const
-	-> decltype(__const_delegate<_Maker, _Function>::__impl(this->tuple(), parameters))
-	{ return __const_delegate<_Maker, _Function>::__impl(tuple(), parameters); }
+	CPP0X_DELEGATE_FUNCTION(
+		__call(_TupleParameter parameters, _Maker = _Maker()) const,
+		__delegate<_Maker, _Function>::__impl(this->tuple(), parameters)
+	)
 
 public:
 #define _FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type, override)\
@@ -252,19 +255,15 @@ public:
 #undef _FALCON_SYNCHRONIZER_OPERATOR2
 #undef _FALCON_SYNCHRONIZER_OPERATOR
 
-// private:
+private:
 	template<typename _T, typename _Member>
-	class __member_to_pointer
+	struct __member_to_pointer
 	{
-		///TODO private
-	public:
+		typedef typename std::remove_reference<_Member>::type member_type;
 		typename std::remove_reference<_T>::type* o;
-		_Member m;
+		member_type m;
 
-	public:
-		__member_to_pointer(const __member_to_pointer&) = default;
-		__member_to_pointer& operator=(const __member_to_pointer&) = default;
-		__member_to_pointer(_T& object, _Member member)
+		__member_to_pointer(_T& object, member_type member)
 		: o(&object)
 		, m(member)
 		{}
@@ -275,7 +274,6 @@ public:
 	};
 
 public:
-	///TODO
 	template<typename _Member>
 	CPP0X_DELEGATE_FUNCTION(operator->*(_Member m),
 	this->__call<late_maker<__member_to_pointer>>(std::make_tuple(m), late_maker<synchronizer>()))
@@ -284,7 +282,6 @@ public:
 	CPP0X_DELEGATE_FUNCTION(operator->*(_Member m) const,
 	this->__call<late_maker<__member_to_pointer>>(std::make_tuple(m), late_maker<synchronizer>()))
 
-	///TODO
 	template<typename... _Args>
 	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args),
 	tuple_compose<>(late_tupe(), this->tuple(), std::forward_as_tuple(args...)))
@@ -295,13 +292,13 @@ public:
 
 	synchronizer& operator++()
 	{
-		tuple_for_each(tuple(), late_increment());
+		falcon::tuple_for_each(this->tuple(), falcon::late_increment());
 		return *this;
 	}
 
 	synchronizer& operator--()
 	{
-		tuple_for_each(tuple(), late_decrement());
+		falcon::tuple_for_each(this->tuple(), falcon::late_decrement());
 		return *this;
 	}
 
@@ -322,12 +319,15 @@ public:
 	template<typename _U>
 	synchronizer& operator=(_U&& x)
 	{
-		tuple_for_each(tuple(), placeholder_for_argument<1, late_affect, _U&>(x));
+		falcon::tuple_for_each(
+			this->tuple(),
+			falcon::placeholder_for_argument<1, falcon::late_affect, _U&>(x)
+		);
 		return *this;
 	}
 
 	void swap(synchronizer& other)
-	{ std::swap(tuple(), other.tuple()); }
+	{ std::swap(this->tuple(), other.tuple()); }
 };
 
 template<typename... _Elements>
@@ -335,14 +335,21 @@ constexpr synchronizer<typename decay_and_strip<_Elements>::type...>
 make_synchronizer(_Elements&&... __args)
 {
 	return synchronizer<
-		typename decay_and_strip<_Elements>::type...
+		typename falcon::decay_and_strip<_Elements>::type...
 	>(std::forward<_Elements>(__args)...);
 }
 
 template<typename... _Elements>
-constexpr synchronizer<_Elements&...>
-synchronize(_Elements&... __args)
+constexpr synchronizer<_Elements&...> synchronize(_Elements&... __args)
 { return synchronizer<_Elements&...>(__args...); }
+
+template<typename... _Elements>
+synchronizer<_Elements...>& tuple_synchronise(std::tuple<_Elements...>& t)
+{ return static_cast<synchronizer<_Elements...>&>(t); }
+
+template<typename... _Elements>
+const synchronizer<_Elements...>& tuple_synchronise(const std::tuple<_Elements...>& t)
+{ return static_cast<const synchronizer<_Elements...>&>(t); }
 
 }
 
