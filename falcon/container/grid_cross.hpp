@@ -102,37 +102,37 @@ protected:
 		_array.resize(size(), value);
 		friend_algo::init(*this);
 
-		if (__flag & 0b00000001)
+		if (__flag & 1)
 			back_to_first_each_line();
-		else if (__flag & 0b00000010)
+		if (__flag & 2)
 			back_to_first();
 
-		if (__flag & 0b00000100)
+		if (__flag & 4)
 			back_to_first_each_column();
-		else if (__flag & 0b00001000)
+		if (__flag & 8)
 			back_to_first_column();
 
-		if (__flag & 0b00100000)
+		if (__flag & 16)
 			edge_connect_horizontal();
-		if (__flag & 0b01000000)
+		if (__flag & 32)
 			edge_connect_vertical();
 	}
 
 	char flag() const
 	{
-		char f = is_back_to_first_each_line() ? 0b00000001
-			: is_back_to_first() ? 0b00000010
+		char f = is_back_to_first_each_line() ? 1
+			: is_back_to_first() ? 2
 			: 0;
 
 		if (is_back_to_first_each_column())
-			f |= 0b0000100;
-		else if (is_back_to_first_column())
-			f |= 0b0001000;
+			f |= 4;
+		if (is_back_to_first_column())
+			f |= 8;
 
 		if (is_edge_connect_horizontal())
-			f |= 0b0010000;
+			f |= 16;
 		if (is_edge_connect_vertical())
-			f |= 0b0100000;
+			f |= 32;
 
 		return f;
 	}
