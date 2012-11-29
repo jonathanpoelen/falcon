@@ -6,8 +6,6 @@ fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_const
 
 rendre operator.hpp un peu compatible c++89
 
-FALCON_MEMBER_GETTER mal utilisais dans les iterateurs, ne pas l'utilisais ! faire les fonction en dur et utilisais 4 fonctions avec [const](reference|pointer) à la place
-
 fonction get<std::size_t, std::initilizer_list>(std::initilizer_list) (fichier get_initializer_list ?). Grace a ça, std::initilizer_list doit fonctionner avec tuple_call<>().
 
 modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le soncond argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
@@ -22,15 +20,10 @@ iota(begin(), end(), first_value): le faire avec iota(container, first_value)
 
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
 flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
-flag_position qui s'occupe de faire un décalage de bits. Ou un int ? bit_wrapper<_T>{_T*}
-
-utilisé <iosfwd> dans ostream, flag et autre si besoin.
 
 optimiser recursive_iterator (et l'algo de recurtion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
 
 faire un algorithmfwd.hpp pour bien nommer les champs
-
-grid_cross et surement d'autre: ne pas utiliser 0b pour définir les bits (extension gcc)
 
 fairer des macros comme BOOST pour la gestion des flux: FALCON_FLUX(ostream) -> std::basic_ostream<typename _CharT, typename _CharTraits> avec des sous macro pour le "paramètrage"
 
@@ -39,8 +32,6 @@ optimisation de taille des enum class: enum class E : typename std::conditional<
 Mettre constexpr pour les classe d'operateur et enum/operator
 
 ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?)
-
-faudrait penser à vérifier les itérateurs (au niveau de typedef et category)
 
 ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp (via héritage, plus simple). Faire un not1 et not2 comme la std.
 
@@ -80,32 +71,30 @@ un foncteur ???<_Functor, std::tuple<_Elements>, parameter_index<...> ou indexes
 
 structure englopant un type et pour chaque operateur suceptible de changer le type (pour les type scalaire < int) fait un static_cast. (force_type<_T> ? force_type_wrapper<> ? force_scalar<> ? integral_wrapper<> ?). Cas particulier pour l'incrementation et decrementation sur enum.
 Permet ainsi de s'affranchir des enum_* en passant par les foncteurs sur operateurs: enum_plus<enum_t> -> plus<integral_wrapper<enum_t>>, enum_increment<enum_t> -> increment<integral_wrapper<enum_t&>>
-ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?). La classe generique heriter des operateurs de la fonçon décrit au-dessus.
+ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?). La classe generique heriter des operateurs de la façon décrit au-dessus.
 
 remplacer dans static_new et memory_stack construct(emplace_t,...) par un constructeur construct_emplace()
 trouver le moyen de construir un _T par l'intermediaire d'un objet (ex: tuple). construct_adapter(_Adapter, ...) ? avec _Adapter un foncteur prenant le pointeur de la structure a initialiser.
 
-amélioré algorithm.hpp en y mettant en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
+amélioré algorithm.hpp en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
 
-dans les literaux, gerer l'overflow des nombres (on peut les passer en template au lieu de paramètre ?). Sinon via un tableau de char…
+dans les literaux, gerer l'overflow des nombres (on peut les passer en template au lieu de paramètre ?). La dernier version du compilo le fait ? Sinon via un tableau de char…
 
 singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>
 
-container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des condition à la compilation,
+container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des conditions à la compilation.
 
-les lambda toujours par reference ou il faut des fois utiliser std::ref ? Pas le cas pour while_loop et co...
+les lambdas toujours par reference ou il parfois utiliser std::ref ? Pas le cas pour while_loop et co...
 
-foncteur pour utilisé tuple_apply. Utilise indexes-tag pour définir le parameter_index<...> (tuple_applier<_Functor, _Tag = full_parameter_index_tag> ?).
+foncteur pour utiliser tuple_apply. Utilise indexes-tag pour définir le parameter_index<...> (tuple_applier<_Functor, _Tag = full_parameter_index_tag> ?).
 
 faire un make_caller() et un make_tuple_applier().
 
 temporary_tuple_cat (tuple concatener par reference ?)
 
-mettre pour les fonction dans tuple/ l'attribut parameter_index<> en premier.
-
 tuple_organizer<_Tag, bool no_tuple_parameter_is_tuple = true> pour faire une agglomération de tuple et filtrer les éléments non voulut. tuple_organizer<_Functor, _Tag> avec _Tag parameter-tag, parameter_index<> ou wrapper avec organizer_for_each_tag (ex organizer_for_each_tag<_Tag>) qui va s'appliquer indépendament sur chaque tuple. Passer par un traits pour faire appliquer ces tags: organizer_tag_to_parameter_index<_Tag, _Tuples>::type
 
-les tuple_* doivent fonctionner avec std::pair<>
+les tuple_* doivent fonctionner avec std::pair<>, faire des tests
 
 unary_compose et binary_compose doivent pouvoir deviné le type des fonctions
 
@@ -129,7 +118,7 @@ une sorte de unary_compose mais sans arguments -> f(g()). (ancien delegate_resul
 enlever les doubles underscore car reservé. Idem pour les underscores suivit de majuscule dans l'espace globale.
 
 Vérifier les types tag dans les iterateurs.
-ajouter les fonctions base() si inexistante et des fonctions fn() pour celles utilisant des foncteurs. Si 2 fn ajouter un suffixe (ou prefixe)
+Ajouter dans les iterators les fonctions pour acceder au fonctor lorsaue ceux-ci en utilisent (fn() ?).
 
 ostream/join.hpp est devenu trop complexe, simplifier ! Idem pour istream/ignore.hpp ?
 
@@ -138,9 +127,6 @@ algorithm.hpp : ne prend pas en compte les containers constant…
 un iterateur qui execute une fonction apres avoir atteint une valeur (autre iterateur ou compteur (2 classes ?)). Permet par exemple de boucler en une fois sur une zone d'un rectangle.
 padding_iterator: pour par exemple iterer sur un sous retangle.
 un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
-
-toutes les classes iterators ont bien une fonction base() ? la categorie est bien definit ?
-il manque les operators mathematique sur les iterators Le operator+() manquait dans proxy_iterator, c'est donc surement le cas autre part et avec aussi d'autres operateurs. Faire une macro qui les crés à inclure dans chaque iterator… Le mieux est de paser par une classe (amie?) qui s'occupe de faire les operateurs et (des static_assert ?). Classe amie surcharger pour les cas particuliers (foncteur sur valeurs) ou via traits + surcharge
 
 tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ? getx_accessor ?
 
@@ -154,12 +140,20 @@ __CHAR_BIT__ standard ? À utiliser pour définir la taille des types dans bit/b
 
 dans les classes accesseur ajouter des typedef argument_type ou fitst_argument_type et  second_argument_type
 
-synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). (Utilise par multiple_iterator ? Le remplace ?). Sera utilisé par delegate_comparison_iterator. Basé sur synchronous.
+synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). (Utilise par multiple_iterator ? Le remplace ?). Sera utilisé par delegate_comparison_iterator. Basé sur synchronizer<>.
 
 merger indirect_iterator et proxy_iterator avec par defaut le comportement de indirect_iterator
 
 ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
 
-ajouter l'operator ->* ds operators.hpp (pointer_to_member)
-
 placeholder_for_argument: déduire par défaut le type de la donnée.
+
+synchronizer: ignorer les valeur de type std::ignore_t. Les fonctions retournant void, voient leur type changer en std::ignore_t
+
+
+
+
+
+
+
+

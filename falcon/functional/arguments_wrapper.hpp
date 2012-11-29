@@ -63,7 +63,7 @@ public:
 
 	template<typename... _UElements>
 	constexpr arguments_wrapper(std::tuple<_UElements...>&& __in)
-	: __base(__in)
+	: __base(std::forward<std::tuple<_UElements...>>(__in))
 	{}
 
 	template<typename _Alloc>
@@ -107,7 +107,7 @@ public:
 	: __base(__tag, __a, std::forward<std::tuple<_UElements...>>(__in))
 	{}
 
-	using __base::operator=;
+	using std::tuple<_Elements...>::operator=;
 
 	const tuple_type& tuple() const
 	{ return *this; }

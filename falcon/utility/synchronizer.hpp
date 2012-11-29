@@ -15,10 +15,14 @@
 #include <falcon/templates/template_left_accumulator.hpp>
 #include <falcon/parameter/manip.hpp>
 #include <falcon/type_traits/decay_and_strip.hpp>
+#include <falcon/preprocessor/not_ide_parser.hpp>
 
 namespace falcon
 {
 
+/**
+ * Delegate the operation to each items
+ */
 template <typename... _Elements>
 class synchronizer
 : public std::tuple<_Elements...>
@@ -63,7 +67,7 @@ public:
 
 	template<typename... _UElements>
 	constexpr synchronizer(std::tuple<_UElements...>&& __in)
-	: __base(__in)
+	: __base(std::forward<std::tuple<_UElements...>>(__in))
 	{}
 
 	template<typename _Alloc>
@@ -107,7 +111,7 @@ public:
 	: __base(__tag, __a, std::forward<std::tuple<_UElements...>>(__in))
 	{}
 
-	using __base::operator=;
+	using std::tuple<_Elements...>::operator=;
 
 	const tuple_type& tuple() const
 	{ return *this; }
@@ -275,11 +279,11 @@ private:
 
 public:
 	template<typename _Member>
-	CPP0X_DELEGATE_FUNCTION(operator->*(_Member m),
+	CPP0X_DELEGATE_FUNCTION(operator FALCON_PP_NOT_IDE_PARSER(->*)(_Member m),
 	this->__call<late_maker<__member_to_pointer>>(std::make_tuple(m), late_maker<synchronizer>()))
 
 	template<typename _Member>
-	CPP0X_DELEGATE_FUNCTION(operator->*(_Member m) const,
+	CPP0X_DELEGATE_FUNCTION(operator FALCON_PP_NOT_IDE_PARSER(->*)(_Member m) const,
 	this->__call<late_maker<__member_to_pointer>>(std::make_tuple(m), late_maker<synchronizer>()))
 
 	template<typename... _Args>
@@ -292,13 +296,13 @@ public:
 
 	synchronizer& operator++()
 	{
-		falcon::tuple_for_each(this->tuple(), falcon::late_increment());
+		tuple_for_each(this->tuple(), late_increment());
 		return *this;
 	}
 
 	synchronizer& operator--()
 	{
-		falcon::tuple_for_each(this->tuple(), falcon::late_decrement());
+		tuple_for_each(this->tuple(), late_decrement());
 		return *this;
 	}
 
@@ -316,15 +320,25 @@ public:
 		return ret;
 	}
 
+private:
 	template<typename _U>
-	synchronizer& operator=(_U&& x)
+	synchronizer& assign(_U& x)
 	{
-		falcon::tuple_for_each(
+		tuple_for_each(
 			this->tuple(),
-			falcon::placeholder_for_argument<1, falcon::late_affect, _U&>(x)
+			placeholder_for_argument<1, late_affect, _U&>(x)
 		);
 		return *this;
 	}
+
+public:
+	template<typename _U>
+	synchronizer& operator=(_U& x)
+	{ return assign(x); }
+
+	template<typename _U>
+	synchronizer& operator=(const _U& x)
+	{ return assign(x); }
 
 	void swap(synchronizer& other)
 	{ std::swap(this->tuple(), other.tuple()); }
@@ -335,18 +349,21 @@ constexpr synchronizer<typename decay_and_strip<_Elements>::type...>
 make_synchronizer(_Elements&&... __args)
 {
 	return synchronizer<
-		typename falcon::decay_and_strip<_Elements>::type...
+		typename decay_and_strip<_Elements>::type...
 	>(std::forward<_Elements>(__args)...);
 }
 
+///Creates a @c synchronizer of lvalue references
 template<typename... _Elements>
 constexpr synchronizer<_Elements&...> synchronize(_Elements&... __args)
 { return synchronizer<_Elements&...>(__args...); }
 
+///Creates a @c synchronizer of lvalue references on tuple values
 template<typename... _Elements>
 synchronizer<_Elements...>& tuple_synchronise(std::tuple<_Elements...>& t)
 { return static_cast<synchronizer<_Elements...>&>(t); }
 
+///Creates a const @c synchronizer of lvalue references on tuple values
 template<typename... _Elements>
 const synchronizer<_Elements...>& tuple_synchronise(const std::tuple<_Elements...>& t)
 { return static_cast<const synchronizer<_Elements...>&>(t); }
