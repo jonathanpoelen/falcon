@@ -142,15 +142,11 @@ dans les classes accesseur ajouter des typedef argument_type ou fitst_argument_t
 
 synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). (Utilise par multiple_iterator ? Le remplace ?). Sera utilisé par delegate_comparison_iterator. Basé sur synchronizer<>.
 
-merger indirect_iterator et proxy_iterator avec par defaut le comportement de indirect_iterator
-
 ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
-
-placeholder_for_argument: déduire par défaut le type de la donnée.
 
 synchronizer: ignorer les valeur de type std::ignore_t. Les fonctions retournant void, voient leur type changer en std::ignore_t
 
-
+completer les operateurs de range_modifier et faire un for_each() et un invoke(). enlever unary() et binary() ? Passer par operator() ? uniquement par invoke() ?
 
 
 
