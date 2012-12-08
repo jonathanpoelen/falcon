@@ -7,7 +7,7 @@ namespace falcon {
 	template <typename _T>
 	struct bit_size
 	{
-		static const std::size_t value = 8 * sizeof(_T);
+		static const std::size_t value = __CHAR_BIT__ * sizeof(_T);
 	};
 }
 

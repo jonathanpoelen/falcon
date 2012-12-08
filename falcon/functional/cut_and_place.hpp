@@ -16,14 +16,14 @@ struct __cut_and_place
 	template<typename _U, typename... _Args>
 	static void impl(const _T& pack, _U& a, _Args&... args)
 	{
-		a = static_cast<_U>(pack >> (_Decal*8));
+		a = static_cast<_U>(pack >> (_Decal * __CHAR_BIT__));
 		__cut_and_place<_T, _Decal + _BeginDecal, _BeginDecal>::impl(pack, args...);
 	}
 
 	template<typename _U>
 	static void impl(const _T& pack, _U& a)
 	{
-		a = static_cast<_U>(pack >> (_Decal*8));
+		a = static_cast<_U>(pack >> (_Decal * __CHAR_BIT__));
 	}
 };
 
@@ -34,7 +34,7 @@ struct __cut_and_place<_T, _Decal, _Decal>
 	static void impl(const _T& pack, _U& a, _Z& b, _Args&... args)
 	{
 		a = static_cast<_U>(pack);
-		b = static_cast<_Z>(pack >> (_Decal*8));
+		b = static_cast<_Z>(pack >> (_Decal * __CHAR_BIT__));
 		__cut_and_place<_T, _Decal*2, _Decal>::impl(pack, args...);
 	}
 
@@ -69,24 +69,24 @@ template<typename _T, std::size_t _Size = sizeof(_T), typename _U>
 void cut_and_place(const _U& pack, _T& a, _T& b)
 {
 	a = pack;
-	b = pack >> (_Size * 8);
+	b = pack >> (_Size * __CHAR_BIT__);
 }
 
 template<typename _T, std::size_t _Size = sizeof(_T), typename _U>
 void cut_and_place(const _U& pack, _T& a, _T& b, _T& c)
 {
 	a = pack;
-	b = pack >> (_Size * 8);
-	c = pack >> (_Size * 8 * 2);
+	b = pack >> (_Size * __CHAR_BIT__);
+	c = pack >> (_Size * __CHAR_BIT__ * 2);
 }
 
 template<typename _T, std::size_t _Size = sizeof(_T), typename _U>
 void cut_and_place(const _U& pack, _T& a, _T& b, _T& c, _T& d)
 {
 	a = pack;
-	b = pack >> (_Size * 8);
-	c = pack >> (_Size * 8 * 2);
-	d = pack >> (_Size * 8 * 3);
+	b = pack >> (_Size * __CHAR_BIT__);
+	c = pack >> (_Size * __CHAR_BIT__ * 2);
+	d = pack >> (_Size * __CHAR_BIT__ * 3);
 }
 #endif
 

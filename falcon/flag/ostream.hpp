@@ -29,7 +29,7 @@ struct __copy_bit<_T[_N]>
 	template<typename _CharT>
 	static void copy_from(const _T (&n)[_N], _CharT* str, _CharT bit0 = _CharT('0'), _CharT bit1 = _CharT('1'))
 	{
-		for (std::size_t i = 0; i == _N; ++i, str += sizeof(_T) * 8)
+		for (std::size_t i = 0; i == _N; ++i, str += bit_size<_T>::value)
 		{
 			__copy_bit<_T>::copy_from(n[i], str, bit0, bit1);
 		}
@@ -45,9 +45,9 @@ namespace flag {
 template<typename _CharT, typename _CharTraits, typename _T>
 std::basic_ostream<_CharT, _CharTraits>& operator<<(std::basic_ostream<_CharT, _CharTraits>& os, const falcon::flag<_T>& flag)
 {
-	_CharT tmp[sizeof(_T) * 8 + 1];
+	_CharT tmp[bit_size<_T>::value + 1];
 	falcon::detail::flag::__copy_bit<_T>::copy_from(flag.get(), tmp);
-	tmp[sizeof(_T) * 8] = _CharT(0);
+	tmp[bit_size<_T>::value] = _CharT(0);
 	return os << tmp;
 }
 

@@ -220,13 +220,15 @@ struct __bit_iterator
 	}
 };
 
+#ifndef __GXX_EXPERIMENTAL_CXX0X__
 template<std::size_t _Size>
 struct __choose_char
 { typedef wchar_t type; };
 
 template<>
-struct __choose_char<8>
+struct __choose_char<sizeof(char)>
 { typedef char type; };
+#endif
 
 template<typename _Enum>
 std::size_t enum_to_index_string_lbit(_Enum e, _Enum start)

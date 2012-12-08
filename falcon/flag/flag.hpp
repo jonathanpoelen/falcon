@@ -534,10 +534,10 @@ public:
 
 	self_type& operator<<=(std::size_t n)
 	{
-		if (n >= sizeof(_T) * 8 * _N)
+		if (n >= bit_size<_T>::value * _N)
 			return set_null();
-		std::size_t d = n / (sizeof(_T) * 8);
-		n %= sizeof(_T) * 8;
+		std::size_t d = n / (bit_size<_T>::value);
+		n %= bit_size<_T>::value;
 		_M_flag[0] = _M_flag[d] << n;
 		for (std::size_t i = d; i != _N; ++i)
 		{
@@ -559,10 +559,10 @@ public:
 
 	self_type& operator>>=(unsigned int n)
 	{
-		if (n >= sizeof(_T) * 8 * _N)
+		if (n >= bit_size<_T>::value * _N)
 			return set_null();
-		std::size_t d = n / (sizeof(_T) * 8);
-		n %= sizeof(_T) * 8;
+		std::size_t d = n / (bit_size<_T>::value);
+		n %= bit_size<_T>::value;
 		for (std::size_t i = _N-1; i != _N-1-d; --i)
 		{
 			_M_flag[i] = _M_flag[i-d] >> n;
@@ -643,11 +643,12 @@ typedef flag<uint64_t[2]> flag128;
 typedef flag<uint64_t[3]> flag192;
 typedef flag<uint64_t[4]> flag256;
 
+///TODO int pas forcement egal a 32, le prevoir por selectionner un int si possible
 template<std::size_t _Choose, bool u32, bool u64>
 struct __flag_type_selector
 {
 	typedef uint64_t type[
-		(_Choose + (sizeof(uint64_t)*8-1)) / (sizeof(uint64_t)*8)
+		(_Choose + (bit_size<uint64_t>::value - 1)) / (bit_size<uint64_t>::value)
 	];
 };
 
@@ -667,8 +668,8 @@ template<std::size_t _Choose>
 struct flag_selector
 {
 	typedef flag<typename __flag_type_selector<_Choose,
-		(sizeof(uint32_t)*8 >= _Choose),
-		(sizeof(uint64_t)*8 >= _Choose)
+		(bit_size<uint32_t>::value >= _Choose),
+		(bit_size<uint64_t>::value >= _Choose)
 	>::type> type;
 };
 

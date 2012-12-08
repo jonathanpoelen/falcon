@@ -221,7 +221,7 @@ public:
 			return *this;
 		if (!(n % scalar_size))
 		{
-			_data.insert(_data.end(), n / 8, 0);
+			_data.insert(_data.end(), n / __CHAR_BIT__, 0);
 			return *this;
 		}
 		scalar_data_type pbit = 1;
@@ -256,9 +256,9 @@ public:
 			return *this;
 		data_iterator it = _data.end();
 		data_iterator end = _data.begin();
-		while (n >= 8 && --it != end)
-			n -= 8;
-		if (it == end && n >= 8)
+		while (n >= __CHAR_BIT__ && --it != end)
+			n -= __CHAR_BIT__;
+		if (it == end && n >= __CHAR_BIT__)
 		{
 			_data.clear();
 			return *this;

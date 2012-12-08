@@ -15,7 +15,7 @@ struct __full_bits {
 	struct impl<1,n> {
 		static const std::size_t value = n;
 	};
-	static const std::size_t value = impl<Octet*8>::value;
+	static const std::size_t value = impl<Octet * __CHAR_BIT__>::value;
 };
 
 template<std::size_t choose, typename _Int, bool lower = (choose <= __full_bits<sizeof(_Int)>::value)>
