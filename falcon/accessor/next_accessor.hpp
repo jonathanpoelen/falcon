@@ -9,6 +9,7 @@ template <typename _Class, typename _T = typename _Class::value_type&>
 struct next_accessor
 {
 	typedef _T result_type;
+	typedef _Class argument_type;
 
 	result_type operator()(_Class& cont) const
 	{

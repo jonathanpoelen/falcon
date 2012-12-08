@@ -9,6 +9,7 @@ template <typename _PairT>
 struct first_accessor
 {
 	typedef _PairT pair_type;
+	typedef pair_type argument_type;
 	typedef typename pair_type::first_type& result_type;
 
 	result_type operator()(pair_type& pair) const
@@ -26,6 +27,7 @@ template <typename _PairT>
 struct second_accessor
 {
 	typedef _PairT pair_type;
+	typedef pair_type argument_type;
 	typedef typename pair_type::second_type& result_type;
 
 	result_type operator()(pair_type& pair) const

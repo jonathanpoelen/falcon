@@ -10,6 +10,7 @@ template <typename _T>
 struct size_accessor
 {
 	typedef std::size_t result_type;
+	typedef _T argument_type;
 
 	CPP_CONSTEXPR result_type operator()(const _T& x) const
 	{ return x.size(); }

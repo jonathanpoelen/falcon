@@ -11,6 +11,7 @@ struct reference_accessor
 {
 	typedef _T value_type;
 	typedef _T& reference;
+	typedef reference argument_type;
 	typedef reference result_type;
 	typedef typename add_const_if_reference<reference>::type const_reference;
 
@@ -26,6 +27,7 @@ struct reference_accessor<const _T>
 {
 	typedef _T value_type;
 	typedef const _T& reference;
+	typedef reference argument_type;
 	typedef reference result_type;
 	typedef reference const_reference;
 
