@@ -15,19 +15,18 @@ struct __crange_traits
 	typedef falcon::iterator::fake_iterator<
 		_T,
 		falcon::iterator::fake_iterator_less_comparison_tag
-	> __iterator_base;
-	typedef falcon::range<__iterator_base> __type_range;
+	> __iterator;
+	typedef falcon::range<__iterator> __range_type;
 
 	typedef falcon::iterator::nexter_iterator<
-		__iterator_base,
+		__iterator,
 		falcon::placeholder_for_argument<
 			1,
-			falcon::plus_equal<__iterator_base, unsigned>,
+			falcon::plus_equal<__iterator, unsigned>,
 			unsigned
 		>
-	> __iterator_step_base;
-	typedef falcon::range<__iterator_step_base> __type_range_step;
-
+	> __step_iterator;
+	typedef falcon::range<__step_iterator> __step_range_type;
 };
 
 /**
@@ -48,15 +47,14 @@ struct __crange_traits
  * }
  * @endcode
  */
-inline /*constexpr*/ typename __crange_traits<int>::__type_range
+inline /*constexpr*/ typename __crange_traits<int>::__range_type
 crange(int first, int last)
 {
 	return {
-		__crange_traits<int>::__iterator_base(first),
-		__crange_traits<int>::__iterator_base(last)
+		__crange_traits<int>::__iterator(first),
+		__crange_traits<int>::__iterator(last)
 	};
 }
-
 
 /**
  * \brief Create @ref range used with for raw statement.
@@ -76,12 +74,12 @@ crange(int first, int last)
  * }
  * @endcode
  */
-inline /*constexpr*/ typename __crange_traits<int>::__type_range_step
+inline /*constexpr*/ typename __crange_traits<int>::__step_range_type
 crange(int first, int last, unsigned step)
 {
 	return {
-		{__crange_traits<int>::__iterator_base(first), step},
-		{__crange_traits<int>::__iterator_base(last), step}
+		{__crange_traits<int>::__iterator(first), step},
+		{__crange_traits<int>::__iterator(last), step}
 	};
 }
 

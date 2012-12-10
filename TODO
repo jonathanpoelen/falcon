@@ -140,9 +140,11 @@ utiliser __CHAR_BIT__ dans bit/bit_swap.hpp et bit/detail/bit_swap.hpp (en fait 
 
 synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). (Utilise par multiple_iterator ? Le remplace ?). Sera utilisé par delegate_comparison_iterator. Basé sur synchronizer<>.
 
+l'actuel delegate_comparison_iterator est en fait un multiple_iterator avec un seul iterateur de comparaison (utilise keep_parameter_index). Le changer pour qu'il fonctionne comme indirect_iterator mais uniquement pour la comparaison.
+
 ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
 
-synchronizer: ignorer les valeur de type std::ignore_t. Les fonctions retournant void, voient leur type changer en std::ignore_t
+tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant void, voient leur type changer en std::ignore_t.
 
 completer les operateurs de range_modifier et faire un for_each() et un invoke(). enlever unary() et binary() ? Passer par operator() ? uniquement par invoke() ?
 

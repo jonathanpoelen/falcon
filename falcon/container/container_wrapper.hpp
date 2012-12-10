@@ -41,6 +41,12 @@ private:
 public:
 #endif
 
+	container_wrapper& operator=(container_type& container)
+	{
+		_container = &container;
+		return *this;
+	}
+
 	iterator begin() const
 	{ return _Traits::begin(base()); }
 

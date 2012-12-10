@@ -6,7 +6,7 @@
 #else
 # include <boost/type_traits/remove_reference.hpp>
 #endif
-#include <falcon/iterator/detail/handler_iterator.hpp>
+#include <falcon/iterator/iterator_handler.hpp>
 
 namespace falcon {
 namespace iterator {
@@ -14,45 +14,28 @@ namespace iterator {
 template <typename _Iterator, typename _Proxy>
 class indirect_iterator;
 
-namespace detail
+template <typename _Iterator, typename _Proxy>
+struct indirect_base
 {
-	template <typename _Iterator, typename _Proxy>
-	struct indirect_iterator_base
-	: std::iterator_traits<_Iterator>
-	{
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-		typedef typename std::result_of<
-			const _Proxy&(decltype(*std::declval<_Iterator&>()))
-		>::type reference;
-		typedef typename std::remove_reference<reference>::type value_type;
+	typedef typename std::result_of<
+		const _Proxy&(decltype(*std::declval<_Iterator&>()))
+	>::type reference;
+	typedef typename std::remove_reference<reference>::type value_type;
 #else
-		typedef typename _Proxy::result_type reference;
-		typedef typename boost::remove_reference<reference>::type value_type;
+	typedef typename _Proxy::result_type reference;
+	typedef typename boost::remove_reference<reference>::type value_type;
 #endif
-		typedef value_type* pointer;
-	};
-}
 
-template<typename _Iterator, typename _Proxy>
-struct __indirect_iterator_traits
-: detail::handler_iterator_traits<indirect_iterator<_Iterator, _Proxy> >
-{
-	typedef indirect_iterator<_Iterator, _Proxy> __indirect_iterator;
-	typedef detail::handler_iterator_traits<__indirect_iterator> __base;
-
-	static typename __base::reference dereference(const __indirect_iterator& it)
-	{ return it.proxy()(*it._M_current); }
-
-	static typename __base::reference dereference(__indirect_iterator& it)
-	{ return it.proxy()(*it._M_current); }
-
-	using __base::next;
-	static __indirect_iterator next(const __indirect_iterator& it, int n, int)
-	{ return __indirect_iterator(it._M_current + n, it.proxy()); }
-
-	using __base::prev;
-	static __indirect_iterator prev(const __indirect_iterator& it, int n, int)
-	{ return __indirect_iterator(it._M_current - n, it.proxy()); }
+	typedef typename iterator_handler_types<
+		indirect_iterator<_Iterator, _Proxy>,
+		_Iterator,
+		use_default,
+		value_type,
+		use_default,
+		use_default,
+		reference
+	>::base base;
 };
 
 template <typename _Iterator>
@@ -71,24 +54,20 @@ struct __proxy_indirect_iterator
 
 template <typename _Iterator, typename _Proxy = __proxy_indirect_iterator<_Iterator> >
 class indirect_iterator
-: public detail::handler_iterator<
-	indirect_iterator<_Iterator, _Proxy>,
-	_Iterator,
-	__indirect_iterator_traits<_Iterator, _Proxy>,
-	detail::indirect_iterator_base<_Iterator, _Proxy>
->
+: public indirect_base<_Iterator, _Proxy>::base
+
 {
-	typedef detail::handler_iterator<
-		indirect_iterator<_Iterator, _Proxy>,
-		_Iterator,
-		__indirect_iterator_traits<_Iterator, _Proxy>,
-		detail::indirect_iterator_base<_Iterator, _Proxy>
-	> __base;
+	friend class iterator_core_access;
+
+	typedef typename indirect_base<_Iterator, _Proxy>::base __base;
 
 	_Proxy _proxy;
 
 public:
 	typedef typename __base::iterator_type iterator_type;
+	typedef typename __base::difference_type difference_type;
+	typedef typename __base::reference reference;
+
 	typedef _Proxy proxy_type;
 
 public:
@@ -119,6 +98,13 @@ public:
 
 	_Proxy& proxy()
 	{ return _proxy; }
+
+private:
+	reference dereference() const
+	{ return _proxy(*__base::_M_current); }
+
+	reference dereference()
+	{ return _proxy(*__base::_M_current); }
 };
 
 template <typename _Iterator, typename _Proxy>

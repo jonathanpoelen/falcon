@@ -8,7 +8,7 @@
 
 namespace falcon {
 
-template <int _Position, typename _Functor, typename _T = _Functor::first_argument_type>
+template <int _Position, typename _Functor, typename _T>
 struct placeholder_for_argument
 {
 	typedef _Functor functor_type;
