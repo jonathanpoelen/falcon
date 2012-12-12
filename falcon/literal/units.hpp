@@ -8,31 +8,22 @@ namespace falcon {
 namespace literal {
 
 namespace units {}
-namespace units_symbol {}
 
-#define FALCON_USER_DEFINED_LD_UNITS_LITERAL(suffix, symbol)\
+#define FALCON_USER_DEFINED_LD_UNITS_LITERAL(suffix, symbol, ratio)\
 	namespace units {\
-		constexpr long double operator "" _##suffix (long double n)\
-		{ return n * ::falcon::suffix::num / ::falcon::suffix::den; }\
-	}\
-	namespace units_symbol {\
-		constexpr long double operator "" _##symbol (long double n)\
-		{ return ::falcon::literal::units::operator "" _##suffix (n); }\
+		constexpr long double operator "" _##suffix (long double n) noexcept\
+		{ return n * ratio; }\
 	}
 
 #define FALCON_USER_DEFINED_ULL_UNITS_LITERAL(suffix, symbol)\
 	namespace units {\
-		constexpr unsigned long long operator "" _##suffix (unsigned long long n)\
+		constexpr unsigned long long operator "" _##suffix (unsigned long long n) noexcept\
 		{ return n * ::falcon::suffix::num / ::falcon::suffix::den; }\
-	}\
-	namespace units_symbol {\
-		constexpr unsigned long long operator "" _##symbol (unsigned long long n)\
-		{ return ::falcon::literal::units::operator "" _##suffix (n); }\
 	}
 
 #define FALCON_USER_DEFINED_UNITS_LITERAL(suffix, symbol)\
 	FALCON_USER_DEFINED_ULL_UNITS_LITERAL(suffix, symbol)\
-	FALCON_USER_DEFINED_LD_UNITS_LITERAL(suffix, symbol)
+	FALCON_USER_DEFINED_LD_UNITS_LITERAL(suffix, symbol, ::falcon::suffix::num / ::falcon::suffix::den)
 
 FALCON_USER_DEFINED_LD_UNITS_LITERAL(yocto, y, 1.e-24)
 FALCON_USER_DEFINED_LD_UNITS_LITERAL(zepta, z, 1.e-21)
@@ -67,7 +58,7 @@ FALCON_USER_DEFINED_UNITS_LITERAL(exbi, Ei)
 #undef FALCON_USER_DEFINED_LD_UNITS_LITERAL
 #undef FALCON_USER_DEFINED_ULL_UNITS_LITERAL
 
-namespace units_symbol {
+namespace units {
 	constexpr unsigned long long operator "" _MM (unsigned long long n)
 	{ return operator "" _G(n); }
 	constexpr long double operator "" _MM (long double n)

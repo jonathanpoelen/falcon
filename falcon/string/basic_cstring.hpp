@@ -9,6 +9,7 @@
 #include <falcon/ostream/ostream_insert.hpp>
 #include <falcon/detail/string_convertion.hpp>
 #include <falcon/preprocessor/variatic/enum.hpp>
+#include <falcon/c++/constexpr.hpp>
 
 namespace falcon {
 
@@ -43,7 +44,7 @@ private:
 	iterator        m_end;
 
 public:
-	constexpr basic_cstring()
+	CPP_CONSTEXPR basic_cstring()
 	: m_begin(0)
 	, m_end(0)
 	{}
@@ -63,17 +64,17 @@ public:
 	{}
 
 	template<std::size_t _N>
-	constexpr basic_cstring(_CharT (&s) [_N], int)
+	CPP_CONSTEXPR basic_cstring(_CharT (&s) [_N], int)
 	: m_begin(s ? s : 0)
 	, m_end(s ? s + _N - 1 : 0)
 	{}
 
-	constexpr basic_cstring(pointer s, size_type __size)
+	CPP_CONSTEXPR basic_cstring(pointer s, size_type __size)
 	: m_begin(s)
 	, m_end(s + __size)
 	{}
 
-	constexpr basic_cstring(pointer first, pointer last)
+	CPP_CONSTEXPR basic_cstring(pointer first, pointer last)
 	: m_begin(first)
 	, m_end(last)
 	{}
@@ -105,7 +106,7 @@ public:
 	 *  Returns a read-only (constant) reference to the data at the first
 	 *  element of the %string.
 	 */
-	constexpr const_reference front() const
+	CPP_CONSTEXPR const_reference front() const
 	{ return operator[](0); }
 
 	/**
@@ -118,7 +119,7 @@ public:
 	 *  Returns a read-only (constant) reference to the data at the
 	 *  last element of the %string.
 	 */
-	constexpr const_reference back() const
+	CPP_CONSTEXPR const_reference back() const
 	{ return operator[](m_end - 1); }
 
 	reference at(size_type index)
@@ -128,22 +129,22 @@ public:
 		return m_begin[index];
 	}
 
-	constexpr const_reference at(size_type index) const
+	CPP_CONSTEXPR const_reference at(size_type index) const
 	{
 		if(m_begin + index >= m_end)
 			throw std::out_of_range("basic_cstring::at");
 		return m_begin[index];
 	}
 
-	constexpr size_type size() const
+	CPP_CONSTEXPR size_type size() const
 	{ return m_end - m_begin; }
-	constexpr size_type length() const
+	CPP_CONSTEXPR size_type length() const
 	{ return m_end - m_begin; }
 
-	constexpr size_type max_size() const
+	CPP_CONSTEXPR size_type max_size() const
 	{ return static_cast<size_type>(-1); }
 
-	constexpr bool empty() const
+	CPP_CONSTEXPR bool empty() const
 	{ return m_begin == m_end; }
 
 	void clear()
@@ -221,7 +222,7 @@ public:
 	 *  This is a handle to internal data.  Do not modify or dire things may
 	 *  happen.
 	 */
-	constexpr const_pointer c_str() const
+	CPP_CONSTEXPR const_pointer c_str() const
 	{ return m_begin; }
 
 	/**
@@ -230,7 +231,7 @@ public:
 	 *  This is a handle to internal data.  Do not modify or dire things may
 	 *  happen.
 	 */
-	constexpr const_pointer data() const
+	CPP_CONSTEXPR const_pointer data() const
 	{ return m_begin; }
 
 	void swap(basic_cstring& s)
@@ -241,24 +242,25 @@ public:
 
 	iterator begin()
 	{ return m_begin; }
-	constexpr const_iterator begin() const
+	CPP_CONSTEXPR const_iterator begin() const
 	{ return m_begin; }
 
 	iterator end()
 	{ return m_end; }
-	constexpr const_iterator end() const
+	CPP_CONSTEXPR const_iterator end() const
 	{ return m_end; }
 
 	reverse_iterator rbegin()
 	{ return reverse_iterator(m_end); }
-	constexpr const_reverse_iterator rbegin() const
+	CPP_CONSTEXPR const_reverse_iterator rbegin() const
 	{ return reverse_iterator(m_end); }
 
 	reverse_iterator rend()
 	{ return reverse_iterator(m_begin); }
-	constexpr const_reverse_iterator rend() const
+	CPP_CONSTEXPR const_reverse_iterator rend() const
 	{ return reverse_iterator(m_begin); }
 
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
 	/**
 	 *  Returns a read-only (constant) iterator that points to the first
 	 *  character in the %string.
@@ -288,6 +290,7 @@ public:
 	 */
 	constexpr const_reverse_iterator crend() const
 	{ return const_reverse_iterator(m_begin); }
+#endif
 
 	/**
 	 *  @brief  Find position of a C substring.
@@ -737,7 +740,7 @@ public:
 	 *  characters.  If @a pos is beyond the end of the string, out_of_range
 	 *  is thrown.
 	 */
-	constexpr basic_cstring substr(size_type __pos = 0, size_type __n = npos) const
+	CPP_CONSTEXPR basic_cstring substr(size_type __pos = 0, size_type __n = npos) const
 	{
 		if (size() < __pos + __n)
 			throw std::out_of_range("basic_cstring::substr");
@@ -954,19 +957,19 @@ private:
 };
 
 template <typename _CharT, typename _Traits = std::char_traits<_CharT>, std::size_t _N>
-constexpr basic_cstring<_CharT, _Traits> make_cstring(_CharT (&s)[_N])
+CPP_CONSTEXPR basic_cstring<_CharT, _Traits> make_cstring(_CharT (&s)[_N])
 {
 	return basic_cstring<_CharT, _Traits>(s, s + _N - 1);
 }
 
 template <typename _CharT, typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type>>
-constexpr basic_cstring<_CharT, _Traits> make_cstring(_CharT* s, std::size_t n)
+CPP_CONSTEXPR basic_cstring<_CharT, _Traits> make_cstring(_CharT* s, std::size_t n)
 {
 	return basic_cstring<_CharT, _Traits>(s, n);
 }
 
 template <typename _CharT, typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type>>
-constexpr basic_cstring<_CharT, _Traits> make_cstring(_CharT* first, _CharT* last)
+CPP_CONSTEXPR basic_cstring<_CharT, _Traits> make_cstring(_CharT* first, _CharT* last)
 {
 	return basic_cstring<_CharT, _Traits>(first, last);
 }

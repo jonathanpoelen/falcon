@@ -10,7 +10,7 @@ namespace literal {
 namespace chrono {
 
 #define FALCON_USER_DEFINED_CHRONO_LITERAL(suffix)\
-	constexpr std::chrono::suffix operator "" _##suffix(unsigned long long n)\
+	constexpr std::chrono::suffix operator "" _##suffix(unsigned long long n) noexcept\
 	{ return std::chrono::suffix(n); }
 
 	FALCON_USER_DEFINED_CHRONO_LITERAL(nanoseconds)

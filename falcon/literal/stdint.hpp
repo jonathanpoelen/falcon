@@ -10,7 +10,7 @@ namespace literal {
 namespace numeric {
 
 #define FALCON_USER_DEFINED_STDINT_LITERAL(suffix)\
-	constexpr suffix##_t operator "" _##suffix(unsigned long long n)\
+	constexpr suffix##_t operator "" _##suffix(unsigned long long n) noexcept\
 	{ return static_cast<suffix##_t>(n); }
 
 #define FALCON_USER_DEFINED_STDINT_LITERAL_PAIR(suffix)\
