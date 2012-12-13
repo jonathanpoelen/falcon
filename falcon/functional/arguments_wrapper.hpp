@@ -38,7 +38,7 @@ public:
 
 	template<typename... _UElements>
 	explicit constexpr arguments_wrapper(_UElements&&... __elements)
-	: __base(std::forward<_Elements>(__elements)...)
+	: __base(std::forward<_UElements>(__elements)...)
 	{}
 
 	constexpr arguments_wrapper(const tuple_type& t)
@@ -117,8 +117,8 @@ public:
 
 	template<typename _Functor>
 	auto operator()(_Functor func) const
-	-> decltype(tuple_apply<_Functor&>(func, this->tuple()))
-	{ return tuple_apply<_Functor&>(func, tuple()); }
+	-> decltype(tuple_apply<const _Functor&>(func, this->tuple()))
+	{ return tuple_apply<const _Functor&>(func, tuple()); }
 
 	template<typename _Functor>
 	auto operator()(_Functor func)
@@ -127,8 +127,8 @@ public:
 
 	template<typename _Functor, std::size_t... _Indexes>
 	auto operator()(const parameter_index<_Indexes...>& indexes, _Functor func) const
-	-> decltype(tuple_apply<_Functor&>(indexes, func, this->tuple()))
-	{ return tuple_apply<_Functor&>(indexes, func, tuple()); }
+	-> decltype(tuple_apply<const _Functor&>(indexes, func, this->tuple()))
+	{ return tuple_apply<const _Functor&>(indexes, func, tuple()); }
 
 	template<typename _Functor, std::size_t... _Indexes>
 	auto operator()(const parameter_index<_Indexes...>& indexes, _Functor func)
