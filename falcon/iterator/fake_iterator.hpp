@@ -1,7 +1,7 @@
 #ifndef FALCON_ITERATOR_FAKE_ITERATOR_HPP
 #define FALCON_ITERATOR_FAKE_ITERATOR_HPP
 
-#include <falcon/iterator/detail/handler_iterator.hpp>
+#include <falcon/iterator/iterator_handler.hpp>
 #include <falcon/type_traits/difference.hpp>
 
 namespace falcon {
@@ -11,91 +11,53 @@ struct fake_iterator_full_comparison_tag {};
 struct fake_iterator_less_comparison_tag {};
 struct fake_iterator_equal_to_comparison_tag {};
 
-template <typename _T, typename _ComparisonTag = fake_iterator_full_comparison_tag>
+template <typename _T, typename _ComparisonTag = use_default,
+	typename _Category = use_default,
+	typename _Reference = use_default,
+	typename _Distance = use_default,
+	typename _Pointer = use_default
+>
 class fake_iterator;
 
-namespace detail
-{
-	template <typename _T, typename _ComparisonTag>
-	struct fake_iterator_base
+
+namespace detail {
+
+	template <typename _T, typename _ComparisonTag,
+		typename _Category, typename _Reference, typename _Distance, typename _Pointer>
+	struct fake_base
 	{
-		typedef typename ::falcon::difference<_T>::type difference_type;
-		///TODO not always
-		typedef std::random_access_iterator_tag iterator_category;
-		typedef _T value_type;
-		typedef value_type& reference;
-		typedef value_type* pointer;
+		typedef typename iterator_handler_types<
+			fake_iterator<_T, _ComparisonTag,  _Category, _Reference, _Distance, _Pointer>,
+			_T,
+			typename default_or_type<
+				use<std::random_access_iterator_tag/*TODO not always*/>,
+				_Category
+			>::type,
+			_T,
+			typename default_or_type<use<_T>, _Distance>::type,
+			typename default_or_type<use<_T*>, _Pointer>::type,
+			typename default_or_type<use<_T&>, _Reference>::type
+		>::base base;
 	};
 
-	template <typename _T, typename _ComparisonTag>
-	struct fake_iterator_base<_T&, _ComparisonTag>
-	{
-		typedef typename ::falcon::difference<_T>::type difference_type;
-		///TODO not always
-		typedef std::random_access_iterator_tag iterator_category;
-		typedef _T& value_type;
-		typedef _T& reference;
-		typedef _T* pointer;
-	};
 }
 
-template<typename _T, typename _ComparisonTag>
-struct __fake_iterator_traits_base
-: detail::handler_iterator_traits<fake_iterator<_T, _ComparisonTag> >
-{
-	typedef fake_iterator<_T, _ComparisonTag> __fake_iterator;
-	typedef typename std::iterator_traits<__fake_iterator>::reference reference;
 
-	static reference dereference(__fake_iterator& it)
-	{ return it._M_current; }
-
-	static reference dereference(const __fake_iterator& it)
-	{ return it._M_current; }
-};
-
-template<typename _T, typename _ComparisonTag>
-struct __fake_iterator_traits
-: __fake_iterator_traits_base<_T, _ComparisonTag>
-{};
-
-template<typename _T>
-struct __fake_iterator_traits<_T, fake_iterator_equal_to_comparison_tag>
-: __fake_iterator_traits_base<_T, fake_iterator_equal_to_comparison_tag>
-{
-	typedef fake_iterator<_T, fake_iterator_equal_to_comparison_tag> __fake_iterator;
-	static bool lt(const __fake_iterator& a, const __fake_iterator& b);
-};
-
-template<typename _T>
-struct __fake_iterator_traits<_T, fake_iterator_less_comparison_tag>
-: __fake_iterator_traits_base<_T, fake_iterator_less_comparison_tag>
-{
-	typedef fake_iterator<_T, fake_iterator_less_comparison_tag> __fake_iterator;
-	static bool eq(const __fake_iterator& a, const __fake_iterator& b)
-	{ return !(a._M_current < b._M_current); }
-};
-
-
-template<typename _T, typename _ComparisonTag>
-class fake_iterator
-: public detail::handler_iterator<
-	fake_iterator<_T, _ComparisonTag>,
-	_T,
-	__fake_iterator_traits<_T, _ComparisonTag>,
-	detail::fake_iterator_base<_T, _ComparisonTag>
+template<typename _T, typename _ComparisonTag,
+	typename _Category,
+	typename _Reference,
+	typename _Distance,
+	typename _Pointer
 >
+class fake_iterator
+: public detail::fake_base<_T, _ComparisonTag, _Category, _Reference, _Distance, _Pointer>::base
 {
-	typedef __fake_iterator_traits<_T, _ComparisonTag> __traits;
-	typedef detail::handler_iterator<
-		fake_iterator,
-		_T,
-		__traits,
-		detail::fake_iterator_base<_T, _ComparisonTag>
-	> __base;
+	typedef typename detail::fake_base<_T, _ComparisonTag, _Category, _Reference, _Distance, _Pointer>::base __base;
+
+	friend iterator_core_access;
 
 public:
-	typedef typename __base::iterator_type iterator_type;
-	typedef typename __base::value_type value_type;
+	typedef typename __base::reference reference;
 
 public:
 	fake_iterator()
@@ -103,7 +65,7 @@ public:
 	{}
 
 	fake_iterator(const fake_iterator& other)
-	: __base(other._M_current)
+	: __base(other)
 	{}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -112,7 +74,7 @@ public:
 	{}
 
 	template<typename _U, class _Enable = typename
-	std::enable_if<!std::is_reference<iterator_type>::value && std::is_convertible<_U, iterator_type>::value>::type>
+	std::enable_if<!std::is_reference<_T>::value && std::is_convertible<_U, _T>::value>::type>
 	/*explicit*/ fake_iterator(_U&& value)
 	: __base(std::forward<_U>(value))
 	{}
@@ -122,29 +84,49 @@ public:
 	{}
 #endif
 
-	using __base::operator=;
+private:
+	reference dereference()
+	{ return this->base_reference(); }
 
-	const value_type& operator*() const
-	{ return __traits::dereference(this->downcast()); }
+	reference dereference() const
+	{ return this->base_reference(); }
 
-	using __base::operator*;
+	typedef typename default_or_type<
+		use<fake_iterator_full_comparison_tag>,
+		_ComparisonTag
+	>::type __comparison_tag;
 
-	const value_type* operator->() const
-	{ return &(operator*()); }
+	bool equal(const fake_iterator& other, fake_iterator_less_comparison_tag) const
+	{ return other.base_reference() < this->base_reference(); }
 
-	using __base::operator->;
+	template<typename _Tag>
+	bool equal(const fake_iterator& other, _Tag) const
+	{ return this->base_reference() == other.base_reference(); }
+
+	bool equal(const fake_iterator& other) const
+	{ return equal(other, __comparison_tag()); }
+
+	bool less(const fake_iterator& other, fake_iterator_equal_to_comparison_tag) const;
+
+	template<typename _Tag>
+	bool less(const fake_iterator& other, _Tag) const
+	{ return this->base_reference() < other.base_reference(); }
+
+	bool less(const fake_iterator& other) const
+	{ return less(other, __comparison_tag()); }
 };
+
 
 template <typename _T, typename _ComparisonTag>
 fake_iterator<_T, _ComparisonTag>
 make_fake_iterator(const _T& value,
-				   const _ComparisonTag& = _ComparisonTag())
+									 _ComparisonTag = fake_iterator_full_comparison_tag())
 { return fake_iterator<_T, _ComparisonTag>(value); }
 
 template <typename _T, typename _ComparisonTag>
 fake_iterator<const _T, _ComparisonTag>
 make_cfake_iterator(const _T& value,
-					const _ComparisonTag& = _ComparisonTag())
+										_ComparisonTag = fake_iterator_full_comparison_tag())
 { return fake_iterator<const _T, _ComparisonTag>(value); }
 
 }}

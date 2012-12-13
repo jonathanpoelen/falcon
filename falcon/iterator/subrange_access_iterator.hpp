@@ -6,11 +6,12 @@
 
 namespace falcon {
 
-	template<typename _T>
-	struct subrange_access_iterator
-	{
-		typedef typename range_access_iterator<typename subtype<_T>::type>::type type;
-	};
+template<typename _T>
+struct subrange_access_iterator
+{
+	typedef typename range_access_iterator<typename subtype<_T>::type>::type type;
+};
+
 }
 
 #endif

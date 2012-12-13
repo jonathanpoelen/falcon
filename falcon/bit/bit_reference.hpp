@@ -1,23 +1,26 @@
 #ifndef FALCON_BIT_BIT_REFERENCE_HPP
 #define FALCON_BIT_BIT_REFERENCE_HPP
 
-#include <type_traits>
+#include <falcon/c++/boost_or_std.hpp>
+
+#include FALCON_BOOST_OR_STD_TRAITS(remove_const)
 
 namespace falcon {
 
-template<typename _T>
+template<typename _T, typename _Mask
+	= typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<_T>::type>
 struct basic_bit_reference
 {
 	typedef _T bit_type;
-	typedef typename std::remove_const<bit_type>::type mask_type;
+	typedef _Mask mask_type;
 
 private:
 	bit_type * _p;
 	mask_type _mask;
 
 public:
-	basic_bit_reference(bit_type * x, bit_type y)
-	: _p(x), _mask(y)
+	basic_bit_reference(bit_type * x, mask_type m)
+	: _p(x), _mask(m)
 	{}
 
 	basic_bit_reference()

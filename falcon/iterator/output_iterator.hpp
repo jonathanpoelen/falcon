@@ -6,27 +6,57 @@
 namespace falcon {
 namespace iterator {
 
-typedef std::iterator<std::output_iterator_tag, void, void, void, void> output_iterator;
+typedef std::iterator<std::output_iterator_tag, void, void, void, void> output_iterator_base;
 
-template<typename _Self>
-struct output_iterator_base
-: std::iterator<std::output_iterator_tag, void, void, void, void>
+template<typename _Iterator, typename _T>
+struct output_iterator
+: output_iterator_base
 {
-	/// Simply returns *this.
-	_Self& operator*()
-	{ return downcast(); }
-
-	/// Simply returns *this.  (This %iterator does not @a move.)
-	_Self& operator++()
-	{ return downcast(); }
-
-	/// Simply returns *this.  (This %iterator does not @a move.)
-	_Self operator++(int)
-	{ return _Self(downcast()); }
+	typedef _Iterator iterator_type;
 
 private:
-	_Self& downcast()
-	{ static_cast<_Self&>(*this); }
+	iterator_type _M_current;
+
+public:
+	output_iterator()
+	: _M_current()
+	{}
+
+	output_iterator(iterator_type x)
+	: _M_current(x)
+	{}
+
+	output_iterator(const output_iterator& other)
+	: _M_current(other._M_current)
+	{}
+
+	template<typename _U>
+	output_iterator(const _U& x)
+	: _M_current(x)
+	{}
+
+	template<typename _U>
+	output_iterator(_U& x)
+	: _M_current(x)
+	{}
+
+	output_iterator(const _T& x)
+	{
+		*_M_current = x;
+		return *this;
+	}
+
+	/// Simply returns *this.
+	output_iterator& operator*()
+	{ return *this; }
+
+	/// Simply returns *this.  (This %iterator does not @a move.)
+	output_iterator& operator++()
+	{ return *this; }
+
+	/// Simply returns *this.  (This %iterator does not @a move.)
+	output_iterator& operator++(int)
+	{ return *this; }
 };
 
 }}

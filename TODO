@@ -148,9 +148,13 @@ tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant voi
 
 completer les operateurs de range_modifier et faire un for_each() et un invoke(). enlever unary() et binary() ? Passer par operator() ? uniquement par invoke() ?
 
+template<char... _Chars> std::bitset<sizeof...(_Chars)> operator "" _bits()
+int "" _b(unsigned long long x)
+long operator "" _lb(unsigned long long x)
+long long operator "" _llb(unsigned long long x)
 
-
-
+basic_cstring + string => string
+string + basic_cstring => string
 
 
 
