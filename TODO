@@ -152,12 +152,18 @@ template<char... _Chars> std::bitset<sizeof...(_Chars)> operator "" _bits()
 int "" _b(unsigned long long x)
 long operator "" _lb(unsigned long long x)
 long long operator "" _llb(unsigned long long x)
+int "" _ub(unsigned long long x)
+long operator "" _ulb(unsigned long long x)
+long long operator "" _ullb(unsigned long long x)
 
 basic_cstring + string => string
 string + basic_cstring => string
+string += basic_cstring => string
+string (==|<[<=|>=|>]!=) basic_cstring => bool
+basic_cstring (==|<[<=|>=|>]!=) string => bool
+(falcon/string/stringfwd.hpp)
 
-
-
+merger les operateurs de iterator_handler dans iterator_core_access
 
 
 
