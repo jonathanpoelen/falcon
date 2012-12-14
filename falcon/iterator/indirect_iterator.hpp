@@ -105,7 +105,7 @@ public:
 	{}
 
 	indirect_iterator(const indirect_iterator& __x)
-	: __base(__x._M_current)
+	: __base(__x)
 	, _proxy(__x._proxy)
 	{}
 

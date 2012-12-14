@@ -21,80 +21,129 @@ template<typename _Iterator, typename _IteratorBase,
 >
 class iterator_handler;
 
+class iterator_core_access
+{
+public:
 #define FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
 	template<typename _I, typename _IBase, \
-		typename _C, typename _V, typename _D, typename _P, typename _R>
-
-#define FALCON_ITERATOR_HANDLER_TEMPLATE2_HEAD()\
-	template<typename _I, typename _IBase, typename _I2, typename _IBase2,\
 		typename _C, typename _V, typename _D, typename _P, typename _R>
 
 #define FALCON_ITERATOR_HANDLER_TYPE()\
 	iterator_handler<_I, _IBase, _C, _V, _D, _P, _R>
 
-#define FALCON_ITERATOR_HANDLER2_TYPE()\
-	iterator_handler<_I2, _IBase2, _C, _V, _D, _P, _R>
-
-class iterator_core_access
-{
-public:
-#define FALCON_ITERATOR_CORE_ACCESS_OP(result_type, qualifier, member)\
-	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	static result_type member(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a)\
-	{ return derived(a).member(); }
-
-	FALCON_ITERATOR_CORE_ACCESS_OP(typename _I::reference, const, dereference)
-	FALCON_ITERATOR_CORE_ACCESS_OP(typename _I::reference, , dereference)
-	FALCON_ITERATOR_CORE_ACCESS_OP(void, , increment)
-	FALCON_ITERATOR_CORE_ACCESS_OP(void, , decrement)
-	FALCON_ITERATOR_CORE_ACCESS_OP(const _IBase&, const , base_reference)
-	FALCON_ITERATOR_CORE_ACCESS_OP(_IBase&, , base_reference)
-
-#undef FALCON_ITERATOR_CORE_ACCESS_OP
-
-#define FALCON_ITERATOR_CORE_ACCESS_OP2(result_type, member)\
-	FALCON_ITERATOR_HANDLER_TEMPLATE2_HEAD()\
-	static result_type member(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
-														const FALCON_ITERATOR_HANDLER2_TYPE()& b)\
-	{ return derived(a).member(derived(b)); }
-
-FALCON_ITERATOR_CORE_ACCESS_OP2(bool, equal)
-FALCON_ITERATOR_CORE_ACCESS_OP2(bool, less)
-FALCON_ITERATOR_CORE_ACCESS_OP2(typename _I::difference_type, difference)
-
-#undef FALCON_ITERATOR_CORE_ACCESS_OP2
-
-#define FALCON_ITERATOR_CORE_ACCESS_MOVE_OP(member)\
-	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	static void member(FALCON_ITERATOR_HANDLER_TYPE()& a,\
-										 typename _I::difference_type n)\
-	{ derived(a).member(n); }
-
-FALCON_ITERATOR_CORE_ACCESS_MOVE_OP(advance)
-FALCON_ITERATOR_CORE_ACCESS_MOVE_OP(recoil)
-
-#undef FALCON_ITERATOR_CORE_ACCESS_MOVE_OP
-
-#define FALCON_ITERATOR_CORE_ACCESS_NEWMOVE_OP(member)\
-	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	static _I member(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
-									 typename _I::difference_type n)\
-	{ return derived(a).member(n); }
-
-FALCON_ITERATOR_CORE_ACCESS_NEWMOVE_OP(advance)
-FALCON_ITERATOR_CORE_ACCESS_NEWMOVE_OP(recoil)
-
-#undef FALCON_ITERATOR_CORE_ACCESS_NEWMOVE_OP
-
-#define FALCON_ITERATOR_CORE_ACCESS_HEAD(prefix, result_type, qualifier, name)\
+#define FALCON_ITERATOR_CORE_ACCESS_HEAD(prefix, result_type, name, qualifier)\
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
 	prefix result_type name(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a)
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, _I&, , derived)
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, _I&, derived, )
 	{ return a.downcast(); }
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, const _I&, const, derived)
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, const _I&, derived, const)
 	{ return a.downcast(); }
+
+#define FALCON_ITERATOR_CORE_ACCESS(result_type, member, qualifier)\
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, result_type, member, qualifier)\
+	{ return derived(a).member(); }
+
+	FALCON_ITERATOR_CORE_ACCESS(const _IBase&, base_reference, )
+	FALCON_ITERATOR_CORE_ACCESS(_IBase&, base_reference, const)
+
+	FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, )
+	FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, const)
+
+	FALCON_ITERATOR_CORE_ACCESS(void, increment, )
+	FALCON_ITERATOR_CORE_ACCESS(void, decrement, )
+
+#undef FALCON_ITERATOR_CORE_ACCESS
+
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, typename _I::reference, operator*, )
+	{ return dereference(a); }
+
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, typename _I::reference, operator*, const)
+	{ return dereference(a); }
+
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, _I&, operator++, )
+	{
+		increment(a);
+		return derived(a);
+	}
+
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, _I&, operator--, )
+	{
+		decrement(a);
+		return derived(a);
+	}
+
+#undef FALCON_ITERATOR_CORE_ACCESS_HEAD
+
+	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()
+	friend _I operator++(FALCON_ITERATOR_HANDLER_TYPE()& a, int)
+	{
+		_I ret(a);
+		increment(a);
+		return ret;
+	}
+
+	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()
+	friend _I operator--(FALCON_ITERATOR_HANDLER_TYPE()& a, int)
+	{
+		_I ret(a);
+		decrement(a);
+		return ret;
+	}
+
+#define FALCON_ITERATOR_CORE_ACCESS_2CONST_HEAD(prefix, result_type, name)\
+	template<typename _I, typename _IBase, typename _I2, typename _IBase2,\
+		typename _C, typename _V, typename _D, typename _P, typename _R>\
+	prefix result_type name(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
+													const iterator_handler<_I2, _IBase2, \
+																								 _C, _V, _D, _P, _R>& b)
+
+#define FALCON_ITERATOR_CORE_ACCESS_COMPARISON(result_type, op, member)\
+	FALCON_ITERATOR_CORE_ACCESS_2CONST_HEAD(static, result_type, member)\
+	{ return a.member(b); }\
+	FALCON_ITERATOR_CORE_ACCESS_2CONST_HEAD(friend, result_type, operator op)\
+	{ return member(a, b); }
+
+	FALCON_ITERATOR_CORE_ACCESS_COMPARISON(bool, ==, equal)
+	FALCON_ITERATOR_CORE_ACCESS_COMPARISON(bool, <, less)
+	FALCON_ITERATOR_CORE_ACCESS_COMPARISON(typename _I::difference_type, -, difference)
+
+#undef FALCON_ITERATOR_CORE_ACCESS_COMPARISON
+
+#define FALCON_ITERATOR_CORE_ACCESS_COMPARISON(op, core)\
+	FALCON_ITERATOR_CORE_ACCESS_2CONST_HEAD(friend, bool, operator op)\
+	{ return core; }
+
+	FALCON_ITERATOR_CORE_ACCESS_COMPARISON(!=, !(a==b))
+	FALCON_ITERATOR_CORE_ACCESS_COMPARISON(<=, !(b<a))
+	FALCON_ITERATOR_CORE_ACCESS_COMPARISON(>,    b<a)
+	FALCON_ITERATOR_CORE_ACCESS_COMPARISON(>=, !(a<b))
+
+#undef FALCON_ITERATOR_CORE_ACCESS_COMPARISON
+
+#define FALCON_ITERATOR_CORE_ACCESS_MOVE(result_type, qualifier, op, member, ret)\
+	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
+	static result_type member(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a,\
+														typename _I::difference_type n)\
+	{ ret derived(a).member(a, n); }\
+	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
+	friend result_type operator op(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a,\
+																 typename _I::difference_type n)\
+	{\
+		ret member(a, n);\
+		return derived(a);\
+	}
+
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I, const, +, advance, return)
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I, const, -, recoil, return)
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I&, , +=, advance, )
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I&, , -=, recoil, )
+
+#undef FALCON_ITERATOR_CORE_ACCESS_MOVE
+
+#undef FALCON_ITERATOR_HANDLER_TYPE
+#undef FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD
 };
 
 template<typename _Iterator, typename _IteratorBase,
@@ -106,6 +155,7 @@ template<typename _Iterator, typename _IteratorBase,
 >
 class iterator_handler
 : public std::iterator<_Category, _Tp, _Distance, _Pointer, _Reference>
+, public iterator_core_access
 {
 	friend class iterator_core_access;
 
@@ -297,89 +347,6 @@ struct iterator_handler_types
 		reference
 	> base;
 };
-
-
-FALCON_ITERATOR_CORE_ACCESS_HEAD(, typename _I::reference, const, operator*)
-{ return iterator_core_access::dereference(a); }
-
-FALCON_ITERATOR_CORE_ACCESS_HEAD(, typename _I::reference, , operator*)
-{ return iterator_core_access::dereference(a); }
-
-FALCON_ITERATOR_CORE_ACCESS_HEAD(, _I&, , operator++)
-{
-	iterator_core_access::increment(a);
-	return iterator_core_access::derived(a);
-}
-
-FALCON_ITERATOR_CORE_ACCESS_HEAD(, _I&, , operator--)
-{
-	iterator_core_access::decrement(a);
-	return iterator_core_access::derived(a);
-}
-
-#undef FALCON_ITERATOR_CORE_ACCESS_HEAD
-
-FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()
-_I operator++(FALCON_ITERATOR_HANDLER_TYPE()& a, int)
-{
-	_I ret(a);
-	iterator_core_access::increment(a);
-	return ret;
-}
-
-FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()
-_I operator--(FALCON_ITERATOR_HANDLER_TYPE()& a, int)
-{
-	_I ret(a);
-	iterator_core_access::decrement(a);
-	return ret;
-}
-
-#define FALCON_ITERATOR_HANDLER_OP2(result_type, op, member)\
-	FALCON_ITERATOR_HANDLER_TEMPLATE2_HEAD()\
-	result_type operator op(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
-													const FALCON_ITERATOR_HANDLER2_TYPE()& b)\
-	{ return iterator_core_access::member(a,b); }
-
-FALCON_ITERATOR_HANDLER_OP2(bool, ==, equal)
-FALCON_ITERATOR_HANDLER_OP2(bool, <, less)
-FALCON_ITERATOR_HANDLER_OP2(typename _I::difference_type, -, difference)
-
-#undef FALCON_ITERATOR_HANDLER_OP2
-
-#define FALCON_ITERATOR_HANDLER_BINARY_OP(op, cmp)\
-	FALCON_ITERATOR_HANDLER_TEMPLATE2_HEAD()\
-	bool operator op(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
-									const FALCON_ITERATOR_HANDLER2_TYPE()& b)\
-	{ return cmp; }
-
-FALCON_ITERATOR_HANDLER_BINARY_OP(!=, !(a==b))
-FALCON_ITERATOR_HANDLER_BINARY_OP(<=, !(b<a))
-FALCON_ITERATOR_HANDLER_BINARY_OP(>,    b<a)
-FALCON_ITERATOR_HANDLER_BINARY_OP(>=, !(a<b))
-
-#undef FALCON_ITERATOR_HANDLER_BINARY_OP
-
-#define FALCON_ITERATOR_HANDLER_MOVE_OP(result_type, qualifier, op, member, ret)\
-	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	result_type operator op(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a,\
-													typename _I::difference_type n)\
-	{ \
-		ret iterator_core_access::member(a,n); \
-		return iterator_core_access::derived(a);\
-	}
-
-FALCON_ITERATOR_HANDLER_MOVE_OP(_I, const, +, advance, return)
-FALCON_ITERATOR_HANDLER_MOVE_OP(_I, const, -, recoil, return)
-FALCON_ITERATOR_HANDLER_MOVE_OP(_I&, , +=, advance, )
-FALCON_ITERATOR_HANDLER_MOVE_OP(_I&, , -=, recoil, )
-
-#undef FALCON_ITERATOR_HANDLER_MOVE_OP
-
-#undef FALCON_ITERATOR_HANDLER_TYPE
-#undef FALCON_ITERATOR_HANDLER2_TYPE
-#undef FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD
-#undef FALCON_ITERATOR_HANDLER_TEMPLATE2_HEAD
 
 }}
 
