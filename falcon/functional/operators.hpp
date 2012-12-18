@@ -2,6 +2,7 @@
 #define _FALCON_FUNCTIONAL_OPERATORS_HPP
 
 #include <iosfwd>
+#include <utility>
 #include <type_traits>
 #include <falcon/c++0x/syntax.hpp>
 #include <falcon/functional/late_parameter.hpp>
