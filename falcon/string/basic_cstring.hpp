@@ -6,6 +6,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <type_traits>
+#include <falcon/string/cstringfwd.hpp>
 #include <falcon/ostream/ostream_insert.hpp>
 #include <falcon/detail/string_convertion.hpp>
 #include <falcon/preprocessor/variatic/enum.hpp>
@@ -17,7 +18,7 @@ namespace falcon {
  * @brief Managing sequences of constants characters and constant character-like objects.
  *
  */
-template <typename _CharT, typename _Traits = std::char_traits<_CharT>>
+template <typename _CharT, typename _Traits>
 class basic_cstring
 {
 public:
@@ -217,7 +218,7 @@ public:
 	}
 
 	/**
-	 *  @brief  Return const pointer to null-terminated contents.
+	 *  @brief Returns const pointer to the beginning of string (equivalent to begin())
 	 *
 	 *  This is a handle to internal data.  Do not modify or dire things may
 	 *  happen.
@@ -1183,12 +1184,6 @@ template<typename _CharT, typename _Traits>
 inline bool operator>=(const _CharT* __lhs,
 					   const basic_cstring<_CharT, _Traits>& __rhs)
 { return __rhs.compare(__lhs) <= 0; }
-
-typedef basic_cstring<char> cstring;
-typedef basic_cstring<wchar_t> cwstring;
-
-typedef basic_cstring<const char> const_cstring;
-typedef basic_cstring<const wchar_t> const_cwstring;
 
 }
 
