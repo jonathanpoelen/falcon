@@ -101,7 +101,7 @@ public:
 
 #define FALCON_ITERATOR_CORE_ACCESS_COMPARISON(result_type, op, member)\
 	FALCON_ITERATOR_CORE_ACCESS_2CONST_HEAD(static, result_type, member)\
-	{ return a.member(b); }\
+	{ return derived(a).member(derived(b)); }\
 	FALCON_ITERATOR_CORE_ACCESS_2CONST_HEAD(friend, result_type, operator op)\
 	{ return member(a, b); }
 
@@ -122,23 +122,29 @@ public:
 
 #undef FALCON_ITERATOR_CORE_ACCESS_COMPARISON
 
-#define FALCON_ITERATOR_CORE_ACCESS_MOVE(result_type, qualifier, op, member, ret)\
+#define FALCON_ITERATOR_CORE_ACCESS_MOVE(op, member)\
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	static result_type member(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a,\
+	static void member(FALCON_ITERATOR_HANDLER_TYPE()& a,\
 														typename _I::difference_type n)\
-	{ ret derived(a).member(a, n); }\
+	{ derived(a).member(n); }\
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	friend result_type operator op(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a,\
-																 typename _I::difference_type n)\
+	static _I member(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
+									 typename _I::difference_type n)\
+	{ return derived(a).member(n); }\
+	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
+	friend _I& operator op##=(FALCON_ITERATOR_HANDLER_TYPE()& a,\
+														typename _I::difference_type n)\
 	{\
-		ret member(a, n);\
+		member(a, n);\
 		return derived(a);\
-	}
+	}\
+	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
+	friend _I operator op(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
+											 typename _I::difference_type n)\
+	{ return member(a, n); }
 
-	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I, const, +, advance, return)
-	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I, const, -, recoil, return)
-	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I&, , +=, advance, )
-	FALCON_ITERATOR_CORE_ACCESS_MOVE(_I&, , -=, recoil, )
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(+, advance)
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(-, recoil)
 
 #undef FALCON_ITERATOR_CORE_ACCESS_MOVE
 
