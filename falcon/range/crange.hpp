@@ -12,21 +12,21 @@ namespace falcon {
 template<typename _T>
 struct __crange_traits
 {
-	typedef falcon::iterator::fake_iterator<
+	typedef iterator::fake_iterator<
 		_T,
-		falcon::iterator::fake_iterator_less_comparison_tag
+		iterator::fake_iterator_less_comparison_tag
 	> __iterator;
-	typedef falcon::range<__iterator> __range_type;
+	typedef range<__iterator> __range_type;
 
-	typedef falcon::iterator::nexter_iterator<
+	typedef iterator::nexter_iterator<
 		__iterator,
-		falcon::placeholder_for_argument<
+		placeholder_for_argument<
 			1,
-			falcon::plus_equal<__iterator, unsigned>,
+			plus_equal<__iterator, unsigned>,
 			unsigned
 		>
 	> __step_iterator;
-	typedef falcon::range<__step_iterator> __step_range_type;
+	typedef range<__step_iterator> __step_range_type;
 };
 
 /**

@@ -8,7 +8,6 @@ void crange_test()
 	for (int& n: falcon::crange(0,10)){
 		CHECK_EQUAL_VALUE(++i, ++n);
 		CHECK(i < 12);
-		std::cout << i << std::endl;
 		++i;
 	}
 	CHECK_EQUAL_VALUE(12, i);
@@ -16,7 +15,7 @@ void crange_test()
 	i = 0;
 	for (int& n: falcon::crange(0,10, 2)){
 		CHECK_EQUAL_VALUE(++i, ++n);
-		CHECK(i < 12);
+		CHECK(i <= 10);
 		i += 2;
 	}
 	CHECK_EQUAL_VALUE(i, 12);

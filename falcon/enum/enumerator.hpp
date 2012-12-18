@@ -32,7 +32,7 @@
  *
  * 	struct strings
  * 	{
- *		///NOTE char_type is determined
+ * 		typedef ... char_type;
  * 		typedef const char_type* value_type;
  * 		typedef const value_type& const_reference;
  * 		typedef const_reference reference;
