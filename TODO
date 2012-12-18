@@ -8,7 +8,7 @@ rendre operator.hpp un peu compatible c++89
 
 fonction get<std::size_t, std::initilizer_list>(std::initilizer_list) (fichier get_initializer_list ?). Grace a ça, std::initilizer_list doit fonctionner avec tuple_call<>().
 
-modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le soncond argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
+modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
 
 Essayer d'enlever un maximum de __VA_ARGS__
 
@@ -148,14 +148,6 @@ tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant voi
 
 completer les operateurs de range_modifier et faire un for_each() et un invoke(). enlever unary() et binary() ? Passer par operator() ? uniquement par invoke() ?
 
-template<char... _Chars> std::bitset<sizeof...(_Chars)> operator "" _bits()
-int "" _b(unsigned long long x)
-long operator "" _lb(unsigned long long x)
-long long operator "" _llb(unsigned long long x)
-int "" _ub(unsigned long long x)
-long operator "" _ulb(unsigned long long x)
-long long operator "" _ullb(unsigned long long x)
-
 basic_cstring + string => string
 string + basic_cstring => string
 string += basic_cstring => string
@@ -163,8 +155,16 @@ string (==|<[<=|>=|>]!=) basic_cstring => bool
 basic_cstring (==|<[<=|>=|>]!=) string => bool
 (falcon/string/stringfwd.hpp)
 
-merger les operateurs de iterator_handler dans iterator_core_access
+preprocessor/prefix_char: FALCON_PREFIX_CHAR(char_type) prefix
 
+literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants.
+
+renommer le dossier c++0x en c++xx ?
+modifier les noms des macro CPP0X_* et CPP_* en FALCON_* (et FALCON_XX_ ?)
+renommer CPP_USE_CONSTEXPR en FALCON_CONSEXPR_OR_CONST
+#define FALCON_STATIC_CONSTEXPR static FALCON_CONSEXPR_OR_CONST
+utilisé les macros prédéfinit dans boost et ne plus utilisé __GXX_EXPERIMENTAL_CXX0X__
+www.boost.org/doc/libs/1_49_0/libs/config/doc/html/boost_config/boost_macro_reference.html
 
 
 

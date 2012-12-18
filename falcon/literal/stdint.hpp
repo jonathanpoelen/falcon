@@ -1,7 +1,7 @@
 #ifndef _FALCON_LITERAL_STDDEF_HPP
 #define _FALCON_LITERAL_STDDEF_HPP
 
-#include <falcon/literal/detail/literal_support.hpp>
+#include <falcon/literal/utility.hpp>
 
 #include <cstdint>
 
@@ -10,8 +10,9 @@ namespace literal {
 namespace numeric {
 
 #define FALCON_USER_DEFINED_STDINT_LITERAL(suffix)\
-	constexpr suffix##_t operator "" _##suffix(unsigned long long n) noexcept\
-	{ return static_cast<suffix##_t>(n); }
+	template<char... chars>\
+	constexpr suffix##_t operator "" _##suffix() noexcept\
+	{ return convert_to<suffix##_t, chars...>(); }
 
 #define FALCON_USER_DEFINED_STDINT_LITERAL_PAIR(suffix)\
 	FALCON_USER_DEFINED_STDINT_LITERAL(suffix)\

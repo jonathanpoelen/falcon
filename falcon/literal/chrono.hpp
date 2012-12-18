@@ -1,7 +1,7 @@
 #ifndef _FALCON_LITERAL_CHRONO_HPP
 #define _FALCON_LITERAL_CHRONO_HPP
 
-#include <falcon/literal/detail/literal_support.hpp>
+#include <falcon/literal/utility.hpp>
 
 #include <chrono>
 
@@ -10,8 +10,9 @@ namespace literal {
 namespace chrono {
 
 #define FALCON_USER_DEFINED_CHRONO_LITERAL(suffix)\
-	constexpr std::chrono::suffix operator "" _##suffix(unsigned long long n) noexcept\
-	{ return std::chrono::suffix(n); }
+	template<char... chars>\
+	constexpr std::chrono::suffix operator "" _##suffix() noexcept\
+	{ return std::chrono::suffix(convert_to<std::chrono::suffix::rep, chars...>()); }
 
 	FALCON_USER_DEFINED_CHRONO_LITERAL(nanoseconds)
 	FALCON_USER_DEFINED_CHRONO_LITERAL(microseconds)
