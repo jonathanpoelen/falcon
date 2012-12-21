@@ -9,13 +9,10 @@ void nexter_iterator_test()
 	typedef typename container_type::iterator iterator;
 	std::vector<int> c = {0,1,2,3,4};
 
-	auto it = falcon::iterator::make_nexter_iterator<>(c.begin()
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-		, [](iterator&__it) {return ++__it;}
-#endif
+	auto it = falcon::iterator::make_nexter_iterator<>(c.begin(),
+																										 [](iterator&__it){return ++__it;}
 	);
-	auto end = c.end();
-	//auto it = falcon::iterator::make_count_iterator<>(c.begin(), c.end());
+	auto end = falcon::iterator::make_nexter_iterator<>(c.end(), it.nexter());
 
 	CHECK_EQUAL_VALUE(true, it != end);
 	CHECK_EQUAL_VALUE(0, (*it)++);

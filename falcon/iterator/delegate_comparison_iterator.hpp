@@ -6,6 +6,8 @@
 namespace falcon {
 namespace iterator {
 
+///TODO voir la seconde note sur delegate_comparison_iterator dans le fichier TODO
+
 template <typename _Iterator, typename _ComparisonIterator>
 class delegate_comparison_iterator;
 
