@@ -53,4 +53,6 @@ $mmain($1_test)" > $s
 
 echo create_exec_test"($1)" >> $cmakelist
 
+[ "$d" != '.' ] && echo add_subdirectory"($d)" >> CMakeLists.txt
+
 exit 0

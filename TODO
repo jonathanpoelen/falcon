@@ -155,8 +155,6 @@ string (==|<[<=|>=|>]!=) basic_cstring => bool
 basic_cstring (==|<[<=|>=|>]!=) string => bool
 (falcon/string/stringfwd.hpp)
 
-preprocessor/prefix_char: FALCON_PREFIX_CHAR(char_type) prefix
-
 literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants.
 
 renommer le dossier c++0x en c++xx ?
