@@ -148,13 +148,6 @@ tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant voi
 
 completer les operateurs de range_modifier et faire un for_each() et un invoke(). enlever unary() et binary() ? Passer par operator() ? uniquement par invoke() ?
 
-basic_cstring + string => string
-string + basic_cstring => string
-string += basic_cstring => string
-string (==|<[<=|>=|>]!=) basic_cstring => bool
-basic_cstring (==|<[<=|>=|>]!=) string => bool
-(falcon/string/stringfwd.hpp)
-
 literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants.
 
 renommer le dossier c++0x en c++xx ?

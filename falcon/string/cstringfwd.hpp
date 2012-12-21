@@ -17,11 +17,11 @@ namespace falcon {
 	typedef basic_cstring<const wchar_t> const_cwstring; /// A cstring of @c const_wchar_t
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	typedef basic_string<char16_t> u16string; /// A cstring of @c char16_t
-	typedef basic_string<char32_t> u32string; /// A cstring of @c char32_t
+	typedef basic_cstring<char16_t> u16string; /// A cstring of @c char16_t
+	typedef basic_cstring<char32_t> u32string; /// A cstring of @c char32_t
 
-	typedef basic_string<const char16_t> const_u16string; /// A cstring of @c const_char16_t
-	typedef basic_string<const char32_t> const_u32string; /// A cstring of @c const_char32_t
+	typedef basic_cstring<const char16_t> const_u16string; /// A cstring of @c const_char16_t
+	typedef basic_cstring<const char32_t> const_u32string; /// A cstring of @c const_char32_t
 #endif
 }
 

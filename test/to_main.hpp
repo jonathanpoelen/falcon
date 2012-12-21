@@ -1,0 +1,20 @@
+#ifndef FALCON_TEST_TO_MAIN_HPP
+#define FALCON_TEST_TO_MAIN_HPP
+
+#define __FALCON_TEST_TO_MAIN(func_test_name) int main() { func_test_name(); return 0;}
+#define __FALCON_USELESS_TEST_TO_MAIN(func_test_name)
+
+#ifndef FALCON_ALL_TEST
+# ifndef FALCON_GROUP_TEST
+#  define FALCON_GROUP_TEST_TO_MAIN __FALCON_USELESS_TEST_TO_MAIN
+#  define FALCON_TEST_TO_MAIN __FALCON_TEST_TO_MAIN
+# else
+#  define FALCON_GROUP_TEST_TO_MAIN __FALCON_TEST_TO_MAIN
+#  define FALCON_TEST_TO_MAIN __FALCON_USELESS_TEST_TO_MAIN
+# endif
+#else
+# define FALCON_TEST_TO_MAIN __FALCON_USELESS_TEST_TO_MAIN
+# define FALCON_GROUP_TEST_TO_MAIN __FALCON_USELESS_TEST_TO_MAIN
+#endif
+
+#endif

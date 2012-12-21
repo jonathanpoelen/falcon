@@ -981,209 +981,394 @@ basic_cstring<_CharT, _Traits> make_cstring(_CharT* s)
 	return basic_cstring<_CharT, _Traits>(s);
 }
 
+template<typename _CharT>
+struct __cstring_const_pointer
+{ typedef const _CharT* __pointer; };
+
+template<typename _CharT>
+struct __cstring_const_pointer<const _CharT>
+{ typedef const _CharT* __pointer; };
+
 // operator ==
 /**
- *  @brief  Test equivalence of two strings.
- *  @param lhs  First string.
- *  @param rhs  Second string.
+ *  @brief  Test equivalence of two cstrings.
+ *  @param lhs  First cstring.
+ *  @param rhs  Second cstring.
  *  @return  True if @a lhs.compare(@a rhs) == 0.  False otherwise.
  */
 template<typename _CharT, typename _Traits>
 inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return __lhs.compare(__rhs) == 0; }
 
 /**
-*  @brief  Test equivalence of C string and string.
-*  @param lhs  C string.
-*  @param rhs  String.
-*  @return  True if @a rhs.compare(@a lhs) == 0.  False otherwise.
-*/
+ *  @brief  Test equivalence of C string and cstring.
+ *  @param lhs  C string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a rhs.compare(@a lhs) == 0.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
-inline bool operator==(const _CharT* __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+inline bool operator==(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return __rhs.compare(__lhs) == 0; }
 
 /**
-*  @brief  Test equivalence of string and C string.
-*  @param lhs  String.
-*  @param rhs  C string.
-*  @return  True if @a lhs.compare(@a rhs) == 0.  False otherwise.
-*/
+ *  @brief  Test equivalence of cstring and C string.
+ *  @param lhs  Cstring.
+ *  @param rhs  C string.
+ *  @return  True if @a lhs.compare(@a rhs) == 0.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const _CharT* __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
 { return __lhs.compare(__rhs) == 0; }
+
+/**
+ *  @brief  Test equivalence of string and cstring.
+ *  @param lhs  string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs.compare(@a rhs) == 0.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator==(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) == 0; }
+
+/**
+ *  @brief  Test equivalence of cstring and string.
+ *  @param lhs  cstring.
+ *  @param rhs  string.
+ *  @return  True if @a rhs.compare(@a lhs) == 0.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+{ return (__rhs == __lhs); }
 
 // operator !=
 /**
-*  @brief  Test difference of two strings.
-*  @param lhs  First string.
-*  @param rhs  Second string.
-*  @return  True if @a lhs.compare(@a rhs) != 0.  False otherwise.
-*/
+ *  @brief  Test difference of two cstrings.
+ *  @param lhs  First cstring.
+ *  @param rhs  Second cstring.
+ *  @return  True if @a lhs.compare(@a rhs) != 0.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return !(__lhs == __rhs); }
 
 /**
-*  @brief  Test difference of C string and string.
-*  @param lhs  C string.
-*  @param rhs  String.
-*  @return  True if @a rhs.compare(@a lhs) != 0.  False otherwise.
-*/
+ *  @brief  Test difference of C string and cstring.
+ *  @param lhs  C string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a rhs.compare(@a lhs) != 0.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
-inline bool operator!=(const _CharT* __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+inline bool operator!=(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return !(__lhs == __rhs); }
 
 /**
-*  @brief  Test difference of string and C string.
-*  @param lhs  String.
-*  @param rhs  C string.
-*  @return  True if @a lhs.compare(@a rhs) != 0.  False otherwise.
-*/
+ *  @brief  Test difference of cstring and C string.
+ *  @param lhs  Cstring.
+ *  @param rhs  C string.
+ *  @return  True if @a lhs.compare(@a rhs) != 0.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+{ return !(__lhs == __rhs); }
+
+/**
+ *  @brief  Test difference of string and cstring.
+ *  @param lhs  string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a rhs.compare(@a lhs) != 0.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator!=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
+{ return !(__lhs == __rhs); }
+
+/**
+ *  @brief  Test difference of cstring and string.
+ *  @param lhs  Cstring.
+ *  @param rhs  string.
+ *  @return  True if @a lhs.compare(@a rhs) != 0.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const _CharT* __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
 { return !(__lhs == __rhs); }
 
 // operator <
 /**
-*  @brief  Test if string precedes string.
-*  @param lhs  First string.
-*  @param rhs  Second string.
-*  @return  True if @a lhs precedes @a rhs.  False otherwise.
-*/
+ *  @brief  Test if string precedes cstring.
+ *  @param lhs  First cstring.
+ *  @param rhs  Second cstring.
+ *  @return  True if @a lhs precedes @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
-					  const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs)
 { return __lhs.compare(__rhs) < 0; }
 
 /**
-*  @brief  Test if string precedes C string.
-*  @param lhs  String.
-*  @param rhs  C string.
-*  @return  True if @a lhs precedes @a rhs.  False otherwise.
-*/
+ *  @brief  Test if cstring precedes C string.
+ *  @param lhs  Cstring.
+ *  @param rhs  C string.
+ *  @return  True if @a lhs precedes @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
-					  const _CharT* __rhs)
+											typename __cstring_const_pointer<_CharT>::__pointer __rhs)
 { return __lhs.compare(__rhs) < 0; }
 
 /**
-*  @brief  Test if C string precedes string.
-*  @param lhs  C string.
-*  @param rhs  String.
-*  @return  True if @a lhs precedes @a rhs.  False otherwise.
-*/
+ *  @brief  Test if C string precedes cstring.
+ *  @param lhs  C string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs precedes @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
-inline bool operator<(const _CharT* __lhs,
-					  const basic_cstring<_CharT, _Traits>& __rhs)
+inline bool operator<(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
+											const basic_cstring<_CharT, _Traits>& __rhs)
 { return __rhs.compare(__lhs) > 0; }
+
+/**
+ *  @brief  Test if cstring precedes string.
+ *  @param lhs  Cstring.
+ *  @param rhs  string.
+ *  @return  True if @a lhs precedes @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
+											const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
+
+/**
+ *  @brief  Test if string precedes cstring.
+ *  @param lhs  string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs precedes @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator<(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+											const basic_cstring<_CharT, _Traits>& __rhs)
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) > 0; }
 
 // operator >
 /**
-*  @brief  Test if string follows string.
-*  @param lhs  First string.
-*  @param rhs  Second string.
-*  @return  True if @a lhs follows @a rhs.  False otherwise.
-*/
+ *  @brief  Test if cstring follows cstring.
+ *  @param lhs  First cstring.
+ *  @param rhs  Second cstring.
+ *  @return  True if @a lhs follows @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
-					  const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs)
 { return __lhs.compare(__rhs) > 0; }
 
 /**
-*  @brief  Test if string follows C string.
-*  @param lhs  String.
-*  @param rhs  C string.
-*  @return  True if @a lhs follows @a rhs.  False otherwise.
-*/
+ *  @brief  Test if cstring follows C string.
+ *  @param lhs  Cstring.
+ *  @param rhs  C string.
+ *  @return  True if @a lhs follows @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
-					  const _CharT* __rhs)
+											typename __cstring_const_pointer<_CharT>::__pointer __rhs)
 { return __lhs.compare(__rhs) > 0; }
 
 /**
-*  @brief  Test if C string follows string.
-*  @param lhs  C string.
-*  @param rhs  String.
-*  @return  True if @a lhs follows @a rhs.  False otherwise.
-*/
+ *  @brief  Test if C string follows cstring.
+ *  @param lhs  C string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs follows @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
-inline bool operator>(const _CharT* __lhs,
-					  const basic_cstring<_CharT, _Traits>& __rhs)
+inline bool operator>(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
+											const basic_cstring<_CharT, _Traits>& __rhs)
 { return __rhs.compare(__lhs) < 0; }
+
+/**
+ *  @brief  Test if cstring follows string.
+ *  @param lhs  Cstring.
+ *  @param rhs  String.
+ *  @return  True if @a lhs follows @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
+											const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
+
+/**
+ *  @brief  Test if string follows cstring.
+ *  @param lhs  String.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs follows @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator>(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+											const basic_cstring<_CharT, _Traits>& __rhs)
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) > 0; }
 
 // operator <=
 /**
-*  @brief  Test if string doesn't follow string.
-*  @param lhs  First string.
-*  @param rhs  Second string.
-*  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
-*/
+ *  @brief  Test if cstring doesn't follow cstring.
+ *  @param lhs  First cstring.
+ *  @param rhs  Second cstring.
+ *  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return __lhs.compare(__rhs) <= 0; }
 
 /**
-*  @brief  Test if string doesn't follow C string.
-*  @param lhs  String.
-*  @param rhs  C string.
-*  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
-*/
+ *  @brief  Test if cstring doesn't follow C string.
+ *  @param lhs  Cstring.
+ *  @param rhs  C string.
+ *  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const _CharT* __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
 { return __lhs.compare(__rhs) <= 0; }
 
 /**
-*  @brief  Test if C string doesn't follow string.
-*  @param lhs  C string.
-*  @param rhs  String.
-*  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
-*/
+ *  @brief  Test if C string doesn't follow cstring.
+ *  @param lhs  C string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
-inline bool operator<=(const _CharT* __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+inline bool operator<=(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return __rhs.compare(__lhs) >= 0; }
+
+/**
+ *  @brief  Test if cstring doesn't follow string.
+ *  @param lhs  Cstring.
+ *  @param rhs  string.
+ *  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) <= 0; }
+
+/**
+ *  @brief  Test if string doesn't follow cstring.
+ *  @param lhs  string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs doesn't follow @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator<=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) >= 0; }
 
 // operator >=
 /**
-*  @brief  Test if string doesn't precede string.
-*  @param lhs  First string.
-*  @param rhs  Second string.
-*  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
-*/
+ *  @brief  Test if cstring doesn't precede cstring.
+ *  @param lhs  First cstring.
+ *  @param rhs  Second cstring.
+ *  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return __lhs.compare(__rhs) >= 0; }
 
 /**
-*  @brief  Test if string doesn't precede C string.
-*  @param lhs  String.
-*  @param rhs  C string.
-*  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
-*/
+ *  @brief  Test if cstring doesn't precede C string.
+ *  @param lhs  Cstring.
+ *  @param rhs  C string.
+ *  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
 inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
-					   const _CharT* __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
 { return __lhs.compare(__rhs) >= 0; }
 
 /**
-*  @brief  Test if C string doesn't precede string.
-*  @param lhs  C string.
-*  @param rhs  String.
-*  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
-*/
+ *  @brief  Test if C string doesn't precede cstring.
+ *  @param lhs  C string.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
+ */
 template<typename _CharT, typename _Traits>
-inline bool operator>=(const _CharT* __lhs,
-					   const basic_cstring<_CharT, _Traits>& __rhs)
+inline bool operator>=(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return __rhs.compare(__lhs) <= 0; }
+
+/**
+ *  @brief  Test if cstring doesn't precede string.
+ *  @param lhs  Cstring.
+ *  @param rhs  String.
+ *  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) <= 0; }
+
+/**
+ *  @brief  Test if C string doesn't precede cstring.
+ *  @param lhs  String.
+ *  @param rhs  Cstring.
+ *  @return  True if @a lhs doesn't precede @a rhs.  False otherwise.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline bool operator>=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+											 const basic_cstring<_CharT, _Traits>& __rhs)
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) >= 0; }
+
+
+/**
+ *  @brief  Concatenate string and cstring.
+ *  @param __lhs  First string.
+ *  @param __rhs  Last cstring.
+ *  @return  New string with value of @a __lhs followed by @a __rhs.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline std::basic_string<_CharT, _Traits, _Alloc>
+operator+(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+					const basic_cstring<_CharT, _Traits>& __rhs)
+{
+	std::basic_string<_CharT, _Traits, _Alloc> __str(__lhs);
+	__str.append(__rhs);
+	return __str;
+}
+
+/**
+ *  @brief  Concatenate cstring and string.
+ *  @param __lhs  First cstring.
+ *  @param __rhs  Last string.
+ *  @return  New string with value of @a __lhs followed by @a __rhs.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline std::basic_string<_CharT, _Traits, _Alloc>
+operator+(const basic_cstring<_CharT, _Traits>& __lhs,
+					const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+{
+	std::basic_string<_CharT, _Traits, _Alloc> __str(__lhs.c_str(), __lhs.size());
+	__str.append(__rhs);
+	return __str;
+}
+
+/**
+ *  @brief  Append a cstring to string.
+ *  @param __lhs  string.
+ *  @param __rhs  The cstring to append.
+ *  @return  Reference to __lhs.
+ */
+template<typename _CharT, typename _Traits, typename _Alloc>
+inline std::basic_string<_CharT, _Traits, _Alloc>&
+operator+=(std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
+					 const basic_cstring<_CharT, _Traits>& __rhs)
+{ return __lhs.append(__rhs.c_str(), __rhs.size()) >= 0; }
 
 }
 
