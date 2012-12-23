@@ -24,5 +24,14 @@ void infinite_iterator_test()
 	CHECK_EQUAL_VALUE(3, *--it);
 	CHECK_EQUAL_VALUE(2, *--it);
 	CHECK_EQUAL_VALUE(1, *--it);
+	CHECK_EQUAL_VALUE(0, *--it);
+
+	CHECK_EQUAL_VALUE(0, *(it+=5));
+	CHECK_EQUAL_VALUE(1, *(it+=6));
+	CHECK_EQUAL_VALUE(4, *(it+=13));
+
+	CHECK_EQUAL_VALUE(4, *(it-=5));
+	CHECK_EQUAL_VALUE(3, *(it-=6));
+	CHECK_EQUAL_VALUE(1, *(it-=12));
 }
 FALCON_TEST_TO_MAIN(infinite_iterator_test)

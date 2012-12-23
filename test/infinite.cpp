@@ -13,7 +13,7 @@ void infinite_test()
 		CHECK_EQUAL_VALUE(0, ++n);
 		CHECK_EQUAL_VALUE(1, ++n);
 		CHECK_EQUAL_VALUE(2, ++n);
-		n.current(1);
+		n.set(1);
 		CHECK_EQUAL_VALUE(1, n);
 		CHECK_EQUAL_VALUE(0, --n);
 		CHECK_EQUAL_VALUE(3, --n);

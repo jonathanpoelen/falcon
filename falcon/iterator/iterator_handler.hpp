@@ -205,10 +205,6 @@ public:
 	{}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	explicit iterator_handler(iterator_type&& __x)
-	: _M_current(std::forward<iterator_type>(__x))
-	{}
-
 	template<typename _U, class _Enable = typename
 	std::enable_if<!std::is_reference<iterator_type>::value && std::is_convertible<_U, iterator_type>::value>::type>
 	explicit iterator_handler(_U&& __x)

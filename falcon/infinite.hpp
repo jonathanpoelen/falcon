@@ -18,9 +18,9 @@ protected:
 
 
 public:
-	CPP_CONSTEXPR infinite_base(const value_type& first, const value_type& last)
-	: _current(first)
-	, _first(first)
+	CPP_CONSTEXPR infinite_base(const value_type& x, const value_type& last)
+	: _current(x)
+	, _first()
 	, _last(last)
 	{}
 
@@ -30,8 +30,11 @@ public:
 	, _last(last)
 	{}
 
-	void current(const value_type& x)
+	void set(const value_type& x)
 	{ _current = x; }
+
+	const value_type& get() const
+	{ return _current; }
 
 	const value_type& begin() const
 	{ return _first; }
@@ -44,16 +47,6 @@ public:
 
 	void end(const value_type& last)
 	{ _last = last; }
-
-protected:
-	const value_type& current() const
-	{ return _current; }
-
-	const value_type& rcurrent() const
-	{ return _current; }
-
-	value_type& rcurrent()
-	{ return _current; }
 
 	void next()
 	{
@@ -68,62 +61,58 @@ protected:
 		--_current;
 	}
 
+protected:
+	const value_type& get_by_reference() const
+	{ return _current; }
+
+	value_type& get_by_reference()
+	{ return _current; }
+
 private:
-	inline void _move_n(_T& n, const _T& d)
+	template<typename _Distance>
+	void _next(_Distance n)
 	{
-		d = _last - _first;
-		while (d <= n)
-			n -= d;
-	}
-
-	inline void _plus(const _T& n)
-	{
-		_T d = _last - _current;
-		if (d <= n)
-		{
-			_T cn = static_cast<_T>(n - d);
-			_move_n(cn, d);
-			_current = cn;
-		}
-		else
+		_Distance d = _last - _current;
+		if (n < d)
 			_current += n;
+		else
+			_current = _first + (n - d) % (_last - _first);
 	}
 
-	inline void _minus(_T& n)
+	template<typename _Distance>
+	void _prev(_Distance n)
 	{
-		_T d = _current - _first;
-		if (d <= n)
-		{
-			n -= d;
-			_move_n(n, d);
-			_current = static_cast<_T>(_last - n);
-		}
-		else
+		_Distance d = _current - _first;
+		if (n <= d)
 			_current -= n;
+		else
+			_current = _last - (n - d) % (_last - _first);
 	}
 
 protected:
-	void plus(const _T& n)
-	{ _plus(n); }
-
-	void minus(const _T& n)
+	template<typename _Distance>
+	void add(_Distance n)
 	{
-		_T cn = -n;
-		_minus(cn);
+		if (n < 0)
+			_prev(-n);
+		if (n > 0)
+			_next(n);
+	}
+
+	template<typename _Distance>
+	void minus(_Distance n)
+	{
+		if (n < 0)
+			_next(n);
+		if (n > 0)
+			_prev(-n);
 	}
 
 	void next(std::size_t n)
-	{
-		if (n)
-			_plus(n);
-	}
+	{ _next(n); }
 
 	void prev(std::size_t n)
-	{
-		if (!n)
-			return;
-		_minus(n);
-	}
+	{ _prev(n); }
 };
 
 
@@ -132,32 +121,55 @@ struct infinite : public infinite_base<_T>
 {
 private:
 	typedef infinite_base<_T> base_type;
-	typedef infinite<_T> self_type;
 
 public:
 	typedef typename base_type::value_type value_type;
 
 public:
-	CPP_CONSTEXPR infinite(const value_type& first, const value_type& last)
-	: base_type(first, last)
+	CPP_CONSTEXPR infinite(const value_type& x, const value_type& last)
+	: base_type(x, last)
 	{}
 
 	CPP_CONSTEXPR infinite(const value_type& first, const value_type& x, const value_type& last)
 	: base_type(first, x, last)
 	{}
 
-	FALCON_MEMBER_GETTER(value_type, operator->, base_type::_current)
+	FALCON_MEMBER_GETTER(value_type, operator->, get())
 
 	operator const value_type &() const
-	{ return current(); }
+	{ return get(); }
 
-	using base_type::current;
-	using base_type::rcurrent;
+	using base_type::get;
+	using base_type::get_by_reference;
 	using base_type::next;
 	using base_type::prev;
 
-	FALCON_MEMBER_INCREMENT(infinite<_T>, next())
-	FALCON_MEMBER_DECREMENT(infinite<_T>, prev())
+	FALCON_MEMBER_INCREMENT(infinite, next())
+	FALCON_MEMBER_DECREMENT(infinite, prev())
+
+	infinite& operator+=(const _T& n)
+	{
+		this->add(n);
+		return *this;
+	}
+
+	infinite& operator-=(const _T& n)
+	{
+		this->minus(n);
+		return *this;
+	}
+
+	infinite& operator+=(std::size_t n)
+	{
+		next(n);
+		return *this;
+	}
+
+	infinite& operator-=(std::size_t n)
+	{
+		prev(n);
+		return *this;
+	}
 };
 
 }

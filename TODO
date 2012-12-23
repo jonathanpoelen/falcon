@@ -157,6 +157,7 @@ renommer CPP_USE_CONSTEXPR en FALCON_CONSEXPR_OR_CONST
 utilisé les macros prédéfinit dans boost et ne plus utilisé __GXX_EXPERIMENTAL_CXX0X__
 www.boost.org/doc/libs/1_49_0/libs/config/doc/html/boost_config/boost_macro_reference.html
 
-
-
+infinite.hpp: à épurer et ajouter des méthodes telle que infinit+=n, ...
+un objet qui fait des décalages de bit à l'infinit (option pour post ou pre inc ? (permet d'avoir ou ne jamais avoir la valeur 0)). Objet qui pour les opérateurs ++/-- utilise un foncteur ? Ce qui donne infinite<delegate_move<int, left_shift, right_shift>>
+une sorte de always_range qui permet de définir un nombre eyant un interval determiner (:infinite ?) mais avec des fonctions en plus comme add_and_return_superfluous ?
 
