@@ -3,12 +3,12 @@
 
 #include <falcon/c++/boost_or_std.hpp>
 
-#include FALCON_BOOST_OR_STD_TRAITS(remove_const)
+#include FALCON_BOOST_OR_STD_TRAITS(remove_cv)
 
 namespace falcon {
 
 template<typename _T, typename _Mask
-	= typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<_T>::type>
+	= typename FALCON_BOOST_OR_STD_NAMESPACE::remove_cv<_T>::type>
 struct basic_bit_reference
 {
 	typedef _T bit_type;
