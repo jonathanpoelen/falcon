@@ -2,7 +2,6 @@
 #define _FALCON_PARAMETER_MANIP_HPP
 
 #include <cstddef>
-#include <falcon/arg/arg_range.hpp>
 
 namespace falcon {
 namespace parameter {
@@ -91,20 +90,30 @@ struct pack_wrapper
 
 
 template <typename _Pack, typename _Pack2>
-struct __pack_modifier;
+struct __pack_use_type;
 
 template <typename... _Elements, typename _WrapElement, typename... _ElementsOther>
-struct __pack_modifier<parameter_pack<_Elements...>, parameter_pack<_WrapElement, _ElementsOther...>>
-: __pack_modifier<
+struct __pack_use_type<parameter_pack<_Elements...>, parameter_pack<_WrapElement, _ElementsOther...>>
+: __pack_use_type<
 	parameter_pack<_Elements..., typename _WrapElement::type>,
 	parameter_pack<_ElementsOther...>
 >
 {};
 
 template <typename... _Elements>
-struct __pack_modifier<parameter_pack<_Elements...>, parameter_pack<>>
+struct __pack_use_type<parameter_pack<_Elements...>, parameter_pack<>>
 {
 	typedef parameter_pack<_Elements...> __type;
+};
+
+/**
+ * @brief Get each inner type of _Pack
+ * _Pack must is a @ref parameter_pack
+ */
+template <typename _Pack>
+struct pack_use_type
+{
+	typedef typename __pack_use_type<parameter_pack<>, _Pack>::__type type;
 };
 
 /**
@@ -114,7 +123,7 @@ struct __pack_modifier<parameter_pack<_Elements...>, parameter_pack<>>
 template <template<class...> class _Modifier, typename _Pack>
 struct pack_modifier
 {
-	typedef typename __pack_modifier<
+	typedef typename __pack_use_type<
 		parameter_pack<>,
 		typename pack_wrapper<_Modifier, _Pack>::type
 	>::__type type;

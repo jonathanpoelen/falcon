@@ -1,6 +1,171 @@
 #ifndef _FALCON_ITERATOR_RECURSIVE_ITERATOR_HPP
 #define _FALCON_ITERATOR_RECURSIVE_ITERATOR_HPP
 
+#include <falcon/container/range_access_traits.hpp>
+#include <falcon/iterator/iterator_handler.hpp>
+#include <falcon/parameter/pack_element.hpp>
+#include <falcon/parameter/manip.hpp>
+#include <falcon/tuple/parameter_pack.hpp>
+#include <falcon/parameter/parameter_index.hpp>
+#include <falcon/arg/arg_range.hpp>
+#include <falcon/type_traits/if.hpp>
+#include <falcon/type_traits/use.hpp>
+#include <falcon/arg/arg.hpp>
+
+namespace falcon {
+namespace iterator {
+
+template <typename... _Iterators>
+class recursive_iterator;
+
+template<typename _Iterator, typename _AccessTrait = range_access_traits<typename std::iterator_traits<_Iterator>::value_type>>
+struct recursive_iterator_access_adapter
+{
+	typedef _Iterator iterator;
+	typedef std::pair<_Iterator, _Iterator> type;
+	typedef _AccessTrait access_traits;
+};
+
+template<typename _Iterator>
+struct iterator_to_recursive_iterator_access_adapter
+{ typedef recursive_iterator_access_adapter<_Iterator> type; };
+
+template<typename _Iterator, typename _AccessTrait>
+struct iterator_to_recursive_iterator_access_adapter
+<recursive_iterator_access_adapter<_Iterator, _AccessTrait>>
+{ typedef recursive_iterator_access_adapter<_Iterator, _AccessTrait> type; };
+
+namespace detail {
+
+	template <typename... _Iterators>
+	struct recursive_iterator_base
+	{
+		typedef typename parameter::pack_modifier<
+			iterator_to_recursive_iterator_access_adapter,
+			typename parameter::pack_element<
+				parameter_pack<_Iterators...>,
+				typename build_parameter_index<sizeof...(_Iterators) - 1>::type
+			>::type
+		>::type __parameter_adapter;
+
+		typedef typename arg_element<
+			sizeof...(_Iterators) - 1,
+			_Iterators...
+		>::type __last_iterator;
+		typedef typename std::pair<__last_iterator, __last_iterator> __last_type;
+
+		typedef typename parameter_pack_to_tuple<
+			typename parameter::pack_add_right<
+				typename parameter::pack_use_type<__parameter_adapter>::type,
+				__last_type
+			>::type
+		>::type __tuple;
+
+		typedef typename std::iterator_traits<__last_iterator> __traits;
+
+		typedef typename iterator_handler_types<
+			recursive_iterator<_Iterators...>,
+			__tuple,
+			std::forward_iterator_tag,
+			typename __traits::value_type,
+			typename __traits::difference_type,
+			typename __traits::pointer,
+			typename __traits::reference
+		>::base base;
+	};
+
+}
+
+template<typename _Tuple, typename _ParameterAdapter, std::size_t _Idx>
+struct __recursive_iterator_move
+{
+	typedef typename parameter_element<_Idx-1, _ParameterAdapter>::type::access_traits __access;
+	static void __inc(_Tuple& t)
+	{
+		if (++std::get<_Idx>(t).first == std::get<_Idx>(t).second)
+		{
+			__recursive_iterator_move<_Tuple, _ParameterAdapter, _Idx - 1>::__inc(t);
+			std::get<_Idx>(t).first = __access::begin(*std::get<_Idx-1>(t).first);
+			std::get<_Idx>(t).second = __access::end(*std::get<_Idx-1>(t).second);
+		}
+	}
+};
+
+template<typename _Tuple, typename _ParameterAdapter>
+struct __recursive_iterator_move<_Tuple, _ParameterAdapter, 0>
+{
+	static void __inc(_Tuple& t)
+	{ ++std::get<0>(t).first; }
+};
+
+
+template <typename... _Iterator>
+class recursive_iterator
+: public detail::recursive_iterator_base<_Iterator...>::base
+{
+	friend class iterator_core_access;
+
+	typedef detail::recursive_iterator_base<_Iterator...> __detail;
+	typedef typename __detail::__last_type __last_type;
+	typedef typename __detail::__last_iterator __last_iterator;
+	typedef typename __detail::__parameter_adapter __parameter_adapter;
+
+	typedef typename __detail::base __base;
+
+public:
+	typedef typename __base::iterator_type iterator_type;
+	typedef typename __base::difference_type difference_type;
+	typedef typename __base::reference reference;
+
+public:
+	recursive_iterator()
+	: __base()
+	{}
+
+	explicit recursive_iterator(iterator_type __x)
+	: __base(__x)
+	{}
+
+	recursive_iterator(const recursive_iterator& __x)
+	: __base(__x)
+	{}
+
+	using __base::operator=;
+
+private:
+	static const std::size_t __last_idx = sizeof...(_Iterator) - 1;
+
+	const __last_type& get_last() const
+	{ return std::get<__last_idx>(this->base_reference()); }
+
+	const __last_iterator& get_last_iterator() const
+	{ return get_last().first; }
+
+	reference dereference() const
+	{ return *get_last_iterator(); }
+
+	void increment()
+	{
+		__recursive_iterator_move<iterator_type, __parameter_adapter, __last_idx>
+		::__inc(this->base_reference());
+	}
+
+	bool equal(const recursive_iterator& x) const
+	{ return get_last_iterator() == x.get_last_iterator(); }
+
+	bool less(const recursive_iterator& x) const
+	{ return get_last_iterator() < x.get_last_iterator(); }
+};
+
+
+
+
+}
+}
+
+
+#if 0
+
 #include <iterator>
 #include <falcon/c++0x/syntax.hpp>
 #include <falcon/type_traits/dimension.hpp>
@@ -17,10 +182,10 @@ template<bool _Protect, std::size_t _N, std::size_t _Dimension, typename... _Ite
 struct __recursive_iterator;
 
 template<bool _Protect, std::size_t _N, std::size_t _Dimension, typename _Iterator, typename... _Iterators>
-class __recursive_iterator<_Protect, _N, _Dimension, _Iterator, _Iterators CPP0X_EXTEND_PACK>
+class __recursive_iterator<_Protect, _N, _Dimension, _Iterator, _Iterators...>
 {
-	typedef __recursive_iterator<_Protect, _N, _Dimension, _Iterator, _Iterators CPP0X_EXTEND_PACK> self_type;
-	typedef __recursive_iterator<_Protect, _N-1, _Dimension, _Iterators CPP0X_EXTEND_PACK> parent_recursive_iterator;
+	typedef __recursive_iterator<_Protect, _N, _Dimension, _Iterator, _Iterators...> self_type;
+	typedef __recursive_iterator<_Protect, _N-1, _Dimension, _Iterators...> parent_recursive_iterator;
 	typedef typename detail::to_iterator_traits<_Iterator>::type iterator_traits;
 
 public:
@@ -252,15 +417,15 @@ class __recursive_iterator_info
 	struct __recursive_iterator_info_impl;
 
 	template<std::size_t _N, typename _T, typename... _Elements>
-	struct __recursive_iterator_info_impl<_N, parameter_pack<_T, _Elements CPP0X_EXTEND_PACK> >
+	struct __recursive_iterator_info_impl<_N, parameter_pack<_T, _Elements...> >
 	{
-		typedef typename __recursive_iterator_info_impl<_N-1, parameter_pack<typename subrange_access_iterator<_T>::type, _T, _Elements CPP0X_EXTEND_PACK> >::type type;
+		typedef typename __recursive_iterator_info_impl<_N-1, parameter_pack<typename subrange_access_iterator<_T>::type, _T, _Elements...> >::type type;
 	};
 
 	template<typename _T, typename... _Elements>
-	struct __recursive_iterator_info_impl<0, parameter_pack<_T, _Elements CPP0X_EXTEND_PACK> >
+	struct __recursive_iterator_info_impl<0, parameter_pack<_T, _Elements...> >
 	{
-		typedef __recursive_iterator<_Protect, _Dimension, _Dimension, _T, _Elements CPP0X_EXTEND_PACK> type;
+		typedef __recursive_iterator<_Protect, _Dimension, _Dimension, _T, _Elements...> type;
 	};
 
 public:
@@ -330,5 +495,7 @@ safe_recursive_iterator(_Iterator first, _Iterator last)
 
 }
 }
+
+#endif
 
 #endif

@@ -281,8 +281,12 @@ private:
 	bool less(const iterator_handler& x) const
 	{ return _M_current < x._M_current; }
 
-	difference_type difference(const iterator_handler& x) const
+	difference_type difference(const iterator_handler& x,
+														 std::forward_iterator_tag) const
 	{ return x._M_current - _M_current; }
+
+	difference_type difference(const iterator_handler& x) const
+	{ return difference(x, iterator_category()); }
 
 	void advance(difference_type n)
 	{ _M_current += n; }
