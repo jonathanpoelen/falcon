@@ -6,7 +6,7 @@
 #include <falcon/type_traits/declval.hpp>
 #include <falcon/type_traits/difference.hpp>
 #include <falcon/type_traits/dimension.hpp>
-#include <falcon/type_traits/enable_if.hpp>
+#include <falcon/type_traits/disable_if.hpp>
 #include <falcon/type_traits/enable_if_not_integral.hpp>
 #include <falcon/type_traits/identity.hpp>
 #include <falcon/type_traits/ignore.hpp>

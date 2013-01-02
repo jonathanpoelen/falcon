@@ -21,4 +21,13 @@ namespace falcon {
 }
 #endif
 
+namespace falcon {
+
+	template<class C, typename _Tp = void>
+	struct enable_if_c
+	: enable_if<C::value, _Tp>
+	{};
+
+}
+
 #endif
