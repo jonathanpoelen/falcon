@@ -54,7 +54,7 @@ template<std::size_t _Keep, std::size_t _NmArg>
 struct __keep_parameter_index<last_parameter_index_tag<_Keep>, _NmArg>
 {
 	typedef typename build_range_parameter_index<
-		(_Keep > _NmArg ? _NmArg : _Keep),
+		(_Keep > _NmArg ? 0 : _NmArg - _Keep),
 		_NmArg
 	>::type __type;
 };

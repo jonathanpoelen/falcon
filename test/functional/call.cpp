@@ -6,7 +6,7 @@
 #include "call.hpp"
 
 void call_test() {
-	CHECK_EQUAL_VALUE(12, falcon::call_last_param<2>(falcon::late_plus(), 1, 2, 4, 8));
+	CHECK_EQUAL_VALUE(12, falcon::call_last_param<2>(falcon::late_plus(), 0, 1, 2, 4, 8));
 	CHECK_EQUAL_VALUE(3, falcon::call_first_param<2>(falcon::late_plus(), 1, 2, 4, 8));
 	CHECK_EQUAL_VALUE(9, falcon::call_ignore_param<1, 2>(falcon::late_plus(), 1, 2, 4, 8));
 
