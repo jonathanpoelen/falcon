@@ -5,7 +5,7 @@
 void circular_bit_test()
 {
 	{
-		falcon::circular_bit<uint8_t> circular;
+		falcon::basic_circular_bit<uint8_t> circular;
 
 		CHECK_EQUAL_VALUE(0x80,*circular);
 		CHECK_EQUAL_VALUE(0x40,*++circular);
@@ -19,7 +19,7 @@ void circular_bit_test()
 		CHECK_EQUAL_VALUE(0x40,*++circular);
 	}
 	{
-		falcon::reverse_circular_bit<uint8_t> circular;
+		falcon::basic_reverse_circular_bit<uint8_t> circular;
 
 		CHECK_EQUAL_VALUE(0x01,*circular);
 		CHECK_EQUAL_VALUE(0x02,*++circular);
