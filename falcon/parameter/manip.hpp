@@ -173,7 +173,7 @@ struct __pack_reverse<parameter_pack<_Elements...>, parameter_pack<>>
  * @brief Reverse element of _Pack
  * _Pack must is a @ref parameter_pack
  */
-template <template<class...> class _Modifier, typename _Pack>
+template <typename _Pack>
 struct pack_reverse
 { typedef typename __pack_reverse<parameter_pack<>, _Pack>::__type type; };
 
