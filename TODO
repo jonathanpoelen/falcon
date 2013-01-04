@@ -161,3 +161,10 @@ Utiliser d'avantage FALCON_BOOST_OR_STD_NAMESPACE et FALCON_BOOST_OR_STD_TRAITS 
 
 and_ et or_ qui prend chaque valeur et fait un and ou or avec (and_c et or_c pour les classes). Utilise template_[or|and] ?
 
+
+
+
+
+
+
+

@@ -19,6 +19,7 @@ public:
 	typedef typename __type_traits::value_type value_type;
 	typedef typename __type_traits::pointer pointer;
 	typedef typename __type_traits::reference reference;
+	typedef typename __type_traits::difference_type difference_type;
 
 
 private:
@@ -34,7 +35,7 @@ public:
 	container_wrapper(container_type&&) = delete;
 	container_wrapper(const container_wrapper& other) = delete;
 	container_wrapper& operator=(const container_wrapper& other) = delete;
-	#else
+#else
 private:
 	container_wrapper& operator=(const container_wrapper& other);
 	container_wrapper(const container_wrapper& other);
@@ -52,6 +53,9 @@ public:
 
 	iterator end() const
 	{ return _Traits::end(base()); }
+
+	value_type& operator[](difference_type n)
+	{ return *(begin() + n); }
 
 	void swap(container_wrapper& other)
 	{ std::swap(_container, other._container); }

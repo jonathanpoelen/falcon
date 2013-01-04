@@ -3,6 +3,8 @@
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # include <type_traits>
+#else
+# include <boost/type_traits/remove_pointer.hpp>
 #endif
 #include <falcon/iterator/iterator_handler.hpp>
 

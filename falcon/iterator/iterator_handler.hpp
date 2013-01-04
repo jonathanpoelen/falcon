@@ -122,15 +122,15 @@ public:
 
 #undef FALCON_ITERATOR_CORE_ACCESS_COMPARISON
 
-#define FALCON_ITERATOR_CORE_ACCESS_MOVE(op, member)\
+#define FALCON_ITERATOR_CORE_ACCESS_MOVE(op, member, member2)\
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
 	static void member(FALCON_ITERATOR_HANDLER_TYPE()& a,\
 														typename _I::difference_type n)\
 	{ derived(a).member(n); }\
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	static _I member(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
+	static _I member2(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
 									 typename _I::difference_type n)\
-	{ return derived(a).member(n); }\
+	{ return derived(a).member2(n); }\
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
 	friend _I& operator op##=(FALCON_ITERATOR_HANDLER_TYPE()& a,\
 														typename _I::difference_type n)\
@@ -141,10 +141,10 @@ public:
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
 	friend _I operator op(const FALCON_ITERATOR_HANDLER_TYPE()& a,\
 											 typename _I::difference_type n)\
-	{ return member(a, n); }
+	{ return member2(a, n); }
 
-	FALCON_ITERATOR_CORE_ACCESS_MOVE(+, advance)
-	FALCON_ITERATOR_CORE_ACCESS_MOVE(-, recoil)
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(+, advance, next)
+	FALCON_ITERATOR_CORE_ACCESS_MOVE(-, recoil, prev)
 
 #undef FALCON_ITERATOR_CORE_ACCESS_MOVE
 
@@ -193,6 +193,12 @@ public:
 	explicit iterator_handler(const iterator_type& __x, int)
 	: _M_current(__x)
 	{}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	explicit iterator_handler(iterator_type&& __x, int)
+	: _M_current(std::forward<iterator_type>(__x))
+	{}
+#endif
 
 	iterator_handler(const iterator_handler& other)
 	: _M_current(other._M_current)
@@ -291,14 +297,22 @@ private:
 	void advance(difference_type n)
 	{ _M_current += n; }
 
-	_Iterator advance(difference_type n) const
-	{ return _Iterator(downcast()) += n; }
+	_Iterator next(difference_type n) const
+	{
+		_Iterator ret(downcast());
+		ret += n;
+		return ret;
+	}
 
 	void recoil(difference_type n)
 	{ _M_current += n; }
 
-	_Iterator recoil(difference_type n) const
-	{ return _Iterator(downcast()) -= n; }
+	_Iterator prev(difference_type n) const
+	{
+		_Iterator ret(downcast());
+		ret -= n;
+		return ret;
+	}
 };
 
 template<typename _Iterator, typename _IteratorBase,
