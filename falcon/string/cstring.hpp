@@ -65,6 +65,12 @@ public:
 	{}
 
 	template<std::size_t _N>
+	CPP_CONSTEXPR basic_cstring(_CharT (&s) [_N])
+	: m_begin(s ? s : 0)
+	, m_end(s ? s + _N - 1 : 0)
+	{}
+
+	template<std::size_t _N>
 	CPP_CONSTEXPR basic_cstring(_CharT (&s) [_N], int)
 	: m_begin(s ? s : 0)
 	, m_end(s ? s + _N - 1 : 0)
