@@ -6,6 +6,8 @@
 #include <iterator>
 #include <stdexcept>
 #include <type_traits>
+#include <falcon/type_traits/enable_if.hpp>
+#include <falcon/type_traits/is_same.hpp>
 #include <falcon/string/cstringfwd.hpp>
 #include <falcon/ostream/ostream_insert.hpp>
 #include <falcon/detail/string_convertion.hpp>
@@ -84,6 +86,18 @@ public:
 	CPP_CONSTEXPR basic_cstring(pointer first, pointer last)
 	: m_begin(first)
 	, m_end(last)
+	{}
+
+	basic_cstring(const basic_cstring& s)
+	: m_begin(s.m_begin)
+	, m_end(s.m_end)
+	{}
+
+	template<typename _CharT2,
+		typename _Enable = typename enable_if_c<is_same<const _CharT2, _CharT> >::type>
+	basic_cstring(const basic_cstring<_CharT2, _Traits> s)
+	: m_begin(s.c_str())
+	, m_end(m_begin + s.size())
 	{}
 
 	basic_cstring& operator=(const basic_cstring& s)
@@ -1331,6 +1345,24 @@ inline bool operator>=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
 											 const basic_cstring<_CharT, _Traits>& __rhs)
 { return __lhs.compare(0, __rhs.size(), __rhs.c_str()) >= 0; }
 
+
+/**
+ *  @brief  Concatenate two cstring.
+ *  @param __lhs  First cstring.
+ *  @param __rhs  Last cstring.
+ *  @return  New string with value of @a __lhs followed by @a __rhs.
+ */
+template<typename _CharT, typename _Traits>
+inline std::basic_string<_CharT, _Traits>
+operator+(const basic_cstring<_CharT, _Traits>& __lhs,
+					const basic_cstring<_CharT, _Traits>& __rhs)
+{
+	std::basic_string<_CharT, _Traits> __str;
+	__str.reserve(__lhs.size() + __rhs.size());
+	__str.append(__lhs);
+	__str.append(__rhs);
+	return __str;
+}
 
 /**
  *  @brief  Concatenate string and cstring.

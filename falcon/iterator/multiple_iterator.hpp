@@ -12,7 +12,7 @@ namespace iterator {
 
 ///TODO value_type, pointer, etc sont templater à la maniere de std::get (membre static)
 
-template <typename... _Iterators>
+template<typename... _Iterators>
 struct multiple_iterator : public std::tuple<_Iterators CPP0X_EXTEND_PACK>
 {
 	typedef multiple_iterator<_Iterators CPP0X_EXTEND_PACK> self_type;

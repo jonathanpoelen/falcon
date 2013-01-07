@@ -19,9 +19,9 @@ template<typename _Container, typename _ToIterator>
 struct __range_access_traits<_Container, _ToIterator, _ToIterator>
 {
 	static _ToIterator begin(_Container& cont)
-	{ return begin(cont); }
+	{ return falcon::begin(cont); }
 	static _ToIterator end(_Container& cont)
-	{ return end(cont); }
+	{ return falcon::end(cont); }
 };
 
 template<typename _Container, typename _Iterator = typename range_access_iterator<_Container>::type>
@@ -42,9 +42,9 @@ template<typename _Container, typename _ToIterator,
 struct __reverse_range_access_traits
 {
 	static _ToIterator begin(_Container& cont)
-	{ return _ToIterator(falcon::rbegin(cont)); }
+	{ return _ToIterator(rbegin(cont)); }
 	static _ToIterator end(_Container& cont)
-	{ return _ToIterator(falcon::rend(cont)); }
+	{ return _ToIterator(rend(cont)); }
 };
 
 template<typename _Container, typename _ToIterator>

@@ -121,12 +121,34 @@ struct __parameter_index_reverse<parameter_index<_Indexes...>, parameter_index<>
 };
 
 /**
- * @brief Reverse index of _Indexes
+ * @brief Reverse indexes of _Indexes
  * _Pack must is a @ref parameter_index
  */
 template <typename _Indexes>
 struct parameter_index_reverse
 { typedef typename __parameter_index_reverse<parameter_index<>, _Indexes>::__type type; };
+
+
+template<typename, std::size_t>
+struct __parameter_index_increment;
+
+template<std::size_t... _Indexes, std::size_t _N>
+struct __parameter_index_increment<parameter_index<_Indexes...>, _N>
+{ typedef parameter_index<_N + _Indexes...> __type; };
+
+/**
+ * @brief Increment each index of _N
+ */
+template<typename _Indexes, std::size_t _N = 1>
+struct parameter_index_increment
+{ typedef typename __parameter_index_increment<_Indexes, _N>::__type type; };
+
+/**
+ * @brief Decrement each index of _N
+ */
+template<typename _Indexes, std::size_t _N = 1>
+struct parameter_index_decrement
+{ typedef typename __parameter_index_increment<_Indexes, -_N>::__type type; };
 
 }
 

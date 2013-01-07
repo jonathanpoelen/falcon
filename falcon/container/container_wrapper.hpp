@@ -67,6 +67,44 @@ public:
 	{ return *_container; }
 };
 
+template<typename _Container, typename _Iterator>
+struct build_container_wrapper
+{
+	typedef container_wrapper<
+		_Container,
+		range_access_traits<_Container, _Iterator>
+	> type;
+};
+
+template<typename _Container,
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	template<class...> class _IteratorType, typename... _ArgsIterator
+#else
+	template<class> class _IteratorType
+#endif
+>
+struct build_indirect_container_wrapper
+{
+	typedef container_wrapper<
+		_Container,
+		range_access_traits<
+			_Container,
+			typename _IteratorType<
+				typename range_access_iterator<_Container>::type
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+				, _ArgsIterator...
+#endif
+			>::type
+		>
+	> type;
+};
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+template<typename _Container,
+	template<class...>class _IteratorType, typename... _ArgsIterator>
+using indirect_container_wrapper = typename build_indirect_container_wrapper<_Container, _IteratorType, _ArgsIterator...>::type;
+#endif
+
 }
 
 #endif

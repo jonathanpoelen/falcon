@@ -159,10 +159,13 @@ www.boost.org/doc/libs/1_49_0/libs/config/doc/html/boost_config/boost_macro_refe
 
 Utiliser d'avantage FALCON_BOOST_OR_STD_NAMESPACE et FALCON_BOOST_OR_STD_TRAITS (c++/boost_or_std.hpp)
 
-and_ et or_ qui prend chaque valeur et fait un and ou or avec (and_c et or_c pour les classes). Utilise template_[or|and] ?
+and_ et or_ qui prend chaque valeur et fait un and ou or avec (and_c et or_c pour les classes). Utilise template_[or|and] ? faire enable_if_[any|none][_c]
 
+parameter/parameter_index_adapter.hpp = functional/caller.hpp
+déplacer les fonctionnalité de caller vers parameter_index_adapter et renommer les caller_*_tag en call_*_tag
+renommer et déplacer parameter_index_adapter dans functional/prameter_adapter.hpp
 
-
+mettre parameter/pack_size.hpp dans parameter/manip.hpp
 
 
 

@@ -5,7 +5,7 @@
 
 namespace falcon {
 
-template <typename _Class, typename _T = typename _Class::value_type&>
+template <typename _Class, typename _T = typename _Class::type&>
 struct get_accessor
 {
 	typedef _T result_type;
