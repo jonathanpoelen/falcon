@@ -1,11 +1,11 @@
 #include <test/test.hpp>
-#include <falcon/parameter/parameter_index_adapter.hpp>
+#include <falcon/functional/parameter_adapter.hpp>
 #include <falcon/functional/operators.hpp>
-#include "parameter_index_adapter.hpp"
+#include "parameter_adapter.hpp"
 
-void parameter_index_adapter_test()
+void parameter_adapter_test()
 {
-	typedef falcon::parameter_index_adapter<
+	typedef falcon::parameter_adapter<
 		falcon::late_plus,
 		falcon::range_parameter_index_tag<1, 2>
 	> adapter_type;
@@ -15,4 +15,4 @@ void parameter_index_adapter_test()
 	CHECK_EQUAL_VALUE(12, adapter(1, 7, 5, 8));
 }
 
-FALCON_TEST_TO_MAIN(parameter_index_adapter_test)
+FALCON_TEST_TO_MAIN(parameter_adapter_test)

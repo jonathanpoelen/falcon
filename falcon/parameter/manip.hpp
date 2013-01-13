@@ -2,9 +2,19 @@
 #define _FALCON_PARAMETER_MANIP_HPP
 
 #include <cstddef>
+#include <falcon/parameter/parameter_pack.hpp>
 
 namespace falcon {
 namespace parameter {
+
+template<typename _Pack>
+class pack_size;
+
+template<typename... _Elements>
+struct pack_size<parameter_pack<_Elements...> >
+{
+	static const std::size_t value = sizeof...(_Elements);
+};
 
 template <typename _Pack, typename... _Args>
 class __pack_add_left;

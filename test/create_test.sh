@@ -7,7 +7,7 @@ cd `dirname $0`
 
 if [ $# = 2 ];then
 	d=${1%%\/}
-	shift 1
+	shift 1add_subdirectory
 	defbase=$d'_'
 	cmakelist=$d/CMakeLists.txt
 	mmain=FALCON_TEST_TO_MAIN
@@ -53,6 +53,6 @@ $mmain($1_test)" > $s
 
 echo create_exec_test"($1)" >> $cmakelist
 
-[ "$d" != '.' ] && echo add_subdirectory"($d)" >> CMakeLists.txt
+[ "$d" != '.' ] && [ $(grep -L "$d" CMakeLists.txt) ] && echo add_subdirectory"($d)" >> CMakeLists.txt
 
 exit 0
