@@ -347,13 +347,13 @@ public:
 	template<typename... _Args>
 	void construct(_Args&&... args)
 	{
-		for (uint i = 0; i != _N; ++i)
+		for (unsigned int i = 0; i != _N; ++i)
 			_value[i] = {std::forward<_Args>(args)...};
 	}
 
 	void construct(_T&& value)
 	{
-		for (uint i = 0; i != _N; ++i)
+		for (unsigned int i = 0; i != _N; ++i)
 			_value[i] = std::forward<_T>(value);
 	}
 
