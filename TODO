@@ -31,7 +31,7 @@ optimisation de taille des enum class: enum class E : typename std::conditional<
 
 Mettre constexpr pour les classe d'operateur et enum/operator
 
-ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?)
+ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?). quotient partiel
 
 ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp (via héritage, plus simple). Faire un not1 et not2 comme la std.
 
@@ -167,7 +167,13 @@ renommer et déplacer parameter_index_adapter dans functional/prameter_adapter.h
 
 mettre parameter/pack_size.hpp dans parameter/manip.hpp
 
+note/*.hpp: les node peuvent fonctionne de facon transparente avec des std::unique_ptr ?
 
+implémenter la proposition de suffix dans la nouvelle norme: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3402.pdf
+ne pas oublier de prendre en compte les unité (non mis dans la norme) avec les abréviation udl ou iso
 
+falcon::algorithm::filter(container, predicate, cp)
 
+faire en sorte que memory_stack et static_new soient consepressive. Respecter l'alignement en créant une union{unsigned char buffer_[neededSize];Align dummy_;};
 
+optimal tuple : http://flamingdangerzone.com/cxx11/2012/12/02/optimal-tuple-ii.html

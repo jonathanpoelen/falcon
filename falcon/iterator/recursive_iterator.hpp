@@ -358,9 +358,16 @@ public:
 	}
 
 	bool equal(const basic_recursive_iterator& x) const
-	{ return valid() == x.valid() && (!x.valid() || __tuple_reference() == x.__tuple_reference()); }
+	{ return valid() == x.valid() && (x.valid() && __tuple_reference() == x.__tuple_reference()); }
 
 	bool less(const basic_recursive_iterator& x) const;
+
+	basic_recursive_iterator next(difference_type n) const
+	{
+		basic_recursive_iterator ret(*this);
+		ret.advance(n);
+		return ret;
+	}
 
 public:
 	bool operator==	(const __last_iterator& x) const { return get_last_iterator() == x; }
@@ -375,6 +382,18 @@ public:
 
 	bool operator !() const
 	{ return !valid(); }
+
+	bool next()
+	{
+		this->increment();
+		return valid();
+	}
+
+	bool next(difference_type n)
+	{
+		advance(n);
+		return valid();
+	}
 };
 
 

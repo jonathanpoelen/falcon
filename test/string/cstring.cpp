@@ -1,6 +1,6 @@
 #include <test/test.hpp>
-#include <falcon/string/basic_cstring.hpp>
-#include "basic_cstring.hpp"
+#include <falcon/string/cstring.hpp>
+#include "cstring.hpp"
 
 void basic_cstring_test()
 {

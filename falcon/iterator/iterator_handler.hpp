@@ -289,7 +289,7 @@ private:
 
 	difference_type difference(const iterator_handler& x,
 														 std::forward_iterator_tag) const
-	{ return x._M_current - _M_current; }
+	{ return _M_current - x._M_current; }
 
 	difference_type difference(const iterator_handler& x) const
 	{ return difference(x, iterator_category()); }

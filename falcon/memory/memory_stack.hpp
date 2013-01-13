@@ -261,7 +261,7 @@ public:
 
 /**
  * \brief Reserve memory in the stack.
- * \attention The inner object is not automatically destroy.
+ * \attention The internal object is not automatically destroy.
  */
 template<typename _T>
 class memory_stack

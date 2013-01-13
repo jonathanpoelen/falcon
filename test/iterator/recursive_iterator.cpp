@@ -139,6 +139,8 @@ void recursive_iterator_test()
 		++rec;
 		CHECK(rec == last);
 		CHECK(!rec.valid());
+
+		rec + 2l;
 	}
 }
 
