@@ -3,6 +3,7 @@
 
 #include <falcon/type_traits/add_const_if_reference.hpp>
 #include <falcon/type_traits/add_n_pointer.hpp>
+#include <falcon/type_traits/and.hpp>
 #include <falcon/type_traits/declval.hpp>
 #include <falcon/type_traits/difference.hpp>
 #include <falcon/type_traits/dimension.hpp>
@@ -17,6 +18,7 @@
 #include <falcon/type_traits/is_tuple.hpp>
 #include <falcon/type_traits/normalize_index.hpp>
 #include <falcon/type_traits/numeric.hpp>
+#include <falcon/type_traits/or.hpp>
 #include <falcon/type_traits/scalar.hpp>
 #include <falcon/type_traits/selector.hpp>
 #include <falcon/type_traits/subtype.hpp>
