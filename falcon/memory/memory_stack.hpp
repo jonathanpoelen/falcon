@@ -9,7 +9,7 @@ template<typename _T>
 class __memory_stack_base
 {
 public:
-	typedef _T value_type;
+	typedef _T type;
 	typedef unsigned char memory_type[sizeof(_T)];
 
 private:
@@ -27,12 +27,12 @@ public:
 	__memory_stack_base()
 	{}
 
-	value_type& get()
+	type& get()
 	{
 		return _data._v;
 	}
 
-	const value_type& get() const
+	const type& get() const
 	{
 		return _data._v;
 	}
@@ -47,19 +47,19 @@ public:
 		return _data._memory;
 	}
 
-	value_type* address()
+	type* address()
 	{
-		return reinterpret_cast<value_type*>(&_data._memory);
+		return reinterpret_cast<type*>(&_data._memory);
 	}
 
-	const value_type* address() const
+	const type* address() const
 	{
-		return reinterpret_cast<const value_type*>(&_data._memory);
+		return reinterpret_cast<const type*>(&_data._memory);
 	}
 
 	constexpr std::size_t size() const
 	{
-		return sizeof(value_type);
+		return sizeof(type);
 	}
 };
 
@@ -69,7 +69,7 @@ class __memory_stack
 : public __memory_stack_base<_T>
 {
 public:
-	typedef typename __memory_stack_base<_T>::value_type value_type;
+	typedef typename __memory_stack_base<_T>::type type;
 	typedef typename __memory_stack_base<_T>::memory_type memory_type;
 
 public:
@@ -94,7 +94,7 @@ class __memory_stack<_T, true>
 : public __memory_stack_base<_T>
 {
 public:
-	typedef typename __memory_stack_base<_T>::value_type value_type;
+	typedef typename __memory_stack_base<_T>::type type;
 	typedef typename __memory_stack_base<_T>::memory_type memory_type;
 
 public:
@@ -125,7 +125,7 @@ class __memory_stack<_T[_N], false>
 : public __memory_stack_base<_T[_N]>
 {
 public:
-	typedef typename __memory_stack_base<_T>::value_type value_type;
+	typedef typename __memory_stack_base<_T>::type type;
 	typedef typename __memory_stack_base<_T>::memory_type memory_type;
 
 public:
@@ -207,7 +207,7 @@ class __memory_stack<_T[_N], true>
 : public __memory_stack_base<_T[_N]>
 {
 public:
-	typedef typename __memory_stack_base<_T>::value_type value_type;
+	typedef typename __memory_stack_base<_T>::type type;
 	typedef typename __memory_stack_base<_T>::memory_type memory_type;
 
 public:
@@ -268,7 +268,7 @@ class memory_stack
 : __memory_stack<_T>
 {
 public:
-	typedef typename __memory_stack<_T>::value_type value_type;
+	typedef typename __memory_stack<_T>::type type;
 	typedef typename __memory_stack<_T>::memory_type memory_type;
 
 public:
