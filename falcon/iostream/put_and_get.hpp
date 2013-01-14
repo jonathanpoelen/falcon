@@ -50,11 +50,11 @@ class basic_ostream_functor
 {
 	typedef std::basic_ostream<_CharT, _Traits> __ostream_type;
 
-	__ostream_type& _os;
+	__ostream_type* _os;
 
 public:
 	basic_ostream_functor(__ostream_type& os)
-	: _os(os)
+	: _os(&os)
 	{}
 
 	basic_ostream_functor(const basic_ostream_functor& other)
@@ -64,11 +64,14 @@ public:
 	template<typename... _Args>
 	__ostream_type& operator()(const _Args&... args) const
 	{
-		return put<>(_os, args...);
+		return put<>(*_os, args...);
 	}
 
 	__ostream_type& base()
-	{ return _os; }
+	{ return *_os; }
+
+	void swap(basic_ostream_functor& other)
+	{ std::swap(_os, other._os); }
 };
 
 typedef basic_ostream_functor<char> ostream_functor;
@@ -86,11 +89,11 @@ struct basic_istream_functor
 {
 	typedef std::basic_istream<_CharT, _Traits> __istream_type;
 
-	__istream_type& _is;
+	__istream_type* _is;
 
 public:
 	basic_istream_functor(__istream_type& is)
-	: _is(is)
+	: _is(&is)
 	{}
 
 	basic_istream_functor(const basic_istream_functor& other)
@@ -100,11 +103,14 @@ public:
 	template<typename... _Args>
 	__istream_type& operator()(_Args&... args) const
 	{
-		return get<>(_is, args...);
+		return get<>(*_is, args...);
 	}
 
 	__istream_type& base()
-	{ return _is; }
+	{ return *_is; }
+
+	void swap(basic_istream_functor& other)
+	{ std::swap(_is, other._is); }
 };
 
 typedef basic_istream_functor<char> istream_functor;
@@ -114,6 +120,17 @@ template<typename _CharT, typename _Traits>
 basic_istream_functor<_CharT, _Traits> make_istream_functor(std::basic_istream<_CharT, _Traits>& is)
 { return basic_istream_functor<_CharT, _Traits>(is); }
 
+}
+
+namespace std {
+	template<typename _CharT, typename _Traits>
+	void swap(falcon::basic_istream_functor<_CharT, _Traits> a,
+						falcon::basic_istream_functor<_CharT, _Traits> b)
+	{ a.swap(b); }
+	template<typename _CharT, typename _Traits>
+	void swap(falcon::basic_ostream_functor<_CharT, _Traits> a,
+						falcon::basic_ostream_functor<_CharT, _Traits> b)
+	{ a.swap(b); }
 }
 
 #endif

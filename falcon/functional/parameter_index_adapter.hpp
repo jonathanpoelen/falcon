@@ -1,5 +1,5 @@
-#ifndef FALCON_FUNCTIONAL_PARAMETER_ADAPTER_HPP
-#define FALCON_FUNCTIONAL_PARAMETER_ADAPTER_HPP
+#ifndef FALCON_FUNCTIONAL_PARAMETER_INDEX_ADAPTER_HPP
+#define FALCON_FUNCTIONAL_PARAMETER_INDEX_ADAPTER_HPP
 
 #include <falcon/functional/call.hpp>
 #include <falcon/functional/call_partial_param_loop.hpp>
@@ -8,11 +8,11 @@
 
 namespace falcon {
 
-///\brief Tag for used @p call_partial_param_loop() with @c parameter_adapter
+///\brief Tag for used @p call_partial_param_loop() with @c parameter_index_adapter
 template<std::size_t _NumberArg>
 struct call_partial_param_loop_tag {};
 
-///\brief Tag for used @p call_partial_recursive_param_loop() with @c parameter_adapter
+///\brief Tag for used @p call_partial_recursive_param_loop() with @c parameter_index_adapter
 template<std::size_t _NumberArg>
 struct call_partial_recursive_param_loop_tag {};
 
@@ -24,7 +24,7 @@ struct call_partial_recursive_param_loop_tag {};
  * @{
  */
 template <typename _Functor, typename _Tag = full_parameter_index_tag>
-struct parameter_adapter
+struct parameter_index_adapter
 {
 	_Functor _M_func;
 
@@ -54,16 +54,16 @@ public:
 													 std::forward<_Args>(args)...);
 	}
 
-	void swap(parameter_adapter& other)
+	void swap(parameter_index_adapter& other)
 	{ std::swap(_M_func, other._M_func); }
 
 	template<typename _Tag2>
-	void swap(parameter_adapter<_Functor, _Tag2>& other)
+	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
 	{ std::swap(_M_func, other._M_func); }
 };
 
 template <typename _Functor, std::size_t _NumberArg>
-struct parameter_adapter<_Functor, call_partial_param_loop_tag<_NumberArg>>
+struct parameter_index_adapter<_Functor, call_partial_param_loop_tag<_NumberArg>>
 {
 	_Functor _M_func;
 
@@ -81,16 +81,16 @@ struct parameter_adapter<_Functor, call_partial_param_loop_tag<_NumberArg>>
 			_M_func, std::forward<_Args>(args)...);
 	}
 
-	void swap(parameter_adapter& other)
+	void swap(parameter_index_adapter& other)
 	{ std::swap(_M_func, other._M_func); }
 
 	template<typename _Tag2>
-	void swap(parameter_adapter<_Functor, _Tag2>& other)
+	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
 	{ std::swap(_M_func, other._M_func); }
 };
 
 template <typename _Functor, std::size_t _NumberArg>
-struct parameter_adapter<_Functor, call_partial_recursive_param_loop_tag<_NumberArg>>
+struct parameter_index_adapter<_Functor, call_partial_recursive_param_loop_tag<_NumberArg>>
 {
 	_Functor _M_func;
 
@@ -108,11 +108,11 @@ struct parameter_adapter<_Functor, call_partial_recursive_param_loop_tag<_Number
 			_M_func, std::forward<_Args>(args)...);
 	}
 
-	void swap(parameter_adapter& other)
+	void swap(parameter_index_adapter& other)
 	{ std::swap(_M_func, other._M_func); }
 
 	template<typename _Tag2>
-	void swap(parameter_adapter<_Functor, _Tag2>& other)
+	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
 	{ std::swap(_M_func, other._M_func); }
 };
 
@@ -122,10 +122,10 @@ struct parameter_adapter<_Functor, call_partial_recursive_param_loop_tag<_Number
 
 namespace std {
 template <typename _Functor, typename _Tag>
-void swap(falcon::parameter_adapter<_Functor, _Tag>& a, falcon::parameter_adapter<_Functor, _Tag>& b)
+void swap(falcon::parameter_index_adapter<_Functor, _Tag>& a, falcon::parameter_index_adapter<_Functor, _Tag>& b)
 { a.swap(b); }
 template <typename _Functor, typename _Tag, typename _Tag2>
-void swap(falcon::parameter_adapter<_Functor, _Tag>& a, falcon::parameter_adapter<_Functor, _Tag2>& b)
+void swap(falcon::parameter_index_adapter<_Functor, _Tag>& a, falcon::parameter_index_adapter<_Functor, _Tag2>& b)
 { a.swap(b); }
 }
 

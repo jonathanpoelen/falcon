@@ -31,9 +31,7 @@ optimisation de taille des enum class: enum class E : typename std::conditional<
 
 Mettre constexpr pour les classe d'operateur et enum/operator
 
-ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?). quotient partiel
-
-ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp (via héritage, plus simple). Faire un not1 et not2 comme la std.
+ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?). quotient partiel.
 
 faire un iterator qui itère sur plusieur -à la manière de multiple_iterator- mais ne fait les comparaisons que sur le premier (le merger avec multiple_iterator via des type_traits ?) (le nommer group_iterator ?).
 
@@ -45,7 +43,7 @@ revoir btree et btree_base et réactiver les tests
 
 dans container_wrapper.hpp, ajouter des fonctions comme reverse_container, const_container, etc.
 
-faire des traits char_traits qui transforme tout en majuscule, en minuscule et élimine les accents. Faire un string qui fait des comparaisons insensibles à la case.
+faire des traits char_traits qui transforme tout en majuscule, en minuscule et élimine les accents. Faire un string qui fait des comparaisons insensibles à la case. Quel char_traits existe-il dans boost ?
 
 ne pas oublier le suport de char16_t et char32_t
 
@@ -59,36 +57,23 @@ ostream::repetition(_Obj, size_t) et ostream::repetition(_Obj, size_t, _CharT se
 
 si on active les exceptions des flux, comment ce comporte les fonctions lié (ignore, ignore_all, etc) ? Le state est bien setter à badbit et non égal à good.
 
-proxy_iterator: le _IsRef doit etre a l'interieur de la classe et non dans son template
+un foncteur qui permet de répartir les valeurs de plusieurs iterateurs. foreah(first, last, ???(it1, it2, it3)) -> ???::f(*it, *it1, *it2, *it3); ++it1,++it2,++it3.
 
-un functeur qui permet de répartir les valeurs de plusieurs iterateurs. foreah(first, last, ???(it1, it2, it3)) -> ???::f(*it, *it1, *it2, *it3); ++it1,++it2,++it3.
-
-faire des functors qui font des comparaisons sur les valeurs d'un pointeur: pointer_less -> (*a < *b).
-
-ajouter first_value, second_value et argument_type pour les functors de operators (heriter de std::unary_function et std::binary_function pour ce faire).
-
-un foncteur ???<_Functor, std::tuple<_Elements>, parameter_index<...> ou indexes-tag>.
+ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp. Faire un not1 et not2 comme la std.
 
 structure englopant un type et pour chaque operateur suceptible de changer le type (pour les type scalaire < int) fait un static_cast. (force_type<_T> ? force_type_wrapper<> ? force_scalar<> ? integral_wrapper<> ?). Cas particulier pour l'incrementation et decrementation sur enum.
 Permet ainsi de s'affranchir des enum_* en passant par les foncteurs sur operateurs: enum_plus<enum_t> -> plus<integral_wrapper<enum_t>>, enum_increment<enum_t> -> increment<integral_wrapper<enum_t&>>
 ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?). La classe generique heriter des operateurs de la façon décrit au-dessus.
 
-remplacer dans static_new et memory_stack construct(emplace_t,...) par un constructeur construct_emplace()
-trouver le moyen de construir un _T par l'intermediaire d'un objet (ex: tuple). construct_adapter(_Adapter, ...) ? avec _Adapter un foncteur prenant le pointeur de la structure a initialiser.
+amélioré algorithm.hpp en "optimisant" les algos quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
 
-amélioré algorithm.hpp en "optimisant" les algo quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
-
-dans les literaux, gerer l'overflow des nombres (on peut les passer en template au lieu de paramètre ?). La dernier version du compilo le fait ? Sinon via un tableau de char…
-
-singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>
+singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>. Voir aussi call_once
 
 container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des conditions à la compilation.
 
 les lambdas toujours par reference ou il parfois utiliser std::ref ? Pas le cas pour while_loop et co...
 
-foncteur pour utiliser tuple_apply. Utilise indexes-tag pour définir le parameter_index<...> (tuple_applier<_Functor, _Tag = full_parameter_index_tag> ?).
-
-faire un make_caller() et un make_tuple_applier().
+faire un make_parameter_adapter() et un make_tuple_applier().
 
 temporary_tuple_cat (tuple concatener par reference ?)
 
@@ -98,7 +83,7 @@ les tuple_* doivent fonctionner avec std::pair<>, faire des tests
 
 unary_compose et binary_compose doivent pouvoir deviné le type des fonctions
 
-faire en sorte que mulary_compose passe par héritage au lieu de tuple. Le bool passé en template ne doit pas existé autrement qu'en interne.
+faire en sorte que mulary_compose passe par héritage au lieu de tuple. Le bool passé en template ne doit pas existé autrement qu'en interne. renommer en *_base et passer par un alias ?
 mulary_compose doit hériter et compose retourner unary_compose ou binary_compose quand cela est possible.
 
 unary_compose, binary_compose et mulary_compose supporte falcon::ignore quand on les construits
@@ -107,7 +92,7 @@ faire un function_compose<...> (+ fonction composef()) comme mulary_compose mais
 
 dans enumerator faire une allocation de la chaîne en tant que expression constante (déjà fait ?)
 
-tester les compose() avec les distributions (voir random_device ? (exemple dans cppreference.com avec les distrtibutions))
+tester les compose() avec les distributions (voir random_device ? (exemple dans cppreference.com avec les distributions))
 
 les compose() devrais pouvoir fonctionenr avec les références (pas le cas actuellement). Fonctionne avec std::ref() sans perte de perf (même binaire) ?
 
@@ -118,7 +103,7 @@ une sorte de unary_compose mais sans arguments -> f(g()). (ancien delegate_resul
 enlever les doubles underscore car reservé. Idem pour les underscores suivit de majuscule dans l'espace globale.
 
 Vérifier les types tag dans les iterateurs.
-Ajouter dans les iterators les fonctions pour acceder au fonctor lorsaue ceux-ci en utilisent (fn() ?).
+Ajouter dans les iterators les fonctions pour acceder au fonctor lorsque ceux-ci en utilisent (fn() ?).
 
 ostream/join.hpp est devenu trop complexe, simplifier ! Idem pour istream/ignore.hpp ?
 
@@ -128,7 +113,7 @@ un iterateur qui execute une fonction apres avoir atteint une valeur (autre iter
 padding_iterator: pour par exemple iterer sur un sous retangle.
 un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
 
-tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ? getx_accessor ?
+tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ?
 
 flag.hpp: pb avec le decalage de bit de flag. flag.cpp: god for gcc-4.7, fail with gcc-4.6…
 
@@ -138,7 +123,7 @@ late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…
 
 utiliser __CHAR_BIT__ dans bit/bit_swap.hpp et bit/detail/bit_swap.hpp (en fait les fonction change selon le nombre de bit…)
 
-synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). (Utilise par multiple_iterator ? Le remplace ?). Sera utilisé par delegate_comparison_iterator. Basé sur synchronizer<>.
+synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). Sera utilisé par delegate_comparison_iterator. Basé sur synchronizer<>.
 
 l'actuel delegate_comparison_iterator est en fait un multiple_iterator avec un seul iterateur de comparaison (utilise keep_parameter_index). Le changer pour qu'il fonctionne comme indirect_iterator mais uniquement pour la comparaison.
 
@@ -148,18 +133,16 @@ tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant voi
 
 completer les operateurs de range_modifier et faire un for_each() et un invoke(). enlever unary() et binary() ? Passer par operator() ? uniquement par invoke() ?
 
-literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants.
+literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants (voir pdf plus bas pour les suffix).
 
-renommer le dossier c++0x en c++xx ?
-modifier les noms des macro CPP0X_* et CPP_* en FALCON_* (et FALCON_XX_ ?)
+renommer le dossier c++0x en c++11 ?
+modifier les noms des macro CPP0X_* et CPP_* en FALCON_* (et FALCON_CXX11_ ?)
 renommer CPP_USE_CONSTEXPR en FALCON_CONSEXPR_OR_CONST
 #define FALCON_STATIC_CONSTEXPR static FALCON_CONSEXPR_OR_CONST
 utilisé les macros prédéfinit dans boost et ne plus utilisé __GXX_EXPERIMENTAL_CXX0X__
 www.boost.org/doc/libs/1_49_0/libs/config/doc/html/boost_config/boost_macro_reference.html
 
 Utiliser d'avantage FALCON_BOOST_OR_STD_NAMESPACE et FALCON_BOOST_OR_STD_TRAITS (c++/boost_or_std.hpp)
-
-and_ et or_ qui prend chaque valeur et fait un and ou or avec (and_c et or_c pour les classes). Utilise template_[or|and] ? faire enable_if_[any|none][_c]
 
 note/*.hpp: les node peuvent fonctionne de facon transparente avec des std::unique_ptr ?
 
@@ -169,3 +152,13 @@ ne pas oublier de prendre en compte les unité (non mis dans la norme) avec les 
 falcon::algorithm::filter(container, predicate, cp)
 
 optimal tuple : http://flamingdangerzone.com/cxx11/2012/12/02/optimal-tuple-ii.html
+
+
+
+
+
+
+
+
+
+

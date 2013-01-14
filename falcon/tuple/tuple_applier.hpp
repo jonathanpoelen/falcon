@@ -37,9 +37,11 @@ public:
 	}
 
 	void swap(tuple_applier& other)
-	{
-		std::swap(_M_func, other._M_func);
-	}
+	{ std::swap(_M_func, other._M_func); }
+
+	template<typename _Tag2>
+	void swap(tuple_applier<_Functor, _Tag2>& other)
+	{ std::swap(_M_func, other._M_func); }
 };
 
 }
@@ -47,7 +49,11 @@ public:
 namespace std {
 template <typename _Functor, typename _Tag>
 void swap(falcon::tuple_applier<_Functor, _Tag>& a,
-		  falcon::tuple_applier<_Functor, _Tag>& b)
+					falcon::tuple_applier<_Functor, _Tag>& b)
+{ (a.swap(b); }
+template <typename _Functor, typename _Tag, typename _Tag2>
+void swap(falcon::tuple_applier<_Functor, _Tag2>& a,
+					falcon::tuple_applier<_Functor, _Tag2>& b)
 { (a.swap(b); }
 }
 

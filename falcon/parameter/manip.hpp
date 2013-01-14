@@ -99,21 +99,13 @@ struct pack_wrapper
 };
 
 
-template <typename _Pack, typename _Pack2>
+template <typename _Pack>
 struct __pack_use_type;
 
-template <typename... _Elements, typename _WrapElement, typename... _ElementsOther>
-struct __pack_use_type<parameter_pack<_Elements...>, parameter_pack<_WrapElement, _ElementsOther...>>
-: __pack_use_type<
-	parameter_pack<_Elements..., typename _WrapElement::type>,
-	parameter_pack<_ElementsOther...>
->
-{};
-
 template <typename... _Elements>
-struct __pack_use_type<parameter_pack<_Elements...>, parameter_pack<>>
+struct __pack_use_type<parameter_pack<_Elements...>>
 {
-	typedef parameter_pack<_Elements...> __type;
+	typedef parameter_pack<typename _Elements::type...> __type;
 };
 
 /**
@@ -123,7 +115,7 @@ struct __pack_use_type<parameter_pack<_Elements...>, parameter_pack<>>
 template <typename _Pack>
 struct pack_use_type
 {
-	typedef typename __pack_use_type<parameter_pack<>, _Pack>::__type type;
+	typedef typename __pack_use_type<_Pack>::__type type;
 };
 
 /**
@@ -134,7 +126,6 @@ template <template<class...> class _Modifier, typename _Pack>
 struct pack_modifier
 {
 	typedef typename __pack_use_type<
-		parameter_pack<>,
 		typename pack_wrapper<_Modifier, _Pack>::type
 	>::__type type;
 };

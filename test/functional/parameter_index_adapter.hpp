@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_FUNCTIONAL_PARAMETER_INDEX_ADAPTER_HPP
+#define FALCON_TEST_FUNCTIONAL_PARAMETER_INDEX_ADAPTER_HPP
+
+void parameter_index_adapter_test();
+
+#endif
