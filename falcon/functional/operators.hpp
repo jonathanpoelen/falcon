@@ -324,6 +324,10 @@ struct left_shift<std::basic_ostream<_CharT, _Traits>, late_parameter_t>
 	template<typename _T>
 	inline __ostream_type& operator()(__ostream_type& os, const _T& b)
 	{ return os << b; }
+
+	inline __ostream_type& operator()(__ostream_type& os,
+																		__ostream_type&(*manipulator)(__ostream_type&))
+	{ return manipulator(os); }
 };
 
 template<>
@@ -370,6 +374,10 @@ struct right_shift<std::basic_istream<_CharT, _Traits>, late_parameter_t>
 	template<typename _T>
 	inline __istream_type& operator()(__istream_type& is, _T& b)
 	{ return is >> b; }
+
+	inline __istream_type& operator()(__istream_type& os,
+																		__istream_type&(*manipulator)(__istream_type&))
+	{ return manipulator(os); }
 };
 
 template<>
@@ -701,6 +709,111 @@ struct parenthesis<late_parameter_t>
 	template<typename _T, typename... _Args>
 	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
 };
+
+template<typename _Functor, typename _T>
+struct ptr_unary_operation
+{
+	_Functor _operation;
+
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T* v) const, _operation(*v))
+
+	inline CPP0X_DELEGATE_FUNCTION(operator()(_T* v), _operation(*v))
+
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T* v) const, _operation(*v))
+
+	inline CPP0X_DELEGATE_FUNCTION(operator()(const _T* v), _operation(*v))
+};
+
+template<typename _Functor>
+struct ptr_unary_operation<_Functor, late_parameter_t>
+{
+	_Functor _operation;
+
+	template<typename _T>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T* v) const, _operation(*v))
+
+	template<typename _T>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(_T* v), _operation(*v))
+
+	template<typename _T>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T* v) const, _operation(*v))
+
+	template<typename _T>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(const _T* v), _operation(*v))
+};
+
+template<typename _Functor, typename _T, typename _U = _T>
+struct ptr_binary_operation
+{
+	_Functor _operation;
+
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2) const, _operation(*v, *v2))
+
+	inline CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2), _operation(*v, *v2))
+
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2) const, _operation(*v, *v2))
+
+	inline CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2), _operation(*v, *v2))
+};
+
+template<typename _Functor, typename _U>
+struct ptr_binary_operation<_Functor, late_parameter_t, _U>
+{
+	_Functor _operation;
+
+	template<typename _T>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2) const, _operation(*v, *v2))
+
+	template<typename _T>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2), _operation(*v, *v2))
+
+	template<typename _T>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2) const, _operation(*v, *v2))
+
+	template<typename _T>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2), _operation(*v, *v2))
+};
+
+template<typename _Functor, typename _T>
+struct ptr_binary_operation<_Functor, _T, late_parameter_t>
+{
+	_Functor _operation;
+
+	template<typename _U>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2) const, _operation(*v, *v2))
+
+	template<typename _U>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2), _operation(*v, *v2))
+
+	template<typename _U>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2) const, _operation(*v, *v2))
+
+	template<typename _U>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2), _operation(*v, *v2))
+};
+
+template<typename _Functor>
+struct ptr_binary_operation<_Functor, late_parameter_t, late_parameter_t>
+{
+	_Functor _operation;
+
+	template<typename _T, typename _U>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2) const, _operation(*v, *v2))
+
+	template<typename _T, typename _U>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(_T* v, _U* v2), _operation(*v, *v2))
+
+	template<typename _T, typename _U>
+	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2) const, _operation(*v, *v2))
+
+	template<typename _T, typename _U>
+	inline CPP0X_DELEGATE_FUNCTION(operator()(const _T* v, const _U* v2), _operation(*v, *v2))
+};
+
+template<typename _Functor>
+using late_ptr_unary_operation = ptr_unary_operation<_Functor, late_parameter_t>;
+template<typename _Functor>
+using late_ptr_binary_operation = ptr_binary_operation<_Functor, late_parameter_t>;
 
 }
 
