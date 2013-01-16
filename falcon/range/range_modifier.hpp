@@ -1,7 +1,9 @@
 #ifndef _FALCON_RANGE_RANGE_MODIFIER_HPP
 #define _FALCON_RANGE_RANGE_MODIFIER_HPP
 
-#include <falcon/container/range_access.hpp>
+#include <algorithm>
+#include <falcon/container/container_wrapper.hpp>
+#include <falcon/type_traits/difference.hpp>
 
 namespace falcon {
 
@@ -11,62 +13,188 @@ namespace falcon {
  * make_range_modifier(container) += 8;
  * make_range(first, last).modifier() -= 7;
  */
-template<typename _Range>
+template<typename _Range, typename _Traits = range_access_traits<_Range> >
 struct range_modifier
+: container_wrapper<_Range, _Traits>
 {
-	_Range& _M_range;
+	typedef _Range container_type;
+	typedef typename container_wrapper<_Range, _Traits>::iterator iterator;
+	typedef typename container_wrapper<_Range, _Traits>::value_type value_type;
+	typedef typename container_wrapper<_Range, _Traits>::difference_type difference_type;
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-	typedef decltype(begin(_M_range)) iterator;
-#else
-	typedef typename range_access_iterator<_Range>::iterator iterator;
-#endif
-
-	range_modifier(_Range& range)
-	: _M_range(range)
+	range_modifier(container_type& container)
+	: container_wrapper<_Range, _Traits>(container)
 	{}
 
+	difference_type size() const
+	{ this->end() - this->begin(); }
+
 	template<typename _T>
-	range_modifier<_Range>& operator=(const _T& v)
+	range_modifier& operator=(const range_modifier& other)
 	{
-		for (iterator first = begin(_M_range), last = end(_M_range); first != last; ++first)
-			*first = v;
+		this->base() = other.base();
 		return *this;
 	}
 
-	template<typename _Functor>
-	range_modifier& unary(_Functor func)
+	template<typename _T>
+	range_modifier& operator=(const _Range& other)
 	{
-		for (iterator first = begin(_M_range), last = end(_M_range); first != last; ++first)
+		this->base() = other;
+		return *this;
+	}
+
+	template<typename _T>
+	range_modifier& operator=(const _T& v)
+	{
+		assign<>(v);
+		return *this;
+	}
+
+	template<typename _T>
+	void assign(const _T& v)
+	{
+		for (iterator first = this->begin(), last = this->end(); first != last; ++first)
+			*first = v;
+	}
+
+	template<typename _InputIterator>
+	void assign(_InputIterator first, _InputIterator last)
+	{
+		for (iterator result = this->begin(); first != last; ++first, ++result)
+			*result = *first;
+	}
+
+	template<typename _Functor>
+	range_modifier& for_each(_Functor func) const
+	{
+		for (iterator first = this->begin(), last = this->end(); first != last; ++first)
 			func(*first);
 		return *this;
 	}
 
+	template<typename _Functor>
+	range_modifier& for_each(_Functor func)
+	{
+		for (iterator first = this->begin(), last = this->end(); first != last; ++first)
+			func(*first);
+		return *this;
+	}
+
+	template<typename _Functor, typename _T>
+	range_modifier& for_each(_Functor func, const _T& x)
+	{
+		for (iterator first = this->begin(), last = this->end(); first != last; ++first)
+			func(*first, x);
+		return *this;
+	}
+
+	template<typename _Functor, typename _T>
+	range_modifier& for_each(_Functor func, const _T& x) const
+	{
+		for (iterator first = this->begin(), last = this->end(); first != last; ++first)
+			func(*first, x);
+		return *this;
+	}
+
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	template<typename _Functor, typename _T>
-	range_modifier& binary(_Functor func, _T&& v)
+	template<typename _Functor, typename... _Args>
+	range_modifier& for_each(_Functor func, const _Args&... x) const
 	{
-		for (iterator first = begin(_M_range), last = end(_M_range); first != last; ++first)
-			func(*first, v);
+		for (iterator first = this->begin(), last = this->end(); first != last; ++first)
+			func(*first, x...);
 		return *this;
 	}
-#else
-	template<typename _Functor, typename _T>
-	range_modifier& binary(_Functor func, _T& v)
+
+	template<typename _Functor, typename... _Args>
+	range_modifier& for_each(_Functor func, const _Args&... x)
 	{
-		for (iterator first = begin(_M_range), last = end(_M_range); first != last; ++first)
-			func(*first, v);
-		return *this;
-	}
-	template<typename _Functor, typename _T>
-	range_modifier& binary(_Functor func, const _T& v)
-	{
-		for (iterator first = begin(_M_range), last = end(_M_range); first != last; ++first)
-			func(*first, v);
+		for (iterator first = this->begin(), last = this->end(); first != last; ++first)
+			func(*first, x...);
 		return *this;
 	}
 #endif
 
+	/**
+	 * @brief  Find the first element in a sequence for which a predicate is true.
+	 * @param  predicate   A predicate.
+	 * @return   The first iterator @c i in the range such that @p predicate(*i) is true, or @p end() if no such iterator exists.
+	 */
+	template<typename _Predicate>
+	inline iterator find_if(_Predicate predicate) const
+	{
+		return std::find_if(this->begin(), this->end(), predicate);
+	}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+private:
+	template<typename _Predicate>
+	struct __predicat_not
+	{
+		_Predicate& predicate;
+		__predicat_not(_Predicate & pred)
+		: predicate(pred)
+		{}
+
+		bool operator()(const value_type& x) const
+		{ return !predicate(x); }
+	};
+public:
+#endif
+
+	/**
+	 * @brief  Find the first element in a sequence for which a predicate is false.
+	 * @param  predicate   A predicate.
+	 * @return   The first iterator @c i in the range such that @p predicate(*i) is false, or @p end() if no such iterator exists.
+	 */
+	template<typename _Predicate>
+	inline iterator find_if_not(_Predicate predicate) const
+	{
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		return std::find_if_not(this->begin(), this->end(), predicate);
+#else
+		return std::find_if(this->begin(), this->end(),
+												__predicat_not<_Predicate>(predicate));
+#endif
+	}
+
+	/**
+	 * @brief Checks that a predicate is true for all the elements of a sequence.
+	 * @param  predicate    A predicate.
+	 * @return  True if the check is true, false otherwise.
+	 */
+	template<typename _Predicate>
+	inline bool all_of(_Predicate predicate) const
+	{
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		return std::all_of(this->first(), this->end(), predicate);
+#else
+		return this->end() == find_if_not(predicate);
+#endif
+	}
+
+	/**
+	 * @brief  Checks that a predicate is false for all the elements of a sequence.
+	 * @param  predicate    A predicate.
+	 * @return  True if the check is true, false otherwise.
+	 */
+	template<typename _Predicate>
+	inline bool none_of(_Predicate predicate) const
+	{
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		return std::none_of(this->first(), this->end(), predicate);
+#else
+		return this->end() == find_if(predicate);
+#endif
+	}
+
+	/**
+	 * @brief  Checks that a predicate is false for at least an element of a sequence.
+	 * @param  predicate    A predicate.
+	 * @return  True if the check is true, false otherwise.
+	 */
+	template<typename _Predicate>
+	inline bool any_of(_Predicate predicate) const
+	{ return !none_of(predicate); }
 };
 
 template<typename _Container>
@@ -76,10 +204,10 @@ range_modifier<_Container> make_range_modifier(_Container& container)
 }
 
 #define _FALCON_CREATE_RANGE_FUNCTION_OPERATOR(op)\
-	template<typename _Range, typename _T>\
-	range_modifier<_Range> operator op(range_modifier<_Range> range, const _T& v)\
+	template<typename _Range, typename _Traits, typename _T>\
+	range_modifier<_Range, _Traits> operator op(range_modifier<_Range, _Traits> range, const _T& v)\
 	{\
-		for (typename range_modifier<_Range>::iterator first = begin(range._M_range), last = end(range._M_range); first != last; ++first)\
+		for (typename range_modifier<_Range, _Traits>::iterator first = range.begin(), last = range.end(); first != last; ++first)\
 			*first op v;\
 		return range;\
 	}
@@ -98,17 +226,17 @@ _FALCON_CREATE_RANGE_FUNCTION_OPERATOR(<<=)
 #undef _FALCON_CREATE_RANGE_FUNCTION_OPERATOR
 
 #define _FALCON_CREATE_RANGE_FUNCTION_OPERATOR(op)\
-	template<typename _Range>\
-	range_modifier<_Range> operator op(range_modifier<_Range> range)\
+	template<typename _Range, typename _Traits>\
+	range_modifier<_Range, _Traits> operator op(range_modifier<_Range, _Traits> range)\
 	{\
-		for (typename range_modifier<_Range>::iterator first = begin(range._M_range), last = end(range._M_range); first != last; ++first)\
+		for (typename range_modifier<_Range, _Traits>::iterator first = range.begin(), last = range.end(); first != last; ++first)\
 			op(*first);\
 		return range;\
 	}\
-	template<typename _Range>\
-	range_modifier<_Range> operator op(range_modifier<_Range> range, int)\
+	template<typename _Range, typename _Traits>\
+	range_modifier<_Range, _Traits> operator op(range_modifier<_Range, _Traits> range, int)\
 	{\
-		for (typename range_modifier<_Range>::iterator first = begin(range._M_range), last = end(range._M_range); first != last; ++first)\
+		for (typename range_modifier<_Range, _Traits>::iterator first = range.begin(), last = range.end(); first != last; ++first)\
 			op(*first);\
 		return range;\
 	}
@@ -118,10 +246,11 @@ _FALCON_CREATE_RANGE_FUNCTION_OPERATOR(--)
 
 #undef _FALCON_CREATE_RANGE_FUNCTION_OPERATOR
 
-template<typename _Range, typename _T>
-bool operator==(range_modifier<_Range> range, const _T v)
+template<typename _Range, typename _Traits, typename _T>
+bool operator==(range_modifier<_Range, _Traits> range, const _T v)
 {
-	for (typename range_modifier<_Range>::iterator first = begin(range._M_range), last = end(range._M_range); first != last; ++first)
+	typedef typename range_modifier<_Range, _Traits>::iterator iterator;
+	for (iterator first = range.begin(), last = range.end(); first != last; ++first)
 	{
 		if (*first != v)
 			return false;
@@ -129,10 +258,11 @@ bool operator==(range_modifier<_Range> range, const _T v)
 	return true;
 }
 
-template<typename _Range, typename _T>
-bool operator<(range_modifier<_Range> range, const _T v)
+template<typename _Range, typename _Traits, typename _T>
+bool operator<(range_modifier<_Range, _Traits> range, const _T v)
 {
-	for (typename range_modifier<_Range>::iterator first = begin(range._M_range), last = end(range._M_range); first != last; ++first)
+	typedef typename range_modifier<_Range, _Traits>::iterator iterator;
+	for (iterator first = range.begin(), last = range.end(); first != last; ++first)
 	{
 		if (*first >= v)
 			return false;
@@ -140,10 +270,11 @@ bool operator<(range_modifier<_Range> range, const _T v)
 	return true;
 }
 
-template<typename _Range, typename _T>
-bool operator>(range_modifier<_Range> range, const _T v)
+template<typename _Range, typename _Traits, typename _T>
+bool operator>(range_modifier<_Range, _Traits> range, const _T v)
 {
-	for (typename range_modifier<_Range>::iterator first = begin(range._M_range), last = end(range._M_range); first != last; ++first)
+	typedef typename range_modifier<_Range, _Traits>::iterator iterator;
+	for (iterator first = range.begin(), last = range.end(); first != last; ++first)
 	{
 		if (*first <= v)
 			return false;
@@ -151,16 +282,16 @@ bool operator>(range_modifier<_Range> range, const _T v)
 	return true;
 }
 
-template<typename _Range, typename _T>
-bool operator!=(range_modifier<_Range> range, const _T v)
+template<typename _Range, typename _Traits, typename _T>
+bool operator!=(range_modifier<_Range, _Traits> range, const _T v)
 { return !(range == v); }
 
-template<typename _Range, typename _T>
-bool operator<=(range_modifier<_Range> range, const _T v)
+template<typename _Range, typename _Traits, typename _T>
+bool operator<=(range_modifier<_Range, _Traits> range, const _T v)
 { return !(range > v); }
 
-template<typename _Range, typename _T>
-bool operator>=(range_modifier<_Range> range, const _T v)
+template<typename _Range, typename _Traits, typename _T>
+bool operator>=(range_modifier<_Range, _Traits> range, const _T v)
 { return !(range < v); }
 
 }

@@ -27,10 +27,6 @@ struct A{
 
 	A* address() { return this; }
 	const A* address() const { return this; }
-	bool operator==(const A&a) const
-	{
-		return i==a.i;
-	}
 };
 
 inline int operator+(int i, const A& a)

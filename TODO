@@ -131,8 +131,6 @@ ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui se
 
 tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant void, voient leur type changer en std::ignore_t.
 
-completer les operateurs de range_modifier et faire un for_each() et un invoke(). enlever unary() et binary() ? Passer par operator() ? uniquement par invoke() ?
-
 literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants (voir pdf plus bas pour les suffix).
 
 renommer le dossier c++0x en c++11 ?
@@ -144,12 +142,10 @@ www.boost.org/doc/libs/1_49_0/libs/config/doc/html/boost_config/boost_macro_refe
 
 Utiliser d'avantage FALCON_BOOST_OR_STD_NAMESPACE et FALCON_BOOST_OR_STD_TRAITS (c++/boost_or_std.hpp)
 
-note/*.hpp: les node peuvent fonctionne de facon transparente avec des std::unique_ptr ?
+note/*.hpp: peuvent fonctionner de façon transparente avec des std::unique_ptr ?
 
 implémenter la proposition de suffix dans la nouvelle norme: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3402.pdf
 ne pas oublier de prendre en compte les unité (non mis dans la norme) avec les abréviation udl ou iso
-
-falcon::algorithm::filter(container, predicate, cp)
 
 optimal tuple : http://flamingdangerzone.com/cxx11/2012/12/02/optimal-tuple-ii.html
 

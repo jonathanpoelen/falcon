@@ -5,7 +5,7 @@ namespace falcon {
 template<typename _T>
 inline bool is_true(const _T& a)
 {
-	return static_cast<bool>(a);
+	return a ? true : false;
 }
 
 template<typename _T>

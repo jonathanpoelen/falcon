@@ -31,23 +31,6 @@ public:
 	: _container(&container)
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-	container_wrapper(container_type&&) = delete;
-	container_wrapper(const container_wrapper& other) = delete;
-	container_wrapper& operator=(const container_wrapper& other) = delete;
-#else
-private:
-	container_wrapper& operator=(const container_wrapper& other);
-	container_wrapper(const container_wrapper& other);
-public:
-#endif
-
-	container_wrapper& operator=(container_type& container)
-	{
-		_container = &container;
-		return *this;
-	}
-
 	iterator begin() const
 	{ return _Traits::begin(base()); }
 

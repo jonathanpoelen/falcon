@@ -12,6 +12,8 @@
 #include <falcon/type_traits/decay_and_strip.hpp>
 #include <falcon/logical/range_comparisons.hpp>
 #include <falcon/range/range_modifier.hpp>
+#include <falcon/type_traits/build_class.hpp>
+#include <falcon/type_traits/eval_if.hpp>
 
 namespace falcon {
 
@@ -128,6 +130,7 @@ struct range
 		return *this;
 	}
 
+	/// Increase @p left and decrease @p right of @a n
 	template<typename _U>
 	range<_T>& towards_infinity(const _U& n)
 	{
@@ -144,6 +147,7 @@ struct range
 		return *this;
 	}
 
+	/// Decrease @p left and increase @p right of @a n
 	template<typename _U>
 	range<_T>& towards_reverse_infinity(const _U& n)
 	{
@@ -160,6 +164,7 @@ struct range
 		return *this;
 	}
 
+	/// Decrease @p left and @p right of @a n
 	template<typename _U>
 	range<_T>& towards_left(const _U& n)
 	{
@@ -176,6 +181,7 @@ struct range
 		return *this;
 	}
 
+	/// Increase @p left and @p right of @a n
 	template<typename _U>
 	range<_T>& towards_right(const _U& n)
 	{
@@ -260,9 +266,21 @@ struct range
 		return right - left;
 	}
 
-	range_modifier<range<_T> > modifier()
+	///Create a objet @c range_modifier<range>
+	template<typename U = void>
+	//fixing bug with gcc-4.7
+	typename eval_if<1, build_class2<range_modifier, range>, U>::type modifier()
 	{
-		return range_modifier<range<_T> >(*this);
+		return range_modifier<range>(*this);
+	}
+
+	///Create a objet @c range_modifier<range>
+	template<typename U = void>
+	//fixing bug with gcc-4.7
+	typename eval_if<1, build_class2<range_modifier, const range>, U>::type
+	modifier() const
+	{
+		return range_modifier<const range>(*this);
 	}
 
 	CPP_CONSTEXPR _T begin() const
