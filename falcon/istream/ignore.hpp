@@ -175,123 +175,28 @@ template<typename _CharT, typename _Traits, typename _IntType>
 std::basic_istream<_CharT, _Traits>& operator>>(std::basic_istream<_CharT, _Traits>& is, __ignore_size_delimiter_stream<_IntType> n)
 { return is.ignore(n.__size, n.__delim); }
 
-template<bool _Lax, typename _CharT, typename _Traits, typename _ForwardIterator>
-std::basic_istream<_CharT, _Traits>& __ignore(std::basic_istream<_CharT, _Traits>& is, _ForwardIterator& first, _ForwardIterator& last)
+
+template <typename _InputIterator>
+struct __ignore_range
 {
-	typedef std::basic_istream<_CharT, _Traits> __istream_type;
-	typedef typename __istream_type::sentry __sentry;
-	__sentry __cerb(is, true);
-	if (__cerb)
-	{
-		typedef std::basic_streambuf<_CharT, _Traits> __streambuf_type;
-		typedef typename __istream_type::int_type __int_type;
-		const __int_type __eof = _Traits::eof();
-		__streambuf_type* __sb = is.rdbuf();
-		__int_type __c = __sb->sgetc();
-
-		std::ios_base::iostate __err = std::ios_base::goodbit;
-
-		while (first != last && !_Traits::eq_int_type(__c, __eof) && _Traits::eq(_Traits::to_char_type(__c), *first))
-		{
-			__c = __sb->snextc();
-			++first;
-		}
-
-		if (_Traits::eq_int_type(__c, __eof))
-			__err |= std::ios_base::eofbit;
-		if (!_Lax && first != last)
-			__err |= std::ios_base::badbit;
-
-		if (__err)
-			is.setstate(__err);
-	}
-	return is;
-}
-
-/**
- * @brief Discarding characters in a sequence.
- * @param first An input iterator.
- * @param last  An input iterator.
- *
- * If the stream object have @c _Traits::eof() so @c std::badbit is set in the stream.
- */
-template<typename _CharT, typename _Traits, typename _ForwardIterator>
-std::basic_istream<_CharT, _Traits>& ignore(std::basic_istream<_CharT, _Traits>& is, _ForwardIterator first, _ForwardIterator last)
-{ return __ignore<false>(is, first, last); }
-
-/**
- * @brief Discarding characters in a sequence.
- * @param first An forward iterator.
- * @param last  An forward iterator.
- */
-template<typename _CharT, typename _Traits, typename _ForwardIterator>
-std::basic_istream<_CharT, _Traits>& laxignore(std::basic_istream<_CharT, _Traits>& is, _ForwardIterator first, _ForwardIterator last)
-{ return __ignore<true>(is, first, last); }
-
-template<typename _ForwardIterator, typename _ForwardIterator2, bool _Lax>
-struct __ignore_iterator_stream
-{
-	_ForwardIterator __first;
-	_ForwardIterator2 __last;
+	_InputIterator &first, &last;
+	bool operator *() const
+	{ return first != last; }
+	void operator ++() const
+	{ ++first; }
 };
 
-/**
- * @brief Manipulator for @c ignore().
- * @param first An forward iterator.
- * @param last  An forward iterator.
- *
- * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
- */
-template<typename _ForwardIterator>
-__ignore_iterator_stream<_ForwardIterator, _ForwardIterator, false>
-ignore(_ForwardIterator first, _ForwardIterator last)
-{ return {first, last}; }
+template<typename _CharT>
+const _CharT __ignore_get_char(const _CharT* s)
+{ return *s; }
 
-/**
- * @brief Manipulator for @c laxignore().
- * @param first An forward iterator.
- * @param last  An forward iterator.
- *
- * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
- */
-template<typename _ForwardIterator>
-__ignore_iterator_stream<_ForwardIterator, _ForwardIterator, true>
-laxignore(_ForwardIterator first, _ForwardIterator last)
-{ return {first, last}; }
+template<typename _InputIterator>
+typename std::iterator_traits<_InputIterator>::value_type
+__ignore_get_char(const __ignore_range<_InputIterator>& r)
+{ return *r.first; }
 
-/**
- * @brief Manipulator for @c ignore().
- * @param first An forward iterator.
- * @param last  An forward iterator.
- *
- * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
- * The @a first iterator advance
- */
-template<typename _ForwardIterator>
-__ignore_iterator_stream<_ForwardIterator&, _ForwardIterator, false>
-advance_ignore(_ForwardIterator& first, _ForwardIterator last)
-{ return {first, last}; }
-
-/**
- * @brief Manipulator for @c laxignore().
- * @param first An forward iterator.
- * @param last  An forward iterator.
- *
- * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
- * The @a first iterator advance
- */
-template<typename _ForwardIterator>
-__ignore_iterator_stream<_ForwardIterator&, _ForwardIterator, true>
-advance_laxignore(_ForwardIterator first, _ForwardIterator last)
-{ return {first, last}; }
-
-template<typename _CharT, typename _Traits, typename _ForwardIterator, typename _ForwardIterator2, bool _Lax>
-std::basic_istream<_CharT, _Traits>& operator>>(std::basic_istream<_CharT, _Traits>& is, __ignore_iterator_stream<_ForwardIterator, _ForwardIterator2, _Lax> range)
-{ return __ignore<_Lax>(is, range.__first, range.__last); }
-
-
-template<bool _Lax, typename _CharT, typename _Traits>
-std::basic_istream<_CharT, _Traits>& __ignore(std::basic_istream<_CharT, _Traits>& is, const _CharT *& s)
+template<bool _Lax, typename _CharT, typename _Traits, typename _StringOrRange>
+std::basic_istream<_CharT, _Traits>& __ignore(std::basic_istream<_CharT, _Traits>& is, _StringOrRange s)
 {
 	typedef std::basic_istream<_CharT, _Traits> __istream_type;
 	typedef typename __istream_type::sentry __sentry;
@@ -306,7 +211,7 @@ std::basic_istream<_CharT, _Traits>& __ignore(std::basic_istream<_CharT, _Traits
 
 		std::ios_base::iostate __err = std::ios_base::goodbit;
 
-		while (*s && !_Traits::eq_int_type(__c, __eof) && _Traits::eq(_Traits::to_char_type(__c), *s))
+		while (*s && !_Traits::eq_int_type(__c, __eof) && _Traits::eq(_Traits::to_char_type(__c), __ignore_get_char<>(s)))
 		{
 			__c = __sb->snextc();
 			++s;
@@ -322,6 +227,88 @@ std::basic_istream<_CharT, _Traits>& __ignore(std::basic_istream<_CharT, _Traits
 	}
 	return is;
 }
+
+/**
+ * @brief Discarding characters in a sequence.
+ * @param first An input iterator.
+ * @param last  An input iterator.
+ *
+ * If the stream object have @c _Traits::eof() so @c std::badbit is set in the stream.
+ */
+template<typename _CharT, typename _Traits, typename _InputIterator>
+std::basic_istream<_CharT, _Traits>& ignore(std::basic_istream<_CharT, _Traits>& is, _InputIterator first, _InputIterator last)
+{ return __ignore<false>(is, __ignore_range<_InputIterator>{first, last}); }
+
+/**
+ * @brief Discarding characters in a sequence.
+ * @param first An input iterator.
+ * @param last  An input iterator.
+ */
+template<typename _CharT, typename _Traits, typename _InputIterator>
+std::basic_istream<_CharT, _Traits>& laxignore(std::basic_istream<_CharT, _Traits>& is, _InputIterator first, _InputIterator last)
+{ return __ignore<true>(is, __ignore_range<_InputIterator>{first, last}); }
+
+template<typename _InputIterator, typename _InputIterator2, bool _Lax>
+struct __ignore_iterator_stream
+{
+	_InputIterator __first;
+	_InputIterator2 __last;
+};
+
+/**
+ * @brief Manipulator for @c ignore().
+ * @param first An input iterator.
+ * @param last  An input iterator.
+ *
+ * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
+ */
+template<typename _InputIterator>
+__ignore_iterator_stream<_InputIterator, _InputIterator, false>
+ignore(_InputIterator first, _InputIterator last)
+{ return {first, last}; }
+
+/**
+ * @brief Manipulator for @c laxignore().
+ * @param first An input iterator.
+ * @param last  An input iterator.
+ *
+ * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
+ */
+template<typename _InputIterator>
+__ignore_iterator_stream<_InputIterator, _InputIterator, true>
+laxignore(_InputIterator first, _InputIterator last)
+{ return {first, last}; }
+
+/**
+ * @brief Manipulator for @c ignore().
+ * @param first An input iterator.
+ * @param last  An input iterator.
+ *
+ * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
+ * The @a first iterator advance
+ */
+template<typename _InputIterator>
+__ignore_iterator_stream<_InputIterator&, _InputIterator, false>
+advance_ignore(_InputIterator& first, _InputIterator last)
+{ return {first, last}; }
+
+/**
+ * @brief Manipulator for @c laxignore().
+ * @param first An input iterator.
+ * @param last  An input iterator.
+ *
+ * Sent to a stream object, this manipulator calls @c ignore(stream, @a first, @a last) for that object.
+ * The @a first iterator advance
+ */
+template<typename _InputIterator>
+__ignore_iterator_stream<_InputIterator&, _InputIterator, true>
+advance_laxignore(_InputIterator first, _InputIterator last)
+{ return {first, last}; }
+
+template<typename _CharT, typename _Traits, typename _InputIterator, typename _InputIterator2, bool _Lax>
+std::basic_istream<_CharT, _Traits>& operator>>(std::basic_istream<_CharT, _Traits>& is, __ignore_iterator_stream<_InputIterator, _InputIterator2, _Lax> range)
+{ return __ignore<_Lax>(is, __ignore_range<_InputIterator>{range.__first, range.__last}); }
+
 
 /**
  * @brief Discarding a string.

@@ -112,31 +112,25 @@ std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Trai
 	return join<>(os, wrapper._first, wrapper._last, wrapper._glue, wrapper._size);
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-template<typename _CharT = char, typename _ForwardIterator>
-#else
 template<typename _CharT, typename _ForwardIterator>
-#endif
 join_iterator_wrapper<_CharT, const _CharT*, _ForwardIterator> join(_ForwardIterator first, _ForwardIterator last, const _CharT* glue)
 {
 	return join_iterator_wrapper<_CharT, const _CharT*, _ForwardIterator>(first, last, glue);
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-template<typename _CharT = char, typename _ForwardIterator>
-#else
 template<typename _CharT, typename _ForwardIterator>
-#endif
-join_iterator_wrapper<_CharT, _CharT, _ForwardIterator> join(_ForwardIterator first, _ForwardIterator last, _CharT glue = ',')
+join_iterator_wrapper<_CharT, _CharT, _ForwardIterator> join(_ForwardIterator first, _ForwardIterator last, _CharT glue)
 {
 	return join_iterator_wrapper<_CharT, _CharT, _ForwardIterator>(first, last, glue);
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-template<typename _CharT = char, typename _ForwardIterator>
-#else
+template<typename _ForwardIterator>
+join_iterator_wrapper<char, char, _ForwardIterator> join(_ForwardIterator first, _ForwardIterator last)
+{
+	return join_iterator_wrapper<char, char, _ForwardIterator>(first, last, ',');
+}
+
 template<typename _CharT, typename _ForwardIterator>
-#endif
 join_iterator_wrapper<_CharT, const _CharT*, _ForwardIterator, true> join(_ForwardIterator first, _ForwardIterator last, const _CharT* glue, std::streamsize size)
 {
 	return join_iterator_wrapper<_CharT, const _CharT*, _ForwardIterator, true>(first, last, glue, size);
@@ -187,60 +181,20 @@ std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Trai
 	return join<>(os, begin(wrapper._container), end(wrapper._container), wrapper._glue, wrapper._size);
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-template<typename _CharT = char, typename _Container>
-#else
 template<typename _CharT, typename _Container>
-#endif
-join_wrapper<_CharT, const _CharT*, _Container> join(const _Container& container, const _CharT* glue)
+typename enable_if<!is_ostream<_Container>::value,
+	join_wrapper<_CharT, const _CharT*, _Container> >::type
+join(const _Container& container, const _CharT* glue)
 {
 	return join_wrapper<_CharT, const _CharT*, _Container>(container, glue);
 }
 
-template<typename _CharT, typename _Container, bool = is_ostream<_Container>::value>
-struct __dispatch_join
-{
-	typedef std::basic_ostream<
-		typename _Container::char_type,
-		typename _Container::traits_type
-	> __ostream_type;
-	typedef __ostream_type& __result_type;
-	static __result_type __join(_Container& os, const _CharT& cont)
-	{
-		return join(static_cast<__result_type>(os), cont);
-	}
-};
-
 template<typename _CharT, typename _Container>
-struct __dispatch_join<_CharT, _Container, false>
+typename enable_if<!is_ostream<_Container>::value,
+	join_wrapper<_CharT, _CharT, _Container> >::type
+join(const _Container& container, _CharT glue)
 {
-	typedef join_wrapper<_CharT, _CharT, _Container> __result_type;
-	static __result_type __join(const _Container& container, _CharT glue)
-	{
-		return __result_type(container, glue);
-	}
-};
-
-template<typename _CharT, std::size_t _N, typename _Container>
-struct __dispatch_join<_CharT[_N], _Container, false>
-{
-	typedef join_wrapper<_CharT, const _CharT*, _Container> __result_type;
-	static __result_type __join(const _Container& container,
-								const _CharT* glue)
-	{
-		return __result_type(container, glue);
-	}
-};
-
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-template<typename _CharT = char, typename _Container>
-#else
-template<typename _CharT, typename _Container>
-#endif
-typename __dispatch_join<_CharT, _Container>::__result_type
-join(_Container& container, const _CharT& glue = ',')
-{
-	return __dispatch_join<_CharT, _Container>::__join(container, glue);
+	return join_wrapper<_CharT, _CharT, _Container>(container, glue);
 }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -253,12 +207,15 @@ join_wrapper<_CharT, _CharT, _Container> join(const _Container& container)
 	return join_wrapper<_CharT, _CharT, _Container>(container, ',');
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-template<typename _CharT = char, typename _Container>
-#else
+template<typename _Container>
+join_wrapper<char, char, _Container> join(const _Container& container)
+{
+	return join_wrapper<char, char, _Container>(container, ',');
+}
+
 template<typename _CharT, typename _Container>
-#endif
-typename enable_if<!is_ostream<_Container>::value, join_wrapper<_CharT, const _CharT*, _Container, true>>::type
+typename enable_if<!is_ostream<_Container>::value,
+	join_wrapper<_CharT, const _CharT*, _Container, true> >::type
 join(const _Container& container, const _CharT* glue, std::streamsize size)
 {
 	return join_wrapper<_CharT, const _CharT*, _Container, true>(container, glue, size);
