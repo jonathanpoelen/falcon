@@ -1,6 +1,8 @@
 #ifndef TUPLE_DETAIL_TUPLEFWD_HPP
 #define TUPLE_DETAIL_TUPLEFWD_HPP
 
+#include <cstddef>
+
 namespace falcon
 {
 	template<typename>

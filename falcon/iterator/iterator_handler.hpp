@@ -196,7 +196,12 @@ public:
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 	explicit iterator_handler(iterator_type&& __x, int)
-	: _M_current(std::forward<iterator_type>(__x))
+	: _M_current(std::move(__x))
+	{}
+
+	template<typename... _Args>
+	explicit iterator_handler(const std::piecewise_construct_t&, _Args&&... __args)
+	: _M_current(std::forward<_Args>(__args)...)
 	{}
 #endif
 

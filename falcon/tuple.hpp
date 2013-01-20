@@ -3,6 +3,7 @@
 
 #include <tuple>
 #include <falcon/tuple/iostream.hpp>
+#include <falcon/tuple/optimal_tuple.hpp>
 #include <falcon/tuple/to_tuple_pointer.hpp>
 #include <falcon/tuple/to_tuple_reference.hpp>
 #include <falcon/tuple/tuple_applier.hpp>
@@ -10,7 +11,6 @@
 #include <falcon/tuple/tuple_compose.hpp>
 #include <falcon/tuple/tuple_for_each.hpp>
 #include <falcon/tuple/tuple_modifier.hpp>
-#include <falcon/tuple/tuple_pack.hpp>
 #include <falcon/tuple/tuple_transform.hpp>
 
 #endif

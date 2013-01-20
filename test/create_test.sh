@@ -7,7 +7,7 @@ cd `dirname $0`
 
 if [ $# = 2 ];then
 	d=${1%%\/}
-	shift 1add_subdirectory
+	shift 1
 	defbase=$d'_'
 	cmakelist=$d/CMakeLists.txt
 	mmain=FALCON_TEST_TO_MAIN

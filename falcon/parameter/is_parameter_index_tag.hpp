@@ -51,6 +51,17 @@ struct is_parameter_index_tag<specified_parameter_index_tag<_Indexes>>
 : true_type
 {};
 
+
+template<typename _Indexes>
+struct is_parameter_index_or_tag
+: is_parameter_index_tag<_Indexes>
+{};
+
+template<std::size_t... _Indexes>
+struct is_parameter_index_or_tag<parameter_index<_Indexes...>>
+: true_type
+{};
+
 }
 
 #endif

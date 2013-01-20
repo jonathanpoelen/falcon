@@ -16,16 +16,16 @@ namespace falcon {
  *
  * @{
  */
-template<std::size_t _Keep>
+template<std::size_t _Keep = 1>
 struct first_parameter_index_tag {};
 
-template<std::size_t _Keep>
+template<std::size_t _Keep = 1>
 struct last_parameter_index_tag {};
 
-template<std::size_t _Start, std::size_t _Len>
+template<std::size_t _Start, std::size_t _Len = 1>
 struct range_parameter_index_tag {};
 
-template<std::size_t _Start, std::size_t _Len>
+template<std::size_t _Start, std::size_t _Len = 1>
 struct ignore_parameter_index_tag {};
 
 template<std::size_t _Start, std::size_t _Len = -1>

@@ -149,20 +149,6 @@ private:
 
 	typedef late_maker<std::tuple> late_tupe;
 
-	template<typename _ToTuple, typename _Tuple, bool>
-	struct __delegate_to_tuple
-	{
-		static _ToTuple __impl(_Tuple& t)
-		{ return _ToTuple(t); }
-	};
-
-	template<typename _ToTuple, typename _Tuple>
-	struct __delegate_to_tuple<_ToTuple, _Tuple, false>
-	{
-		static _ToTuple __impl(_Tuple& t)
-		{ return _ToTuple(to_tuple_reference(t)); }
-	};
-
 	template<typename _Maker, typename _Functor, typename _Pack = __parameter_pack, typename _Tuple = tuple_type>
 	struct __delegate
 	{
@@ -173,12 +159,10 @@ private:
 			>::type
 		>::type __tuple;
 
-		typedef __delegate_to_tuple<__tuple, _Tuple, std::is_same<late_tupe, _Maker>::value> __to_tuple;
-
 		template<typename _TupleParameter>
 		CPP0X_DELEGATE_FUNCTION(
 			static __impl(_Tuple& t, _TupleParameter parameters),
-			tuple_compose<>(_Maker(), __to_tuple::__impl(t), parameters)
+			tuple_compose<>(_Maker(), __tuple(to_tuple_reference(t)), parameters)
 		)
 	};
 
@@ -196,7 +180,7 @@ private:
 	template<typename _Function, typename _TupleParameter, typename _Maker = late_tupe>
 	CPP0X_DELEGATE_FUNCTION(
 		__call(_TupleParameter parameters, _Maker = _Maker()) const,
-		__delegate<_Maker, _Function>::__impl(this->tuple(), parameters)
+		__const_delegate<_Maker, _Function>::__impl(this->tuple(), parameters)
 	)
 
 public:
