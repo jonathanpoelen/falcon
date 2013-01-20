@@ -1,36 +1,33 @@
 #ifndef FALCON_DELETE_ALL_HPP
 #define FALCON_DELETE_ALL_HPP
 
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
-#include <boost/type_traits/remove_pointer.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-#endif
-#include <falcon/algorithm/algorithm.hpp>
+#include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(remove_pointer)
+#include FALCON_BOOST_OR_STD_TRAITS(remove_reference)
 #include <falcon/memory/destroy.hpp>
-#include <falcon/type_traits/subtype.hpp>
-#include <falcon/detail/dep_nspace.hpp>
+#include <falcon/container/range_access.hpp>
 
 namespace falcon
 {
 
 template<
 	typename _Container,
-	typename _T = typename _FALCON_DEP_NSPACE(remove_pointer)<
-		typename _FALCON_DEP_NSPACE(remove_reference)<
+	typename _T = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_pointer<
+		typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<
 			typename range_access_subtype<_Container>::type
 		>::type
 	>::type
 >
 inline void delete_all(_Container& container)
 {
-	algorithm::for_each<>(container, default_delete_wrapper<_T>());
+	std::for_each<>(begin(container), end(container), default_delete_wrapper<_T>());
 }
 
 template<
 	typename _ForwardIterator,
-	typename _T = typename _FALCON_DEP_NSPACE(remove_pointer)<
-		typename _FALCON_DEP_NSPACE(remove_reference)<
-			typename subtype<_ForwardIterator>::type
+	typename _T = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_pointer<
+		typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<
+			typename std::iterator_traits<_ForwardIterator>::value_type
 		>::type
 	>::type
 >

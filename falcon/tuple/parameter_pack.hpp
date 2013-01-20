@@ -42,15 +42,22 @@ public:
 
 template<typename _T>
 struct tuple_to_parameter_pack
-: tuple_to_parameter_pack_with_parameter_index<
-	_T,
-	typename build_parameter_index<std::tuple_size<_T>::value>::type
->{};
+{
+	typedef typename tuple_to_parameter_pack_with_parameter_index<
+		_T,
+		typename build_parameter_index<std::tuple_size<_T>::value>::type
+	>::type type;
+};
 
 template<typename _Pack>
 struct parameter_pack_to_tuple
-: build_class<std::tuple, _Pack>
-{};
+{ typedef typename build_class<std::tuple, _Pack>::type type; };
+
+template <typename _Tuple, typename _Indexes>
+struct tuple_pack_element
+: parameter_pack_to_tuple<
+	typename tuple_to_parameter_pack_with_parameter_index<_Tuple, _Indexes>::type
+>{};
 
 }
 

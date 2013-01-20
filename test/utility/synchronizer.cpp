@@ -24,10 +24,19 @@ void synchronizer_test()
 	{
 		const char * s = "plop";
 		auto sync = falcon::make_synchronizer<>(s, s+1);
-		CHECK_EQUAL_VALUE(sync[0],		std::make_tuple('p', 'l'));
-		CHECK_EQUAL_VALUE(*sync,		std::make_tuple('p', 'l'));
-		CHECK_EQUAL_VALUE((sync+=1)[0],	std::make_tuple('l', 'o'));
-		CHECK_EQUAL_VALUE(sync + 1,		std::make_tuple(s+2, s+3));
+		CHECK_EQUAL_VALUE(sync[0],      std::make_tuple('p', 'l'));
+		CHECK_EQUAL_VALUE(*sync,        std::make_tuple('p', 'l'));
+		CHECK_EQUAL_VALUE((sync+=1)[0], std::make_tuple('l', 'o'));
+		CHECK_EQUAL_VALUE(sync + 1,     std::make_tuple(s+2, s+3));
+	}
+
+	{
+		char s[] = {'p','l','o','p','\0'};
+		auto sync = falcon::make_synchronizer<>(s, s+1);
+		CHECK_EQUAL_VALUE(sync[0],      std::make_tuple('p', 'l'));
+		CHECK_EQUAL_VALUE(*sync,        std::make_tuple('p', 'l'));
+		CHECK_EQUAL_VALUE((sync+=1)[0], std::make_tuple('l', 'o'));
+		CHECK_EQUAL_VALUE(sync + 1,     std::make_tuple(s+2, s+3));
 	}
 
 	{

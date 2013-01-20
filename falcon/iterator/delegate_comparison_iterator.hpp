@@ -1,103 +1,132 @@
 #ifndef _FALCON_ITERATOR_DELEGATE_COMPARISON_ITERATOR_HPP
 #define _FALCON_ITERATOR_DELEGATE_COMPARISON_ITERATOR_HPP
 
-#include <falcon/iterator/detail/handler_iterator.hpp>
+#include <falcon/iterator/iterator_handler.hpp>
 
 namespace falcon {
 namespace iterator {
 
-///TODO voir la seconde note sur delegate_comparison_iterator dans le fichier TODO
-
-template <typename _Iterator, typename _ComparisonIterator>
+template <typename _Iterator, typename _ComparisonIterator,
+	typename _Tp = use_default,
+	typename _Category = use_default,
+	typename _Reference = use_default,
+	typename _Distance = use_default,
+	typename _Pointer = use_default
+>
 class delegate_comparison_iterator;
 
-template<typename _Iterator, typename _ComparisonIterator>
-struct __delegate_comparison_iterator_traits
-: detail::handler_iterator_traits<
-	delegate_comparison_iterator<_Iterator, _ComparisonIterator>
+namespace detail {
+
+	template <typename _Iterator, typename _ComparisonIterator, typename _Tp,
+		typename _Category, typename _Reference, typename _Distance, typename _Pointer>
+	struct delegate_comparison_base
+	{
+		typedef typename iterator_handler_types<
+			delegate_comparison_iterator<_Iterator, _ComparisonIterator,
+				_Tp, _Category, _Reference, _Distance, _Pointer>,
+			_Iterator,
+			_Category,
+			_Tp,
+			_Distance,
+			_Pointer,
+			_Reference
+		>::base base;
+	};
+
+}
+
+template <typename _Iterator, typename _ComparisonIterator,
+	typename _Tp,
+	typename _Category,
+	typename _Reference,
+	typename _Distance,
+	typename _Pointer
 >
-{
-	typedef delegate_comparison_iterator<_Iterator, _ComparisonIterator> __iterator;
-
-	static bool eq(const __iterator& a, const __iterator& b)
-	{ return a.comparison_iterator() == b.comparison_iterator(); }
-
-	static bool lt(const __iterator& a, const __iterator& b)
-	{ return a.comparison_iterator() < b.comparison_iterator(); }
-
-	static void next(__iterator& it)
-	{ ++it._M_current; ++it.comparison_iterator(); }
-
-	static void next(__iterator& it, int n)
-	{ it._M_current += n; it.comparison_iterator() += n; }
-
-	static __iterator next(const __iterator& it, int n, int)
-	{ return __iterator(it._M_current + n, it.comparison_iterator() + n); }
-
-	static void prev(__iterator& it)
-	{ --it._M_current; --it.comparison_iterator(); }
-
-	static void prev(__iterator& it, int n)
-	{ it._M_current -= n; it.comparison_iterator() -= n; }
-
-	static __iterator prev(const __iterator& it, int n, int)
-	{ return __iterator(it._M_current - n, it.comparison_iterator() - n); }
-};
-
-
-template <typename _Iterator, typename _ComparisonIterator>
 class delegate_comparison_iterator
-: public detail::handler_iterator<
-	delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
-	_Iterator,
-	__delegate_comparison_iterator_traits<_Iterator, _ComparisonIterator>
->
+: public detail::delegate_comparison_base<_Iterator, _ComparisonIterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base
 {
-	typedef detail::handler_iterator<
-		delegate_comparison_iterator<_Iterator, _ComparisonIterator>,
-		_Iterator,
-		__delegate_comparison_iterator_traits<_Iterator, _ComparisonIterator>
-	> __base;
+	friend class iterator_core_access;
 
-	_ComparisonIterator _comparison_iterator;
+	typedef typename detail::delegate_comparison_base<_Iterator, _ComparisonIterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
+
+	_ComparisonIterator _cmp_iterator;
 
 public:
 	typedef typename __base::iterator_type iterator_type;
-	typedef _ComparisonIterator comparison_iterator_type;
+	typedef typename __base::difference_type difference_type;
+
+	typedef _ComparisonIterator comparison_iterator;
 
 public:
 	delegate_comparison_iterator()
 	: __base()
-	, _comparison_iterator()
+	, _cmp_iterator()
 	{}
 
-	explicit delegate_comparison_iterator(comparison_iterator_type __comparison_iterator)
+	explicit delegate_comparison_iterator(comparison_iterator __cmp_iterator)
 	: __base()
-	, _comparison_iterator(__comparison_iterator)
+	, _cmp_iterator(__cmp_iterator)
 	{}
 
-	explicit delegate_comparison_iterator(iterator_type __x, const comparison_iterator_type& __comparison_iterator)
+	delegate_comparison_iterator(iterator_type __x, comparison_iterator __cmp_iterator)
 	: __base(__x)
-	, _comparison_iterator(__comparison_iterator)
+	, _cmp_iterator(__cmp_iterator)
 	{}
 
 	delegate_comparison_iterator(const delegate_comparison_iterator& __x)
-	: __base(__x._M_current)
-	, _comparison_iterator(__x._comparison_iterator)
+	: __base(__x)
+	, _cmp_iterator(__x._cmp_iterator)
 	{}
 
 	using __base::operator=;
 
-	const comparison_iterator_type& comparison_iterator() const
-	{ return _comparison_iterator; }
+	const _ComparisonIterator& compare_with() const
+	{ return _cmp_iterator; }
 
-	comparison_iterator_type& comparison_iterator()
-	{ return _comparison_iterator; }
+	_ComparisonIterator& compare_with()
+	{ return _cmp_iterator; }
+
+private:
+	void increment()
+	{
+		++this->base_reference();
+		++_cmp_iterator;
+	}
+
+	void decrement()
+	{
+		--this->base_reference();
+		--_cmp_iterator;
+	}
+
+	void advance(difference_type n)
+	{
+		this->base_reference() += n;
+		_cmp_iterator += n;
+	}
+
+	void recoil(difference_type n)
+	{
+		this->base_reference() -= n;
+		_cmp_iterator -= n;
+	}
+
+	bool equal(const delegate_comparison_iterator& x) const
+	{ return _cmp_iterator == x._cmp_iterator; }
+
+	bool less(const delegate_comparison_iterator& x) const
+	{ return _cmp_iterator < x._cmp_iterator; }
 };
 
 template <typename _Iterator, typename _ComparisonIterator>
-iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator> make_delegate_comparison_iterator(_Iterator x, const _ComparisonIterator& compare)
-{ return iterator::delegate_comparison_iterator<_Iterator, _ComparisonIterator>(x, compare); }
+delegate_comparison_iterator<_Iterator, _ComparisonIterator>
+make_delegate_comparison_iterator(_Iterator x, _ComparisonIterator cmp_x)
+{ return delegate_comparison_iterator<_Iterator, _ComparisonIterator>(x, cmp_x); }
+
+template <typename _Iterator>
+delegate_comparison_iterator<_Iterator, _Iterator>
+make_delegate_comparison_iterator(_Iterator x)
+{ return delegate_comparison_iterator<_Iterator, _Iterator>(x); }
 
 }}
 
