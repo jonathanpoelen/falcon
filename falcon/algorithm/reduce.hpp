@@ -1,13 +1,8 @@
 #ifndef _FALCON_ALGORITHM_REDUCE_HPP
 #define _FALCON_ALGORITHM_REDUCE_HPP
 
-#include <falcon/container/range_access.hpp>
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-# include <type_traits>
-#else
-# include <boost/type_traits/remove_reference.hpp>
-#endif
-#include <falcon/detail/dep_nspace.hpp>
+#include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(remove_reference)
 
 namespace falcon {
 namespace algorithm {
@@ -23,7 +18,7 @@ _Result reduce(_ForwardIterator first, _ForwardIterator last, _Reducer reducer)
 	return r;
 }
 
-template<typename _Container, typename _Reducer, typename _Result = typename _FALCON_DEP_NSPACE(remove_reference)<typename range_access_subtype<_Container>::type>::type>
+template<typename _Container, typename _Reducer, typename _Result = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<typename range_access_subtype<_Container>::type>::type>
 inline _Result reduce(const _Container& container, _Reducer reducer)
 {
 	return reduce<>(begin(container), end(container), reducer);
