@@ -1,99 +1,99 @@
 #ifndef _FALCON_JAVA_ITERATOR_COUNTING_ITERATOR_HPP
 #define _FALCON_JAVA_ITERATOR_COUNTING_ITERATOR_HPP
 
-#include <falcon/c++/cast.hpp>
-#include <falcon/java_iterator/partial_java_iterator.hpp>
-#include <falcon/type_traits/is_java_iterator.hpp>
-#include <falcon/container/range_access.hpp>
+#include <falcon/java_iterator/java_iterator_handler.hpp>
 
 namespace falcon {
 
 namespace java_iterator {
 
-template <typename _Iterator>
+template <typename _Iterator,
+	typename _Value = use_default,
+	typename _Reference = use_default>
+class counting_iterator;
+
+namespace detail {
+	template <typename _Iterator,
+		typename _Value = use_default,
+		typename _Reference = use_default>
+	struct counting_base
+	{
+		typedef typename java_iterator_handler_types<
+			counting_iterator<_Iterator, _Value, _Reference>,
+			_Iterator,
+			use_default,
+			_Value,
+			_Reference
+		>::base base;
+	};
+}
+
+template <typename _Iterator, typename _Value, typename _Reference>
 class counting_iterator
-	: partial_java_iterator<_Iterator>
+: public detail::counting_base<_Iterator, _Value, _Reference>::base
 {
-	typedef counting_iterator<_Iterator> self_type;
-	typedef partial_java_iterator<_Iterator> base_type;
+	friend class java_iterator_core_access;
+
+	typedef typename detail::counting_base<_Iterator, _Value, _Reference>::base __base;
 
 public:
 	typedef _Iterator iterator;
-	typedef typename base_type::value_type value_type;
-	typedef typename base_type::pointer pointer;
-	typedef typename base_type::reference reference;
 
 private:
 	int _n;
 
 public:
-	counting_iterator(const iterator& begin, int n)
-		: base_type(begin)
-		, _n(n)
+	counting_iterator(iterator begin, int n)
+	: __base(begin)
+	, _n(n)
 	{}
 
-	counting_iterator(const self_type& other)
-		: base_type(other._it)
-		, _n(other._n)
+	counting_iterator(const counting_iterator& other)
+	: __base(other.base_reference())
+	, _n(other._n)
 	{}
 
-	self_type& operator=(const iterator& it)
+	counting_iterator& operator=(const counting_iterator& x)
 	{
-		base_type::operator=(it);
+		__base::operator=(x);
+		_n = x._n;
 		return *this;
 	}
 
-	int& count()
+	counting_iterator& operator=(const iterator& x)
 	{
-		return _n;
+		__base::operator=(x);
+		return *this;
 	}
 
-	const int& count() const
-	{
-		return _n;
-	}
+	void count(int n)
+	{ _n = n; }
+
+	int count() const
+	{ return _n; }
 
 	bool valid() const
+	{ return _n; }
+
+private:
+	void advance()
 	{
-		return _n;
+		--_n;
+		__base::advance();
 	}
 
-	reference next()
+	void recoil()
 	{
-		reference r = *base_type::_it;
-		++*this;
-		return r;
+		++_n;
+		__base::recoil();
 	}
-	reference prev()
-	{
-		reference r = *base_type::_it;
-		--*this;
-		return r;
-	}
-
-	FALCON_MEMBER_INCREMENT(self_type, --_n; ++base_type::_it)
-	FALCON_MEMBER_DECREMENT(self_type, ++_n; --base_type::_it)
-
-	CPP_EXPLICIT_BOOL_CAST(valid())
 };
 
-template <typename _Container, typename _Iterator = typename _Container::iterator>
-counting_iterator<_Iterator> make_counting_iterator(_Container& c, int n) {
-	return counting_iterator<_Iterator>(begin(c), n);
-}
-
 template <typename _Iterator>
-counting_iterator<_Iterator> make_counting_iterator(const _Iterator& it, int n) {
-	return counting_iterator<_Iterator>(it, n);
-}
+counting_iterator<_Iterator> make_counting_iterator(_Iterator x, int n)
+{ return counting_iterator<_Iterator>(x, n); }
 
 }
-
-template <typename _Iterator>
-struct is_java_iterator<java_iterator::counting_iterator<_Iterator> >
-		: true_type
-	{};
-
 }
 
 #endif

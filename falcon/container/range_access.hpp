@@ -4,6 +4,8 @@
 #include <iterator>
 #include <falcon/type_traits/declval.hpp>
 
+/// @defgroup sequences Sequences
+
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 
 namespace falcon {
@@ -179,14 +181,12 @@ namespace falcon {
 
 namespace falcon {
 
-	template <typename _T>
+	template <typename _Container>
 	struct range_access_subtype
 	{
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-		typedef decltype(*begin(declval<_T&>())) type;
-#else
-		typedef typename std::iterator_traits<typename range_access_iterator<_T>::type>::value_type type;
-#endif
+		typedef typename std::iterator_traits<
+			typename range_access_iterator<_Container>::type
+		>::value_type type;
 	};
 
 }
