@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <falcon/container/range_access.hpp>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/c++/noexcept.hpp>
 
 namespace falcon {
 
@@ -56,33 +55,33 @@ public:
 	, _M_last(other._M_last)
 	{}
 
-	range_container& operator=(const range_container& other) CPP_NOEXCEPT
+	range_container& operator=(const range_container& other)
 	{
 		_M_first = other._M_first;
 		_M_last = other._M_last;
 	}
 
-	void begin(pointer first) CPP_NOEXCEPT
+	void begin(pointer first)
 	{ _M_first = first; }
 
-	void end(pointer last) CPP_NOEXCEPT
+	void end(pointer last)
 	{ _M_last = last; }
 
 	// Iterators.
-	iterator begin() const CPP_NOEXCEPT
+	iterator begin() const
 	{ return _M_first; }
 
-	iterator end() const CPP_NOEXCEPT
+	iterator end() const
 	{ return _M_last; }
 
 	// Capacity.
-	CPP_CONSTEXPR size_type size() const CPP_NOEXCEPT
+	CPP_CONSTEXPR size_type size() const
 	{ return _M_last - _M_first; }
 
-	CPP_CONSTEXPR size_type max_size() const CPP_NOEXCEPT
+	CPP_CONSTEXPR size_type max_size() const
 	{ return size(); }
 
-	CPP_CONSTEXPR bool empty() const CPP_NOEXCEPT
+	CPP_CONSTEXPR bool empty() const
 	{ return _M_first == _M_last; }
 
 	// Element access.
@@ -103,7 +102,7 @@ public:
 	reference back() const
 	{ return empty() ? *_M_last : *(_M_last - 1); }
 
-	void swap(range_container& other) CPP_NOEXCEPT
+	void swap(range_container& other)
 	{
 		std::swap<>(_M_first, other._M_first);
 		std::swap<>(_M_last, other._M_last);
