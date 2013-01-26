@@ -7,7 +7,7 @@ void stepping_iterator_test()
 {
 	std::vector<int> c = {0,1,2,3,4};
 
-	auto it = falcon::java_iterator::make_stepping_iterator<>(2, c);
+	auto it = falcon::java_iterator::make_stepping_iterator<>(c, 2);
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE(0, it.next());
 	CHECK_EQUAL_VALUE(true, it.valid());

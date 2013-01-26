@@ -1,13 +1,13 @@
 #include <vector>
 #include <test/test.hpp>
-#include <falcon/java_iterator/range_iterator.hpp>
-#include "range_iterator.hpp"
+#include <falcon/java_iterator/java_iterator.hpp>
+#include "java_iterator.hpp"
 
-void range_iterator_test()
+void java_iterator_test()
 {
 	std::vector<int> c = {0,1,2,3,4};
 
-	auto it = falcon::java_iterator::make_range_iterator<>(c);
+	auto it = falcon::java_iterator::make_java_iterator<>(c);
 	//auto it = falcon::make_java_iterator<>(c.begin(), c.end());
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE(0, it.next());
@@ -20,7 +20,7 @@ void range_iterator_test()
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE(4, it.next());
 	CHECK_EQUAL_VALUE(false, it.valid());
-	it = c.end();
+	it.begin(c.end());
 	it.prev();
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE(4, it.prev());
@@ -33,4 +33,4 @@ void range_iterator_test()
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE(0, it.prev());
 }
-FALCON_TEST_TO_MAIN(range_iterator_test)
+FALCON_TEST_TO_MAIN(java_iterator_test)

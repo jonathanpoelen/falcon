@@ -14,22 +14,20 @@ namespace iterator {
 template <typename _Iterator>
 struct __proxy_indirect_iterator
 {
-	typedef typename std::iterator_traits<_Iterator>::value_type __value_type;
+	typedef typename std::iterator_traits<_Iterator>::value_type argument_type;
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	typedef decltype(**std::declval<_Iterator&>()) __result_type;
+	typedef decltype(**std::declval<_Iterator&>()) result_type;
 #else
-	typedef typename boost::remove_pointer<__value_type>::type& __result_type;
+	typedef typename boost::remove_pointer<argument_type>::type& result_type;
 #endif
 
-	__result_type operator()(__value_type& x) const
+	result_type operator()(argument_type& x) const
 	{ return *x; }
 };
 
-template <typename _Iterator, typename _Proxy = __proxy_indirect_iterator<_Iterator>,
-	typename _Tp = use_default,
-	typename _Category = use_default,
-	typename _Reference = use_default,
-	typename _Distance = use_default,
+template <typename _Iterator, typename _Proxy = use_default,
+	typename _Tp = use_default, typename _Category = use_default,
+	typename _Reference = use_default, typename _Distance = use_default,
 	typename _Pointer = use_default
 >
 class indirect_iterator;
@@ -40,16 +38,21 @@ namespace detail {
 		typename _Category, typename _Reference, typename _Distance, typename _Pointer>
 	struct indirect_base
 	{
+		typedef typename default_or_type<
+			use<__proxy_indirect_iterator<_Iterator> >,
+			_Proxy
+		>::type __proxy;
+
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 		struct __result_type{
 			typedef typename std::result_of<
-				_Proxy(decltype(*std::declval<_Iterator&>()))
+				__proxy(decltype(*std::declval<_Iterator&>()))
 			>::type type;
 		};
 		typedef typename default_or_type<__result_type, _Reference>::type reference;
 		typedef typename default_or_type<std::remove_reference<reference>, _Tp>::type value_type;
 #else
-		typedef typename default_or_type<use_result_type<_Proxy>, _Tp>::type value_type;
+		typedef typename default_or_type<use_result_type<__proxy>, _Tp>::type value_type;
 		typedef typename default_or_type<use<value_type&>, _Reference>::type reference;
 #endif
 
@@ -79,16 +82,18 @@ class indirect_iterator
 {
 	friend class iterator_core_access;
 
-	typedef typename detail::indirect_base<_Iterator, _Proxy, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
-
-	_Proxy _proxy;
+	typedef detail::indirect_base<_Iterator, _Proxy, _Tp, _Category, _Reference, _Distance, _Pointer> __detail;
+	typedef typename __detail::base __base;
 
 public:
 	typedef typename __base::iterator_type iterator_type;
 	typedef typename __base::difference_type difference_type;
 	typedef typename __base::reference reference;
 
-	typedef _Proxy proxy_type;
+	typedef typename __detail::__proxy  proxy_type;
+
+private:
+	proxy_type _proxy;
 
 public:
 	indirect_iterator()
@@ -112,6 +117,16 @@ public:
 	{}
 
 	using __base::operator=;
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	indirect_iterator& operator=(const indirect_iterator&) = default;
+#else
+	indirect_iterator& operator=(const indirect_iterator& other)
+	{
+		this->base_reference() = other.base_reference();
+		_proxy = other._proxy;
+		return *this;
+	}
+#endif
 
 	const _Proxy& proxy() const
 	{ return _proxy; }

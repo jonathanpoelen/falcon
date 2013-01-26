@@ -197,7 +197,7 @@ public:
 	basic_cstring& assign(pointer s)
 	{
 		m_begin = s ? s : 0;
-		m_end = s ? traits_type::length(s) : 0;
+		m_end = s ? s + traits_type::length(s) : 0;
 		return *this;
 	}
 

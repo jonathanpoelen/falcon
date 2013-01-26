@@ -4,7 +4,10 @@
 #include <iterator>
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # include <utility>
+#else
+# include <boost/type_traits/add_pointer.hpp>
 #endif
+#include <falcon/c++/boost_or_std.hpp>
 #include <falcon/type_traits/is_same.hpp>
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>
@@ -221,9 +224,17 @@ public:
 	explicit iterator_handler(_U&& __x)
 	: _M_current(std::forward<_U>(__x))
 	{}
+
+	iterator_handler& operator=(const iterator_handler& ) = default;
+#else
+	iterator_handler& operator=(const iterator_type& other) = default
+	{
+		_M_current = other._M_current;
+		return *this;
+	}
 #endif
 
-	iterator_handler& operator=(iterator_type __x)
+	iterator_handler& operator=(const iterator_type& __x)
 	{
 		_M_current = __x;
 		return *this;
@@ -348,7 +359,7 @@ struct iterator_handler_types
 		eval_if_c<
 			is_default<_Tp>,
 			use_pointer<__iterator_traits>,
-			use<value_type*>
+			FALCON_BOOST_OR_STD_NAMESPACE::add_pointer<value_type>
 		>,
 		use<_Pointer>
 	>::type pointer;

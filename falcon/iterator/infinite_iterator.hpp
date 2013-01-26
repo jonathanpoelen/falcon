@@ -83,6 +83,17 @@ public:
 	{}
 
 	using __base::operator=;
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	infinite_iterator& operator=(const infinite_iterator&) = default;
+#else
+	infinite_iterator& operator=(const infinite_iterator& other)
+	{
+		this->base_reference() = other.base_reference();
+		_first = other._first;
+		_last = other._last;
+		return *this;
+	}
+#endif
 
 private:
 	void increment()
@@ -98,19 +109,29 @@ private:
 		--this->base_reference();
 	}
 
-	void advance(difference_type n, std::random_access_iterator_tag)
-	{ infinite<_Iterator&>(_first, this->base_reference(), _last) += n; }
-
 	void difference(infinite_iterator);
 
 	void advance(difference_type n)
-	{ advance(n, iterator_category()); }
-
-	void recoil(difference_type n, std::random_access_iterator_tag)
-	{ infinite<_Iterator&>(_first, this->base_reference(), _last) -= n; }
+	{
+		if (n < 0)
+			recoil(-n);
+		difference_type diff = _last - this->base_reference();
+		if (diff < n)
+			this->base_reference() = _first + (n - diff) % (_last - _first);
+		else
+			this->base_reference() += n;
+	}
 
 	void recoil(difference_type n)
-	{ recoil(n, iterator_category()); }
+	{
+		if (n < 0)
+			advance(-n);
+		difference_type diff = this->base_reference() - _first;
+		if (diff < n)
+			this->base_reference() = _last - (n - diff) % (_last - _first);
+		else
+			this->base_reference() -= n;
+	}
 
 	bool equal(const infinite_iterator&) const
 	{ return false; }

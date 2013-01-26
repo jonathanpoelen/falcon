@@ -175,7 +175,7 @@ compose1(FALCON_RVALUE(_Operation1) __fn1,
  * @{
  */
 #ifndef __GXX_EXPERIMENTAL_CXX0X__
-template <class _Operation1, class _Operation2, class _Operation3>
+template <class _Operation1, class _Operation2, class _Operation3 = _Operation2>
 struct binary_compose
 : public std::unary_function<
 	typename _Operation2::argument_type,
@@ -207,7 +207,7 @@ public:
 
 #else
 
-template <class _Operation1, class _Operation2, class _Operation3,
+template <class _Operation1, class _Operation2, class _Operation3 = _Operation2,
 bool = __compose_check_type<_Operation2, _Operation1>::value>
 struct binary_compose
 : public std::unary_function<
@@ -279,7 +279,7 @@ public:
 
 #endif
 
-template <class _Operation1, class _Operation2, class _Operation3>
+template <class _Operation1, class _Operation2, class _Operation3 = _Operation2>
 inline binary_compose<_Operation1, _Operation2, _Operation3>
 compose2(FALCON_RVALUE(_Operation1) __fn1,
 		 FALCON_RVALUE(_Operation2) __fn2,
@@ -289,6 +289,16 @@ compose2(FALCON_RVALUE(_Operation1) __fn1,
 		FALCON_FORWARD(_Operation1, __fn1),
 		FALCON_FORWARD(_Operation2, __fn2),
 		FALCON_FORWARD(_Operation3, __fn3)
+	);
+}
+
+template <class _Operation1, class _Operation2>
+inline binary_compose<_Operation1, _Operation2, _Operation2>
+compose2(FALCON_RVALUE(_Operation1) __fn1, FALCON_RVALUE(_Operation2) __fn2)
+{
+	return binary_compose<_Operation1, _Operation2, _Operation2>(
+		FALCON_FORWARD(_Operation1, __fn1),
+		FALCON_FORWARD(_Operation2, __fn2)
 	);
 }
 

@@ -84,6 +84,8 @@ public:
 	{}
 #endif
 
+	using __base::operator=;
+
 private:
 	reference dereference()
 	{ return this->base_reference(); }

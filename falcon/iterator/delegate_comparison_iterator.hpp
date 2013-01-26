@@ -79,6 +79,16 @@ public:
 	{}
 
 	using __base::operator=;
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	delegate_comparison_iterator& operator=(const delegate_comparison_iterator&) = default;
+#else
+	delegate_comparison_iterator& operator=(const delegate_comparison_iterator& other)
+	{
+		this->base_reference() = other.base_reference();
+		_cmp_iterator = other._cmp_iterator;
+		return *this;
+	}
+#endif
 
 	const _ComparisonIterator& compare_with() const
 	{ return _cmp_iterator; }

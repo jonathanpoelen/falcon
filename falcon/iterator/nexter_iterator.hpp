@@ -68,6 +68,16 @@ public:
 	{}
 
 	using __base::operator=;
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	nexter_iterator& operator=(const nexter_iterator&) = default;
+#else
+	nexter_iterator& operator=(const nexter_iterator& other)
+	{
+		this->base_reference() = other.base_reference();
+		_nexter = other._nexter;
+		return *this;
+	}
+#endif
 
 	const nexter_type& nexter() const
 	{ return _nexter; }

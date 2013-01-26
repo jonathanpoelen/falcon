@@ -25,7 +25,7 @@ int main()
 	number2 >>= 8;
 	std::cout << number2 << std::endl;
 	number2 >>= 16;
-	std::cout << number2 << std::endl;*/
+	std::cout << number2 << std::endl;
 
 
 	// 	std::cout << number.not_remove_unused_zero() << std::endl;

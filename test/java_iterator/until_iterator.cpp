@@ -6,7 +6,7 @@ void until_iterator_test()
 {
 	const char * cstr = "plop\n";
 
-	auto it = falcon::java_iterator::make_until_iterator<>(cstr, '\n');
+	auto it = falcon::java_iterator::make_until_iterator<>(&cstr[0], '\n');
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE('p', it.next());
 	CHECK_EQUAL_VALUE(true, it.valid());

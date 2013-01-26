@@ -21,7 +21,7 @@ iota(begin(), end(), first_value): le faire avec iota(container, first_value)
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
 flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
 
-optimiser recursive_iterator (et l'algo de recurtion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
+optimiser recursive_iterator (et l'algo de recursion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
 
 faire un algorithmfwd.hpp pour bien nommer les champs
 
@@ -54,8 +54,6 @@ basic_string_repetition<_String>{_String, size_t} ? (os << string_repetition('a'
 ostream::repetition(_Obj, size_t) et ostream::repetition(_Obj, size_t, _CharT separator) ; avec _CharT = _Obj::char_type. Idem pour les ostream
 
 si on active les exceptions des flux, comment ce comporte les fonctions lié (ignore, ignore_all, etc) ? Le state est bien setter à badbit et non égal à good.
-
-un foncteur qui permet de répartir les valeurs de plusieurs iterateurs. foreah(first, last, ???(it1, it2, it3)) -> ???::f(*it, *it1, *it2, *it3); ++it1,++it2,++it3.
 
 ajouter les typedef result_type, argument_type, first_argument_type et second_argument_type -quand possible- dans les classes de operators.hpp. Faire un not1 et not2 comme la std.
 
@@ -101,12 +99,12 @@ une sorte de unary_compose mais sans arguments -> f(g()). (ancien delegate_resul
 enlever les doubles underscore car reservé. Idem pour les underscores suivit de majuscule dans l'espace globale.
 
 Vérifier les types tag dans les iterateurs.
-Ajouter dans les iterators les fonctions pour acceder au fonctor lorsque ceux-ci en utilisent (fn() ?).
+Ajouter dans les iterators les fonctions pour acceder aux fonctorx lorsque ceux-ci en utilisent (fn() ?).
 
 algorithm.hpp : ne prend pas en compte les containers constant…
 
 un iterateur qui execute une fonction apres avoir atteint une valeur (autre iterateur ou compteur (2 classes ?)). Permet par exemple de boucler en une fois sur une zone d'un rectangle.
-padding_iterator: pour par exemple iterer sur un sous retangle.
+padding_iterator: pour par exemple iterer sur un sous rectangle.
 un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
 
 tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ?
@@ -118,8 +116,6 @@ enlever pseudo_iterator et faire [in|out]put_iterator_base
 late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…) { return _FunctorAllocator(…) } ; _FunctorAllocator -> return _ClassTemplate<_T>()
 
 utiliser __CHAR_BIT__ dans bit/bit_swap.hpp et bit/detail/bit_swap.hpp (en fait les fonctions changent selon le nombre de bit…)
-
-synchronous_iterator qui permet d'avancer 2 itérateurs en même temps. 2 trait (1 par itérateurs). Faire un double_traits qui combine les 2. base() retourne une pair et le trait contient le getter. Posibilité de passé par un adaptateur qui retourne une tuple ou possède un get_base<N>(). Basé sur synchronizer<>.
 
 ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
 
@@ -145,9 +141,9 @@ optimal tuple : http://flamingdangerzone.com/cxx11/2012/12/02/optimal-tuple-ii.h
 
 utiliser optimal_tuple dans recursive_iterator
 
+revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
 
-
-
+un iterateurs sur un tableau d'iterateurs (voir la après avoir les itérateurs plus haut)
 
 
 

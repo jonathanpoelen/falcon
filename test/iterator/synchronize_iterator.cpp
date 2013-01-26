@@ -1,5 +1,8 @@
+#include <sstream>
+#include <algorithm>
 #include <test/test.hpp>
 #include <falcon/iterator/synchronize_iterator.hpp>
+#include <falcon/tuple/tuple_applier.hpp>
 #include "synchronize_iterator.hpp"
 
 void synchronize_iterator_test()
@@ -34,6 +37,19 @@ void synchronize_iterator_test()
 		CHECK(i == 2);
 		CHECK(s[0] == 'r' && s[1] == 'n' && s[2] == 'p' && s[3] == 'q');
 		CHECK(s2[0] == 'c' && s2[1] == 'd' && s2[2] == 'd' && s2[3] == 'e');
+	}
+
+	{
+		int a[]{0,1,2,3,4,5,6,7,8,9};
+		int a2[]{1,2,3,4,5,6,7,8,9,10};
+		std::ostringstream ss;
+
+		std::for_each<>(falcon::iterator::make_synchronize_iterator<>(&a[0], &a2[0]),
+										falcon::iterator::make_synchronize_iterator<>(&a[10], &a2[10]),
+										falcon::make_tuple_applier([&ss](int i,int i2){
+											ss << i << '-' << i2 << '\n';
+										}));
+		CHECK_EQUAL_VALUE(ss.str(), "0-1\n1-2\n2-3\n3-4\n4-5\n5-6\n6-7\n7-8\n8-9\n9-10\n");
 	}
 }
 
