@@ -7,7 +7,8 @@
 #endif
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>
-#include <falcon/java_iterator/java_iterator_category.hpp>
+#include <falcon/type_traits/integral_constant.hpp>
+#include <falcon/java_iterator/is_java_iterator.hpp>
 
 namespace falcon {
 namespace java_iterator {
@@ -69,11 +70,10 @@ public:
 
 template<typename _Iterator, typename _IteratorBase, typename _Category,
 	typename _Tp, typename _Reference>
-class java_iterator_handler
+struct java_iterator_handler
 {
 	friend class java_iterator_core_access;
 
-public:
 	typedef _Category java_iterator_category;
 	typedef _IteratorBase iterator_type;
 	typedef _Tp value_type;
@@ -121,13 +121,19 @@ public:
 	explicit java_iterator_handler(_U&& __x)
 	: _M_current(std::forward<_U>(__x))
 	{}
+
+	java_iterator_handler& operator=(const java_iterator_handler&) = default;
+#else
+	java_iterator_handler& operator=(const java_iterator_handler& other)
+	{ _M_current = other._M_current; }
 #endif
 
-	java_iterator_handler& operator=(const iterator_type& __x)
+	java_iterator_handler& operator=(const iterator_type& x)
 	{
-		_M_current = __x;
+		_M_current = x;
 		return *this;
 	}
+
 
 	iterator_type base() const
 	{ return _M_current; }
@@ -151,17 +157,47 @@ protected:
 	bool do_valid() const
 	{ return _M_current.valid(); }
 
-	reference do_current()
+private:
+	typedef integral_constant<bool, is_java_iterator<_Iterator>::value> __is_java_iterator;
+
+	reference do_current(true_type)
+	{ return _M_current.current(); }
+
+	reference do_current(false_type)
 	{ return *_M_current; }
+
+	const reference do_current(true_type) const
+	{ return _M_current.current(); }
+
+	const reference do_current(false_type) const
+	{ return *_M_current; }
+
+protected:
+	reference do_current()
+	{ return do_current(__is_java_iterator()); }
 
 	const reference do_current() const
-	{ return *_M_current; }
+	{ return do_current(__is_java_iterator()); }
 
-	void advance()
+private:
+	void advance(false_type)
 	{ ++_M_current; }
 
-	void recoil()
+	void advance(true_type)
+	{ java_iterator_core_access::advance(_M_current); }
+
+	void recoil(false_type)
 	{ --_M_current; }
+
+	void recoil(true_type)
+	{ java_iterator_core_access::recoil(_M_current); }
+
+protected:
+	void advance()
+	{ advance(__is_java_iterator()); }
+
+	void recoil()
+	{ recoil(__is_java_iterator()); }
 
 protected:
 	iterator_type& base_reference()
@@ -185,7 +221,7 @@ template<typename _Iterator, typename _IteratorBase,
 struct java_iterator_handler_types
 {
 	typedef typename if_c<
-		is_java_iterator_category<_IteratorBase>,
+		is_java_iterator<_IteratorBase>,
 		_IteratorBase,
 		std::iterator_traits<_IteratorBase>
 	>::type __iterator_traits;

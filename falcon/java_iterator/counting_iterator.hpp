@@ -4,46 +4,43 @@
 #include <falcon/java_iterator/java_iterator_handler.hpp>
 
 namespace falcon {
-
 namespace java_iterator {
 
 template <typename _Iterator,
-	typename _Value = use_default,
+	typename _Tp = use_default,
 	typename _Reference = use_default>
 class counting_iterator;
 
 namespace detail {
-	template <typename _Iterator,
-		typename _Value = use_default,
-		typename _Reference = use_default>
+	template <typename _Iterator, typename _Tp, typename _Reference>
 	struct counting_base
 	{
 		typedef typename java_iterator_handler_types<
-			counting_iterator<_Iterator, _Value, _Reference>,
+			counting_iterator<_Iterator, _Tp, _Reference>,
 			_Iterator,
 			use_default,
-			_Value,
+			_Tp,
 			_Reference
 		>::base base;
 	};
 }
 
-template <typename _Iterator, typename _Value, typename _Reference>
+template <typename _Iterator, typename _Tp, typename _Reference>
 class counting_iterator
-: public detail::counting_base<_Iterator, _Value, _Reference>::base
+: public detail::counting_base<_Iterator, _Tp, _Reference>::base
 {
 	friend class java_iterator_core_access;
 
-	typedef typename detail::counting_base<_Iterator, _Value, _Reference>::base __base;
+	typedef typename detail::counting_base<_Iterator, _Tp, _Reference>::base __base;
 
 public:
-	typedef _Iterator iterator;
+	typedef _Iterator iterator_type;
 
 private:
 	int _n;
 
 public:
-	counting_iterator(iterator begin, int n)
+	counting_iterator(iterator_type begin, int n)
 	: __base(begin)
 	, _n(n)
 	{}
@@ -60,7 +57,7 @@ public:
 		return *this;
 	}
 
-	counting_iterator& operator=(const iterator& x)
+	counting_iterator& operator=(const iterator_type& x)
 	{
 		__base::operator=(x);
 		return *this;
@@ -72,10 +69,10 @@ public:
 	int count() const
 	{ return _n; }
 
-	bool valid() const
+protected:
+	bool do_valid() const
 	{ return _n; }
 
-private:
 	void advance()
 	{
 		--_n;

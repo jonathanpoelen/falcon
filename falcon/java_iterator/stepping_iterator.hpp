@@ -1,144 +1,146 @@
 #ifndef _FALCON_JAVA_ITERATOR_STEPPING_ITERATOR_HPP
 #define _FALCON_JAVA_ITERATOR_STEPPING_ITERATOR_HPP
 
-#include <falcon/c++/cast.hpp>
-#include <falcon/java_iterator/partial_java_iterator.hpp>
-#include <falcon/type_traits/is_java_iterator.hpp>
-#include <falcon/container/range_access.hpp>
+#include <falcon/java_iterator/java_iterator.hpp>
+#include <falcon/java_iterator/is_java_iterator.hpp>
 
 namespace falcon {
-
 namespace java_iterator {
 
-	namespace detail {
-		template<typename _Iterator, typename _Tag = typename _Iterator::iterator_category>
-		struct stepping_iterator
-		{
-			static void next(_Iterator& it, _Iterator& end, int n)
-			{
-				while (n-- && it != end)
-					--it;
-			}
+template <typename _Iterator,
+	typename _Tp = use_default,
+	typename _Reference = use_default>
+class stepping_iterator;
 
-			static void prev(_Iterator& it, int n)
-			{ std::advance<>(it, -n); }
-		};
+namespace detail {
+	template <typename _Iterator, typename _Tp, typename _Reference,
+		bool _IsJavaIterator = is_java_iterator<_Iterator>::value>
+	struct stepping_base
+	{
+		typedef java_iterator<
+			_Iterator,
+			use_default,
+			_Tp,
+			_Reference,
+			stepping_iterator<_Iterator, _Tp, _Reference>
+		> base;
+	};
 
-		template<typename _Iterator>
-		struct stepping_iterator<_Iterator, std::random_access_iterator_tag>
-		{
-			static void next(_Iterator& it, _Iterator& end, int n)
-			{
-				it += n;
-				if (it > end)
-					it = end;
-			}
+	template <typename _Iterator, typename _Tp, typename _Reference>
+	struct stepping_base<_Iterator, _Tp, _Reference, true>
+	{
+		typedef typename java_iterator_handler_types<
+			stepping_iterator<_Iterator, _Tp, _Reference>,
+			_Iterator,
+			use_default,
+			_Tp,
+			_Reference
+		>::base base;
+	};
+}
 
-			static void prev(_Iterator& it, int n)
-			{ it -= n; }
-		};
-	}
-
-template <typename _Iterator>
+template <typename _Iterator, typename _Tp, typename _Reference>
 class stepping_iterator
-: public partial_java_iterator<_Iterator>
+: public detail::stepping_base<_Iterator, _Tp, _Reference>::base
 {
-	typedef stepping_iterator<_Iterator> self_type;
-	typedef partial_java_iterator<_Iterator> base_type;
+	friend class java_iterator_core_access;
+
+	typedef typename detail::stepping_base<_Iterator, _Tp, _Reference>::base __base;
 
 public:
-	typedef _Iterator iterator;
-	typedef typename base_type::value_type value_type;
-	typedef typename base_type::pointer pointer;
-	typedef typename base_type::reference reference;
+	typedef typename __base::iterator_type iterator_type;
 
 private:
-	iterator _end;
-	int _step;
+	unsigned int _step;
 
 public:
-	stepping_iterator(int step, const iterator& begin, const iterator& __end)
-	: base_type(begin)
-	, _end(__end)
-	, _step(step)
+	stepping_iterator(iterator_type x, unsigned int p)
+	: __base(x)
+	, _step(p)
 	{}
 
-	stepping_iterator(int step, const iterator& begin)
-	: base_type(begin)
-	, _end()
-	, _step(step)
+	stepping_iterator(iterator_type first, iterator_type last, unsigned int p)
+	: __base(first, last)
+	, _step(p)
 	{}
 
-	template <typename _Container>
-	stepping_iterator(int step, _Container& container)
-	: base_type(falcon::begin(container))
-	, _end(falcon::end(container))
-	, _step(step)
+	template<typename _Container>
+	stepping_iterator(_Container& cont, unsigned int p)
+	: __base(cont)
+	, _step(p)
 	{}
 
-	stepping_iterator(const self_type& other)
-	: base_type(other._it)
-	, _end(other._end)
+	using __base::operator=;
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	stepping_iterator(const stepping_iterator&) = default;
+#else
+	stepping_iterator(const stepping_iterator& other)
+	: __base(other.base_reference())
+	, _step(other._step)
 	{}
+#endif
 
-	self_type& operator=(const self_type& other)
+	void step(unsigned int p)
+	{ _step = p; }
+
+	unsigned int step() const
+	{ return _step; }
+
+private:
+	template<typename _I, typename _C, typename _T, typename _R, typename _P>
+	void advance_base(true_type, const java_iterator<_I, _C, _T, _R, _P>&)
+	{ advance_base(false_type()); }
+
+	template<typename _Self>
+	void advance_base(true_type, const _Self&)
 	{
-		base_type::current(other._it);
-		_end = other._end;
-		return *this;
+		unsigned int n = _step;
+		while (n-- && this->valid())
+			__base::advance();
 	}
 
-	self_type& operator=(const iterator& it)
+	void advance_base(false_type)
 	{
-		base_type::operator=(it);
-		return *this;
+		typedef typename iterator_type::iterator_category tag;
+		advance_iterator(tag());
 	}
 
-	const iterator& end() const
-	{ return _end; }
-
-	void end(const iterator& __end)
-	{ _end = __end; }
-
-	bool valid() const
-	{ return base_type::_it != _end; }
-
-	reference next()
+	void advance_iterator(std::random_access_iterator_tag)
 	{
-		reference r = *base_type::_it;
-		++*this;
-		return r;
-	}
-	reference prev()
-	{
-		reference r = *base_type::_it;
-		--*this;
-		return r;
+		if (_step > this->size())
+			this->begin(this->end());
+		else
+			this->begin(this->begin() + _step);
 	}
 
-	FALCON_MEMBER_INCREMENT(self_type, detail::stepping_iterator<_Iterator>::next(base_type::_it, _end, _step))
-	FALCON_MEMBER_DECREMENT(self_type, detail::stepping_iterator<_Iterator>::prev(base_type::_it, _step))
+	template<typename _Tag>
+	void advance_iterator(_Tag)
+	{ advance_base(true_type(),0); }
 
-	CPP_EXPLICIT_BOOL_CAST(valid())
+protected:
+	void advance()
+	{
+		typedef typename is_java_iterator<_Iterator>::type is_java_iterator;
+		advance_base(is_java_iterator());
+	}
+
+	void recoil()
+	{ std::advance<>(this->base_reference(), -_step); }
 };
 
-template <typename _Container, typename _Iterator = typename _Container::iterator>
-stepping_iterator<_Iterator> make_stepping_iterator(int step, _Container& c) {
-	return stepping_iterator<_Iterator>(step, c);
-}
 
 template <typename _Iterator>
-stepping_iterator<_Iterator> make_stepping_iterator(int step, const _Iterator& begin, const _Iterator& end) {
-	return stepping_iterator<_Iterator>(step, begin, end);
-}
+stepping_iterator<_Iterator>
+make_stepping_iterator(_Iterator first, _Iterator last, unsigned int p)
+{ return stepping_iterator<_Iterator>(first, last, p); }
+
+template <typename _Container>
+stepping_iterator<typename _Container::iterator>
+make_stepping_iterator(_Container& cont, unsigned int p)
+{ return stepping_iterator<typename _Container::iterator>(cont, p); }
 
 }
-
-template <typename _Iterator>
-struct is_java_iterator<java_iterator::stepping_iterator<_Iterator> >
-: true_type
-{};
-
 }
 
 #endif
