@@ -103,10 +103,6 @@ Ajouter dans les iterators les fonctions pour acceder aux fonctorx lorsque ceux-
 
 algorithm.hpp : ne prend pas en compte les containers constant…
 
-un iterateur qui execute une fonction apres avoir atteint une valeur (autre iterateur ou compteur (2 classes ?)). Permet par exemple de boucler en une fois sur une zone d'un rectangle.
-padding_iterator: pour par exemple iterer sur un sous rectangle.
-un iterator qui prend 2 iterators et quand arrive au bout utilise une/deux fonction(s) de modification pour les 2 iterators. Est un recursive_iterator ? En tout cas padding_iterator pourrait en heriter.
-
 tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ?
 
 flag.hpp: pb avec le decalage de bit de flag. flag.cpp: god for gcc-4.7, fail with gcc-4.6…
@@ -144,6 +140,11 @@ utiliser optimal_tuple dans recursive_iterator
 revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
 
 un iterateurs sur un tableau d'iterateurs (voir la après avoir les itérateurs plus haut)
+
+ajouter dans nexter_iterator un support pour la difference entre 2 iterateurs. zone_access utilise un nexter_iterator, il faut donc implémenter la fonction de difference
+
+
+
 
 
 
