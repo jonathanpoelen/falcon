@@ -5,9 +5,8 @@
 //#include <boost/static_assert.hpp>
 #include <cinttypes>
 #include <falcon/c++0x/syntax.hpp>
-#include <falcon/bit/fill_bit.hpp>
+#include <falcon/bit/fill.hpp>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/type_traits/numeric/minimal_bits.hpp>
 #include <falcon/preprocessor/getter.hpp>
 #include <falcon/arg/arg.hpp>
 
@@ -119,7 +118,7 @@ public:
 	{ return  self_type(~_flag); }
 
 	void flip()
-	{ _flag ^= fill_bit<value_type>::value; }
+	{ _flag ^= bit::fill<value_type>::value; }
 
 	CPP_CONSTEXPR self_type operator^(const self_type& other) const
 	{ return self_type(_flag ^ other._flag); }
@@ -166,7 +165,7 @@ public:
 	CPP_CONSTEXPR bool operator!=(const value_type& other) const
 	{ return !(*this == other); }
 
-	void clear(const value_type& remove = fill_bit<value_type>::value)
+	void clear(const value_type& remove = bit::fill<value_type>::value)
 	{ _flag ^= remove; }
 
 	/**
@@ -504,7 +503,7 @@ public:
 	void flip()
 	{
 		for (std::size_t i = 0; i != _N; ++i)
-			_M_flag[i] ^= fill_bit<_T>::value;
+			_M_flag[i] ^= bit::fill<_T>::value;
 	}
 
 	void clear(const self_type& remove)
@@ -534,10 +533,10 @@ public:
 
 	self_type& operator<<=(std::size_t n)
 	{
-		if (n >= bit_size<_T>::value * _N)
+		if (n >= bit::size<_T>::value * _N)
 			return set_null();
-		std::size_t d = n / (bit_size<_T>::value);
-		n %= bit_size<_T>::value;
+		std::size_t d = n / (bit::size<_T>::value);
+		n %= bit::size<_T>::value;
 		_M_flag[0] = _M_flag[d] << n;
 		for (std::size_t i = d; i != _N; ++i)
 		{
@@ -559,10 +558,10 @@ public:
 
 	self_type& operator>>=(unsigned int n)
 	{
-		if (n >= bit_size<_T>::value * _N)
+		if (n >= bit::size<_T>::value * _N)
 			return set_null();
-		std::size_t d = n / (bit_size<_T>::value);
-		n %= bit_size<_T>::value;
+		std::size_t d = n / (bit::size<_T>::value);
+		n %= bit::size<_T>::value;
 		for (std::size_t i = _N-1; i != _N-1-d; --i)
 		{
 			_M_flag[i] = _M_flag[i-d] >> n;
@@ -644,22 +643,28 @@ typedef flag<uint64_t[3]> flag192;
 typedef flag<uint64_t[4]> flag256;
 
 ///TODO int pas forcement egal a 32, le prevoir por selectionner un int si possible
-template<std::size_t _Choose, bool u32, bool u64>
+template<std::size_t _Choose, bool u, bool u32, bool u64>
 struct __flag_type_selector
 {
 	typedef uint64_t type[
-		(_Choose + (bit_size<uint64_t>::value - 1)) / (bit_size<uint64_t>::value)
+		(_Choose + (bit::size<uint64_t>::value - 1)) / (bit::size<uint64_t>::value)
 	];
 };
 
 template<std::size_t _Choose>
-struct __flag_type_selector<_Choose, true, true>
+struct __flag_type_selector<_Choose, true, true, true>
+{
+	typedef unsigned type;
+};
+
+template<std::size_t _Choose>
+struct __flag_type_selector<_Choose, false, true, true>
 {
 	typedef uint32_t type;
 };
 
 template<std::size_t _Choose>
-struct __flag_type_selector<_Choose, false, true>
+struct __flag_type_selector<_Choose, false, false, true>
 {
 	typedef uint64_t type;
 };
@@ -668,8 +673,9 @@ template<std::size_t _Choose>
 struct flag_selector
 {
 	typedef flag<typename __flag_type_selector<_Choose,
-		(bit_size<uint32_t>::value >= _Choose),
-		(bit_size<uint64_t>::value >= _Choose)
+		(bit::size<unsigned>::value >= _Choose),
+		(bit::size<uint32_t>::value >= _Choose),
+		(bit::size<uint64_t>::value >= _Choose)
 	>::type> type;
 };
 

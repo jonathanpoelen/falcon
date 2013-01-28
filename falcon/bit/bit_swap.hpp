@@ -1,7 +1,7 @@
 #ifndef _FALCON_BIT_BIT_SWAP_HPP
 #define _FALCON_BIT_BIT_SWAP_HPP
 
-#include <falcon/bit/bit_size.hpp>
+#include <falcon/bit/size.hpp>
 #include <falcon/bit/detail/bit_swap.hpp>
 #include <falcon/detail/addressof.hpp>
 #include <falcon/cast/unreliable_pointer_cast.hpp>
@@ -36,7 +36,7 @@ namespace falcon {
 			falcon::detail::bit::bit8_swap(*unreliable_pointer_cast<uint8_t>(n-1));
 	}
 
-	template<typename _T, unsigned int _S = bit_size<_T>::value>
+	template<typename _T, unsigned int _S = bit::size<_T>::value>
 	struct __bit_swap
 	{
 		inline static void __impl(_T& bits)

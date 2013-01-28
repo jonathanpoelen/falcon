@@ -8,8 +8,8 @@
 #include <falcon/type_traits/unqualified.hpp>
 #include <falcon/preprocessor/incremental.hpp>
 #include <falcon/preprocessor/comparison.hpp>
-#include <falcon/bit/right_bit.hpp>
-#include <falcon/bit/left_bit.hpp>
+#include <falcon/bit/right.hpp>
+#include <falcon/bit/left.hpp>
 
 namespace falcon {
 
@@ -21,8 +21,8 @@ public:
 
 private:
 	typedef typename unqualified<value_type>::type __unqualified_type;
-	static const __unqualified_type _S_left = left_bit<__unqualified_type>::value;
-	static const __unqualified_type _S_right = right_bit<__unqualified_type>::value;
+	static const __unqualified_type _S_left = bit::left<__unqualified_type>::value;
+	static const __unqualified_type _S_right = bit::right<__unqualified_type>::value;
 
 private:
 	value_type _mask;

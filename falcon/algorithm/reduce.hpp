@@ -3,6 +3,7 @@
 
 #include <falcon/c++/boost_or_std.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_reference)
+#include <falcon/container/range_access.hpp>
 
 namespace falcon {
 namespace algorithm {

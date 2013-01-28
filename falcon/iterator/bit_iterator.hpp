@@ -2,7 +2,7 @@
 #define _FALCON_ITERATOR_BIT_ITERATOR_HPP
 
 #include <falcon/iterator/iterator_handler.hpp>
-#include <falcon/bit/bit_size.hpp>
+#include <falcon/bit/size.hpp>
 #include <falcon/bit/bit_reference.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
 
@@ -80,7 +80,7 @@ public:
 
 private:
 	typedef typename std::iterator_traits<_Iterator>::value_type __mask_t;
-	static const unsigned _S_word_bit = bit_size<__mask_t>::value;
+	static const unsigned _S_word_bit = bit::size<__mask_t>::value;
 
 	__mask_t mask() const
 	{ return static_cast<__mask_t>(1UL << _M_offset); }
