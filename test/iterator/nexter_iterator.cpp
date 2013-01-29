@@ -1,5 +1,6 @@
 #include <vector>
 #include <test/test.hpp>
+#include <test/check_sequence.hpp>
 #include <falcon/iterator/nexter_iterator.hpp>
 #include "nexter_iterator.hpp"
 
@@ -14,29 +15,14 @@ void nexter_iterator_test()
 	);
 	auto end = falcon::iterator::make_nexter_iterator<>(c.end(), it.nexter());
 
-	CHECK_EQUAL_VALUE(true, it != end);
-	CHECK_EQUAL_VALUE(0, (*it)++);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(1, (*it)++);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(2, (*it)++);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(3, (*it)++);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(4, (*it)++);
-	CHECK_EQUAL_VALUE(false, ++it != end);
+	{
+		int a[] = {0,1,2,3,4,};
+		CHECK_SEQUENCE_M2(a, it, end, ++*it);
+	}
 	it = c.begin();
-	CHECK_EQUAL_VALUE(true, it != end);
-	CHECK_EQUAL_VALUE(1, *it);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(2, *it);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(3, *it);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(4, *it);
-	CHECK_EQUAL_VALUE(true, ++it != end);
-	CHECK_EQUAL_VALUE(5, *it);
-	CHECK_EQUAL_VALUE(false, ++it != end);
-
+	{
+		int a[] = {1,2,3,4,5};
+		CHECK_SEQUENCE_M2(a, it, end, ++*it);
+	}
 }
 FALCON_TEST_TO_MAIN(nexter_iterator_test)

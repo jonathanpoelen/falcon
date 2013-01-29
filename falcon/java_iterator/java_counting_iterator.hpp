@@ -1,5 +1,5 @@
-#ifndef _FALCON_JAVA_ITERATOR_COUNTING_ITERATOR_HPP
-#define _FALCON_JAVA_ITERATOR_COUNTING_ITERATOR_HPP
+#ifndef _FALCON_JAVA_ITERATOR_JAVA_COUNTING_ITERATOR_HPP
+#define _FALCON_JAVA_ITERATOR_JAVA_COUNTING_ITERATOR_HPP
 
 #include <falcon/java_iterator/java_iterator_handler.hpp>
 
@@ -9,14 +9,14 @@ namespace java_iterator {
 template <typename _Iterator,
 	typename _Tp = use_default,
 	typename _Reference = use_default>
-class counting_iterator;
+class java_counting_iterator;
 
 namespace detail {
 	template <typename _Iterator, typename _Tp, typename _Reference>
 	struct counting_base
 	{
 		typedef typename java_iterator_handler_types<
-			counting_iterator<_Iterator, _Tp, _Reference>,
+			java_counting_iterator<_Iterator, _Tp, _Reference>,
 			_Iterator,
 			use_default,
 			_Tp,
@@ -26,7 +26,7 @@ namespace detail {
 }
 
 template <typename _Iterator, typename _Tp, typename _Reference>
-class counting_iterator
+class java_counting_iterator
 : public detail::counting_base<_Iterator, _Tp, _Reference>::base
 {
 	friend class java_iterator_core_access;
@@ -40,24 +40,24 @@ private:
 	int _n;
 
 public:
-	counting_iterator(iterator_type begin, int n)
+	java_counting_iterator(iterator_type begin, int n)
 	: __base(begin)
 	, _n(n)
 	{}
 
-	counting_iterator(const counting_iterator& other)
+	java_counting_iterator(const java_counting_iterator& other)
 	: __base(other.base_reference())
 	, _n(other._n)
 	{}
 
-	counting_iterator& operator=(const counting_iterator& x)
+	java_counting_iterator& operator=(const java_counting_iterator& x)
 	{
 		__base::operator=(x);
 		_n = x._n;
 		return *this;
 	}
 
-	counting_iterator& operator=(const iterator_type& x)
+	java_counting_iterator& operator=(const iterator_type& x)
 	{
 		__base::operator=(x);
 		return *this;
@@ -87,8 +87,8 @@ protected:
 };
 
 template <typename _Iterator>
-counting_iterator<_Iterator> make_counting_iterator(_Iterator x, int n)
-{ return counting_iterator<_Iterator>(x, n); }
+java_counting_iterator<_Iterator> make_java_counting_iterator(_Iterator x, int n)
+{ return java_counting_iterator<_Iterator>(x, n); }
 
 }
 }

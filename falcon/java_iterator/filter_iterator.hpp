@@ -115,6 +115,15 @@ public:
 	const predicate_type& predicate() const
 	{ return _predicate; }
 
+	void begin(const iterator_type& x)
+	{
+		__base::begin(x);
+		satisfy_predicate();
+	}
+
+	const iterator_type& begin() const
+	{ return __base::begin(); }
+
 protected:
 	void advance()
 	{

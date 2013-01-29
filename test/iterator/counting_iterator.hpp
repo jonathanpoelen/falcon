@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_ITERATOR_COUNTING_ITERATOR_HPP
+#define FALCON_TEST_ITERATOR_COUNTING_ITERATOR_HPP
+
+void counting_iterator_test();
+
+#endif

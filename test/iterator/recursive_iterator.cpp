@@ -1,5 +1,6 @@
 #include <vector>
 #include <test/test.hpp>
+#include <test/check_sequence.hpp>
 #include <falcon/iterator/recursive_iterator.hpp>
 #include "recursive_iterator.hpp"
 
@@ -19,22 +20,10 @@ void recursive_iterator_test()
 		auto first = falcon::iterator::recursive_iterator<>(v);
 		auto last = std::end(v[1]);
 
-		CHECK_EQUAL_VALUE(0, *first);
-		CHECK(++first != last);
-		CHECK_EQUAL_VALUE(1, *first);
-		CHECK(++first != last);
-		CHECK_EQUAL_VALUE(2, *first);
-		CHECK(++first != last);
-		CHECK_EQUAL_VALUE(3, *first);
-		CHECK(++first != last);
-		CHECK_EQUAL_VALUE(4, *first);
-		CHECK(++first != last);
-		CHECK_EQUAL_VALUE(5, *first);
-		CHECK(++first != last);
-		CHECK_EQUAL_VALUE(6, *first);
-		CHECK(++first != last);
-		CHECK_EQUAL_VALUE(7, *first);
-		CHECK(++first == last);
+		{
+			int a[] = {0,1,2,3,4,5,6,7};
+			CHECK_SEQUENCE2(a, first, last);
+		}
 
 		typedef decltype(first) recursive_iterator;
 		CHECK_NOTYPENAME_TYPE(
@@ -50,8 +39,6 @@ void recursive_iterator_test()
 		recursive_iterator random(true, std::begin(v[1])+2);
 		first = falcon::iterator::recursive_iterator<>(v);
 		std::advance<>(first, 6);
-		std::cout << "*first: " << *first << '\n';
-		std::cout << "*random: " << *random << '\n';
 		CHECK(first == random);
 	}
 
@@ -82,37 +69,13 @@ void recursive_iterator_test()
 			pair3(last2-1, last2),
 			pair2(std::begin(*(std::begin(*first1)+2))+2, nullptr)
 		));
-		CHECK_EQUAL_VALUE(0, *rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(1, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(2, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(3, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(4, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(5, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(6, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(7, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(8, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(9, *++rec);
-		CHECK(rec != *(last2-1));
-		CHECK(rec != lastrec);
-		CHECK_EQUAL_VALUE(10, *++rec);
+
+		{
+			int a[] = {0,1,2,3,4,5,6,7,8,9};
+			int n = 10;
+			CHECK_SEQUENCE_M2(a, rec, lastrec, CHECK(!!(n--) == (rec != *(last2-1))));
+		}
+		CHECK_EQUAL_VALUE(10, *rec);
 		CHECK(rec == *(last2-1));
 		CHECK(rec == lastrec);
 		CHECK(rec.valid());

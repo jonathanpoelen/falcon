@@ -358,7 +358,7 @@ public:
 	}
 
 	bool equal(const basic_recursive_iterator& x) const
-	{ return valid() == x.valid() && (x.valid() && __tuple_reference() == x.__tuple_reference()); }
+	{ return valid() == x.valid() && (x.valid() ?  __tuple_reference() == x.__tuple_reference() : true); }
 
 	bool less(const basic_recursive_iterator& x) const;
 

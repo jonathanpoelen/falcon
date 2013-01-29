@@ -1,5 +1,6 @@
 #include <vector>
 #include <test/test.hpp>
+#include <test/check_sequence.hpp>
 #include <falcon/iterator/indirect_iterator.hpp>
 #include <falcon/functional/operators.hpp>
 #include "indirect_iterator.hpp"
@@ -16,29 +17,15 @@ void indirect_iterator_test()
 		falcon::iterator::indirect_iterator<iterator> it(cont.begin());
 		falcon::iterator::indirect_iterator<iterator> end(cont.end());
 
-		CHECK_EQUAL_VALUE(true, it != end);
-		CHECK_EQUAL_VALUE(0, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(1, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(2, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(3, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(4, (*it)++);
-		CHECK_EQUAL_VALUE(false, ++it != end);
+		{
+			int ab [] = {0,1,2,3,4};
+			CHECK_SEQUENCE_M2(ab, it, end, ++*it);
+		}
 		it = cont.begin();
-		CHECK_EQUAL_VALUE(true, it != end);
-		CHECK_EQUAL_VALUE(1, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(2, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(3, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(4, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(5, *it);
-		CHECK_EQUAL_VALUE(false, ++it != end);
+		{
+			int ab [] = {1,2,3,4,5};
+			CHECK_SEQUENCE2(ab, it, end);
+		}
 	}
 
 	{
@@ -49,29 +36,15 @@ void indirect_iterator_test()
 		pointer_iterator it(cont.begin());
 		pointer_iterator end(cont.end());
 
-		CHECK_EQUAL_VALUE(true, it != end);
-		CHECK_EQUAL_VALUE(0, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(1, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(2, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(3, (*it)++);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(4, (*it)++);
-		CHECK_EQUAL_VALUE(false, ++it != end);
+		{
+			int ab [] = {0,1,2,3,4};
+			CHECK_SEQUENCE_M2(ab, it, end, ++*it);
+		}
 		it = cont.begin();
-		CHECK_EQUAL_VALUE(true, it != end);
-		CHECK_EQUAL_VALUE(1, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(2, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(3, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(4, *it);
-		CHECK_EQUAL_VALUE(true, ++it != end);
-		CHECK_EQUAL_VALUE(5, *it);
-		CHECK_EQUAL_VALUE(false, ++it != end);
+		{
+			int ab [] = {1,2,3,4,5};
+			CHECK_SEQUENCE2(ab, it, end);
+		}
 	}
 }
 FALCON_TEST_TO_MAIN(indirect_iterator_test)

@@ -265,12 +265,6 @@ protected:
 private:
 	typedef integral_constant<bool, is_same<std::input_iterator_tag, iterator_category>::value> __is_input_tag;
 
-	_Iterator& downcast()
-	{ return static_cast<_Iterator&>(*this); }
-
-	const _Iterator& downcast() const
-	{ return static_cast<const _Iterator&>(*this); }
-
 	void dereference(true_type) const;
 
 	reference dereference(false_type) const
@@ -279,23 +273,36 @@ private:
 	reference dereference(false_type)
 	{ return *_M_current; }
 
-	reference dereference() const
-	{ return dereference(__is_input_tag()); }
-
-	reference dereference()
-	{ return dereference(__is_input_tag()); }
-
 	void increment(true_type)
 	{}
 
 	void increment(false_type)
 	{ ++_M_current; }
 
+	void decrement(true_type)
+	{}
+
+	void decrement(false_type)
+	{ --_M_current; }
+
+protected:
+	_Iterator& downcast()
+	{ return static_cast<_Iterator&>(*this); }
+
+	const _Iterator& downcast() const
+	{ return static_cast<const _Iterator&>(*this); }
+
+	reference dereference() const
+	{ return dereference(__is_input_tag()); }
+
+	reference dereference()
+	{ return dereference(__is_input_tag()); }
+
 	void increment()
 	{ increment(__is_input_tag()); }
 
 	void decrement()
-	{ --_M_current; }
+	{ decrement(__is_input_tag()); }
 
 	bool equal(const iterator_handler& x) const
 	{ return _M_current == x._M_current; }

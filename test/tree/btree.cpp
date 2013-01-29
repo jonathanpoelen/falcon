@@ -16,7 +16,8 @@ void btree_test()
 	CHECK_VALUE(!=, nullptr, btree_root.left());
 	CHECK_EQUAL_VALUE(1, btree_root.left()->get());
 	CHECK_EQUAL_VALUE(10, btree.left()->get());
-	CHECK_VALUE(!=, nullptr, btree_root.right());
+	CHECK_VALUE(==, nullptr, btree_root.right());
+	CHECK_VALUE(!=, nullptr, btree.right());
 	CHECK_EQUAL_VALUE(20, btree.right()->get());
 }
 FALCON_TEST_TO_MAIN(btree_test)

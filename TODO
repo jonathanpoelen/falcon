@@ -139,7 +139,7 @@ utiliser optimal_tuple dans recursive_iterator
 
 revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
 
-un iterateurs sur un tableau d'iterateurs (voir la après avoir les itérateurs plus haut)
+un iterateurs sur un tableau d'iterateurs (voir après avoir fait les itérateurs plus haut)
 
 ajouter dans nexter_iterator un support pour la difference entre 2 iterateurs. zone_access utilise un nexter_iterator, il faut donc implémenter la fonction de difference
 
@@ -147,7 +147,7 @@ counting_iterator<Iterator, compare_tag = count_comparison_tag|count_and_iterato
 
 ajouter un cast implicit vers std::string dans cstring
 
-
+peut-on supprimer les constructeur de copie et l'affectation dans les iterateurs sans que cela crée des copies ?
 
 
 

@@ -1,7 +1,7 @@
 include(../../CMakeDefinitions.txt)
 include_directories(.. ../..)
 
-create_exec_test(counting_iterator)
+create_exec_test(java_counting_iterator)
 create_exec_test(filter_iterator)
 # create_exec_test(java_iterator_iterator)
 create_exec_test(java_iterator)

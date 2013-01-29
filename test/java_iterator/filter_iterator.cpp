@@ -14,6 +14,7 @@ void filter_iterator_test()
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE(0, it.next());
 	CHECK_EQUAL_VALUE(true, it.valid());
+	CHECK_EQUAL_VALUE(2, it.next());
 	it.begin(c.begin()+1);
 	CHECK_EQUAL_VALUE(true, it.valid());
 	CHECK_EQUAL_VALUE(2, it.next());
