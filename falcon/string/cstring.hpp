@@ -61,19 +61,14 @@ public:
 	basic_cstring(std::initializer_list<value_type>) = delete;
 #endif
 
-	basic_cstring(pointer s)
+	template<typename _CharT2>
+	basic_cstring(_CharT2* s)
 	: m_begin(s ? s : 0)
 	, m_end(s ? s + traits_type::length(s) : 0)
 	{}
 
-	template<std::size_t _N>
-	CPP_CONSTEXPR basic_cstring(_CharT (&s) [_N])
-	: m_begin(s ? s : 0)
-	, m_end(s ? s + _N - 1 : 0)
-	{}
-
-	template<std::size_t _N>
-	CPP_CONSTEXPR basic_cstring(_CharT (&s) [_N], int)
+	template<typename _CharT2, std::size_t _N>
+	CPP_CONSTEXPR basic_cstring(_CharT2 (&s) [_N])
 	: m_begin(s ? s : 0)
 	, m_end(s ? s + _N - 1 : 0)
 	{}
@@ -88,14 +83,14 @@ public:
 	, m_end(last)
 	{}
 
-	basic_cstring(const basic_cstring& s)
+	CPP_CONSTEXPR basic_cstring(const basic_cstring& s)
 	: m_begin(s.m_begin)
 	, m_end(s.m_end)
 	{}
 
 	template<typename _CharT2,
 		typename _Enable = typename enable_if_c<is_same<const _CharT2, _CharT> >::type>
-	basic_cstring(const basic_cstring<_CharT2, _Traits> s)
+	CPP_CONSTEXPR basic_cstring(const basic_cstring<_CharT2, _Traits> s)
 	: m_begin(s.c_str())
 	, m_end(m_begin + s.size())
 	{}
