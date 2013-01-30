@@ -9,17 +9,26 @@ namespace ostream {
 template<typename _CharT, typename _Traits>
 struct __resolve_manipulator
 {
-	typedef std::basic_ostream<_CharT, _Traits>&(*__type)(std::basic_ostream<_CharT, _Traits>&);
+	typedef std::basic_ostream<_CharT, _Traits>&(
+		*__type
+	)(std::basic_ostream<_CharT, _Traits>&);
 };
 
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
 template<typename _CharT = char, typename _Traits = std::char_traits<_CharT> >
-inline typename __resolve_manipulator<_CharT, _Traits>::__type resolve_manipulator(typename __resolve_manipulator<_CharT, _Traits>::__type f)
+#else
+template<typename _CharT, typename _Traits>
+#endif
+inline typename __resolve_manipulator<_CharT, _Traits>::__type
+resolve_manipulator(typename __resolve_manipulator<_CharT, _Traits>::__type f)
 {
 	return f;
 }
 
 template<typename _CharT, typename _Traits>
-inline typename __resolve_manipulator<_CharT, _Traits>::__type resolve_manipulator(const std::basic_ostream<_CharT, _Traits>&, typename __resolve_manipulator<_CharT, _Traits>::__type f)
+inline typename __resolve_manipulator<_CharT, _Traits>::__type
+resolve_manipulator(const std::basic_ostream<_CharT, _Traits>&,
+										typename __resolve_manipulator<_CharT, _Traits>::__type f)
 {
 	return f;
 }

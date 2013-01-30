@@ -217,8 +217,7 @@ void lambda_test() {
 			std::wstringstream wss;
 			auto p3 = lambda(wss) << _1 << std::endl;
 			p3(56);
-			if (wss.str() != L"56\n")
-				throw std::runtime_error(BOOST_PP_STRINGIZE(__LINE__));
+			CHECK(wss.str() == L"56\n");
 		}
 	}
 }

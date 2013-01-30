@@ -6,43 +6,50 @@
 namespace falcon {
 
 template<typename _CharT, typename _Traits>
-inline void ostream_write(std::basic_ostream<_CharT, _Traits>& out,
-						  const _CharT* s, std::streamsize n)
+inline std::basic_ostream<_CharT, _Traits>&
+ostream_write(std::basic_ostream<_CharT, _Traits>& out,
+							const _CharT* s, std::streamsize n)
 {
-	typedef std::basic_ostream<_CharT, _Traits>       ostream_type;
-	typedef typename ostream_type::ios_base    ios_base;
+	typedef std::basic_ostream<_CharT, _Traits> ostream_type;
+	typedef typename ostream_type::ios_base ios_base;
 
-	const std::streamsize put = out.rdbuf()->sputn(s, n);
-	if (put != n)
+	if (out.rdbuf()->sputn(s, n) != n)
 		out.setstate(ios_base::badbit);
+
+	return out;
 }
 
 template<typename _CharT, typename _Traits>
-inline void ostream_fill(std::basic_ostream<_CharT, _Traits>& out,
-						 std::streamsize n)
+inline std::basic_ostream<_CharT, _Traits>&
+ostream_fill(std::basic_ostream<_CharT, _Traits>& out, std::streamsize n, _CharT c)
 {
-	typedef std::basic_ostream<_CharT, _Traits>       ostream_type;
-	typedef typename ostream_type::ios_base    ios_base;
+	typedef std::basic_ostream<_CharT, _Traits> ostream_type;
+	typedef typename ostream_type::ios_base ios_base;
 
-	const _CharT c = out.fill();
 	for (; n > 0; --n)
 	{
-		const typename _Traits::int_type put = out.rdbuf()->sputc(c);
-		if (_Traits::eq_int_type(put, _Traits::eof()))
+		if (_Traits::eq_int_type(out.rdbuf()->sputc(c), _Traits::eof()))
 		{
 			out.setstate(ios_base::badbit);
 			break;
 		}
 	}
+
+	return out;
 }
+
+template<typename _CharT, typename _Traits>
+inline std::basic_ostream<_CharT, _Traits>&
+ostream_fill(std::basic_ostream<_CharT, _Traits>& out, std::streamsize n)
+{ return ostream_fill(out, n, out.fill()); }
 
 template<typename _CharT, typename _Traits>
 std::basic_ostream<_CharT, _Traits>&
 ostream_insert(std::basic_ostream<_CharT, _Traits>& out,
-			   const _CharT* s, std::streamsize n)
+							 const _CharT* s, std::streamsize n)
 {
-	typedef std::basic_ostream<_CharT, _Traits>       ostream_type;
-	typedef typename ostream_type::ios_base    ios_base;
+	typedef std::basic_ostream<_CharT, _Traits> ostream_type;
+	typedef typename ostream_type::ios_base ios_base;
 
 	typename ostream_type::sentry cerb(out);
 	if (cerb)
@@ -50,9 +57,7 @@ ostream_insert(std::basic_ostream<_CharT, _Traits>& out,
 		const std::streamsize w = out.width();
 		if (w > n)
 		{
-			const bool left = ((out.flags()
-			& ios_base::adjustfield)
-			== ios_base::left);
+			const bool left = ((out.flags() & ios_base::adjustfield) == ios_base::left);
 			if (!left)
 				ostream_fill(out, w - n);
 			if (out.good())
