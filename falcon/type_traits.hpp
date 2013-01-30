@@ -13,6 +13,7 @@
 #include <falcon/type_traits/ignore.hpp>
 #include <falcon/type_traits/invalid_type.hpp>
 #include <falcon/type_traits/is_ios.hpp>
+#include <falcon/type_traits/is_iterator.hpp>
 #include <falcon/type_traits/is_java_iterator.hpp>
 #include <falcon/type_traits/is_same.hpp>
 #include <falcon/type_traits/is_tuple.hpp>

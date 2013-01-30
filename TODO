@@ -128,7 +128,7 @@ www.boost.org/doc/libs/1_49_0/libs/config/doc/html/boost_config/boost_macro_refe
 
 Utiliser d'avantage FALCON_BOOST_OR_STD_NAMESPACE et FALCON_BOOST_OR_STD_TRAITS (c++/boost_or_std.hpp)
 
-note/*.hpp: peuvent fonctionner de façon transparente avec des std::unique_ptr ?
+node/*.hpp: peuvent fonctionner de façon transparente avec des std::unique_ptr ?
 
 implémenter la proposition de suffix dans la nouvelle norme: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3402.pdf
 ne pas oublier de prendre en compte les unités (non mis dans la norme) avec les abréviations udl ou iso
