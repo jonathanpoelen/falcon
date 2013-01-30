@@ -143,10 +143,6 @@ un iterateurs sur un tableau d'iterateurs (voir après avoir fait les itérateur
 
 ajouter dans nexter_iterator un support pour la difference entre 2 iterateurs. zone_access utilise un nexter_iterator, il faut donc implémenter la fonction de difference
 
-counting_iterator<Iterator, compare_tag = count_comparison_tag|count_and_iterator_comparison_tag>([iterator,]n=0)
-
-ajouter un cast implicit vers std::string dans cstring
-
 peut-on supprimer les constructeur de copie et l'affectation dans les iterateurs sans que cela crée des copies ?
 
 

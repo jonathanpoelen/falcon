@@ -5,14 +5,17 @@
 #include <limits>
 #include <iterator>
 #include <stdexcept>
-#include <type_traits>
+#include <utility>
+#ifndef __GXX_EXPERIMENTAL_CXX0X__
+# include <boost/type_traits/remove_const.hpp>
+#endif
+#include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/noexcept.hpp>
 #include <falcon/type_traits/enable_if.hpp>
 #include <falcon/type_traits/is_same.hpp>
 #include <falcon/string/cstringfwd.hpp>
 #include <falcon/ostream/ostream_insert.hpp>
 #include <falcon/detail/string_convertion.hpp>
-#include <falcon/preprocessor/variatic/enum.hpp>
-#include <falcon/c++/constexpr.hpp>
 
 namespace falcon {
 
@@ -24,36 +27,44 @@ template <typename _CharT, typename _Traits>
 class basic_cstring
 {
 public:
-	typedef _Traits				traits_type;
-	typedef typename std::remove_const<_CharT>::type value_type;
-	typedef _CharT*				pointer;
-	typedef const value_type*	const_pointer;
-	typedef _CharT&				reference;
-	typedef const value_type&	const_reference;
-	typedef std::size_t			size_type;
-	typedef std::ptrdiff_t		difference_type;
+	typedef _Traits traits_type;
+
+	typedef typename
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		std
+#else
+		boost
+#endif
+	::remove_const<_CharT>::type value_type;
+
+	typedef _CharT*           pointer;
+	typedef const value_type* const_pointer;
+	typedef _CharT&           reference;
+	typedef const value_type& const_reference;
+	typedef std::size_t       size_type;
+	typedef std::ptrdiff_t    difference_type;
 
 	typedef const_pointer	const_iterator;
 	typedef pointer			iterator;
 
-	typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
-	typedef std::reverse_iterator<iterator>			reverse_iterator;
+	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+	typedef std::reverse_iterator<iterator>       reverse_iterator;
 
 public:
 	static const size_type npos = static_cast<size_type>(-1);
 
 private:
-	iterator        m_begin;
-	iterator        m_end;
+	iterator m_begin;
+	iterator m_end;
 
 public:
-	CPP_CONSTEXPR basic_cstring()
+	CPP_CONSTEXPR basic_cstring() CPP_NOEXCEPT
 	: m_begin(0)
 	, m_end(0)
 	{}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	constexpr basic_cstring(std::nullptr_t)
+	constexpr basic_cstring(std::nullptr_t) noexcept
 	: m_begin(0)
 	, m_end(0)
 	{}
@@ -62,80 +73,83 @@ public:
 #endif
 
 	template<typename _CharT2>
-	basic_cstring(_CharT2* s)
+	basic_cstring(_CharT2* s) CPP_NOEXCEPT
 	: m_begin(s ? s : 0)
 	, m_end(s ? s + traits_type::length(s) : 0)
 	{}
 
 	template<typename _CharT2, std::size_t _N>
-	CPP_CONSTEXPR basic_cstring(_CharT2 (&s) [_N])
+	CPP_CONSTEXPR basic_cstring(_CharT2 (&s) [_N]) CPP_NOEXCEPT
 	: m_begin(s ? s : 0)
 	, m_end(s ? s + _N - 1 : 0)
 	{}
 
-	CPP_CONSTEXPR basic_cstring(pointer s, size_type __size)
+	CPP_CONSTEXPR basic_cstring(pointer s, size_type __size) CPP_NOEXCEPT
 	: m_begin(s)
 	, m_end(s + __size)
 	{}
 
-	CPP_CONSTEXPR basic_cstring(pointer first, pointer last)
+	CPP_CONSTEXPR basic_cstring(pointer first, pointer last) CPP_NOEXCEPT
 	: m_begin(first)
 	, m_end(last)
 	{}
 
-	CPP_CONSTEXPR basic_cstring(const basic_cstring& s)
+	CPP_CONSTEXPR basic_cstring(const basic_cstring& s) CPP_NOEXCEPT
 	: m_begin(s.m_begin)
 	, m_end(s.m_end)
 	{}
 
-	template<typename _CharT2,
-		typename _Enable = typename enable_if_c<is_same<const _CharT2, _CharT> >::type>
-	CPP_CONSTEXPR basic_cstring(const basic_cstring<_CharT2, _Traits> s)
+	template<typename _CharT2>
+	CPP_CONSTEXPR basic_cstring(const basic_cstring<_CharT2, _Traits> s,
+															typename enable_if_c<is_same<const _CharT2, _CharT> >::type) CPP_NOEXCEPT
 	: m_begin(s.c_str())
 	, m_end(m_begin + s.size())
 	{}
 
-	basic_cstring& operator=(const basic_cstring& s)
+	basic_cstring& operator=(const basic_cstring& s) CPP_NOEXCEPT
 	{ return assign(s); }
 
-	basic_cstring& operator=(pointer s)
+	basic_cstring& operator=(pointer s) CPP_NOEXCEPT
 	{ return assign(s); }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	basic_cstring& operator=(std::nullptr_t)
+	basic_cstring& operator=(std::nullptr_t) noexcept
 	{ return clear(); }
+
+	explicit operator std::basic_string<value_type, _Traits> () const
+	{ return std::basic_string<value_type, _Traits>(data(), size()); }
 #endif
 
-	reference operator[](size_type index)
+	reference operator[](size_type index) CPP_NOEXCEPT
 	{ return m_begin[index]; }
 
-	const_reference operator[](size_type index) const
+	const_reference operator[](size_type index) const CPP_NOEXCEPT
 	{ return m_begin[index]; }
 
 	/**
 	 *  Returns a reference to the data at the first element of the %string.
 	 */
-	reference front()
+	reference front() CPP_NOEXCEPT
 	{ return operator[](0); }
 
 	/**
 	 *  Returns a read-only (constant) reference to the data at the first
 	 *  element of the %string.
 	 */
-	CPP_CONSTEXPR const_reference front() const
+	CPP_CONSTEXPR const_reference front() const CPP_NOEXCEPT
 	{ return operator[](0); }
 
 	/**
 	 *  Returns a reference to the data at the last element of the %string.
 	 */
-	reference back()
+	reference back() CPP_NOEXCEPT
 	{ return operator[](m_end - 1); }
 
 	/**
 	 *  Returns a read-only (constant) reference to the data at the
 	 *  last element of the %string.
 	 */
-	CPP_CONSTEXPR const_reference back() const
+	CPP_CONSTEXPR const_reference back() const CPP_NOEXCEPT
 	{ return operator[](m_end - 1); }
 
 	reference at(size_type index)
@@ -152,18 +166,18 @@ public:
 		return m_begin[index];
 	}
 
-	CPP_CONSTEXPR size_type size() const
+	CPP_CONSTEXPR size_type size() const CPP_NOEXCEPT
 	{ return m_end - m_begin; }
-	CPP_CONSTEXPR size_type length() const
+	CPP_CONSTEXPR size_type length() const CPP_NOEXCEPT
 	{ return m_end - m_begin; }
 
-	CPP_CONSTEXPR size_type max_size() const
+	CPP_CONSTEXPR size_type max_size() const CPP_NOEXCEPT
 	{ return static_cast<size_type>(-1); }
 
-	CPP_CONSTEXPR bool empty() const
+	CPP_CONSTEXPR bool empty() const CPP_NOEXCEPT
 	{ return m_begin == m_end; }
 
-	void clear()
+	void clear() CPP_NOEXCEPT
 	{ m_end = m_begin; }
 
 	void resize(size_type new_len)
@@ -173,36 +187,36 @@ public:
 	}
 
 	template<typename _Traits2>
-	basic_cstring& assign(const basic_cstring<_CharT, _Traits2>& s)
+	basic_cstring& assign(const basic_cstring<_CharT, _Traits2>& s) CPP_NOEXCEPT
 	{ return assign(s.m_begin, s.m_end); }
 
-	basic_cstring&  assign(pointer first, pointer last)
+	basic_cstring&  assign(pointer first, pointer last) CPP_NOEXCEPT
 	{
 		m_begin = first;
 		m_end = last;
 		return *this;
 	}
 
-	basic_cstring& assign(pointer s, size_type len)
+	basic_cstring& assign(pointer s, size_type len) CPP_NOEXCEPT
 	{ return assign(s, s + len); }
 
-	basic_cstring& assign(const basic_cstring& s, size_type pos, size_type len)
+	basic_cstring& assign(const basic_cstring& s, size_type pos, size_type len) CPP_NOEXCEPT
 	{ return assign(s + pos, len); }
 
-	basic_cstring& assign(pointer s)
+	basic_cstring& assign(pointer s) CPP_NOEXCEPT
 	{
 		m_begin = s ? s : 0;
 		m_end = s ? s + traits_type::length(s) : 0;
 		return *this;
 	}
 
-	basic_cstring& erase()
+	basic_cstring& erase() CPP_NOEXCEPT
 	{
 		clear();
 		return *this;
 	}
 
-	basic_cstring& erase(size_type pos)
+	basic_cstring& erase(size_type pos) CPP_NOEXCEPT
 	{
 		if (size() <= pos)
 			clear();
@@ -238,7 +252,7 @@ public:
 	 *  This is a handle to internal data.  Do not modify or dire things may
 	 *  happen.
 	 */
-	CPP_CONSTEXPR const_pointer c_str() const
+	CPP_CONSTEXPR const_pointer c_str() const CPP_NOEXCEPT
 	{ return m_begin; }
 
 	/**
@@ -247,33 +261,33 @@ public:
 	 *  This is a handle to internal data.  Do not modify or dire things may
 	 *  happen.
 	 */
-	CPP_CONSTEXPR const_pointer data() const
+	CPP_CONSTEXPR const_pointer data() const CPP_NOEXCEPT
 	{ return m_begin; }
 
-	void swap(basic_cstring& s)
+	void swap(basic_cstring& s) CPP_NOEXCEPT
 	{
 		std::swap<>(m_begin, s.m_begin);
 		std::swap<>(m_end, s.m_end);
 	}
 
-	iterator begin()
+	iterator begin() CPP_NOEXCEPT
 	{ return m_begin; }
-	CPP_CONSTEXPR const_iterator begin() const
+	CPP_CONSTEXPR const_iterator begin() const CPP_NOEXCEPT
 	{ return m_begin; }
 
-	iterator end()
+	iterator end() CPP_NOEXCEPT
 	{ return m_end; }
-	CPP_CONSTEXPR const_iterator end() const
+	CPP_CONSTEXPR const_iterator end() const CPP_NOEXCEPT
 	{ return m_end; }
 
-	reverse_iterator rbegin()
+	reverse_iterator rbegin() CPP_NOEXCEPT
 	{ return reverse_iterator(m_end); }
-	CPP_CONSTEXPR const_reverse_iterator rbegin() const
+	CPP_CONSTEXPR const_reverse_iterator rbegin() const CPP_NOEXCEPT
 	{ return reverse_iterator(m_end); }
 
-	reverse_iterator rend()
+	reverse_iterator rend() CPP_NOEXCEPT
 	{ return reverse_iterator(m_begin); }
-	CPP_CONSTEXPR const_reverse_iterator rend() const
+	CPP_CONSTEXPR const_reverse_iterator rend() const CPP_NOEXCEPT
 	{ return reverse_iterator(m_begin); }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -281,14 +295,14 @@ public:
 	 *  Returns a read-only (constant) iterator that points to the first
 	 *  character in the %string.
 	 */
-	constexpr const_iterator cbegin() const
+	constexpr const_iterator cbegin() const noexcept
 	{ return const_iterator(m_begin); }
 
 	/**
 	 *  Returns a read-only (constant) iterator that points one past the
 	 *  last character in the %string.
 	 */
-	constexpr const_iterator cend() const
+	constexpr const_iterator cend() const noexcept
 	{ return const_iterator(m_end); }
 
 	/**
@@ -296,7 +310,7 @@ public:
 	 *  to the last character in the %string.  Iteration is done in
 	 *  reverse element order.
 	 */
-	constexpr const_reverse_iterator crbegin() const
+	constexpr const_reverse_iterator crbegin() const noexcept
 	{ return const_reverse_iterator(m_end); }
 
 	/**
@@ -304,7 +318,7 @@ public:
 	 *  to one before the first character in the %string.  Iteration
 	 *  is done in reverse element order.
 	 */
-	constexpr const_reverse_iterator crend() const
+	constexpr const_reverse_iterator crend() const noexcept
 	{ return const_reverse_iterator(m_begin); }
 #endif
 
@@ -319,7 +333,7 @@ public:
 	 *  in @a s within this string.  If found, returns the index where it
 	 *  begins.  If not found, returns npos.
 	 */
-	size_type find(const _CharT* __s, size_type __pos, size_type __n) const
+	size_type find(const _CharT* __s, size_type __pos, size_type __n) const CPP_NOEXCEPT
 	{
 		const size_type __size = size();
 		const _CharT* __data = data();
@@ -348,7 +362,7 @@ public:
 	 *  this string.  If found, returns the index where it begins.  If not
 	 *  found, returns npos.
 	 */
-	size_type find(const basic_cstring& __str, size_type __pos = 0) const
+	size_type find(const basic_cstring& __str, size_type __pos = 0) const CPP_NOEXCEPT
 	{ return this->find(__str.data(), __pos, __str.size()); }
 
 	/**
@@ -361,7 +375,7 @@ public:
 	 *  this string.  If found, returns the index where it begins.  If not
 	 *  found, returns npos.
 	 */
-	size_type find(const _CharT* __s, size_type __pos = 0) const
+	size_type find(const _CharT* __s, size_type __pos = 0) const CPP_NOEXCEPT
 	{ return this->find(__s, __pos, traits_type::length(__s)); }
 
 	/**
@@ -374,7 +388,7 @@ public:
 	 *  If found, returns the index where it was found.  If not found,
 	 *  returns npos.
 	 */
-	size_type find(_CharT __c, size_type __pos = 0) const
+	size_type find(_CharT __c, size_type __pos = 0) const CPP_NOEXCEPT
 	{
 		size_type __ret = npos;
 		const size_type __size = size();
@@ -400,7 +414,7 @@ public:
 	 *  characters in @a s within this string.  If found, returns the index
 	 *  where it begins.  If not found, returns npos.
 	 */
-	size_type rfind(const _CharT* __s, size_type __pos, size_type __n) const
+	size_type rfind(const _CharT* __s, size_type __pos, size_type __n) const CPP_NOEXCEPT
 	{
 		const size_type __size = size();
 		if (__n <= __size)
@@ -427,7 +441,7 @@ public:
 	 *  this string.  If found, returns the index where it begins.  If not
 	 *  found, returns npos.
 	 */
-	size_type rfind(const basic_cstring& __str, size_type __pos = npos) const
+	size_type rfind(const basic_cstring& __str, size_type __pos = npos) const CPP_NOEXCEPT
 	{ return this->rfind(__str.data(), __pos, __str.size()); }
 
 	/**
@@ -440,7 +454,7 @@ public:
 	 *  this string.  If found, returns the index where it begins.  If not
 	 *  found, returns npos.
 	 */
-	size_type rfind(const _CharT* __s, size_type __pos = npos) const
+	size_type rfind(const _CharT* __s, size_type __pos = npos) const CPP_NOEXCEPT
 	{ return this->rfind(__s, __pos, traits_type::length(__s)); }
 
 	/**
@@ -453,7 +467,7 @@ public:
 	 *  If found, returns the index where it was found.  If not found,
 	 *  returns npos.
 	 */
-	size_type rfind(_CharT __c, size_type __pos = npos) const
+	size_type rfind(_CharT __c, size_type __pos = npos) const CPP_NOEXCEPT
 	{
 		size_type __size = size();
 		if (__size)
@@ -478,7 +492,7 @@ public:
 	 *  characters of @a s within this string.  If found, returns the index
 	 *  where it was found.  If not found, returns npos.
 	 */
-	size_type find_first_of(const _CharT* __s, size_type __pos, size_type __n) const
+	size_type find_first_of(const _CharT* __s, size_type __pos, size_type __n) const CPP_NOEXCEPT
 	{
 		for (; __n && __pos < this->size(); ++__pos)
 		{
@@ -499,7 +513,7 @@ public:
 	 *  @a str within this string.  If found, returns the index where it was
 	 *  found.  If not found, returns npos.
 	 */
-	size_type find_first_of(const basic_cstring& __str, size_type __pos = 0) const
+	size_type find_first_of(const basic_cstring& __str, size_type __pos = 0) const CPP_NOEXCEPT
 	{ return this->find_first_of(__str.data(), __pos, __str.size()); }
 
 	/**
@@ -512,7 +526,7 @@ public:
 	 *  @a s within this string.  If found, returns the index where it was
 	 *  found.  If not found, returns npos.
 	 */
-	size_type find_first_of(const _CharT* __s, size_type __pos = 0) const
+	size_type find_first_of(const _CharT* __s, size_type __pos = 0) const CPP_NOEXCEPT
 	{ return this->find_first_of(__s, __pos, traits_type::length(__s)); }
 
 	/**
@@ -527,7 +541,7 @@ public:
 	 *
 	 *  Note: equivalent to find(c, pos).
 	 */
-	size_type find_first_of(_CharT __c, size_type __pos = 0) const
+	size_type find_first_of(_CharT __c, size_type __pos = 0) const CPP_NOEXCEPT
 	{ return this->find(__c, __pos); }
 
 	/**
@@ -540,7 +554,7 @@ public:
 	 *  @a str within this string.  If found, returns the index where it was
 	 *  found.  If not found, returns npos.
 	 */
-	size_type find_last_of(const basic_cstring& __str, size_type __pos = npos) const
+	size_type find_last_of(const basic_cstring& __str, size_type __pos = npos) const CPP_NOEXCEPT
 	{ return this->find_last_of(__str.data(), __pos, __str.size()); }
 
 	/**
@@ -554,7 +568,7 @@ public:
 	 *  characters of @a s within this string.  If found, returns the index
 	 *  where it was found.  If not found, returns npos.
 	 */
-	size_type find_last_of(const _CharT* __s, size_type __pos, size_type __n) const
+	size_type find_last_of(const _CharT* __s, size_type __pos, size_type __n) const CPP_NOEXCEPT
 	{
 		size_type __size = this->size();
 		if (__size && __n)
@@ -581,7 +595,7 @@ public:
 	 *  @a s within this string.  If found, returns the index where it was
 	 *  found.  If not found, returns npos.
 	 */
-	size_type find_last_of(const _CharT* __s, size_type __pos = npos) const
+	size_type find_last_of(const _CharT* __s, size_type __pos = npos) const CPP_NOEXCEPT
 	{ return this->find_last_of(__s, __pos, traits_type::length(__s)); }
 
 	/**
@@ -596,7 +610,7 @@ public:
 	 *
 	 *  Note: equivalent to rfind(c, pos).
 	 */
-	size_type find_last_of(_CharT __c, size_type __pos = npos) const
+	size_type find_last_of(_CharT __c, size_type __pos = npos) const CPP_NOEXCEPT
 	{ return this->rfind(__c, __pos); }
 
 	/**
@@ -609,7 +623,7 @@ public:
 	 *  in @a str within this string.  If found, returns the index where it
 	 *  was found.  If not found, returns npos.
 	 */
-	size_type find_first_not_of(const basic_cstring& __str, size_type __pos = 0) const
+	size_type find_first_not_of(const basic_cstring& __str, size_type __pos = 0) const CPP_NOEXCEPT
 	{ return this->find_first_not_of(__str.data(), __pos, __str.size()); }
 
 	/**
@@ -623,7 +637,7 @@ public:
 	 *  in the first @a n characters of @a s within this string.  If found,
 	 *  returns the index where it was found.  If not found, returns npos.
 	 */
-	size_type find_first_not_of(const _CharT* __s, size_type __pos, size_type __n) const
+	size_type find_first_not_of(const _CharT* __s, size_type __pos, size_type __n) const CPP_NOEXCEPT
 	{
 		for (; __pos < this->size(); ++__pos)
 			if (!traits_type::find(__s, __n, data()[__pos]))
@@ -641,7 +655,7 @@ public:
 	 *  in @a s within this string.  If found, returns the index where it
 	 *  was found.  If not found, returns npos.
 	 */
-	size_type find_first_not_of(const _CharT* __s, size_type __pos = 0) const
+	size_type find_first_not_of(const _CharT* __s, size_type __pos = 0) const CPP_NOEXCEPT
 	{ return this->find_first_not_of(__s, __pos, traits_type::length(__s)); }
 
 	/**
@@ -654,7 +668,7 @@ public:
 	 *  within this string.  If found, returns the index where it was found.
 	 *  If not found, returns npos.
 	 */
-	size_type find_first_not_of(_CharT __c, size_type __pos = 0) const
+	size_type find_first_not_of(_CharT __c, size_type __pos = 0) const CPP_NOEXCEPT
 	{
 		for (; __pos < this->size(); ++__pos)
 			if (!traits_type::eq(data()[__pos], __c))
@@ -672,7 +686,7 @@ public:
 	 *  contained in @a str within this string.  If found, returns the index
 	 *  where it was found.  If not found, returns npos.
 	 */
-	size_type find_last_not_of(const basic_cstring& __str, size_type __pos = npos) const
+	size_type find_last_not_of(const basic_cstring& __str, size_type __pos = npos) const CPP_NOEXCEPT
 	{ return this->find_last_not_of(__str.data(), __pos, __str.size()); }
 
 	/**
@@ -687,7 +701,7 @@ public:
 	 *  If found, returns the index where it was found.  If not found,
 	 *  returns npos.
 	 */
-	size_type find_last_not_of(const _CharT* __s, size_type __pos, size_type __n) const
+	size_type find_last_not_of(const _CharT* __s, size_type __pos, size_type __n) const CPP_NOEXCEPT
 	{
 		size_type __size = this->size();
 		if (__size)
@@ -714,7 +728,7 @@ public:
 	 *  contained in @a s within this string.  If found, returns the index
 	 *  where it was found.  If not found, returns npos.
 	 */
-	size_type find_last_not_of(const _CharT* __s, size_type __pos = npos) const
+	size_type find_last_not_of(const _CharT* __s, size_type __pos = npos) const CPP_NOEXCEPT
 	{ return this->find_last_not_of(__s, __pos, traits_type::length(__s)); }
 
 	/**
@@ -727,7 +741,7 @@ public:
 	 *  @a c within this string.  If found, returns the index where it was
 	 *  found.  If not found, returns npos.
 	 */
-	size_type find_last_not_of(_CharT __c, size_type __pos = npos) const
+	size_type find_last_not_of(_CharT __c, size_type __pos = npos) const CPP_NOEXCEPT
 	{
 		size_type __size = this->size();
 		if (__size)
@@ -776,7 +790,7 @@ public:
 	 *  str.data(),rlen).  If the result of the comparison is nonzero returns
 	 *  it, otherwise the shorter one is ordered first.
 	 */
-	int compare(const basic_cstring& s) const
+	int compare(const basic_cstring& s) const CPP_NOEXCEPT
 	{
 		const size_type __size = this->size();
 		const size_type __osize = s.size();
@@ -866,7 +880,7 @@ public:
 	 *  comparison is nonzero returns it, otherwise the shorter one is
 	 *  ordered first.
 	 */
-	int compare(const _CharT* __s) const
+	int compare(const _CharT* __s) const CPP_NOEXCEPT
 	{
 		const size_type __size = this->size();
 		const size_type __osize = traits_type::length(__s);
@@ -943,7 +957,7 @@ public:
 	}
 
 private:
-	size_type _M_limit(size_type __pos, size_type __off) const
+	size_type _M_limit(size_type __pos, size_type __off) const CPP_NOEXCEPT
 	{
 		const bool __testoff =  __off < this->size() - __pos;
 		return __testoff ? __off : this->size() - __pos;
@@ -951,7 +965,7 @@ private:
 
 	// When __n = 1 way faster than the general multichar
 	// traits_type::copy/move/assign.
-	static void _S_copy(_CharT* __d, const _CharT* __s, size_type __n)
+	static void _S_copy(_CharT* __d, const _CharT* __s, size_type __n) CPP_NOEXCEPT
 	{
 		if (__n == 1)
 			traits_type::assign(*__d, *__s);
@@ -959,7 +973,7 @@ private:
 			traits_type::copy(__d, __s, __n);
 	}
 
-	static int _S_compare(size_type __n1, size_type __n2)
+	static int _S_compare(size_type __n1, size_type __n2) CPP_NOEXCEPT
 	{
 		const difference_type __d = difference_type(__n1 - __n2);
 
@@ -972,29 +986,50 @@ private:
 	}
 };
 
-template <typename _CharT, typename _Traits = std::char_traits<_CharT>, std::size_t _N>
-CPP_CONSTEXPR basic_cstring<_CharT, _Traits> make_cstring(_CharT (&s)[_N])
-{
-	return basic_cstring<_CharT, _Traits>(s, s + _N - 1);
-}
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
 
-template <typename _CharT, typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type>>
-CPP_CONSTEXPR basic_cstring<_CharT, _Traits> make_cstring(_CharT* s, std::size_t n)
-{
-	return basic_cstring<_CharT, _Traits>(s, n);
-}
+template <typename _CharT,
+	typename _Traits = std::char_traits<_CharT>, std::size_t _N>
+constexpr basic_cstring<_CharT, _Traits> make_cstring(_CharT (&s)[_N]) noexcept
+{ return basic_cstring<_CharT, _Traits>(s, s + _N - 1); }
 
-template <typename _CharT, typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type>>
-CPP_CONSTEXPR basic_cstring<_CharT, _Traits> make_cstring(_CharT* first, _CharT* last)
-{
-	return basic_cstring<_CharT, _Traits>(first, last);
-}
+template <typename _CharT,
+	typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type> >
+constexpr basic_cstring<_CharT, _Traits>
+make_cstring(_CharT* s, std::size_t n) noexcept
+{ return basic_cstring<_CharT, _Traits>(s, n); }
 
-template <typename _CharT, typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type>>
-basic_cstring<_CharT, _Traits> make_cstring(_CharT* s)
-{
-	return basic_cstring<_CharT, _Traits>(s);
-}
+template <typename _CharT,
+	typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type> >
+constexpr basic_cstring<_CharT, _Traits>
+make_cstring(_CharT* first, _CharT* last) noexcept
+{ return basic_cstring<_CharT, _Traits>(first, last); }
+
+template <typename _CharT,
+	typename _Traits = std::char_traits<typename std::remove_const<_CharT>::type> >
+basic_cstring<_CharT, _Traits> make_cstring(_CharT* s) noexcept
+{ return basic_cstring<_CharT, _Traits>(s); }
+
+#else
+
+template <typename _CharT, std::size_t _N>
+basic_cstring<_CharT> make_cstring(_CharT (&s)[_N])
+{ return basic_cstring<_CharT>(s, s + _N - 1); }
+
+template <typename _CharT>
+basic_cstring<_CharT> make_cstring(_CharT* s, std::size_t n)
+{ return basic_cstring<_CharT>(s, n); }
+
+template <typename _CharT>
+basic_cstring<_CharT> make_cstring(_CharT* first, _CharT* last)
+{ return basic_cstring<_CharT>(first, last); }
+
+template <typename _CharT>
+basic_cstring<_CharT> make_cstring(_CharT* s)
+{ return basic_cstring<_CharT>(s); }
+
+#endif
+
 
 template<typename _CharT>
 struct __cstring_const_pointer
@@ -1013,7 +1048,7 @@ struct __cstring_const_pointer<const _CharT>
  */
 template<typename _CharT, typename _Traits>
 inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) == 0; }
 
 /**
@@ -1024,7 +1059,7 @@ inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator==(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(__lhs) == 0; }
 
 /**
@@ -1035,7 +1070,7 @@ inline bool operator==(typename __cstring_const_pointer<_CharT>::__pointer __lhs
  */
 template<typename _CharT, typename _Traits>
 inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
-											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) == 0; }
 
 /**
@@ -1046,7 +1081,7 @@ inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator==(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(0, __rhs.size(), __rhs.c_str()) == 0; }
 
 /**
@@ -1057,7 +1092,7 @@ inline bool operator==(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs) CPP_NOEXCEPT
 { return (__rhs == __lhs); }
 
 // operator !=
@@ -1069,7 +1104,7 @@ inline bool operator==(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return !(__lhs == __rhs); }
 
 /**
@@ -1080,7 +1115,7 @@ inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator!=(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return !(__lhs == __rhs); }
 
 /**
@@ -1091,7 +1126,7 @@ inline bool operator!=(typename __cstring_const_pointer<_CharT>::__pointer __lhs
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs) CPP_NOEXCEPT
 { return !(__lhs == __rhs); }
 
 /**
@@ -1102,7 +1137,7 @@ inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator!=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return !(__lhs == __rhs); }
 
 /**
@@ -1113,7 +1148,7 @@ inline bool operator!=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs) CPP_NOEXCEPT
 { return !(__lhs == __rhs); }
 
 // operator <
@@ -1125,7 +1160,7 @@ inline bool operator!=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
-											const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) < 0; }
 
 /**
@@ -1136,7 +1171,7 @@ inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
-											typename __cstring_const_pointer<_CharT>::__pointer __rhs)
+											typename __cstring_const_pointer<_CharT>::__pointer __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) < 0; }
 
 /**
@@ -1147,7 +1182,7 @@ inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator<(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
-											const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(__lhs) > 0; }
 
 /**
@@ -1158,7 +1193,7 @@ inline bool operator<(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
-											const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+											const std::basic_string<_CharT, _Traits, _Alloc>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
 
 /**
@@ -1169,7 +1204,7 @@ inline bool operator<(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator<(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
-											const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(0, __lhs.size(), __lhs.c_str()) > 0; }
 
 // operator >
@@ -1181,7 +1216,7 @@ inline bool operator<(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
-											const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) > 0; }
 
 /**
@@ -1192,7 +1227,7 @@ inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
-											typename __cstring_const_pointer<_CharT>::__pointer __rhs)
+											typename __cstring_const_pointer<_CharT>::__pointer __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) > 0; }
 
 /**
@@ -1203,7 +1238,7 @@ inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator>(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
-											const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(__lhs) < 0; }
 
 /**
@@ -1214,7 +1249,7 @@ inline bool operator>(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
-											const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+											const std::basic_string<_CharT, _Traits, _Alloc>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
 
 /**
@@ -1225,7 +1260,7 @@ inline bool operator>(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator>(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
-											const basic_cstring<_CharT, _Traits>& __rhs)
+											const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(0, __rhs.size(), __rhs.c_str()) > 0; }
 
 // operator <=
@@ -1237,7 +1272,7 @@ inline bool operator>(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) <= 0; }
 
 /**
@@ -1248,7 +1283,7 @@ inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) <= 0; }
 
 /**
@@ -1259,7 +1294,7 @@ inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator<=(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(__lhs) >= 0; }
 
 /**
@@ -1270,7 +1305,7 @@ inline bool operator<=(typename __cstring_const_pointer<_CharT>::__pointer __lhs
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(0, __rhs.size(), __rhs.c_str()) <= 0; }
 
 /**
@@ -1281,7 +1316,7 @@ inline bool operator<=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator<=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(0, __lhs.size(), __lhs.c_str()) >= 0; }
 
 // operator >=
@@ -1293,7 +1328,7 @@ inline bool operator<=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) >= 0; }
 
 /**
@@ -1304,7 +1339,7 @@ inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 typename __cstring_const_pointer<_CharT>::__pointer __rhs)
+											 typename __cstring_const_pointer<_CharT>::__pointer __rhs) CPP_NOEXCEPT
 { return __lhs.compare(__rhs) >= 0; }
 
 /**
@@ -1315,7 +1350,7 @@ inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits>
 inline bool operator>=(typename __cstring_const_pointer<_CharT>::__pointer __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(__lhs) <= 0; }
 
 /**
@@ -1326,7 +1361,7 @@ inline bool operator>=(typename __cstring_const_pointer<_CharT>::__pointer __lhs
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
-											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs)
+											 const std::basic_string<_CharT, _Traits, _Alloc>& __rhs) CPP_NOEXCEPT
 { return __rhs.compare(0, __lhs.size(), __lhs.c_str()) <= 0; }
 
 /**
@@ -1337,7 +1372,7 @@ inline bool operator>=(const basic_cstring<_CharT, _Traits>& __lhs,
  */
 template<typename _CharT, typename _Traits, typename _Alloc>
 inline bool operator>=(const std::basic_string<_CharT, _Traits, _Alloc>& __lhs,
-											 const basic_cstring<_CharT, _Traits>& __rhs)
+											 const basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { return __lhs.compare(0, __rhs.size(), __rhs.c_str()) >= 0; }
 
 
@@ -1432,66 +1467,76 @@ namespace std {
  */
 template<typename _CharT, typename _Traits>
 inline void swap(falcon::basic_cstring<_CharT, _Traits>& __lhs,
-				 falcon::basic_cstring<_CharT, _Traits>& __rhs)
+								 falcon::basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { __lhs.swap(__rhs); }
 
-#define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type, specif)\
+#define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type fname(const falcon::cstring_type& __str, size_t* __idx = 0, int __base = 10)\
-	{ return falcon::detail::stoa\
-	FALCON_PP_VARIADIC_ENUM specif\
+	{ return falcon::detail::stoa<result_type>\
 	(&std::std_fname, #fname, __str.c_str(), __idx, __base); }
 
-#define __FALCON_BASIC_CSTRING_TO(result_type, fname, type, specif)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, cstring, specif)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, const_cstring, specif)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, cwstring, specif)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, const_cwstring, specif)
+#define __FALCON_BASIC_CSTRING_TO(result_type, fname, type)\
+	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, cstring)\
+	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, const_cstring)\
+	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, cwstring)\
+	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, const_cwstring)
 
-#define __FALCON_BASIC_CSTRING_TO2(result_type, fname, type)\
-	__FALCON_BASIC_CSTRING_TO(result_type, fname, type, ())
+__FALCON_BASIC_CSTRING_TO(int, stoi, l)
+__FALCON_BASIC_CSTRING_TO(long, stol, l)
+__FALCON_BASIC_CSTRING_TO(unsigned long, stoul, ul)
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+__FALCON_BASIC_CSTRING_TO(long long, stoll, ull)
+__FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
+#endif
 
-__FALCON_BASIC_CSTRING_TO(int, stoi, l, (<long, int>))
-__FALCON_BASIC_CSTRING_TO2(long, stol, l)
-__FALCON_BASIC_CSTRING_TO2(unsigned long, stoul, ul)
-__FALCON_BASIC_CSTRING_TO2(long long, stoll, ull)
-__FALCON_BASIC_CSTRING_TO2(unsigned long long, stoull, ull)
+#undef __FALCON_BASIC_CSTRING_TO_IMPL
 
-#define __FALCON_BASIC_CSTRING_TO_IMPL2(result_type, fname, std_fname, cstring_type)\
+#define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type fname(const falcon::cstring_type& __str, size_t* __idx = 0)\
-	{ return falcon::detail::stoa\
+	{ return falcon::detail::stoa<result_type>\
 	(&std::std_fname, #fname, __str.c_str(), __idx); }
 
-#define __FALCON_BASIC_CSTRING_TO3(result_type, fname, type)\
-	__FALCON_BASIC_CSTRING_TO_IMPL2(result_type, fname, strto##type, cstring)\
-	__FALCON_BASIC_CSTRING_TO_IMPL2(result_type, fname, strto##type, const_cstring)\
-	__FALCON_BASIC_CSTRING_TO_IMPL2(result_type, fname, wcsto##type, cwstring)\
-	__FALCON_BASIC_CSTRING_TO_IMPL2(result_type, fname, wcsto##type, const_cwstring)
+__FALCON_BASIC_CSTRING_TO(float, stof, f)
+__FALCON_BASIC_CSTRING_TO(double, stod, d)
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+__FALCON_BASIC_CSTRING_TO(double long, stold, ld)
+#endif
 
-__FALCON_BASIC_CSTRING_TO3(float, stof, f)
-__FALCON_BASIC_CSTRING_TO3(double, stod, d)
-__FALCON_BASIC_CSTRING_TO3(double long, stold, ld)
-
-#undef __FALCON_BASIC_CSTRING_TO3
-#undef __FALCON_BASIC_CSTRING_TO2
 #undef __FALCON_BASIC_CSTRING_TO
 #undef __FALCON_BASIC_CSTRING_TO_IMPL
-#undef __FALCON_BASIC_CSTRING_TO_IMPL2
+
+inline std::string to_string(const falcon::cstring& s)
+{ return std::string(s.data(), s.size()); }
+
+inline std::string to_string(const falcon::const_cstring& s)
+{ return std::string(s.data(), s.size()); }
+
+inline std::wstring to_wstring(const falcon::cwstring& s)
+{ return std::wstring(s.data(), s.size()); }
+
+inline std::wstring to_wstring(const falcon::const_cwstring& s)
+{ return std::wstring(s.data(), s.size()); }
+
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
 
 template<typename _CharT, typename _Traits>
-struct hash<falcon::basic_cstring<_CharT, _Traits>>
+struct hash<falcon::basic_cstring<_CharT, _Traits> >
 {
 	typedef size_t result_type;
 	typedef falcon::basic_cstring<_CharT, _Traits> argument_type;
 
-	size_t operator()(const falcon::cstring& s) const
+	result_type operator()(const argument_type& s) const noexcept
 	{
 		typedef falcon::cstring::const_iterator iterator;
-		unsigned long __h = 0;
+		result_type __h = static_cast<result_type>(0xc70f6907UL);
 		for (iterator first = s.begin(), last = s.end(); first != last; ++first)
-			__h = 5 * __h + *first;
-		return size_t(__h);
+			__h ^= static_cast<result_type>(*first) + (__h << 6) + (__h >> 2);
+		return __h;
 	}
 };
+
+#endif
 
 }
 

@@ -13,7 +13,7 @@ namespace detail {
 
 template<typename _TRet, typename _Ret, typename _CharT>
 _Ret __stoa_aux(const _TRet& __tmp, _Ret& __ret, const char* __name,
-				const _CharT* __str, std::size_t* __idx, _CharT* __endptr)
+								const _CharT* __str, std::size_t* __idx, _CharT* __endptr)
 {
 	if (__endptr == __str)
 		throw std::invalid_argument(__name);
@@ -30,9 +30,9 @@ _Ret __stoa_aux(const _TRet& __tmp, _Ret& __ret, const char* __name,
 }
 
 // Helper for all the sto* functions.
-template<typename _TRet, typename _Ret = _TRet, typename _CharT>
+template<typename _Ret, typename _TRet, typename _CharT>
 _Ret stoa(_TRet (*__convf) (const _CharT*, _CharT**),
-		  const char* __name, const _CharT* __str, std::size_t* __idx)
+					const char* __name, const _CharT* __str, std::size_t* __idx)
 {
 	_Ret __ret;
 
@@ -43,10 +43,10 @@ _Ret stoa(_TRet (*__convf) (const _CharT*, _CharT**),
 	return __ret;
 }
 
-template<typename _TRet, typename _Ret = _TRet, typename _CharT>
+template<typename _Ret, typename _TRet, typename _CharT>
 _Ret stoa(_TRet (*__convf) (const _CharT*, _CharT**, int base),
-		  const char* __name, const _CharT* __str, std::size_t* __idx,
-		  int __base)
+					const char* __name, const _CharT* __str, std::size_t* __idx,
+					int __base)
 {
 	_Ret __ret;
 
@@ -58,10 +58,10 @@ _Ret stoa(_TRet (*__convf) (const _CharT*, _CharT**, int base),
 }
 
 // Helper for the to_string / to_wstring functions.
-template<typename _String, typename _CharT = typename _String::value_type>
+template<typename _String, typename _CharT>
 _String to_xstring(int (*__convf) (_CharT*, std::size_t, const _CharT*,
-								   __builtin_va_list),
-				   std::size_t __n, const _CharT* __fmt, ...)
+																	 __builtin_va_list),
+									 std::size_t __n, const _CharT* __fmt, ...)
 {
 	// XXX Eventually the result will be constructed in place in
 	// the C++0x string, likely with the help of internal hooks.

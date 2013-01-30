@@ -37,22 +37,22 @@ private:
 	pointer _M_last;
 
 public:
-	CPP_CONSTEXPR ptr_container()
+	CPP_CONSTEXPR ptr_container() CPP_NOEXCEPT
 	: _M_first(0)
 	, _M_last(0)
 	{}
 
-	CPP_CONSTEXPR ptr_container(pointer first, pointer last)
+	CPP_CONSTEXPR ptr_container(pointer first, pointer last) CPP_NOEXCEPT
 	: _M_first(first)
 	, _M_last(last)
 	{}
 
-	CPP_CONSTEXPR ptr_container(pointer first, size_type n)
+	CPP_CONSTEXPR ptr_container(pointer first, size_type n) CPP_NOEXCEPT
 	: _M_first(first)
 	, _M_last(first + n)
 	{}
 
-	CPP_CONSTEXPR ptr_container(const ptr_container& other)
+	CPP_CONSTEXPR ptr_container(const ptr_container& other) CPP_NOEXCEPT
 	: _M_first(other._M_first)
 	, _M_last(other._M_last)
 	{}
@@ -140,16 +140,16 @@ public:
 		: (std::out_of_range("ptr_container::at"), _M_first[0]);
 	}
 
-	reference front()
+	reference front() CPP_NOEXCEPT
 	{ return *_M_first; }
 
-	const_reference front() const
+	const_reference front() const CPP_NOEXCEPT
 	{ return *_M_first; }
 
-	reference back()
+	reference back() CPP_NOEXCEPT
 	{ return empty() ? *_M_last : *(_M_last - 1); }
 
-	const_reference back() const
+	const_reference back() const CPP_NOEXCEPT
 	{ return empty() ? *_M_last : *(_M_last - 1); }
 
 	void swap(ptr_container& other) CPP_NOEXCEPT
@@ -209,34 +209,34 @@ inline bool operator>=(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
 { return !(x < y); }
 
 template<typename _T>
-ptr_container<_T> make_ptr_container(_T * first, _T * last)
+ptr_container<_T> make_ptr_container(_T * first, _T * last) CPP_NOEXCEPT
 { return ptr_container<_T>(first, last); }
 
 template<typename _T>
-ptr_container<_T> make_ptr_container(_T * first, std::size_t n)
+ptr_container<_T> make_ptr_container(_T * first, std::size_t n) CPP_NOEXCEPT
 { return ptr_container<_T>(first, n); }
 
 template<typename _T>
-ptr_container<const _T> make_ptr_container(const _T * first, const _T * last)
+ptr_container<const _T> make_ptr_container(const _T * first, const _T * last) CPP_NOEXCEPT
 { return ptr_container<const _T>(first, last); }
 
 template<typename _T>
-ptr_container<const _T> make_ptr_container(const _T * first, std::size_t n)
+ptr_container<const _T> make_ptr_container(const _T * first, std::size_t n) CPP_NOEXCEPT
 { return ptr_container<const _T>(first, n); }
 
 template<typename _T, std::size_t _N>
-ptr_container<_T> make_ptr_container(_T(&cont)[_N])
+ptr_container<_T> make_ptr_container(_T(&cont)[_N]) CPP_NOEXCEPT
 { return ptr_container<const _T>(&cont[0], &cont[_N]); }
 
 template<typename _T, std::size_t _N>
-ptr_container<const _T> make_ptr_container(const _T(&cont)[_N])
+ptr_container<const _T> make_ptr_container(const _T(&cont)[_N]) CPP_NOEXCEPT
 { return ptr_container<const _T>(&cont[0], &cont[_N]); }
 
 }
 
 namespace std {
 	template<typename _T>
-	void swap(const falcon::ptr_container<_T>& x, const falcon::ptr_container<_T> y)
+	void swap(const falcon::ptr_container<_T>& x, const falcon::ptr_container<_T> y) CPP_NOEXCEPT
 	{ x.swap(y); }
 }
 
