@@ -225,7 +225,10 @@ public:
 	: _M_current(std::forward<_U>(__x))
 	{}
 
-	iterator_handler& operator=(const iterator_handler& ) = default;
+	iterator_handler& operator=(const iterator_handler&) = default;
+	iterator_handler& operator=(iterator_handler&&) = default;
+	iterator_handler& operator=(_Iterator&& other)
+	{ return operator=(static_cast<iterator_handler&&>(other)); };
 #else
 	iterator_handler& operator=(const iterator_type& other) = default
 	{

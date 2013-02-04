@@ -1,8 +1,8 @@
 #ifndef _FALCON_ITERATOR_NEXTER_ITERATOR_HPP
 #define _FALCON_ITERATOR_NEXTER_ITERATOR_HPP
 
-#include <falcon/type_traits/is_same.hpp>
 #include <falcon/iterator/iterator_handler.hpp>
+#include <falcon/iterator/minimal_iterator_category.hpp>
 
 namespace falcon {
 namespace iterator {
@@ -20,11 +20,9 @@ namespace detail
 		typedef typename iterator_handler_types<
 			nexter_iterator<_Iterator, _Nexter>,
 			_Iterator,
-			typename if_<
-				(is_same<iterator_category, std::bidirectional_iterator_tag>::value
-				|| is_same<iterator_category, std::random_access_iterator_tag>::value),
-				std::forward_iterator_tag,
-				iterator_category
+			typename minimal_iterator_category<
+				iterator_category,
+				std::forward_iterator_tag
 			>::type
 		>::base base;
 	};
