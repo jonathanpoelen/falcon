@@ -40,7 +40,7 @@ add_definitions(
 	-Wpointer-arith
 	-Wconversion
 	-Wsign-compare
-	-Wmissing-declarations
+	-Wno-missing-declarations
 	-Wmissing-noreturn
 	-Wmissing-format-attribute
 	-Wpacked

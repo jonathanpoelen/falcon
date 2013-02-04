@@ -139,13 +139,11 @@ utiliser optimal_tuple dans recursive_iterator
 
 revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
 
-un iterateurs sur un tableau d'iterateurs (voir après avoir fait les itérateurs plus haut)
-
-ajouter dans nexter_iterator un support pour la difference entre 2 iterateurs. zone_access utilise un nexter_iterator, il faut donc implémenter la fonction de difference
+ajouter dans nexter_iterator un support pour la difference entre 2 iterateurs ainsi que'en template les type t, category, reference, distance et pointer ; comme avec indirect_iterator. zone_access utilise un nexter_iterator, il faut donc implémenter la fonction de difference
 
 peut-on supprimer les constructeur de copie et l'affectation dans les iterateurs sans que cela crée des copies ?
 
-
+preprocessor/move.hpp -> c++/move.hpp ?
 
 
 
