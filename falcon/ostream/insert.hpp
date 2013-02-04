@@ -1,12 +1,12 @@
-#ifndef _FALCON_OSTREAM_OSTREAM_INSERT_HPP
-#define _FALCON_OSTREAM_OSTREAM_INSERT_HPP
+#ifndef _FALCON_OSTREAM_INSERT_HPP
+#define _FALCON_OSTREAM_INSERT_HPP
 
 #include <iosfwd>
 
 namespace falcon {
 
 template<typename _CharT, typename _Traits>
-inline std::basic_ostream<_CharT, _Traits>&
+std::basic_ostream<_CharT, _Traits>&
 ostream_write(std::basic_ostream<_CharT, _Traits>& out,
 							const _CharT* s, std::streamsize n)
 {
@@ -19,8 +19,20 @@ ostream_write(std::basic_ostream<_CharT, _Traits>& out,
 	return out;
 }
 
+template<typename _CharT, typename _Traits, std::size_t _N>
+std::basic_ostream<_CharT, _Traits>&
+ostream_write(std::basic_ostream<_CharT, _Traits>& out,
+							const _CharT (&s)[_N])
+{ return ostream_write<>(out, s, static_cast<std::streamsize>(_N)); }
+
+template<typename _CharT, typename _Traits, std::size_t _N>
+std::basic_ostream<_CharT, _Traits>&
+ostream_write(std::basic_ostream<_CharT, _Traits>& out,
+							const std::basic_string<_CharT, _Traits>& s)
+{ return ostream_write<>(out, s.data(), s.size()); }
+
 template<typename _CharT, typename _Traits>
-inline std::basic_ostream<_CharT, _Traits>&
+std::basic_ostream<_CharT, _Traits>&
 ostream_fill(std::basic_ostream<_CharT, _Traits>& out, std::streamsize n, _CharT c)
 {
 	typedef std::basic_ostream<_CharT, _Traits> ostream_type;
@@ -39,7 +51,7 @@ ostream_fill(std::basic_ostream<_CharT, _Traits>& out, std::streamsize n, _CharT
 }
 
 template<typename _CharT, typename _Traits>
-inline std::basic_ostream<_CharT, _Traits>&
+std::basic_ostream<_CharT, _Traits>&
 ostream_fill(std::basic_ostream<_CharT, _Traits>& out, std::streamsize n)
 { return ostream_fill(out, n, out.fill()); }
 
@@ -71,6 +83,18 @@ ostream_insert(std::basic_ostream<_CharT, _Traits>& out,
 	}
 	return out;
 }
+
+template<typename _CharT, typename _Traits, std::size_t _N>
+std::basic_ostream<_CharT, _Traits>&
+ostream_insert(std::basic_ostream<_CharT, _Traits>& out,
+							 const _CharT(&s)[_N])
+{ return ostream_insert<>(out, s, static_cast<std::streamsize>(_N)); }
+
+template<typename _CharT, typename _Traits, std::size_t _N>
+std::basic_ostream<_CharT, _Traits>&
+ostream_insert(std::basic_ostream<_CharT, _Traits>& out,
+							 const std::basic_string<_CharT, _Traits>& s)
+{ return ostream_insert<>(out, s.data(), s.size()); }
 
 }
 

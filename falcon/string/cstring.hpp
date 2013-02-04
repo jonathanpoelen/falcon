@@ -14,7 +14,7 @@
 #include <falcon/type_traits/enable_if.hpp>
 #include <falcon/type_traits/is_same.hpp>
 #include <falcon/string/cstringfwd.hpp>
-#include <falcon/ostream/ostream_insert.hpp>
+#include <falcon/ostream/insert.hpp>
 #include <falcon/detail/string_convertion.hpp>
 
 namespace falcon {
