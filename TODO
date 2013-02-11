@@ -4,7 +4,7 @@ voir les TODO et NOTE de endian.hpp
 
 fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_construct.h (+implementation qui ne fait pas de destruction en passant par exemple un no_garbage_collector_t ou en indiquand dans le nom uninitialized_without_garbage_collector qui retourne un objet avec l'exceptions ou non et l'iterator de fin). fichier à mettre dans memory. Trouver un autre nom que garbage_collector.
 
-rendre operator.hpp un peu compatible c++89
+rendre operators.hpp un peu compatible c++89
 
 fonction get<std::size_t, std::initilizer_list>(std::initilizer_list) (fichier get_initializer_list ?). Grace a ça, std::initilizer_list doit fonctionner avec tuple_call<>().
 
@@ -105,13 +105,9 @@ algorithm.hpp : ne prend pas en compte les containers constant…
 
 tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ?
 
-flag.hpp: pb avec le decalage de bit de flag. flag.cpp: god for gcc-4.7, fail with gcc-4.6…
-
-enlever pseudo_iterator et faire [in|out]put_iterator_base
+flag.hpp: pb avec le decalage de bit de flag. flag.cpp: good for gcc-4.7, fail with gcc-4.6…
 
 late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…) { return _FunctorAllocator(…) } ; _FunctorAllocator -> return _ClassTemplate<_T>()
-
-utiliser __CHAR_BIT__ dans bit/bit_swap.hpp et bit/detail/bit_swap.hpp (en fait les fonctions changent selon le nombre de bit…)
 
 ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
 
@@ -141,7 +137,7 @@ revoir les java_iterator pour faire un heritage sur un java_iterator_handler com
 
 ajouter dans nexter_iterator un support pour la difference entre 2 iterateurs ainsi que'en template les type t, category, reference, distance et pointer ; comme avec indirect_iterator. zone_access utilise un nexter_iterator, il faut donc implémenter la fonction de difference
 
-peut-on supprimer les constructeur de copie et l'affectation dans les iterateurs sans que cela crée des copies ?
+peut-on supprimer les constructeurs de copie et l'affectation dans les iterateurs sans que cela crée des copies ?
 
 preprocessor/move.hpp -> c++/move.hpp ?
 

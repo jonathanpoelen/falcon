@@ -82,7 +82,7 @@ public:
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()
 	friend _I operator++(FALCON_ITERATOR_HANDLER_TYPE()& a, int)
 	{
-		_I ret(a);
+		_I ret(derived(a));
 		increment(a);
 		return ret;
 	}
@@ -90,7 +90,7 @@ public:
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()
 	friend _I operator--(FALCON_ITERATOR_HANDLER_TYPE()& a, int)
 	{
-		_I ret(a);
+		_I ret(derived(a));
 		decrement(a);
 		return ret;
 	}
@@ -331,7 +331,7 @@ protected:
 	}
 
 	void recoil(difference_type n)
-	{ _M_current += n; }
+	{ _M_current -= n; }
 
 	_Iterator prev(difference_type n) const
 	{
