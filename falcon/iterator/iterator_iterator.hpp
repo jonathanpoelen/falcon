@@ -127,6 +127,12 @@ public:
 	const iterator_type& base() const
 	{ return this->base_reference(); }
 
+	const pair_iterator& current_base() const
+	{ return _M_current(); }
+
+	const _Iterator& current_iterator() const
+	{ return _M_first(); }
+
 protected:
 	pair_iterator& _M_current()
 	{ return this->base_reference()[_pos]; }
@@ -204,6 +210,54 @@ protected:
 		return ret;
 	}
 };
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator==(const iterator_iterator<_I, _T, _C, _R, _D, _P>& a, const _I& b)
+{ return a.current_iterator() == b; }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator==(const _I& b, const iterator_iterator<_I, _T, _C, _R, _D, _P>& a)
+{ return b == a.current_iterator(); }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator!=(const iterator_iterator<_I, _T, _C, _R, _D, _P>& a, const _I& b)
+{ return a.current_iterator() != b; }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator!=(const _I& b, const iterator_iterator<_I, _T, _C, _R, _D, _P>& a)
+{ return b != a.current_iterator(); }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator<(const iterator_iterator<_I, _T, _C, _R, _D, _P>& a, const _I& b)
+{ return a.current_iterator() < b; }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator<(const _I& b, const iterator_iterator<_I, _T, _C, _R, _D, _P>& a)
+{ return b < a.current_iterator(); }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator>(const iterator_iterator<_I, _T, _C, _R, _D, _P>& a, const _I& b)
+{ return a.current_iterator() > b; }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator>(const _I& b, const iterator_iterator<_I, _T, _C, _R, _D, _P>& a)
+{ return b > a.current_iterator(); }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator<=(const iterator_iterator<_I, _T, _C, _R, _D, _P>& a, const _I& b)
+{ return a.current_iterator() <= b; }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator<=(const _I& b, const iterator_iterator<_I, _T, _C, _R, _D, _P>& a)
+{ return b <= a.current_iterator(); }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator>=(const iterator_iterator<_I, _T, _C, _R, _D, _P>& a, const _I& b)
+{ return a.current_iterator() >= b; }
+
+template <typename _I, typename _T, typename _C, typename _R, typename _D, typename _P>
+bool operator>=(const _I& b, const iterator_iterator<_I, _T, _C, _R, _D, _P>& a)
+{ return b >= a.current_iterator(); }
 
 }
 }

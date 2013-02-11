@@ -7,33 +7,45 @@
 #include <falcon/cast/unreliable_pointer_cast.hpp>
 
 namespace falcon {
+	inline char __get_char_swap(char c)
+	{
+#if __CHAR_BIT__ == 8
+		return static_cast<char>((c & 1) << 7
+		| (c & 2) << 5
+		| (c & 4) << 3
+		| (c & 8) << 1
+		| (c & 16) >> 1
+		| (c & 32) >> 3
+		| (c & 64) >> 5
+		| (c & 128) >> 7);
+#elif __CHAR_BIT__ == 7
+		return static_cast<char>((c & 1) << 6
+		| (c & 2) << 4
+		| (c & 4) << 2
+		| (c & 8)
+		| (c & 16) >> 2
+		| (c & 32) >> 3
+		| (c & 64) >> 6);
+#else
+#error unimplemented swap on char
+#endif
+	}
 
 	inline void bit_swap(char* n, std::size_t size)
 	{
 		char *end = n + size;
 		for (char c; n < end; ++n)
 		{
-			c = static_cast<char>((*n & 1) << 7
-			| (*n & 2) << 5
-			| (*n & 4) << 3
-			| (*n & 8) << 1
-			| (*n & 16) >> 1
-			| (*n & 32) >> 3
-			| (*n & 64) >> 5
-			| (*n & 128) >> 7);
+			c = __get_char_swap(*n);
 			--end;
-			*n = static_cast<char>((*end & 1) << 7
-			| (*end & 2) << 5
-			| (*end & 4) << 3
-			| (*end & 8) << 1
-			| (*end & 16) >> 1
-			| (*end & 32) >> 3
-			| (*end & 64) >> 5
-			| (*end & 128) >> 7);
+			*n = __get_char_swap(*end);
 			*end = c;
 		}
 		if (n != end)
-			falcon::detail::bit::bit8_swap(*unreliable_pointer_cast<uint8_t>(n-1));
+		{
+			--n;
+			*n = __get_char_swap(*n);
+		}
 	}
 
 	template<typename _T, unsigned int _S = bit::size<_T>::value>
