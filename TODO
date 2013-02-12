@@ -94,8 +94,6 @@ les compose() devrais pouvoir fonctionenr avec les références (pas le cas actu
 
 strong_reference_wrapper: faire des tests
 
-une sorte de unary_compose mais sans arguments -> f(g()). (ancien delegate_result -> delegate_wrapper ?). Il y en a pas déjà une qui prend plusieurs foncteurs ?
-
 enlever les doubles underscore car reservé. Idem pour les underscores suivit de majuscule dans l'espace globale.
 
 Vérifier les types tag dans les iterateurs.

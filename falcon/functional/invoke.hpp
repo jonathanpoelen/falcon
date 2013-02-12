@@ -32,7 +32,7 @@ inline typename std::enable_if<
 	>::value),
 	typename std::result_of<_Functor(_Args&&...)>::type
 >::type
-invoke(_Functor& __f, _Args&&... __args)
+invoke(_Functor __f, _Args&&... __args)
 {
 	return std::mem_fn(__f)(std::forward<_Args>(__args)...);
 }
