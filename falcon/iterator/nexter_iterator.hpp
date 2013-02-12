@@ -7,34 +7,46 @@
 namespace falcon {
 namespace iterator {
 
-template <typename _Iterator, typename _Nexter>
+template <typename _Iterator, typename _Nexter, bool _ContentsDistance = false,
+	typename _Tp = use_default, typename _Category = use_default,
+	typename _Reference = use_default, typename _Distance = use_default,
+	typename _Pointer = use_default
+>
 class nexter_iterator;
 
 namespace detail
 {
-	template <typename _Iterator, typename _Nexter>
+	template <typename _Iterator, typename _Nexter, bool _ContentsDistance, typename _Tp,
+		typename _Category, typename _Reference, typename _Distance, typename _Pointer>
 	struct nexter_base
 	{
-		typedef typename std::iterator_traits<_Iterator>::iterator_category iterator_category;
-
 		typedef typename iterator_handler_types<
-			nexter_iterator<_Iterator, _Nexter>,
+			nexter_iterator<_Iterator, _Nexter, _ContentsDistance, _Tp,
+				_Category, _Reference, _Distance, _Pointer>,
 			_Iterator,
-			typename minimal_iterator_category<
-				iterator_category,
-				std::forward_iterator_tag
-			>::type
+			typename default_or_type<
+				minimal_iterator_category<
+					typename std::iterator_traits<_Iterator>::iterator_category,
+					std::forward_iterator_tag
+				>,
+				_Category
+			>::type,
+			_Tp,
+			_Distance,
+			_Pointer,
+			_Reference
 		>::base base;
 	};
 }
 
-template <typename _Iterator, typename _Nexter>
+template <typename _Iterator, typename _Nexter, bool _ContentsDistance, typename _Tp,
+	typename _Category, typename _Reference, typename _Distance, typename _Pointer>
 class nexter_iterator
-: public detail::nexter_base<_Iterator, _Nexter>::base
+: public detail::nexter_base<_Iterator, _Nexter, _ContentsDistance, _Tp, _Category, _Reference, _Distance, _Pointer>::base
 {
 	friend iterator_core_access;
 
-	typedef typename detail::nexter_base<_Iterator, _Nexter>::base __base;
+	typedef typename detail::nexter_base<_Iterator, _Nexter, _ContentsDistance, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
 
 public:
 	typedef _Nexter nexter_type;
@@ -50,12 +62,12 @@ public:
 	, _nexter(fn)
 	{}
 
-	explicit nexter_iterator(const iterator_type& x)
+	explicit nexter_iterator(iterator_type x)
 	: __base(x)
 	, _nexter()
 	{}
 
-	nexter_iterator(const iterator_type& x, nexter_type fn)
+	nexter_iterator(iterator_type x, nexter_type fn)
 	: __base(x)
 	, _nexter(fn)
 	{}
@@ -88,6 +100,15 @@ private:
 
 	void advance(difference_type n)
 	{ _nexter(this->base_reference(), n); }
+
+	difference_type difference(const nexter_iterator& other, true_type) const
+	{ return _nexter(this->base_reference(), other.base_reference()); }
+
+	difference_type difference(const nexter_iterator& other, false_type) const
+	{ return __base::difference(other); }
+
+	difference_type difference(const nexter_iterator& other) const
+	{ return difference(other, integral_constant<bool, _ContentsDistance>()); }
 };
 
 template <typename _Iterator, typename _Nexter>

@@ -2,7 +2,7 @@
 #define FALCON_CONTAINER_ZONE_ACCESS_HPP
 
 #include <falcon/container/range_access_traits.hpp>
-#include <falcon/iterator/nexter_iterator.hpp>
+#include <falcon/iterator/zone_iterator.hpp>
 
 namespace falcon {
 
@@ -17,48 +17,7 @@ public:
 	typedef typename __traits::difference_type difference_type;
 	typedef difference_type size_t;
 
-private:
-	struct __nexter
-	{
-		__sub_iterator end;
-		size_t n, step;
-
-		__nexter()
-		{}
-
-		__nexter(__sub_iterator __end, size_t __n, size_t __step)
-		: end(__end)
-		, n(__n)
-		, step(__step)
-		{}
-
-		void operator()(__sub_iterator& it)
-		{
-			if (it == end)
-			{
-				it = end + step;
-				end = it + n;
-			}
-			else
-				++it;
-		}
-
-		void operator()(__sub_iterator& it, difference_type __n)
-		{
-			difference_type d = end - it;
-			if (__n > d)
-			{
-				__n -= d;
-				it = end + n + (__n / (n + 1)) * step + __n % (n + 1);
-				end += (__n / (n + 1) + 1) * step + n;
-			}
-			else
-				it += __n;
-		}
-	};
-
-public:
-	typedef falcon::iterator::nexter_iterator<__sub_iterator, __nexter> iterator;
+	typedef falcon::iterator::zone_iterator<__sub_iterator> iterator;
 
 	size_t width_container;
 	size_t x;
@@ -84,17 +43,18 @@ public:
 	{
 		return iterator(
 			access.begin(cont) + (y * width_container + x),
-			__nexter(
-				access.begin(cont) + (y * width_container + x + height_zone - 1),
-				width_zone - 1,
-				width_container - width_zone + 1
-			)
+			width_container,
+			width_zone
 		);
 	}
 
 	iterator end(_Container& cont) const
 	{
-		return iterator(access.begin(cont) + ((y + height_zone) * width_container) + x);
+		return iterator(
+			access.begin(cont) + ((y + height_zone) * width_container) + x,
+			width_container,
+			width_zone
+		);
 	}
 };
 

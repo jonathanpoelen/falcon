@@ -1,12 +1,13 @@
 #ifndef FALCON_SFINAE_HAS_MEMBER_FUNCTION_HPP
 #define FALCON_SFINAE_HAS_MEMBER_FUNCTION_HPP
 
-#include <type_traits>
 #include <falcon/sfinae/sfinae.hpp>
 #include <falcon/sfinae/has_type.hpp>
+#include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(is_class)
 
 #define FALCON_CREATE_HAS_MEMBER_FUNCTION(_Name, _FuncName)\
-	template <typename _Falcon_T,  bool = std::is_class<_Falcon_T>::value>\
+	template <typename _Falcon_T,  bool = ::FALCON_BOOST_OR_STD_NAMESPACE::is_class<_Falcon_T>::value>\
 	class _Name\
 	{\
 		struct base { void _FuncName(); };\
@@ -29,7 +30,7 @@
 
 
 #define FALCON_CREATE_HAS_MEMBER_VAR(_Name, _VarName)\
-	template <typename _Falcon_T,  bool = std::is_class<_Falcon_T>::value>\
+	template <typename _Falcon_T,  bool = ::FALCON_BOOST_OR_STD_NAMESPACE::is_class<_Falcon_T>::value>\
 	class _Name\
 	{\
 		template <typename U, typename V = decltype(U::_VarName)>\
@@ -47,8 +48,8 @@
 #define FALCON_CLASS_HAS_MEMBER_VAR(_VarName)\
 	FALCON_CREATE_HAS_MEMBER_VAR(FALCON_HAS_MEMBER_VAR_NAME(_VarName), _VarName)
 
-
-#define FALCON_CREATE_HAS_SIGNATURE(_Name, _FuncName)\
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+# define FALCON_CREATE_HAS_SIGNATURE(_Name, _FuncName)\
 	template <typename _Falcon_T, typename _Signature>\
 	class _Name;\
 	\
@@ -69,9 +70,10 @@
 		static const bool value = impl<_Falcon_T, _Functor(_Falcon_T::*)(_Args...)>::value || impl<_Falcon_T_const, _Functor(_Falcon_T_const::*)(_Args...)>::value;\
 	}
 
-#define FALCON_HAS_SIGNATURE_NAME(_FuncName) has_##_FuncName##_signature
+# define FALCON_HAS_SIGNATURE_NAME(_FuncName) has_##_FuncName##_signature
 
-#define FALCON_CLASS_HAS_SIGNATURE(_FuncName)\
+# define FALCON_CLASS_HAS_SIGNATURE(_FuncName)\
 	FALCON_CREATE_HAS_SIGNATURE(FALCON_HAS_SIGNATURE_NAME(_FuncName), _FuncName)
+#endif
 
 #endif

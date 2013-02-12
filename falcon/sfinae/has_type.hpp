@@ -1,21 +1,21 @@
 #ifndef FALCON_SFINAE_HAS_TYPE_HPP
 #define FALCON_SFINAE_HAS_TYPE_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-# include <type_traits>
-#endif
+#include <falcon/type_traits/integral_constant.hpp>
 #include <falcon/type_traits/yes_no_type.hpp>
+
+#define __FALCON_HELPER_VALUE_TEST(_T)\
+	public:\
+		static const bool value = sizeof(test(static_cast<_T*>(0))) == sizeof(::falcon::yes_type);\
+		typedef bool value_type;\
+		typedef ::falcon::integral_constant<bool, value> type;
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 #define FALCON_HELPER_VALUE_TEST(_T)\
-	public:\
-		static constexpr bool value = sizeof(test(static_cast<_T*>(0))) == sizeof(::falcon::yes_type);\
-		typedef bool value_type;\
-		constexpr operator bool() { return value; }\
-		typedef std::integral_constant<bool, value> type;
+	__FALCON_HELPER_VALUE_TEST(_T)\
+	constexpr operator bool() { return value; }
 #else
-#define FALCON_HELPER_VALUE_TEST(_T)\
-	public: static const bool value = sizeof(test(static_cast<_T*>(0))) == sizeof(::falcon::yes_type)
+#define FALCON_HELPER_VALUE_TEST(_T) __FALCON_HELPER_VALUE_TEST(_T)
 #endif
 
 #define FALCON_CREATE_HAS_TYPE(_Name, _TypeName)\
