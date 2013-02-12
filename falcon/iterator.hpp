@@ -9,8 +9,11 @@
 #include <falcon/iterator/get_accessor_iterator.hpp>
 #include <falcon/iterator/indirect_iterator.hpp>
 #include <falcon/iterator/infinite_iterator.hpp>
+#include <falcon/iterator/integral_iterator.hpp>
 #include <falcon/iterator/iterator_category.hpp>
+#include <falcon/iterator/iterator_iterator.hpp>
 #include <falcon/iterator/nexter_iterator.hpp>
+#include <falcon/iterator/opposite_direction_iterator.hpp>
 #include <falcon/iterator/output_iterator.hpp>
 #include <falcon/iterator/pseudo_iterator.hpp>
 #include <falcon/iterator/subrange_access_iterator.hpp>

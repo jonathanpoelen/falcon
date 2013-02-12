@@ -6,6 +6,7 @@
 #include <falcon/functional/converter.hpp>
 #include <falcon/functional/cut_and_place.hpp>
 #include <falcon/functional/decremental_generator.hpp>
+#include <falcon/functional/delegate_result.hpp>
 #include <falcon/functional/incremental_generator.hpp>
 #include <falcon/functional/indirect_operation.hpp>
 #include <falcon/functional/invoke.hpp>

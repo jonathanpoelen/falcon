@@ -7,8 +7,8 @@
 namespace falcon {
 
 template<typename _Qualified, typename _Unqualified,
-	bool _IsConst = std::is_const<_Qualified>::value,
-	bool _IsVol = std::is_volatile<_Qualified>::value,
+	bool _IsConst = FALCON_BOOST_OR_STD_NAMESPACE::is_const<_Qualified>::value,
+	bool _IsVol = FALCON_BOOST_OR_STD_NAMESPACE::is_volatile<_Qualified>::value,
 	reference_type::enum_t _Ref = reference_qualified<_Qualified>::value>
 struct match_selector
 {

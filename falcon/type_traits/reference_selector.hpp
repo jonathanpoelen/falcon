@@ -3,8 +3,9 @@
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 # include <type_traits>
+#else
+# include <boost/type_traits/is_reference.hpp>
 #endif
-#include <boost/type_traits/is_reference.hpp>
 
 namespace falcon {
 

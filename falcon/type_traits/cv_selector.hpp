@@ -1,7 +1,9 @@
 #ifndef _FALCON_TYPE_TRAITS_CV_SELECTOR_HPP
 #define _FALCON_TYPE_TRAITS_CV_SELECTOR_HPP
 
-#include <type_traits>
+#include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(is_const)
+#include FALCON_BOOST_OR_STD_TRAITS(is_volatile)
 
 namespace falcon {
 
@@ -30,8 +32,8 @@ struct cv_selector<_Unqualified, true, true>
 };
 
 template<typename _Qualified, typename _Unqualified,
-		bool _IsConst = std::is_const<_Qualified>::value,
-		bool _IsVol = std::is_volatile<_Qualified>::value>
+	bool _IsConst = FALCON_BOOST_OR_STD_NAMESPACE::is_const<_Qualified>::value,
+	bool _IsVol = FALCON_BOOST_OR_STD_NAMESPACE::is_volatile<_Qualified>::value>
 struct match_cv_qualifiers
 {
 	typedef typename cv_selector<_Unqualified, _IsConst, _IsVol>::type type;
