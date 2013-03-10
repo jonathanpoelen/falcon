@@ -10,10 +10,10 @@ template<std::size_t _N, std::size_t _Len>
 struct __tuple_for_each
 {
 	template<typename _Functor, typename _Tuple>
-	static void __impl(_Tuple& t, _Functor& func)
+	static void __impl(_Tuple& t, _Functor&& func)
 	{
 		func(std::get<_N>(t));
-		__tuple_for_each<_N+1, _Len>::__impl(t, func);
+		__tuple_for_each<_N+1, _Len>::__impl(t, std::forward<_Functor>(func));
 	}
 };
 
@@ -21,21 +21,23 @@ template<std::size_t _N>
 struct __tuple_for_each<_N, _N>
 {
 	template<typename _Functor, typename _Tuple>
-	static void __impl(const _Tuple& , _Functor& )
+	static void __impl(const _Tuple& , _Functor&&)
 	{}
 };
 
 template<typename _Functor, typename _Tuple>
-_Functor tuple_for_each(_Tuple& t, _Functor func)
+_Functor tuple_for_each(_Tuple& t, _Functor&& func)
 {
-	__tuple_for_each<0, std::tuple_size<_Tuple>::value>::__impl(t, func);
+	__tuple_for_each<0, std::tuple_size<_Tuple>::value>
+	::__impl(t, std::forward<_Functor>(func));
 	return std::move<>(func);
 }
 
 template<typename _Functor, typename _Tuple>
 _Functor tuple_for_each(const _Tuple& t, _Functor func)
 {
-	__tuple_for_each<0, std::tuple_size<_Tuple>::value>::__impl(t, func);
+	__tuple_for_each<0, std::tuple_size<_Tuple>::value>
+	::__impl(t, std::forward<_Functor>(func));
 	return std::move<>(func);
 }
 

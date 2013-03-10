@@ -137,8 +137,27 @@ peut-on supprimer les constructeurs de copie et l'affectation dans les iterateur
 
 preprocessor/move.hpp -> c++/move.hpp ?
 
+peut-être déjà fait faire un range qui prend des iterateur pour creer un container_wrapper et être utiliser avec for(auto& v:range(it, it+3)). ainsi qu'un ref_range qui ne va pas copier le first et end mais prendre des references (sauf end si rref)
 
+mettre des rref quand un foncteur est demander dans les fonctions (tuple_assign, etc)
 
+tableau 2 dimensions allouer comme 1 de la forme:
+int **pptr = malloc(x * sizeof(int*) + y * x * sizeof(int));
+int *ptr = (int*)(pptr) + y * sizeof(int*);
+for (i = 0; i != y; i++)
+	pptr[i] = ptr + i * x;
+//pptr[x][y]
+et tableau n dimension allouer comme 1 et p[x*y]
 
+istream/operators.hpp: enelever la parties sur les char * ou à mettre dans un namespace idem pour le tableau d'objet. Il n'y a pas de verification du nombre inserer...
 
+fonction pour simplifier les operations sur buffer (renvoit false si fin eof):
+	snextc: bool snextc(buffer, &c)
+	sputc: bool sputc(buffer, c)
+	sputn: bool sputn(buffer, s, n)
+	sgetn: bool sgetn(buffer, s, n)
+	sgetc: bool sgetc(buffer, &c)
+	ios/streambuf.hpp
+mettre certain fichier de {i,o,io}stream/ dans ios/
 
+tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui ce comporte comme un tuple

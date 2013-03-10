@@ -8,8 +8,11 @@ namespace falcon {
 
 template <typename _T>
 struct build_tuple_index
-: build_parameter_index<std::tuple_size<_T>::value>
-{};
+{
+	typedef typename build_parameter_index<
+		std::tuple_size<_T>::value
+	>::type type;
+};
 
 }
 

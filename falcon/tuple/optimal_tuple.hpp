@@ -34,23 +34,25 @@ struct __build_parameter_with_index<
 	parameter_pack<_ElementsWithIndex...>,
 	_I
 >
-: __build_parameter_with_index<
-	parameter_pack<_Elements...>,
-	parameter_pack<__parameter_with_index<_T, _I>, _ElementsWithIndex...>,
-	_I + 1
->
-{};
+{
+	typedef typename __build_parameter_with_index<
+		parameter_pack<_Elements...>,
+		parameter_pack<__parameter_with_index<_T, _I>, _ElementsWithIndex...>,
+		_I + 1
+	>::type type;
+};
 
 template <std::size_t _Size, std::size_t _K, std::size_t _I,
 	typename _T, typename... _Elements>
 struct __maximal_size_element
-: __maximal_size_element<
-	(_Size > _T::__size) ? _Size : _T::__size,
-	(_Size > _T::__size) ? _K : _I,
-	_I + 1,
-	_Elements...
->
-{};
+{
+	typedef typename __maximal_size_element<
+		(_Size > _T::__size) ? _Size : _T::__size,
+		(_Size > _T::__size) ? _K : _I,
+		_I + 1,
+		_Elements...
+	>::type type;
+};
 
 template <std::size_t _Size, std::size_t _K, std::size_t _I, typename _T>
 struct __maximal_size_element<_Size, _K, _I, _T>
@@ -99,6 +101,8 @@ struct optimal_index_pack
 template<typename _Tuple>
 struct optimal_tuple
 {
+	typedef _Tuple tuple_base;
+
 	typedef typename tuple_to_parameter_pack<_Tuple>::type parameter_pack;
 
 	typedef typename optimal_index_pack<parameter_pack>::type indexes;
@@ -106,6 +110,7 @@ struct optimal_tuple
 	typedef typename parameter_pack_to_tuple<
 		typename parameter::pack_element<parameter_pack, indexes>::type
 	>::type tuple;
+	typedef tuple type;
 
 	template<std::size_t _I>
 	struct idx
@@ -117,15 +122,15 @@ struct optimal_tuple
 
 	template<std::size_t _I>
 	static typename tuple_element<_I>::type& get(_Tuple& t)
-	{ return std::get<idx<_I>::value>(t); };
+	{ return std::get<idx<_I>::value>(t); }
 
 	template<std::size_t _I>
 	static const typename tuple_element<_I>::type& get(const _Tuple& t)
-	{ return std::get<idx<_I>::value>(t); };
+	{ return std::get<idx<_I>::value>(t); }
 
 	template<std::size_t _I>
 	static typename tuple_element<_I>::type&& get(_Tuple&& t)
-	{ return std::get<idx<_I>::value>(t); };
+	{ return std::get<idx<_I>::value>(std::forward<_Tuple>(t)); }
 };
 
 }

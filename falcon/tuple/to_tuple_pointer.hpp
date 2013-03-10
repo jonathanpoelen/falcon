@@ -11,16 +11,22 @@ namespace falcon {
 
 /// Pointer tuple element
 template <typename _T, std::size_t... _Indexes>
-constexpr typename build_tuple_const_pointer<_T, parameter_index<_Indexes...>>::type
+constexpr typename build_tuple_const_pointer<
+	_T, parameter_index<_Indexes...>
+>::type
 to_tuple_pointer(const _T& t, const parameter_index<_Indexes...>& indexes)
 { return tuple_transform<>(indexes, t, late_address()); }
 
+/// Pointer tuple element
 template <typename _T, std::size_t... _Indexes>
-constexpr typename build_tuple_pointer<_T, parameter_index<_Indexes...>>::type
+constexpr typename build_tuple_pointer<
+	_T, parameter_index<_Indexes...>
+>::type
 to_tuple_pointer(_T& t, const parameter_index<_Indexes...>& indexes)
 { return tuple_transform<>(indexes, t, late_address()); }
 
 
+/// Pointer tuple element
 template <typename _T>
 constexpr typename build_tuple_const_pointer<
 	_T, typename build_tuple_index<_T>::type
@@ -31,6 +37,7 @@ to_tuple_pointer(const _T& t)
 	return tuple_transform<>(t, late_address(), _BuildIndexes());
 }
 
+/// Pointer tuple element
 template <typename _T>
 constexpr typename build_tuple_pointer<
 	_T, typename build_tuple_index<_T>::type

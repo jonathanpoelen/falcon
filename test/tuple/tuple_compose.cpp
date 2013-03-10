@@ -27,6 +27,19 @@ void tuple_compose_test()
 
 	CHECK_EQUAL_VALUE(os.str(), "5 555 55");
 
+	{
+		os.str("");
+		auto fos = falcon::make_ostream_functor(os);
+		auto tuple = std::make_tuple<>(5, ' ', 55);
+		unless_functor f;
+		falcon::tuple_compose<>(
+			f,
+			std::forward_as_tuple<>(fos, fos),
+			tuple
+		);
+		CHECK_EQUAL_VALUE(os.str(), "5 555 55");
+	}
+
 	falcon::tuple_compose<>(
 		unless_functor(),
 		std::make_tuple<>(

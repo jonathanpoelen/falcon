@@ -187,7 +187,7 @@ struct __ignore_range
 };
 
 template<typename _CharT>
-const _CharT __ignore_get_char(const _CharT* s)
+const _CharT __ignore_get_char(const _CharT * s)
 { return *s; }
 
 template<typename _InputIterator>

@@ -20,17 +20,19 @@ void tuple_apply_test()
 		tuple2_type t(1,2);
 
 		CHECK_EQUAL_VALUE(3, falcon::tuple_apply<>(falcon::plus<int>(), t));
+		falcon::plus<int> f;
+		CHECK_EQUAL_VALUE(3, falcon::tuple_apply<>(f, t));
+		CHECK_EQUAL_VALUE(3, falcon::tuple_apply<>(falcon::plus<int>(), tuple2_type(1,2)));
 	}
 	{
 		tuple3_type t(1,2,60);
 
 		CHECK_EQUAL_VALUE(30, falcon::tuple_apply<>(S3(), t));
 		CHECK_EQUAL_VALUE(0, falcon::tuple_apply<>(falcon::parameter_index<0,2,1>(), S3(), t));
-	}
-	{
-		tuple3_type t(1,2,60);
+		CHECK_EQUAL_VALUE(0, falcon::tuple_apply<>(falcon::parameter_index<0,2,1>(), S3(), tuple3_type(1,2,60)));
 		S3 f;
 		CHECK_EQUAL_VALUE(30, falcon::tuple_apply<const S3&>(f, t));
+		CHECK_EQUAL_VALUE(30, falcon::tuple_apply<const S3&>(f, tuple3_type(1,2,60)));
 	}
 }
 

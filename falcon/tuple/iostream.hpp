@@ -4,4 +4,11 @@
 #include <falcon/tuple/istream.hpp>
 #include <falcon/tuple/ostream.hpp>
 
+namespace tuple {
+	namespace iostream {
+		using ::falcon::tuple::istream::operator<<;
+		using ::falcon::tuple::ostream::operator>>;
+	}
+}
+
 #endif

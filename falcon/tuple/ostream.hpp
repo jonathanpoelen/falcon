@@ -12,7 +12,10 @@ template<std::size_t _I, std::size_t _N>
 struct __ostream_tuple_impl
 {
 	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>& impl(std::basic_ostream<_CharT, _Traits>& os, const std::tuple<_Args...>& t, const _CharT *sep = ",")
+	static std::basic_ostream<_CharT, _Traits>&
+	impl(std::basic_ostream<_CharT, _Traits>& os,
+			 const std::tuple<_Args...>& t,
+			 const _CharT *sep = ",")
 	{
 		return __ostream_tuple_impl<_I + 1, _N>
 		::impl(os << sep << std::get<_I>(t), t, sep);
@@ -23,7 +26,10 @@ template<>
 struct __ostream_tuple_impl<0, 0>
 {
 	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>& impl(std::basic_ostream<_CharT, _Traits>& os, const std::tuple<_Args...>&, const _CharT * = ",")
+	static std::basic_ostream<_CharT, _Traits>&
+	impl(std::basic_ostream<_CharT, _Traits>& os,
+			 const std::tuple<_Args...>&,
+			 const _CharT * = ",")
 	{
 		return os;
 	}
@@ -33,7 +39,10 @@ template<>
 struct __ostream_tuple_impl<0, 1>
 {
 	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>& impl(std::basic_ostream<_CharT, _Traits>& os, const std::tuple<_Args...>& t, const _CharT * = ",")
+	static std::basic_ostream<_CharT, _Traits>&
+	impl(std::basic_ostream<_CharT, _Traits>& os,
+			 const std::tuple<_Args...>& t,
+			 const _CharT * = ",")
 	{
 		return os << std::get<0>(t);
 	}
@@ -43,7 +52,10 @@ template<std::size_t _N>
 struct __ostream_tuple_impl<0, _N>
 {
 	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>& impl(std::basic_ostream<_CharT, _Traits>& os, const std::tuple<_Args...>& t, const _CharT * sep = ",")
+	static std::basic_ostream<_CharT, _Traits>&
+	impl(std::basic_ostream<_CharT, _Traits>& os,
+			 const std::tuple<_Args...>& t,
+			 const _CharT * sep = ",")
 	{
 		return __ostream_tuple_impl<1, _N>::impl(os << std::get<0>(t), t, sep);
 	}
@@ -55,7 +67,9 @@ struct __ostream_tuple_impl<_N, _N>
 {};
 
 template<typename _CharT, typename _Traits, typename... _Args>
-std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Traits>& os, const std::tuple<_Args...>& t)
+std::basic_ostream<_CharT, _Traits>&
+operator<<(std::basic_ostream<_CharT, _Traits>& os,
+					 const std::tuple<_Args...>& t)
 {
 	return __ostream_tuple_impl<0, sizeof...(_Args)>::impl(os, t);
 }
@@ -64,7 +78,10 @@ std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Trai
 }
 
 template<typename _CharT, typename _Traits, typename... _Args>
-std::basic_ostream<_CharT, _Traits>& put_tuple(std::basic_ostream<_CharT, _Traits>& os, const std::tuple<_Args...>& t, const _CharT * sep = ",")
+std::basic_ostream<_CharT, _Traits>&
+put_tuple(std::basic_ostream<_CharT, _Traits>& os,
+					const std::tuple<_Args...>& t,
+					const _CharT * sep = ",")
 {
 	return tuple::ostream::__ostream_tuple_impl<0, sizeof...(_Args)>::impl(os, t, sep);
 }

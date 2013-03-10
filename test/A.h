@@ -7,9 +7,9 @@
 struct A{
 	int i;
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	A(A&&a):i(a.i) {std::cout << "A&&" << std::endl; }
+	A(A&&a):i(a.i) {std::cout << "A(" << i << ")&&" << std::endl; }
 #endif
-	A(const A&a):i(a.i) { std::cout << "const A&" << std::endl; }
+	A(const A&a):i(a.i) { std::cout << "const A(" << i << ")&" << std::endl; }
 	A(int ii=0):i(ii) { std::cout << "A(" << ii << ')' << std::endl; }
 
 	~A() { std::cout << "~A(" << i << ')' << std::endl; }

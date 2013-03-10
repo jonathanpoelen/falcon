@@ -8,19 +8,23 @@ namespace falcon {
 
 template<typename _T, typename _Indexes>
 struct build_tuple_pointer
-: parameter_pack_to_tuple<
-	typename pack_pointer<
-		typename tuple_to_parameter_pack_with_parameter_index<_T, _Indexes>::type
-	>::type
->{};
+{
+	typedef typename parameter_pack_to_tuple<
+		typename pack_pointer<
+			typename tuple_to_parameter_pack_with_parameter_index<_T, _Indexes>::type
+		>::type
+	>::type type;
+};
 
 template<typename _T, typename _Indexes>
 struct build_tuple_const_pointer
-: parameter_pack_to_tuple<
-	typename pack_const_pointer<
-		typename tuple_to_parameter_pack_with_parameter_index<_T, _Indexes>::type
-	>::type
->{};
+{
+	typedef typename parameter_pack_to_tuple<
+		typename pack_const_pointer<
+			typename tuple_to_parameter_pack_with_parameter_index<_T, _Indexes>::type
+		>::type
+	>::type type;
+};
 
 }
 

@@ -44,8 +44,8 @@ public:
 };
 
 template <typename _Functor>
-tuple_applier<_Functor> make_tuple_applier(_Functor func)
-{ return {std::move(func)}; }
+tuple_applier<_Functor> make_tuple_applier(_Functor&& func)
+{ return {std::forward<_Functor>(func)}; }
 
 }
 
@@ -55,7 +55,7 @@ void swap(falcon::tuple_applier<_Functor, _Tag>& a,
 					falcon::tuple_applier<_Functor, _Tag>& b)
 { a.swap(b); }
 template <typename _Functor, typename _Tag, typename _Tag2>
-void swap(falcon::tuple_applier<_Functor, _Tag2>& a,
+void swap(falcon::tuple_applier<_Functor, _Tag>& a,
 					falcon::tuple_applier<_Functor, _Tag2>& b)
 { a.swap(b); }
 }

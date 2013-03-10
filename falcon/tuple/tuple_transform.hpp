@@ -6,39 +6,43 @@
 
 namespace falcon {
 
-template <std::size_t _Index, typename _T, typename _U>
-auto __tuple_transform_get(std::true_type, _T& t, _U& t_func)
+template <std::size_t _Index, typename _Tuple, typename _FunctionOrFunctions>
+auto __tuple_transform_get(std::true_type, _Tuple&& t, _FunctionOrFunctions&& t_func)
 -> decltype(std::get<_Index>(t_func)(std::get<_Index>(t)))
 {
 	return std::get<_Index>(t_func)(std::get<_Index>(t));
 }
 
-template <std::size_t _Index, typename _T, typename _Functor>
-constexpr auto __tuple_transform_get(std::false_type, _T& t, _Functor& func)
+template <std::size_t _Index, typename _Tuple, typename _Functor>
+constexpr auto __tuple_transform_get(std::false_type, _Tuple&& t, _Functor&& func)
 -> decltype(func(std::get<_Index>(t)))
 {
 	return func(std::get<_Index>(t));
 }
 
-template<typename _T, typename _U, std::size_t... _Indexes,
-typename _Tuple = std::tuple<decltype(
+template<typename _Tuple, typename _FunctionOrFunctions, std::size_t... _Indexes,
+typename _Tupleuple = std::tuple<decltype(
 	__tuple_transform_get<_Indexes>(
-		typename detail::has_tuple_impl<_U>::type(),
-		std::declval<_T&>(),
-		std::declval<_U&>()
+		typename detail::has_tuple_impl<_FunctionOrFunctions>::type(),
+		std::declval<_Tuple>(),
+		std::declval<_FunctionOrFunctions>()
 	)
 )...>>
-constexpr _Tuple tuple_transform(_T& t, _U x, const parameter_index<_Indexes...>&)
+constexpr _Tupleuple tuple_transform(_Tuple&& t, _FunctionOrFunctions&& funcs, const parameter_index<_Indexes...>&)
 {
-	return _Tuple(__tuple_transform_get<_Indexes>(typename detail::has_tuple_impl<_U>::type(), t, x)...);
+	return _Tupleuple(__tuple_transform_get<_Indexes>(typename detail::has_tuple_impl<_FunctionOrFunctions>::type(),
+																										std::forward<_Tuple>(t),
+																										std::forward<_FunctionOrFunctions>(funcs))...);
 }
 
-template<typename _T, typename _U,
-	typename _Indexes = typename build_tuple_index<_T>::type>
-constexpr auto tuple_transform(_T& t, _U x)
--> decltype(tuple_transform(t, x, _Indexes()))
+template<typename _Tuple, typename _FunctionOrFunctions,
+	typename _Indexes = typename build_tuple_index<_Tuple>::type>
+constexpr auto tuple_transform(_Tuple&& t, _FunctionOrFunctions && funcs)
+-> decltype(tuple_transform(t, funcs, _Indexes()))
 {
-	return tuple_transform(t, std::move(x), _Indexes());
+	return tuple_transform(std::forward<_Tuple>(t),
+												 std::forward<_FunctionOrFunctions>(funcs),
+												 _Indexes());
 }
 
 }
