@@ -8,9 +8,11 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #endif
+#include <falcon/detail/string_size.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/string/append.hpp>
-#include <falcon/detail/string_size.hpp>
+#include <falcon/type_traits/use.hpp>
+#include <falcon/type_traits/use_if.hpp>
 
 namespace falcon {
 	template <typename _T>
@@ -18,15 +20,7 @@ namespace falcon {
 	{
 		typedef typename _T::value_type __char_type;
 		typedef typename _T::traits_type __traits_type;
-		typedef typename _T::allocator_type __allocator;
-	};
-
-	template <typename _CharT, typename _Traits>
-	struct __concat_result_traits<basic_cstring<_CharT, _Traits> >
-	{
-		typedef _CharT __char_type;
-		typedef _Traits __traits_type;
-		typedef void __allocator;
+		typedef typename use_if<use_allocator_type<_T>, use<void> >::type __allocator;
 	};
 
 	template <typename _CharT>

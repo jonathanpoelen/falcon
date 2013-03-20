@@ -1,7 +1,6 @@
 #ifndef FALCON_DETAIL_STRING_SIZE_HPP
 #define FALCON_DETAIL_STRING_SIZE_HPP
 
-#include <falcon/string/cstringfwd.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 
 namespace falcon {
@@ -31,16 +30,6 @@ struct __string_size_impl<_T, true>
 template<typename _T>
 struct __string_size
 : __string_size_impl<_T>
-{};
-
-template<typename _CharT>
-struct __string_size<const _CharT *>
-: __string_size_base<basic_cstring<const _CharT *> >
-{};
-
-template<typename _CharT>
-struct __string_size<_CharT *>
-: __string_size_base<basic_cstring<_CharT *> >
 {};
 
 template<typename _CharT, std::size_t _N>

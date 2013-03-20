@@ -1,14 +1,17 @@
 #include <iostream>
 #include <falcon/string/cstring.hpp>
-#include <falcon/string/concat.hpp>
+
+struct A{};
 
 int main(/*int argc, char **argv*/)
 {
-// 	falcon::const_cstring ccs("plop");
-	char s[] = "ids";
+	char s[] = "plop";
 	falcon::cstring cs(s);
-	falcon::const_cstring ccs2(cs);
-	std::cout << falcon::concat<>(falcon::const_cstring("plo"),"p", std::string("lala")) << '\n';
-	std::cout << falcon::concat<>('a',"p") << '\n';
-	falcon::concat<>(std::string(), 'a',"p");
+	falcon::const_cstring ccs(cs);
+
+	cs == ccs;
+	cs.compare(ccs);
+	ccs.compare(cs);
+	ccs.find(cs);
+	cs.find(ccs);
 }

@@ -7,12 +7,21 @@ namespace falcon
 {
 
 #define FALCON_CONVERT_NAME_TYPE(name)\
-template <typename _T>\
-struct use_##name\
+template <typename _T, bool = has_##name<_T>::value>\
+struct __use_##name\
 {\
 	typedef typename _T::name type;\
-	static const bool value = has_##name<_T>::value;\
-}
+	static const bool value = true;\
+};\
+template <typename _T>\
+struct __use_##name<_T, false>\
+{\
+	static const bool value = false;\
+};\
+template <typename _T>\
+struct use_##name\
+: __use_##name<_T>\
+{}
 
 FALCON_CONVERT_NAME_TYPE(type);
 FALCON_CONVERT_NAME_TYPE(value_type);

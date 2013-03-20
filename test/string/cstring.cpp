@@ -28,6 +28,21 @@ void basic_cstring_test()
 		CHECK(cstr < "bcd");
 		CHECK("bcd" > cstr);
 	}
+
+	{
+		char s[] = "abcd";
+		falcon::cstring cstr(s);
+		falcon::const_cstring cstr2("abc");
+		CHECK(cstr != cstr2);
+		CHECK(cstr2 != cstr);
+		CHECK(!(cstr < cstr2));
+		CHECK(!(cstr2 > cstr));
+		CHECK(!(cstr == cstr2));
+		CHECK(!(cstr <= cstr2));
+		CHECK(cstr >= cstr2);
+		CHECK(cstr2 <= cstr);
+		CHECK(!(cstr2 >= cstr));
+	}
 }
 
 FALCON_TEST_TO_MAIN(basic_cstring_test)

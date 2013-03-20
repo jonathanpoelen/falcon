@@ -169,8 +169,6 @@ stack_allocator<T,N|max_allocate<Size>>: allocateur sur la pile. Pas de construc
 
 faire un swap (et swap_ranges et iter_swap) qui fait un swap binaire pour les entiers et sinon std::swap
 
-cstring: operateur (et fonction) imcompatible entre cstring et const_cstring alors qu'ils le devraient.
-
 basic_string_reference<String>(std::string&, start, size)
 string_reference=basic_string_reference<std::string>
 
