@@ -1,223 +1,377 @@
-#ifndef FALCON_STRING_CONCAT_HPP
-#define FALCON_STRING_CONCAT_HPP
+#ifndef FALCON_STRING_CONCAT2_HPP
+#define FALCON_STRING_CONCAT2_HPP
 
-#include <falcon/string/append.hpp>
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
+# include <utility>
 # include <type_traits>
+#else
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/is_integral.hpp>
 #endif
+#include <falcon/c++/boost_or_std.hpp>
+#include <falcon/string/append.hpp>
+#include <falcon/detail/string_size.hpp>
 
 namespace falcon {
+	template <typename _T>
+	struct __concat_result_traits
+	{
+		typedef typename _T::value_type __char_type;
+		typedef typename _T::traits_type __traits_type;
+		typedef typename _T::allocator_type __allocator;
+	};
 
-	template<typename _CharT, typename _Traits, typename _Alloc>
+	template <typename _CharT, typename _Traits>
+	struct __concat_result_traits<basic_cstring<_CharT, _Traits> >
+	{
+		typedef _CharT __char_type;
+		typedef _Traits __traits_type;
+		typedef void __allocator;
+	};
+
+	template <typename _CharT>
+	struct __concat_result_traits<const _CharT *>
+	{
+		typedef _CharT __char_type;
+		typedef void __traits_type;
+		typedef void __allocator;
+	};
+
+	template <typename _CharT>
+	struct __concat_result_traits<_CharT *>
+	{
+		typedef _CharT __char_type;
+		typedef void __traits_type;
+		typedef void __allocator;
+	};
+
+	template <typename _CharT, std::size_t _N>
+	struct __concat_result_traits<_CharT[_N]>
+	{
+		typedef _CharT __char_type;
+		typedef void __traits_type;
+		typedef void __allocator;
+	};
+
+	template <typename _CharT, std::size_t _N>
+	struct __concat_result_traits<const _CharT[_N]>
+	{
+		typedef _CharT __char_type;
+		typedef void __traits_type;
+		typedef void __allocator;
+	};
+
+
+	template<typename, typename>
+	struct __concat_char;
+
+	template<typename _T>
+	struct __concat_char<_T,_T>
+	{ typedef _T __char_type; };
+
+
+	template<typename, typename, typename>
+	struct __concat_traits;
+
+	template<typename _CharT, typename _T>
+	struct __concat_traits<_CharT, _T,_T>
+	{ typedef _T __traits_type; };
+
+	template<typename _CharT, typename _T>
+	struct __concat_traits<_CharT, _T, void>
+	{ typedef _T __traits_type; };
+
+	template<typename _CharT, typename _T>
+	struct __concat_traits<_CharT, void, _T>
+	{ typedef _T __traits_type; };
+
+	template<typename _CharT>
+	struct __concat_traits<_CharT, void, void>
+	{ typedef std::char_traits<_CharT> __traits_type; };
+
+
+	template<typename, typename _T, typename>
+	struct __concat_allocator_impl
+	{ typedef _T __allocator; };
+
+	template<typename _CharT, typename _T>
+	struct __concat_allocator_impl<_CharT, void, _T>
+	{ typedef _T __allocator; };
+
+	template<typename _CharT>
+	struct __concat_allocator_impl<_CharT, void, void>
+	{ typedef std::allocator<_CharT> __allocator; };
+
+	template<typename, typename, typename, typename _Alloc>
+	struct __concat_allocator
+	{ typedef _Alloc __allocator; };
+
+	template<typename _CharT, typename _T, typename _U>
+	struct __concat_allocator<_CharT, _T, _U, void>
+	: __concat_allocator_impl<_CharT, _T, _U>
+	{};
+
+	template <bool A, bool B, typename _T, typename _U, typename _Alloc>
+	struct __concat_result_impl
+	{
+		typedef typename __concat_char<
+			typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<
+				typename __concat_result_traits<_T>::__char_type
+			>::type,
+			typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<
+				typename __concat_result_traits<_U>::__char_type
+			>::type
+		>::__char_type __char_type;
+		typedef std::basic_string<
+			__char_type,
+			typename __concat_traits<
+				__char_type,
+				typename __concat_result_traits<_T>::__traits_type,
+				typename __concat_result_traits<_U>::__traits_type
+			>::__traits_type,
+			typename __concat_allocator<
+				__char_type,
+				typename __concat_result_traits<_T>::__allocator,
+				typename __concat_result_traits<_U>::__allocator,
+				_Alloc
+			>::__allocator
+		> __result_type;
+	};
+
+	template <typename _CharT, typename _T, typename _Alloc,
+		typename _Check = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<
+			typename __concat_result_traits<_T>::__char_type
+		>::type
+	>
+	struct __concat_result_impl2;
+
+	template <typename _CharT, typename _T, typename _Alloc>
+	struct __concat_result_impl2<_CharT, _T, _Alloc, _CharT>
+	{
+		typedef std::basic_string<
+			_CharT,
+			typename __concat_traits<
+				_CharT,
+				void,
+				typename __concat_result_traits<_T>::__traits_type
+			>::__traits_type,
+			typename __concat_allocator_impl<
+				_CharT,
+				void,
+				_Alloc
+			>::__allocator
+		> __result_type;
+	};
+
+	template <typename _CharT, typename _T, typename _Alloc>
+	struct __concat_result_impl<true, false, _CharT, _T, _Alloc>
+	: __concat_result_impl2<_CharT, _T, _Alloc>
+	{};
+
+	template <typename _T, typename _CharT, typename _Alloc>
+	struct __concat_result_impl<false, true, _T, _CharT, _Alloc>
+	: __concat_result_impl2<_CharT, _T, _Alloc>
+	{};
+
+	template <typename _CharT, typename _Alloc>
+	struct __concat_result_impl<true, true, _CharT, _CharT, _Alloc>
+	: __concat_result_impl2<_CharT, _CharT, _Alloc>
+	{
+		typedef std::basic_string<
+			_CharT,
+			std::char_traits<_CharT>,
+			typename __concat_allocator_impl<
+				_CharT,
+				void,
+				_Alloc
+			>::__allocator
+		> __result_type;
+	};
+
+	template <typename _T, typename _U, typename _Alloc = void>
+	struct __concat_result
+	: __concat_result_impl<
+		FALCON_BOOST_OR_STD_NAMESPACE::is_integral<_T>::value,
+		FALCON_BOOST_OR_STD_NAMESPACE::is_integral<_U>::value,
+		_T, _U, _Alloc
+	>{};
+
+
+	template<typename _CharT, typename _Traits, typename _Alloc, typename _T>
 	inline std::basic_string<_CharT, _Traits, _Alloc>
 	concat(const std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-				 const std::basic_string<_CharT, _Traits, _Alloc>& rhs)
-	{ return lhs + rhs; }
-
-	template<typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>
-	concat(const std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-				 const basic_cstring<_CharT, _Traits>& rhs)
-	{ return lhs + rhs; }
-
-	template<typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>
-	concat(const basic_cstring<_CharT, _Traits>& lhs,
-				 const std::basic_string<_CharT, _Traits, _Alloc>& rhs)
-	{ return lhs + rhs; }
-
-	template<typename _CharT, typename _Traits>
-	inline std::basic_string<_CharT, _Traits>
-	concat(const basic_cstring<_CharT, _Traits>& lhs,
-				 const basic_cstring<_CharT, _Traits>& rhs)
-	{ return lhs + rhs; }
-
-	template<typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>
-	concat(const basic_cstring<_CharT, _Traits>& lhs,
-				 const basic_cstring<_CharT, _Traits>& rhs,
-				 const _Alloc& allocator)
+				 const _T& rhs)
 	{
-		std::basic_string<_CharT, _Traits, _Alloc> str;
-		str.reserve(rhs.size() + lhs.size());
-		return append(append(str, lhs), rhs);
-	}
-
-	template<std::size_t _N, typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>
-	concat(const std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-				 const _CharT (& rhs)[_N])
-	{
-		std::basic_string<_CharT, _Traits, _Alloc> str(lhs);
-		return str.append(rhs, _N-1);
-	}
-
-	template<std::size_t _N, typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>
-	concat(const basic_cstring<_CharT, _Traits>& lhs,
-				 const _CharT (& rhs)[_N])
-	{
-		std::basic_string<_CharT, _Traits, _Alloc> str;
-		str.reserve(_N-1 + lhs.size());
-		return append(append(str, lhs), rhs);
-	}
-
-	template<std::size_t _N, typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>
-	concat(const _CharT (& lhs)[_N],
-				 const std::basic_string<_CharT, _Traits, _Alloc>& rhs)
-	{
-		std::basic_string<_CharT, _Traits, _Alloc> str;
-		str.reserve(_N-1 + rhs.size());
-		return append(append(str, lhs), rhs);
-	}
-
-	template<std::size_t _N, typename _CharT, typename _Traits>
-	inline std::basic_string<_CharT, _Traits>
-	concat(const _CharT (& lhs)[_N],
-				 const basic_cstring<_CharT, _Traits>& rhs)
-	{
-		std::basic_string<_CharT, _Traits> str;
-		str.reserve(_N-1 + rhs.size());
-		return append(append(str, lhs), rhs);
-	}
-
-	template<std::size_t _N, typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>
-	concat(const _CharT (& lhs)[_N],
-				 const basic_cstring<_CharT, _Traits>& rhs,
-				 const _Alloc& allocator)
-	{
-		std::basic_string<_CharT, _Traits, _Alloc> str(allocator);
-		str.reserve(_N-1 + rhs.size());
-		return append(append(str, lhs), rhs);
-	}
-
-	template<std::size_t _N, std::size_t _N2, typename _CharT>
-	inline std::basic_string<_CharT>
-	concat(const _CharT (& lhs)[_N],
-				 const _CharT (& rhs)[_N2])
-	{
-		std::basic_string<_CharT> str;
-		str.reserve(_N-1 + _N2-1);
-		return append(append(str, lhs), rhs);
-	}
-
-	template<std::size_t _N, std::size_t _N2, typename _CharT, typename _Alloc>
-	inline std::basic_string<_CharT, std::char_traits<_CharT>, _Alloc>
-	concat(const _CharT (& lhs)[_N],
-				 const _CharT (& rhs)[_N2],
-				 const _Alloc& allocator)
-	{
-		std::basic_string<_CharT, std::char_traits<_CharT>, _Alloc> str(allocator);
-		str.reserve(_N-1 + _N2-1);
-		return append(append(str, lhs), rhs);
+		std::basic_string<_CharT, _Traits, _Alloc> ret;
+		typedef typename detail::__string_size<_T>::__reference __reference;
+		__reference __rhs(rhs);
+		ret.reserve(lhs.size() + detail::__string_size<_T>::size(__rhs));
+		append(append(ret, lhs), __rhs);
+		return ret;
 	}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	template<typename _Elements,
-		typename _CharT = void, typename _Traits = void, typename _Alloc = void,
-		typename B1 = std::true_type,
-		typename B2 = std::true_type,
-		typename B3 = std::true_type>
+	template<typename _CharT, typename _Traits, typename _Alloc, typename _T>
+	inline std::basic_string<_CharT, _Traits, _Alloc>
+	concat(std::basic_string<_CharT, _Traits, _Alloc>&& lhs, const _T& rhs)
+	{
+		typedef typename detail::__string_size<_T>::__reference __reference;
+		__reference __rhs(rhs);
+		lhs.reserve(lhs.size() + detail::__string_size<_T>::size(__rhs));
+		append(lhs, __rhs);
+		return std::move(lhs);
+	}
+#endif
+
+	template<typename _S, typename _T, typename _U>
+	inline void __append2(_S& ret, const _T& lhs, const _U& rhs)
+	{
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		append(ret, lhs, rhs);
+#else
+		typedef typename detail::__string_size<_T>::__reference __reference;
+		typedef typename detail::__string_size<_U>::__reference __reference2;
+		__reference __lhs(lhs);
+		__reference2 __rhs(rhs);
+		ret.reserve(ret.size() + detail::__string_size<_T>::size(__lhs) + detail::__string_size<_U>::size(__rhs));
+		append(append(ret, __lhs), __rhs);
+#endif
+	}
+
+	template<typename _T, typename _U>
+	inline typename __concat_result<_T, _U>::__result_type
+	concat(const _T& lhs, const _U& rhs)
+	{
+		typedef typename __concat_result<_T, _U>::__result_type __reult_type;
+		__reult_type ret;
+		__append2(ret, lhs, rhs);
+		return ret;
+	}
+
+	template<typename _T, typename _U, typename _Alloc>
+	inline typename __concat_result<_T, _U, _Alloc>::__result_type
+	concat_with_alloc(const _Alloc& alloc, const _T& lhs, const _U& rhs)
+	{
+		typedef typename __concat_result<_T, _U, _Alloc>::__result_type __reult_type;
+		__reult_type ret(alloc);
+		__append2(ret, lhs, rhs);
+		return ret;
+	}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	template<typename _Elements, typename _Result, typename _Alloc = void>
 	struct __build_string;
 
-	template<typename _CharT, typename _Traits, typename _Alloc, typename... _Elements,
-		typename _CharT2, typename _Traits2, typename _Alloc2>
-	struct __build_string<
-		parameter_pack<std::basic_string<_CharT, _Traits, _Alloc>, _Elements...>,
-		_CharT2, _Traits2, _Alloc2,
-		std::true_type, std::true_type, std::true_type
-	>
-	: __build_string<parameter_pack<_Elements...>, _CharT, _Traits, _Alloc,
-		std::integral_constant<bool,
-			std::is_void<_CharT2>::value || std::is_same<_CharT, _CharT2>::value
-		>,
-		std::integral_constant<bool,
-			std::is_void<_Traits2>::value || std::is_same<_Traits, _Traits2>::value
-		>,
-		std::integral_constant<bool,
-			std::is_void<_Alloc2>::value || std::is_same<_Alloc, _Alloc2>::value
-		>
-	>
+	template<typename _T, typename... _Elements, typename _Alloc>
+	struct __build_string<parameter_pack<_T, _T, _Elements...>, _T, _Alloc>
+	: __build_string<parameter_pack<_T, _Elements...>, _T, _Alloc>
 	{};
 
-	template<typename _CharT, typename _Traits, typename... _Elements,
-		typename _CharT2, typename _Traits2, typename _Alloc2>
-	struct __build_string<
-		parameter_pack<basic_cstring<_CharT, _Traits>, _Elements...>,
-		_CharT2, _Traits2, _Alloc2,
-		std::true_type, std::true_type, std::true_type
-	>
-	: __build_string<parameter_pack<_Elements...>, _CharT2, _Traits2, _Alloc2,
-		std::integral_constant<bool,
-			std::is_void<_CharT2>::value || std::is_same<_CharT, _CharT2>::value
-		>,
-		std::integral_constant<bool,
-			std::is_void<_Traits2>::value || std::is_same<_Traits, _Traits2>::value
-		>,
-		std::true_type
-	>
+	template<typename _T, typename... _Elements, typename _Result, typename _Alloc>
+	struct __build_string<parameter_pack<_T, _T, _Elements...>, _Result, _Alloc>
+	: __build_string<parameter_pack<_T, _Elements...>, _Result, _Alloc>
 	{};
 
-	template<typename _CharT, typename _Traits, typename... _Elements,
-		typename _CharT2, typename _Traits2, typename _Alloc2>
-	struct __build_string<
-		parameter_pack<basic_cstring<const _CharT, _Traits>, _Elements...>,
-		_CharT2, _Traits2, _Alloc2,
-		std::true_type, std::true_type, std::true_type
-	>
-	: __build_string<parameter_pack<_Elements...>, _CharT2, _Traits2, _Alloc2,
-		std::integral_constant<bool,
-			std::is_void<_CharT2>::value || std::is_same<_CharT, _CharT2>::value
-		>,
-		std::integral_constant<bool,
-			std::is_void<_Traits2>::value || std::is_same<_Traits, _Traits2>::value
-		>,
-		std::true_type
-	>
+	template<typename _T, typename _U, typename... _Elements, typename _Alloc>
+	struct __build_string<parameter_pack<_T, _U, _Elements...>, _T, _Alloc>
+	: __build_string<parameter_pack<_U, _Elements...>, _T, _Alloc>
 	{};
 
-	template<typename _CharT, typename... _Elements,
-		typename _CharT2, typename _Traits2, typename _Alloc2>
-	struct __build_string<
-		parameter_pack<_CharT*, _Elements...>,
-		_CharT2, _Traits2, _Alloc2,
-		std::true_type, std::true_type, std::true_type
-	>
-	: __build_string<parameter_pack<_Elements...>, _CharT2, _Traits2, _Alloc2,
-		std::integral_constant<bool,
-			std::is_void<_CharT2>::value || std::is_same<_CharT, _CharT2>::value
-		>,
-		std::true_type,
-		std::true_type>
+	template<typename _T, typename _U, typename _Alloc,
+		bool _Is1 = std::is_integral<_T>::value,
+		bool _Is2 = std::is_integral<_U>::value>
+	struct __build_string_impl
+	: __concat_result_impl<_Is1, _Is2, _T, _U, _Alloc>
 	{};
 
-	template<std::size_t _N, typename _CharT, typename... _Elements,
-		typename _CharT2, typename _Traits2, typename _Alloc2>
-	struct __build_string<
-		parameter_pack<_CharT[_N], _Elements...>,
-		_CharT2, _Traits2, _Alloc2,
-		std::true_type, std::true_type, std::true_type
-	>
-	: __build_string<parameter_pack<_Elements...>, _CharT2, _Traits2, _Alloc2,
-		std::integral_constant<bool,
-			std::is_void<_CharT2>::value || std::is_same<_CharT, _CharT2>::value
-		>,
-		std::true_type,
-		std::true_type>
+	template<typename _T, typename _Alloc>
+	struct __build_string_impl<_T, _T, _Alloc, true, true>
+	{ typedef _T __result_type; };
+
+	template<typename _T, typename _U, typename... _Elements,
+		typename _Result, typename _Alloc>
+	struct __build_string<parameter_pack<_T, _U, _Elements...>, _Result, _Alloc>
+	: __build_string<
+		parameter_pack<_U, _Elements...>,
+		typename __build_string_impl<_T, _Result, _Alloc>::__result_type,
+		_Alloc
+	>{};
+
+	template<typename _T, typename _Result, typename _Alloc>
+	struct __build_string<parameter_pack<_T>, _Result, _Alloc>
+	: __concat_result<_T, _Result, _Alloc>
 	{};
 
-	template<typename _CharT, typename _Traits, typename _Alloc>
-	struct __build_string<parameter_pack<>, _CharT, _Traits, _Alloc>
-	{ typedef std::basic_string<_CharT, _Traits, _Alloc> __type; };
+	template<typename _Result, typename _Alloc>
+	struct __build_string<parameter_pack<>, _Result, _Alloc>
+	: __concat_result<_Result, _Result, _Alloc>
+	{};
 
-	template<typename _StringL, typename _StringR, typename _StringR2, typename... _Strings>
-	typename __build_string<parameter_pack<_StringL, _StringR, _StringR2, _Strings...>>::__type
-	concat(const _StringL& lhs, const _StringR& rhs, const _StringR2& rhs2, const _Strings&... other)
+	template<typename _StringL, typename _StringR,
+		typename _StringR2, typename... _Strings>
+	typename __build_string<
+		parameter_pack<_StringR, _StringR2, _Strings...>,
+		_StringL
+	>::__result_type
+	concat(const _StringL& lhs, const _StringR& rhs,
+				 const _StringR2& rhs2, const _Strings&... other)
 	{
-		typename __build_string<parameter_pack<_StringL, _StringR, _StringR2, _Strings...>>::__type str;
-		return append(str, lhs, rhs, rhs2, other...);
+		typename __build_string<
+			parameter_pack<_StringR, _StringR2, _Strings...>,
+			_StringL
+		>::__result_type str;
+		append(str, lhs, rhs, rhs2, other...);
+		return str;
+	}
+
+	template<typename _CharT, typename _Traits, typename _Alloc,
+		typename _StringR, typename _StringR2, typename... _Strings>
+	std::basic_string<_CharT, _Traits, _Alloc>
+	concat(const std::basic_string<_CharT, _Traits, _Alloc>& lhs,
+				 const _StringR& rhs, const _StringR2& rhs2,
+				 const _Strings&... other)
+	{
+		typename __build_string<
+			parameter_pack<_StringR, _StringR2, _Strings...>,
+			std::basic_string<_CharT, _Traits, _Alloc>
+		>::__result_type str;
+		append(str, lhs, rhs, rhs2, other...);
+		return str;
+	}
+
+	template<typename _CharT, typename _Traits, typename _Alloc,
+		typename _StringR, typename _StringR2, typename... _Strings>
+	std::basic_string<_CharT, _Traits, _Alloc>
+	concat(std::basic_string<_CharT, _Traits, _Alloc>&& lhs,
+				 const _StringR& rhs, const _StringR2& rhs2,
+				 const _Strings&... other)
+	{
+		append(lhs, rhs, rhs2, other...);
+		return std::move(lhs);
+
+		// check if @lhs is compatible with @result_type
+		(void)typename __build_string<
+			parameter_pack<_StringR, _StringR2, _Strings...>,
+			std::basic_string<_CharT, _Traits, _Alloc>
+		>::__result_type(lhs);
+	}
+
+	template<typename _Alloc, typename _StringL, typename _StringR,
+		typename _StringR2, typename... _Strings>
+	typename __build_string<
+		parameter_pack<_StringR, _StringR2, _Strings...>,
+		_StringL
+	>::__result_type
+	concat_with_alloc(const _Alloc& alloc, const _StringL& lhs,
+										const _StringR& rhs, const _StringR2& rhs2,
+									  const _Strings&... other)
+	{
+		typename __build_string<
+			parameter_pack<_StringR, _StringR2, _Strings...>,
+			_StringL, _Alloc
+		>::__result_type str(alloc);
+		append(str, lhs, rhs, rhs2, other...);
+		return str;
 	}
 #endif
 

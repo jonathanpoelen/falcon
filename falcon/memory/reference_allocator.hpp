@@ -5,7 +5,7 @@
 
 namespace falcon {
 
-template<typename _T, typename _AllocBase = std::allocator<_T>>
+template<typename _T, typename _AllocBase = std::allocator<_T> >
 struct reference_allocator
 : _AllocBase
 {
@@ -15,7 +15,7 @@ struct reference_allocator
 
 	template<typename _U>
 	struct rebind
-	{ typedef reference_allocator<_U> other; };
+	{ typedef reference_allocator<_U, typename _AllocBase::template rebind<_U>::other> other; };
 };
 
 }

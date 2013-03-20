@@ -12,8 +12,6 @@ modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit
 
 Essayer d'enlever un maximum de __VA_ARGS__
 
-faire un allocator (compatible C++89) qui fonctionne comme une pile et ne delete jamais (boost::pool_allocator ?)
-
 objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionne avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
 
 iota(begin(), end(), first_value): le faire avec iota(container, first_value)
@@ -149,9 +147,9 @@ for (i = 0; i != y; i++)
 //pptr[x][y]
 et tableau n dimension allouer comme 1 et p[x*y]
 
-istream/operators.hpp: enelever la parties sur les char * ou à mettre dans un namespace idem pour le tableau d'objet. Il n'y a pas de verification du nombre inserer...
+istream/operators.hpp: enelever la parties sur les char * ou à mettre dans un namespace idem pour le tableau d'objet. Il n'y a pas de verification du nombre inseré...
 
-fonction pour simplifier les operations sur buffer (renvoit false si fin eof):
+fonction pour simplifier les operations sur buffer (renvoit false si eof):
 	snextc: bool snextc(buffer, &c)
 	sputc: bool sputc(buffer, c)
 	sputn: bool sputn(buffer, s, n)
@@ -161,3 +159,21 @@ fonction pour simplifier les operations sur buffer (renvoit false si fin eof):
 mettre certain fichier de {i,o,io}stream/ dans ios/
 
 tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui ce comporte comme un tuple
+
+classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.hpp)
+
+macro FALCON_PROPERTY_{READ,WRITE,RW,GET,SET,ACCESS}
+property.hpp: remplacer properties et properties_t par un enum class properties et using properties_t = properties_t ?
+
+stack_allocator<T,N|max_allocate<Size>>: allocateur sur la pile. Pas de constructeur et d'operator de copie. max_allocate definit la taille maximal prit par l'allocateur et N le nombre d'objet supporter par l'allocateur.
+
+faire un swap (et swap_ranges et iter_swap) qui fait un swap binaire pour les entiers et sinon std::swap
+
+cstring: operateur (et fonction) imcompatible entre cstring et const_cstring alors qu'ils le devraient.
+
+basic_string_reference<String>(std::string&, start, size)
+string_reference=basic_string_reference<std::string>
+
+le CONST_REFERENCE_OR_RVALUE(var) -> CONST_REFERENCE_OR_RVALUE const& | &&
+
+

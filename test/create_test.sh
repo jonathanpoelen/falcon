@@ -3,7 +3,7 @@ USAGE='[dirname] category'
 
 cd `dirname $0`
 
-[ $# = 0 ] && echo $0 $USAGE && exit 1
+[ $# != 1 ] && [ $# != 2 ] && echo $0 $USAGE && exit 1
 
 if [ $# = 2 ];then
 	d=${1%%\/}
