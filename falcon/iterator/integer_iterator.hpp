@@ -7,9 +7,9 @@
 namespace falcon {
 namespace iterator {
 
-struct fake_iterator_full_comparison_tag {};
-struct fake_iterator_less_comparison_tag {};
-struct fake_iterator_equal_to_comparison_tag {};
+struct integer_iterator_full_comparison_tag {};
+struct integer_iterator_less_comparison_tag {};
+struct integer_iterator_equal_to_comparison_tag {};
 
 template <typename _T, typename _ComparisonTag = use_default,
 	typename _Category = use_default,
@@ -17,7 +17,7 @@ template <typename _T, typename _ComparisonTag = use_default,
 	typename _Distance = use_default,
 	typename _Pointer = use_default
 >
-class fake_iterator;
+class integer_iterator;
 
 template <typename _T, typename _ComparisonTag = use_default,
 	typename _Category = use_default,
@@ -25,7 +25,7 @@ template <typename _T, typename _ComparisonTag = use_default,
 	typename _Distance = use_default,
 	typename _Pointer = use_default
 >
-class reverse_fake_iterator;
+class reverse_integer_iterator;
 
 
 namespace detail {
@@ -52,14 +52,14 @@ namespace detail {
 	template <typename _T, typename _ComparisonTag,
 		typename _Category, typename _Reference, typename _Distance, typename _Pointer>
 	struct fake_base
-	: __fake_base<fake_iterator,
+	: __fake_base<integer_iterator,
 		_T, _ComparisonTag,  _Category, _Reference, _Distance, _Pointer>
 	{};
 
 	template <typename _T, typename _ComparisonTag,
 		typename _Category, typename _Reference, typename _Distance, typename _Pointer>
 	struct reverse_fake_base
-	: __fake_base<reverse_fake_iterator,
+	: __fake_base<reverse_integer_iterator,
 		_T, _ComparisonTag,  _Category, _Reference, _Distance, _Pointer>
 	{};
 
@@ -72,7 +72,7 @@ template<typename _T, typename _ComparisonTag,
 	typename _Distance,
 	typename _Pointer
 >
-class fake_iterator
+class integer_iterator
 : public detail::fake_base<_T, _ComparisonTag, _Category, _Reference, _Distance, _Pointer>::base
 {
 	typedef typename detail::fake_base<_T, _ComparisonTag, _Category, _Reference, _Distance, _Pointer>::base __base;
@@ -83,26 +83,26 @@ public:
 	typedef typename __base::reference reference;
 
 public:
-	fake_iterator()
+	integer_iterator()
 	: __base()
 	{}
 
-	fake_iterator(const fake_iterator& other)
+	integer_iterator(const integer_iterator& other)
 	: __base(other)
 	{}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	/*explicit*/ fake_iterator(_T&& value)
+	/*explicit*/ integer_iterator(_T&& value)
 	: __base(value)
 	{}
 
 	template<typename _U, class _Enable = typename
 	std::enable_if<!std::is_reference<_T>::value && std::is_convertible<_U, _T>::value>::type>
-	/*explicit*/ fake_iterator(_U&& value)
+	/*explicit*/ integer_iterator(_U&& value)
 	: __base(std::forward<_U>(value))
 	{}
 #else
-	/*explicit*/ fake_iterator(const _T& value)
+	/*explicit*/ integer_iterator(const _T& value)
 	: __base(value, 1)
 	{}
 #endif
@@ -117,48 +117,48 @@ private:
 	{ return this->base_reference(); }
 
 	typedef typename default_or_type<
-		use<fake_iterator_full_comparison_tag>,
+		use<integer_iterator_full_comparison_tag>,
 		_ComparisonTag
 	>::type __comparison_tag;
 
-	bool equal(const fake_iterator& other, fake_iterator_less_comparison_tag) const
+	bool equal(const integer_iterator& other, integer_iterator_less_comparison_tag) const
 	{ return other.base_reference() < this->base_reference(); }
 
 	template<typename _Tag>
-	bool equal(const fake_iterator& other, _Tag) const
+	bool equal(const integer_iterator& other, _Tag) const
 	{ return this->base_reference() == other.base_reference(); }
 
-	bool equal(const fake_iterator& other) const
+	bool equal(const integer_iterator& other) const
 	{ return equal(other, __comparison_tag()); }
 
-	bool less(const fake_iterator& other, fake_iterator_equal_to_comparison_tag) const;
+	bool less(const integer_iterator& other, integer_iterator_equal_to_comparison_tag) const;
 
 	template<typename _Tag>
-	bool less(const fake_iterator& other, _Tag) const
+	bool less(const integer_iterator& other, _Tag) const
 	{ return this->base_reference() < other.base_reference(); }
 
-	bool less(const fake_iterator& other) const
+	bool less(const integer_iterator& other) const
 	{ return less(other, __comparison_tag()); }
 };
 
 
 template <typename _T>
-fake_iterator<_T> make_fake_iterator(const _T& value)
-{ return fake_iterator<_T>(value); }
+integer_iterator<_T> make_integer_iterator(const _T& value)
+{ return integer_iterator<_T>(value); }
 
 template <typename _T, typename _ComparisonTag>
-fake_iterator<_T, _ComparisonTag>
-make_fake_iterator(const _T& value, _ComparisonTag)
-{ return fake_iterator<_T, _ComparisonTag>(value); }
+integer_iterator<_T, _ComparisonTag>
+make_integer_iterator(const _T& value, _ComparisonTag)
+{ return integer_iterator<_T, _ComparisonTag>(value); }
 
 template <typename _T>
-fake_iterator<const _T> make_cfake_iterator(const _T& value)
-{ return fake_iterator<const _T>(value); }
+integer_iterator<const _T> make_cinteger_iterator(const _T& value)
+{ return integer_iterator<const _T>(value); }
 
 template <typename _T, typename _ComparisonTag>
-fake_iterator<const _T, _ComparisonTag>
-make_cfake_iterator(const _T& value, _ComparisonTag)
-{ return fake_iterator<const _T, _ComparisonTag>(value); }
+integer_iterator<const _T, _ComparisonTag>
+make_cinteger_iterator(const _T& value, _ComparisonTag)
+{ return integer_iterator<const _T, _ComparisonTag>(value); }
 
 
 template<typename _T, typename _ComparisonTag,
@@ -167,7 +167,7 @@ template<typename _T, typename _ComparisonTag,
 	typename _Distance,
 	typename _Pointer
 >
-class reverse_fake_iterator
+class reverse_integer_iterator
 : public detail::reverse_fake_base<_T, _ComparisonTag, _Category, _Reference, _Distance, _Pointer>::base
 {
 	typedef typename detail::reverse_fake_base<_T, _ComparisonTag, _Category, _Reference, _Distance, _Pointer>::base __base;
@@ -179,26 +179,26 @@ public:
 	typedef typename __base::difference_type difference_type;
 
 public:
-	reverse_fake_iterator()
+	reverse_integer_iterator()
 	: __base()
 	{}
 
-	reverse_fake_iterator(const reverse_fake_iterator& other)
+	reverse_integer_iterator(const reverse_integer_iterator& other)
 	: __base(other)
 	{}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	/*explicit*/ reverse_fake_iterator(_T&& value)
+	/*explicit*/ reverse_integer_iterator(_T&& value)
 	: __base(value)
 	{}
 
 	template<typename _U, class _Enable = typename
 	std::enable_if<!std::is_reference<_T>::value && std::is_convertible<_U, _T>::value>::type>
-	/*explicit*/ reverse_fake_iterator(_U&& value)
+	/*explicit*/ reverse_integer_iterator(_U&& value)
 	: __base(std::forward<_U>(value))
 	{}
 #else
-	/*explicit*/ reverse_fake_iterator(const _T& value)
+	/*explicit*/ reverse_integer_iterator(const _T& value)
 	: __base(value, 1)
 	{}
 #endif
@@ -224,52 +224,52 @@ private:
 	void recoil(difference_type n)
 	{ this->base_reference() += n; }
 
-	difference_type difference(const reverse_fake_iterator& other) const
+	difference_type difference(const reverse_integer_iterator& other) const
 	{ return other.base_reference() - this->base_reference(); }
 
 	typedef typename default_or_type<
-		use<fake_iterator_full_comparison_tag>,
+		use<integer_iterator_full_comparison_tag>,
 		_ComparisonTag
 	>::type __comparison_tag;
 
-	bool equal(const reverse_fake_iterator& other, fake_iterator_less_comparison_tag) const
+	bool equal(const reverse_integer_iterator& other, integer_iterator_less_comparison_tag) const
 	{ return other.base_reference() > this->base_reference(); }
 
 	template<typename _Tag>
-	bool equal(const reverse_fake_iterator& other, _Tag) const
+	bool equal(const reverse_integer_iterator& other, _Tag) const
 	{ return this->base_reference() == other.base_reference(); }
 
-	bool equal(const reverse_fake_iterator& other) const
+	bool equal(const reverse_integer_iterator& other) const
 	{ return equal(other, __comparison_tag()); }
 
-	bool less(const reverse_fake_iterator& other, fake_iterator_equal_to_comparison_tag) const;
+	bool less(const reverse_integer_iterator& other, integer_iterator_equal_to_comparison_tag) const;
 
 	template<typename _Tag>
-	bool less(const reverse_fake_iterator& other, _Tag) const
+	bool less(const reverse_integer_iterator& other, _Tag) const
 	{ return this->base_reference() > other.base_reference(); }
 
-	bool less(const reverse_fake_iterator& other) const
+	bool less(const reverse_integer_iterator& other) const
 	{ return less(other, __comparison_tag()); }
 };
 
 
 template <typename _T>
-reverse_fake_iterator<_T> make_reverse_fake_iterator(const _T& value)
-{ return reverse_fake_iterator<_T>(value); }
+reverse_integer_iterator<_T> make_reverse_integer_iterator(const _T& value)
+{ return reverse_integer_iterator<_T>(value); }
 
 template <typename _T, typename _ComparisonTag>
-reverse_fake_iterator<_T, _ComparisonTag>
-make_reverse_fake_iterator(const _T& value, _ComparisonTag)
-{ return reverse_fake_iterator<_T, _ComparisonTag>(value); }
+reverse_integer_iterator<_T, _ComparisonTag>
+make_reverse_integer_iterator(const _T& value, _ComparisonTag)
+{ return reverse_integer_iterator<_T, _ComparisonTag>(value); }
 
 template <typename _T>
-reverse_fake_iterator<const _T> make_creverse_fake_iterator(const _T& value)
-{ return reverse_fake_iterator<const _T>(value); }
+reverse_integer_iterator<const _T> make_creverse_integer_iterator(const _T& value)
+{ return reverse_integer_iterator<const _T>(value); }
 
 template <typename _T, typename _ComparisonTag>
-reverse_fake_iterator<const _T, _ComparisonTag>
-make_creverse_fake_iterator(const _T& value, _ComparisonTag)
-{ return reverse_fake_iterator<const _T, _ComparisonTag>(value); }
+reverse_integer_iterator<const _T, _ComparisonTag>
+make_creverse_integer_iterator(const _T& value, _ComparisonTag)
+{ return reverse_integer_iterator<const _T, _ComparisonTag>(value); }
 
 }}
 

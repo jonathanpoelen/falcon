@@ -5,7 +5,7 @@
 #include <falcon/iterator/contain_range_access.hpp>
 #include <falcon/iterator/counting_iterator.hpp>
 #include <falcon/iterator/delegate_comparison_iterator.hpp>
-#include <falcon/iterator/fake_iterator.hpp>
+#include <falcon/iterator/integer_iterator.hpp>
 #include <falcon/iterator/get_accessor_iterator.hpp>
 #include <falcon/iterator/indirect_iterator.hpp>
 #include <falcon/iterator/infinite_iterator.hpp>
