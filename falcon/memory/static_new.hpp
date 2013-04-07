@@ -11,18 +11,18 @@ template<typename _T>
 struct __static_new_traits
 {
 	typedef typename std::remove_extent<_T>::type __type;
-	static constexpr bool easy_constructible =
+	static constexpr bool easily_constructible =
 		std::has_trivial_default_constructor<__type>::value
 		&& std::has_trivial_copy_constructor<__type>::value
 		&& std::has_trivial_copy_assign<__type>::value;
-	static constexpr bool easy_destructible =
+	static constexpr bool easily_destructible =
 		std::has_trivial_destructor<__type>::value;
 };
 
 template <typename _T,
 	bool = false,
-	bool = __static_new_traits<_T>::easy_constructible,
-	bool = __static_new_traits<_T>::easy_destructible>
+	bool = __static_new_traits<_T>::easily_constructible,
+	bool = __static_new_traits<_T>::easily_destructible>
 class __static_new_base
 : __memory_stack<_T>
 {
@@ -115,6 +115,8 @@ class __static_new_base<_T, AddInitialized, true, true>
 public:
 	typedef _T type;
 	typedef _T memory_type;
+	typedef _T * pointer;
+	typedef const _T * const_pointer;
 
 private:
 	__static_new_value<_T, AddInitialized> _value;
@@ -132,10 +134,10 @@ public:
 	const memory_type& data() const
 	{ return _value._value; }
 
-	type* address()
+	pointer address()
 	{ return std::addressof(_value._value); }
 
-	const type* address() const
+	const_pointer address() const
 	{ return std::addressof(_value._value); }
 
 	template<typename... _Args>
@@ -170,7 +172,7 @@ public:
 	typedef typename __memory_stack<_T[_N]>::memory_type memory_type;
 
 private:
-	type* _ptr;
+	_T * _ptr;
 
 public:
 	__static_new_base()
@@ -254,7 +256,7 @@ public:
 	typedef typename __memory_stack<_T[_N]>::memory_type memory_type;
 
 private:
-	type* _ptr;
+	_T* _ptr;
 
 public:
 	__static_new_base()
@@ -319,6 +321,8 @@ class __static_new_base<_T[_N], AddInitialized, true, true>
 public:
 	typedef _T type[_N];
 	typedef _T memory_type;
+	typedef _T* pointer;
+	typedef const _T* const_pointer;
 
 private:
 	__static_new_value<_T[_N], AddInitialized> _value;
@@ -336,10 +340,10 @@ public:
 	const memory_type& data() const
 	{ return _value._value; }
 
-	type* address()
+	pointer address()
 	{ return std::addressof(_value._value); }
 
-	const type* address() const
+	const_pointer address() const
 	{ return std::addressof(_value._value); }
 
 	template<typename... _Args>
