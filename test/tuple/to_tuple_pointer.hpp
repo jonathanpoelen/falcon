@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_TUPLE_TUPLE_POINTER_HPP
-#define _FALCON_TEST_TUPLE_TUPLE_POINTER_HPP
-
-void to_tuple_pointer_test();
-
-#endif //_FALCON_TEST_TUPLE_TUPLE_POINTER_HPP

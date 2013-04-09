@@ -36,40 +36,40 @@ template<typename _T, typename... _Args>
 inline _T* renew(_T* p, _Args&&... args)
 {
 	default_delete(p);
-	return p = default_new<_T>(std::forward<_Args>(args)...);
+	return default_new<_T>(std::forward<_Args>(args)...);
 }
 
 template<typename _T, typename... _Args>
 inline _T* nothrow_renew(_T* p, _Args&&... args)
 {
 	default_delete(p);
-	return p = nothrow_default_new<_T>(std::forward<_Args>(args)...);
+	return nothrow_default_new<_T>(std::forward<_Args>(args)...);
 }
 #else
 template<typename _T>
 inline _T* renew(_T* p)
 {
 	default_delete(p);
-	return p = default_new<_T>();
+	return default_new<_T>();
 }
 template<typename _T, typename _U>
 inline _T* renew(_T* p, const _U& value)
 {
 	default_delete(p);
-	return p = default_new<_T>(value);
+	return default_new<_T>(value);
 }
 
 template<typename _T>
 inline _T* nothrow_renew(_T* p)
 {
 	default_delete(p);
-	return p = nothrow_default_new<_T>();
+	return nothrow_default_new<_T>();
 }
 template<typename _T, typename _U>
 inline _T* nothrow_renew(_T* p, const _U& value)
 {
 	default_delete(p);
-	return p = nothrow_default_new<_T>(value);
+	return nothrow_default_new<_T>(value);
 }
 #endif
 

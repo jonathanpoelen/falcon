@@ -1,6 +1,0 @@
-#ifndef FALCON_TEST_UTILITY_SYNCHRONIZER_HPP
-#define FALCON_TEST_UTILITY_SYNCHRONIZER_HPP
-
-void synchronizer_test();
-
-#endif

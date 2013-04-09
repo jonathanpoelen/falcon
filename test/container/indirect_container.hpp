@@ -1,6 +1,0 @@
-#ifndef FALCON_TEST_CONTAINER_INDIRECT_CONTAINER_HPP
-#define FALCON_TEST_CONTAINER_INDIRECT_CONTAINER_HPP
-
-void indirect_container_test();
-
-#endif

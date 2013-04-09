@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_ALGORITHM_FOR_N_HPP
-#define _FALCON_TEST_ALGORITHM_FOR_N_HPP
-
-void for_n_test();
-
-#endif //_FALCON_TEST_ALGORITHM_FOR_N_HPP

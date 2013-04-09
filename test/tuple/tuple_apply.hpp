@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_TUPLE_TUPLE_APPLY_HPP
-#define _FALCON_TEST_TUPLE_TUPLE_APPLY_HPP
-
-void tuple_apply_test();
-
-#endif //_FALCON_TEST_TUPLE_TUPLE_APPLY_HPP

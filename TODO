@@ -65,7 +65,7 @@ singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>. Voir 
 
 container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des conditions à la compilation.
 
-les lambdas toujours par reference ou il parfois utiliser std::ref ? Pas le cas pour while_loop et co...
+les lambdas toujours par reference ou il faut parfois utiliser std::ref ? Pas le cas pour while_loop et co...
 
 faire un make_parameter_adapter() et un make_tuple_applier().
 
@@ -110,6 +110,8 @@ ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui se
 tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant void, voient leur type changer en std::ignore_t.
 
 literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants (voir pdf plus bas pour les suffix).
+implémenter la proposition de suffix dans la nouvelle norme: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3402.pdf
+ne pas oublier de prendre en compte les unités (non mis dans la norme) avec les abréviations udl ou iso
 
 renommer le dossier c++0x en c++11 ?
 modifier les noms des macro CPP0X_* et CPP_* en FALCON_* (et FALCON_CXX11_ ?)
@@ -122,20 +124,17 @@ Utiliser d'avantage FALCON_BOOST_OR_STD_NAMESPACE et FALCON_BOOST_OR_STD_TRAITS 
 
 node/*.hpp: peuvent fonctionner de façon transparente avec des std::unique_ptr ?
 
-implémenter la proposition de suffix dans la nouvelle norme: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3402.pdf
-ne pas oublier de prendre en compte les unités (non mis dans la norme) avec les abréviations udl ou iso
-
 optimal tuple : http://flamingdangerzone.com/cxx11/2012/12/02/optimal-tuple-ii.html
 
 utiliser optimal_tuple dans recursive_iterator
 
 revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
 
-peut-on supprimer les constructeurs de copie et l'affectation dans les iterateurs sans que cela crée des copies ?
+peut-on supprimer les constructeurs de copie et l'affectation dans les iterateurs sans que cela crée des copies ? il faudra suremant fair un move ctor et un  move copy
 
 preprocessor/move.hpp -> c++/move.hpp ?
 
-peut-être déjà fait faire un range qui prend des iterateur pour creer un container_wrapper et être utiliser avec for(auto& v:range(it, it+3)). ainsi qu'un ref_range qui ne va pas copier le first et end mais prendre des references (sauf end si rref)
+faire un range qui prend des iterateur pour creer un container_wrapper et être utiliser avec for(auto& v:range(it, it+3)). ainsi qu'un ref_range qui ne va pas copier le first et end mais prendre des references (sauf end si rref)
 
 mettre des rref quand un foncteur est demander dans les fonctions (tuple_assign, etc)
 
@@ -147,7 +146,7 @@ for (i = 0; i != y; i++)
 //pptr[x][y]
 et tableau n dimension allouer comme 1 et p[x*y]
 
-istream/operators.hpp: enelever la parties sur les char * ou à mettre dans un namespace idem pour le tableau d'objet. Il n'y a pas de verification du nombre inseré...
+istream/operators.hpp: enlever la parties sur les char * ou à mettre dans un namespace idem pour le tableau d'objet. Il n'y a pas de verification du nombre inseré...
 
 fonction pour simplifier les operations sur buffer (renvoit false si eof):
 	snextc: bool snextc(buffer, &c)
@@ -160,19 +159,40 @@ mettre certain fichier de {i,o,io}stream/ dans ios/
 
 tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui ce comporte comme un tuple
 
-classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.hpp)
+classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.hpp). (header different pour vs++ ?)
 
 macro FALCON_PROPERTY_{READ,WRITE,RW,GET,SET,ACCESS}
 property.hpp: remplacer properties et properties_t par un enum class properties et using properties_t = properties_t ?
 
 stack_allocator<T,N|max_allocate<Size>>: allocateur sur la pile. Pas de constructeur et d'operator de copie. max_allocate definit la taille maximal prit par l'allocateur et N le nombre d'objet supporter par l'allocateur.
 
-faire un swap (et swap_ranges et iter_swap) qui fait un swap binaire pour les entiers et sinon std::swap
+faire un xor_swap (et ranges_xor_swap et iter_xor_swap)
 
-basic_string_reference<String>(std::string&, start, size)
+basic_string_reference<String>(String&, start, size)
 string_reference=basic_string_reference<std::string>
 
 le CONST_REFERENCE_OR_RVALUE(var) -> CONST_REFERENCE_OR_RVALUE const& | &&
+
+en g++-4.8 dans memory/{memory_stack,stack_allocator}.hpp: ne pas utiliser boost si C++11
+
+is_instance_of -> std::is_base_of ? iostream/is_ios.hpp fonctionne quand même ?
+
+make_range_container2(it,it): meme chose que make_range_container(...) mais retourne un paire contenant reference et numero d'iteration
+
+CPP0X devient CPP11 et utilise {} si __cplusplus > 201100L sinon utilise ()
+La macro speciale IDE_NOT_PARSER remaplacer par CPP11
+
+local_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau (la copie partage le même storage)
+global_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau static
+pool_allocator: un global_pool_adapter qui utilise des mutex si besoin
+
+static_new et memory_new: Attention aux affectations ou constructeurs qui peuvent lancer des exceptions
+
+synchronizer et argument_wrapper: remplacer tout les constructeurs par un forward constructeur
+
+support des non exceptions (retourne 0 au lieu de bad_alloc). Flag -fno-exceptions pour gcc. Utiliser la macro BOOST_NO_EXCEPTIONS dans boost/config.hpp
+
+
 
 
 

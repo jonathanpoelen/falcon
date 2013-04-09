@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_FUNCTIONAL_COMPOSE_HPP
-#define _FALCON_TEST_FUNCTIONAL_COMPOSE_HPP
-
-void compose_test();
-
-#endif

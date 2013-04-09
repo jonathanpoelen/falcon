@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_OSTREAM_JOIN_HPP
-#define _FALCON_TEST_OSTREAM_JOIN_HPP
-
-void join_test();
-
-#endif //_FALCON_TEST_OSTREAM_JOIN_HPP

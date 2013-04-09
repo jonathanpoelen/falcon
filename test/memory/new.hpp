@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_MEMORY_NEW_HPP
-#define _FALCON_TEST_MEMORY_NEW_HPP
-
-void new_test();
-
-#endif //_FALCON_TEST_MEMORY_NEW_HPP

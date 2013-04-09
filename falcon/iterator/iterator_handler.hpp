@@ -48,8 +48,8 @@ public:
 	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, result_type, member, qualifier)\
 	{ return derived(a).member(); }
 
-	FALCON_ITERATOR_CORE_ACCESS(const _IBase&, base_reference, )
-	FALCON_ITERATOR_CORE_ACCESS(_IBase&, base_reference, const)
+	FALCON_ITERATOR_CORE_ACCESS(_IBase&, base_reference, )
+	FALCON_ITERATOR_CORE_ACCESS(const _IBase&, base_reference, const)
 
 	FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, )
 	FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, const)
@@ -153,6 +153,8 @@ public:
 
 #undef FALCON_ITERATOR_HANDLER_TYPE
 #undef FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD
+
+#undef FALCON_ITERATOR_CORE_ACCESS_2CONST_HEAD
 };
 
 template<typename _Iterator, typename _IteratorBase,

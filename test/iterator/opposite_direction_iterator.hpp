@@ -1,6 +1,0 @@
-#ifndef FALCON_TEST_ITERATOR_OPOSITE_DIRECTION_ITERATOR_HPP
-#define FALCON_TEST_ITERATOR_OPOSITE_DIRECTION_ITERATOR_HPP
-
-void opposite_direction_iterator_test();
-
-#endif

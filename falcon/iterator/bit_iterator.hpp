@@ -66,8 +66,8 @@ public:
 	typedef typename __base::difference_type difference_type;
 
 
-	bit_iterator(iterator_type __x, unsigned offset)
-	: __base(__x), _M_offset(offset)
+	bit_iterator(iterator_type __x, unsigned __offset)
+	: __base(__x), _M_offset(__offset)
 	{}
 
 	bit_iterator()
@@ -77,6 +77,12 @@ public:
 	bit_iterator(const bit_iterator& __x)
 	: __base(__x), _M_offset(__x._M_offset)
 	{}
+
+	unsigned int offset() const
+	{ return _M_offset; }
+
+	void offset(unsigned int __offset)
+	{ _M_offset = __offset; }
 
 private:
 	typedef typename std::iterator_traits<_Iterator>::value_type __mask_t;

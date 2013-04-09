@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_BIT_CIRCULAR_BIT_HPP
-#define _FALCON_TEST_BIT_CIRCULAR_BIT_HPP
-
-void circular_bit_test();
-
-#endif //_FALCON_TEST_BIT_CIRCULAR_BIT_HPP

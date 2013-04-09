@@ -1,6 +1,0 @@
-#ifndef FALCON_TEST_ITERATOR_ITERATOR_ITERATOR_HPP
-#define FALCON_TEST_ITERATOR_ITERATOR_ITERATOR_HPP
-
-void iterator_iterator_test();
-
-#endif
