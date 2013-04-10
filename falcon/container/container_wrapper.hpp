@@ -39,7 +39,7 @@ public:
 	, _access(traits)
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	container_wrapper(container_type& container, _Args&&... argtraits)
 	: _container(&container)

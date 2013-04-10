@@ -6,7 +6,7 @@ namespace falcon {
 struct ignore_t
 {};
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 constexpr ignore_t ignore;
 #else
 const ignore_t ignore;

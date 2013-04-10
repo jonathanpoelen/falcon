@@ -1,7 +1,7 @@
 #ifndef FALCON_RANGE_RANGE_HPP
 #define FALCON_RANGE_RANGE_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <falcon/tuple/tuple_apply.hpp>
 # include <falcon/utility/maker.hpp>
 #endif
@@ -66,7 +66,7 @@ struct range
 		return *this;
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	constexpr range(const range<_T>&) = default;
 
 	template<class _U, class _Enable = typename std::enable_if<
@@ -312,7 +312,7 @@ inline CPP_CONSTEXPR bool operator!=(const range<_T>& __x, const range<_T>& __y)
 	return !(__x == __y);
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<class _T>
 inline constexpr range<typename decay_and_strip<_T>::type>
 make_range(_T&& __x, _T&& __y)

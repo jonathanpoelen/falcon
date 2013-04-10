@@ -3,7 +3,7 @@
 
 #include <iterator>
 #include <falcon/c++/constexpr.hpp>
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 #include <falcon/utility/maker.hpp>
 #endif
 
@@ -31,7 +31,7 @@ CPP_CONSTEXPR inline _T coord_z(const _T& width, const _T& height,
 template <typename _Coord, typename _T>
 CPP_CONSTEXPR inline _Coord coord(const _T& width, const _T& index) {
 	return
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	maker<_Coord>()
 #else
 	_Coord
@@ -46,7 +46,7 @@ template <typename _Coord, typename _T>
 CPP_CONSTEXPR inline _Coord coord(const _T& width, const _T& height,
 								  const _T& index) {
 	return
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	maker<_Coord>()
 #else
 	_Coord

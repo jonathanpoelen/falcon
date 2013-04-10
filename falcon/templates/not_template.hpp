@@ -3,7 +3,7 @@
 
 namespace falcon {
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<template<class...> class _Temp>
 	struct template_not
 	{

@@ -68,7 +68,7 @@ struct grid_cross_friend_algorithm
 		n2->_M_link().up = &*n;
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _Node>
 	static inline typename std::enable_if<std::is_rvalue_reference<_Node &&>::value, void>::type down(_Node&& n, _Node&& n2)
 	{

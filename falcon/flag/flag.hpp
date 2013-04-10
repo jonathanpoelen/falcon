@@ -330,7 +330,7 @@ struct flag<_T[_N]>
 	value_type _M_flag;
 
 public:
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _U, typename... _Args, typename _ = typename std::enable_if<std::is_integral<_U>::value>::type>
 	constexpr flag(const _U& __flag, const _Args&... __flags)
 	: _M_flag{__flag, __flags...}
@@ -406,7 +406,7 @@ public:
 	const value_type& get() const
 	{ return _M_flag; }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		///TODO move algorithm : namespace constexpr_algorithm ? namespce cexpr ?
 #define _FALCON_FLAG_MAKE_BINARY_OPERATOR(name, Op)\
 	private:\
@@ -468,7 +468,7 @@ public:
 	self_type& operator-=(const self_type& other)
 	{ return *this ^= other._flag; }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 private:
 	template<std::size_t _Num, typename... _Args>
 	struct op_compl
@@ -574,7 +574,7 @@ public:
 	}
 
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 private:
 	template<std::size_t _Num, typename _U>
 	struct op_eq

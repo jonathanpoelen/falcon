@@ -1,7 +1,7 @@
 #ifndef _FALCON_CPP_NOEXCEPT_HPP
 #define _FALCON_CPP_NOEXCEPT_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define CPP_NOEXCEPT noexcept
 #else
 # define CPP_NOEXCEPT

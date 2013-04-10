@@ -29,7 +29,7 @@ protected:
 
 	typedef partial_java_iterator<_Iterator> self_type;
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	partial_java_iterator(_Args&&... args)
 	: _it(std::forward<_Args>(args)...)

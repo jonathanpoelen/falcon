@@ -1,13 +1,13 @@
 #ifndef _FALCON_TEMPLATES_TEMPLATE_RIGHT_ACCUMULATOR_HPP
 #define _FALCON_TEMPLATES_TEMPLATE_RIGHT_ACCUMULATOR_HPP
 
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus <= 201100L
 # include <boost/typeof/typeof.hpp>
 #endif
 
 namespace falcon {
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<template<class...> class _Temp, typename... _RightArgs>
 struct template_right_accumulator
 {

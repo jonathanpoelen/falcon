@@ -1,7 +1,7 @@
 #ifndef _FALCON_DETAIL_TYPEOF_HPP
 #define _FALCON_DETAIL_TYPEOF_HPP
 
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus <= 201100L
 # include <boost/typeof/typeof.hpp>
 # define __FALCON_TYPEOF(Expr) BOOST_TYPEOF(Expr)
 # define __FALCON_TYPEOF_WRAP_EXPR(Expr) BOOST_TYPEOF(Expr)

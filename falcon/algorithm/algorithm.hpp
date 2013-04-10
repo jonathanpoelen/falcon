@@ -40,7 +40,7 @@
 #define __FALCON_ALGORITHM_REF_ARG , _T1& v1
 #define __FALCON_ALGORITHM_REF1_ARG , _T1& v1, _T2 v2
 #define __FALCON_ALGORITHM_REF2_ARG , _T1& v1, _T2 v2, _T3 v3
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define __FALCON_ALGORITHM_RVALUE_ARG , _T1&& v1
 #else
 # define __FALCON_ALGORITHM_RVALUE_ARG , const _T1& v1

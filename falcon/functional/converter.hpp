@@ -1,7 +1,7 @@
 #ifndef _FALCON_FUNCTIONAL_CONVERTER_HPP
 #define _FALCON_FUNCTIONAL_CONVERTER_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <type_traits>
 #endif
 
@@ -22,7 +22,7 @@ struct converter
 		return static_cast<_To>(a);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	inline constexpr _To operator()(_From&& a) const
 	{
 		return static_cast<_To>(a);
@@ -39,7 +39,7 @@ struct converter<_To, late_parameter_t>
 		return static_cast<_To>(a);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _From>
 	inline constexpr typename std::enable_if<std::is_lvalue_reference<_From>::value, _To>::type operator()(_From& a) const
 	{

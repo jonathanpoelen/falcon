@@ -14,7 +14,7 @@ struct __resolve_manipulator
 	)(std::basic_ostream<_CharT, _Traits>&);
 };
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _CharT = char, typename _Traits = std::char_traits<_CharT> >
 #else
 template<typename _CharT, typename _Traits>

@@ -1,7 +1,7 @@
 #ifndef _FALCON_MEMORY_CONSTRUCT_HPP
 #define _FALCON_MEMORY_CONSTRUCT_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <utility>
 # include <falcon/utility/detail/construct_category.hpp>
 #endif
@@ -42,7 +42,7 @@ template<typename _T, typename _U>
 inline void construct(_T* p, const _U& value)
 {
 	__construct<
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		std::has_trivial_default_constructor<_T>::value
 #else
 		false
@@ -50,7 +50,7 @@ inline void construct(_T* p, const _U& value)
 	>::__cons(p, value);
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _T, typename... _Args>
 inline void __construct2(const falcon::detail::normal_construct_tag&,
 						 typename std::remove_extent<_T>::type* p,
@@ -176,7 +176,7 @@ struct construct_wrapper
 		construct<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	void operator()(_Tp* ptr, _Args&&... args) const
 	{
@@ -207,7 +207,7 @@ struct default_new_wrapper
 		return default_new<_Tp>(v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	_Tp* operator()(_Args&&... args) const
 	{
@@ -225,7 +225,7 @@ struct default_new_wrapper
 		return nothrow_default_new<_Tp>(v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	_Tp* operator()(const std::nothrow_t& nothrow, _Args&&... args) const
 	{
@@ -254,7 +254,7 @@ struct nothrow_default_new_wrapper
 		return nothrow_default_new<_Tp>(v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	_Tp* operator()(_Args&&... args) const
 	{

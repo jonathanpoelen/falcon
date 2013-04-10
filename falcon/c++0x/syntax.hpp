@@ -5,7 +5,7 @@
 #include <falcon/c++0x/assignable.hpp>
 #include <falcon/c++0x/extend_pack.hpp>
 
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus <= 201100L
 # define CPP0X_PROTO(_Func, ...) undetermined_type _Func
 
 # define CPP0X(...) (__VA_ARGS__)

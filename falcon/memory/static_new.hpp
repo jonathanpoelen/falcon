@@ -16,7 +16,7 @@ struct __static_new_traits
 		&& std::has_trivial_copy_constructor<__type>::value
 		&& std::has_trivial_copy_assign<__type>::value;
 	static constexpr bool easily_destructible =
-		std::has_trivial_destructor<__type>::value;
+		std::is_trivially_destructible<__type>::value;
 };
 
 template <typename _T,

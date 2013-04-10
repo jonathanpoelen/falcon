@@ -1,7 +1,7 @@
 #ifndef FALCON_CPP_VISIBILITY_HPP
 #define FALCON_CPP_VISIBILITY_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 
 # define CPP_DEFAULT = default
 # define CPP_DELETE = delete

@@ -18,7 +18,7 @@ struct __strip_reference_wrapper
 	typedef _Tp __type;
 };
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _Tp>
 struct __strip_reference_wrapper<std::reference_wrapper<_Tp> >
 {

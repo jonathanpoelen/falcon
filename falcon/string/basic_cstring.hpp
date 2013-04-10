@@ -6,17 +6,21 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus <= 201100L
 # include <boost/type_traits/remove_const.hpp>
+# include <boost/type_traits/remove_reference.hpp>
+# include <boost/type_traits/is_pointer.hpp>
+# include <boost/type_traits/is_array.hpp>
 #endif
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/noexcept.hpp>
+#include <falcon/c++/boost_or_std.hpp>
 #include <falcon/type_traits/enable_if.hpp>
 #include <falcon/type_traits/is_same.hpp>
 #include <falcon/string/cstringfwd.hpp>
 #include <falcon/ostream/insert.hpp>
 #include <falcon/detail/string_convertion.hpp>
-
+#include <typeinfo>
 namespace falcon {
 
 /**
@@ -29,13 +33,7 @@ class basic_cstring
 public:
 	typedef _Traits traits_type;
 
-	typedef typename
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-		std
-#else
-		boost
-#endif
-	::remove_const<_CharT>::type value_type;
+	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<_CharT>::type value_type;
 
 	typedef _CharT*           pointer;
 	typedef const value_type* const_pointer;
@@ -63,25 +61,52 @@ public:
 	, m_end(0)
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	constexpr basic_cstring(std::nullptr_t) noexcept
 	: m_begin(0)
 	, m_end(0)
 	{}
-
-	//basic_cstring(std::initializer_list<value_type>) = delete;
 #endif
 
-	template<typename _CharT2>
-	basic_cstring(_CharT2* s) CPP_NOEXCEPT
-	: m_begin(s)
-	, m_end(s ? s + traits_type::length(s) : s)
-	{}
+private:
+	template<typename _String,
+	bool is_pointer = FALCON_BOOST_OR_STD_NAMESPACE::is_pointer<
+		typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<_String>::type
+	>::value,
+	bool is_array = FALCON_BOOST_OR_STD_NAMESPACE::is_array<
+		typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<_String>::type
+	>::value>
+	struct __dispath_cons
+	{
+		CPP_CONSTEXPR static pointer begin(const _String& s)
+		{ return s.begin(); }
+		CPP_CONSTEXPR static pointer end(const _String& s)
+		{ return s.end(); }
+	};
 
-	template<typename _CharT2, std::size_t _N>
-	CPP_CONSTEXPR basic_cstring(_CharT2 (&s) [_N]) CPP_NOEXCEPT
-	: m_begin(&s[0])
-	, m_end(_N ? &s[_N-1] : &s[0])
+	template<typename _String>
+	struct __dispath_cons<_String, true, false>
+	{
+		static pointer begin(_String s)
+		{ return s; }
+		static pointer end(_String s)
+		{ return s + traits_type::length(s); }
+	};
+
+	template<typename _String>
+	struct __dispath_cons<_String, false, true>
+	{
+		CPP_CONSTEXPR static pointer begin(_String&& s)
+		{ return &s[0]; }
+		CPP_CONSTEXPR static pointer end(_String&& s)
+		{ return &s[0] + std::rank<_String>::value; }
+	};
+
+public:
+	template<typename _String>
+	CPP_CONSTEXPR basic_cstring(_String&& s) CPP_NOEXCEPT
+	: m_begin(__dispath_cons<_String>::begin(s))
+	, m_end(__dispath_cons<_String>::end(s))
 	{}
 
 	CPP_CONSTEXPR basic_cstring(pointer s, size_type __size) CPP_NOEXCEPT
@@ -116,7 +141,7 @@ public:
 	basic_cstring& operator=(pointer s) CPP_NOEXCEPT
 	{ return assign(s); }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	basic_cstring& operator=(std::nullptr_t) noexcept
 	{ return clear(); }
 
@@ -303,7 +328,7 @@ public:
 	CPP_CONSTEXPR const_reverse_iterator rend() const CPP_NOEXCEPT
 	{ return reverse_iterator(m_begin); }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  Returns a read-only (constant) iterator that points to the first
 	 *  character in the %string.
@@ -1077,7 +1102,7 @@ private:
 	}
 };
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 
 template <typename _CharT,
 	typename _Traits = std::char_traits<_CharT>, std::size_t _N>
@@ -1591,7 +1616,7 @@ inline void swap(falcon::basic_cstring<_CharT, _Traits>& __lhs,
 __FALCON_BASIC_CSTRING_TO(int, stoi, l)
 __FALCON_BASIC_CSTRING_TO(long, stol, l)
 __FALCON_BASIC_CSTRING_TO(unsigned long, stoul, ul)
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 __FALCON_BASIC_CSTRING_TO(long long, stoll, ull)
 __FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 #endif
@@ -1605,7 +1630,7 @@ __FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 
 __FALCON_BASIC_CSTRING_TO(float, stof, f)
 __FALCON_BASIC_CSTRING_TO(double, stod, d)
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 __FALCON_BASIC_CSTRING_TO(double long, stold, ld)
 #endif
 
@@ -1625,7 +1650,7 @@ inline std::wstring to_wstring(const falcon::const_cwstring& s)
 { return std::wstring(s.data(), s.size()); }
 
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 
 template<typename _CharT, typename _Traits>
 struct hash<falcon::basic_cstring<_CharT, _Traits> >

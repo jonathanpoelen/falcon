@@ -48,7 +48,7 @@
 #define FALCON_CLASS_HAS_MEMBER_VAR(_VarName)\
 	FALCON_CREATE_HAS_MEMBER_VAR(FALCON_HAS_MEMBER_VAR_NAME(_VarName), _VarName)
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define FALCON_CREATE_HAS_SIGNATURE(_Name, _FuncName)\
 	template <typename _Falcon_T, typename _Signature>\
 	class _Name;\

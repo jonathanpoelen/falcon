@@ -4,7 +4,7 @@
 #include <vector>
 #include <functional>
 #include <falcon/type_traits/use.hpp>
-#include <falcon/memory/reference_allocator.hpp>
+#include <falcon/memory/mutation_allocator.hpp>
 
 namespace falcon {
 
@@ -13,7 +13,7 @@ struct built_reference_vector
 {
 	typedef std::vector<
 		std::reference_wrapper<_T>,
-		reference_allocator<
+		mutation_allocator<
 			std::reference_wrapper<_T>,
 			typename _Allocator::template rebind<
 				std::reference_wrapper<_T>

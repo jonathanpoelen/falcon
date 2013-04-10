@@ -9,7 +9,7 @@
 
 namespace falcon {
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _T, typename... _Args>
 inline void reconstruct(_T* p, _Args&&... args)
 {
@@ -31,7 +31,7 @@ inline void reconstruct(_T* p, const _U& value)
 }
 #endif
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _T, typename... _Args>
 inline _T* renew(_T* p, _Args&&... args)
 {
@@ -73,7 +73,7 @@ inline _T* nothrow_renew(_T* p, const _U& value)
 }
 #endif
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _T, typename... _Args>
 inline void emplace_new(_T*& p, _Args&&... args)
 {
@@ -149,7 +149,7 @@ struct reconstruct_wrapper
 		reconstruct<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	void operator()(_Tp* ptr, _Args&&... args) const
 	{
@@ -180,7 +180,7 @@ struct renew_wrapper
 		return renew<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	_Tp* operator()(_Tp*& ptr, _Args&&... args) const
 	{
@@ -198,7 +198,7 @@ struct renew_wrapper
 		return nothrow_renew<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	_Tp* operator()(_Tp*& ptr, const std::nothrow_t& nothrow, _Args&&... args) const
 	{
@@ -227,7 +227,7 @@ struct nothrow_renew_wrapper
 		return nothrow_renew<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	_Tp* operator()(_Tp*& ptr, _Args&&... args) const
 	{
@@ -257,7 +257,7 @@ struct emplace_new_wrapper
 		emplace_new<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	void operator()(_Tp*& ptr, _Args&&... args) const
 	{
@@ -275,7 +275,7 @@ struct emplace_new_wrapper
 		nothrow_emplace_new<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	void operator()(_Tp*& ptr, const std::nothrow_t& nothrow, _Args&&... args) const
 	{
@@ -304,7 +304,7 @@ struct nothrow_emplace_new_wrapper
 		nothrow_emplace_new<>(ptr, v);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	void operator()(_Tp*& ptr, _Args&&... args) const
 	{

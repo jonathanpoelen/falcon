@@ -1,7 +1,7 @@
 #ifndef _FALCON_MEMORY_UNINITIALIZED_HPP
 #define _FALCON_MEMORY_UNINITIALIZED_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <utility>
 # include <iterator>
 #endif
@@ -15,7 +15,7 @@ namespace falcon {
 template<bool _TrivialValueType>
 struct __uninitialized_emplace
 {
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _ForwardIterator, typename... _Args>
 	static void __uninit_emplace(_ForwardIterator __first, _ForwardIterator __last, _Args&&... __args)
 	{
@@ -61,7 +61,7 @@ struct __uninitialized_emplace<true>
 	}
 };
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 /**
  *  @brief Emplace values args into the range [first,last).
  *  @param first  An input iterator.

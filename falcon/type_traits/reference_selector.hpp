@@ -1,7 +1,7 @@
 #ifndef _FALCON_TYPE_TRAITS_REFERENCE_SELECTOR_HPP
 #define _FALCON_TYPE_TRAITS_REFERENCE_SELECTOR_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <type_traits>
 #else
 # include <boost/type_traits/is_reference.hpp>
@@ -9,7 +9,7 @@
 
 namespace falcon {
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _Unqualified, bool _IsRValue>
 struct rvalue_reference_selector
 {
@@ -38,7 +38,7 @@ struct lvalue_reference_selector<_Unqualified, true>
 namespace reference_type {
 enum enum_t {
 	lvalue_reference,
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	rvalue_reference,
 #endif
 	no_reference
@@ -55,7 +55,7 @@ struct reference_selector<_Unqualified, reference_type::lvalue_reference>
 	typedef _Unqualified& type;
 };
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _Unqualified>
 struct reference_selector<_Unqualified, reference_type::rvalue_reference>
 {
@@ -73,7 +73,7 @@ template <typename _T>
 struct reference_qualified
 {
 	static const reference_type::enum_t value =
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		std::is_rvalue_reference<_T>::value
 		? reference_type::rvalue_reference
 		: (
@@ -83,7 +83,7 @@ struct reference_qualified
 #endif
 			? reference_type::lvalue_reference
 			: reference_type::no_reference
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		)
 #endif
 		;

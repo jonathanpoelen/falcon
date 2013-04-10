@@ -75,7 +75,7 @@ public:
 	void filenames(const filenames_type& __filenames)
 	{ _M_filenames = __filenames; }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	void filenames(filenames_type&& __filenames)
 	{ _M_filenames = std::move(__filenames); }
 
@@ -110,7 +110,7 @@ public:
 		}
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	void shrink_to_fit()
 	{
 		erase_is_open();
@@ -240,7 +240,7 @@ public:
 		this->open(__s, __mode);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Create an input file stream.
 	 *  @param  s  std::string specifying the filename.
@@ -276,7 +276,7 @@ public:
 		open(__files, __mode);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Create an input file stream.
 	 *  @param  files  Null terminated strings specifying filenames.
@@ -365,7 +365,7 @@ public:
 	void filenames(const __filenames_type& __filenames)
 	{ _M_mfilebuf.filenames(__filenames); }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	void filenames(__filenames_type&& __filenames)
 	{ _M_mfilebuf.filenames(std::move(__filenames)); }
 
@@ -412,7 +412,7 @@ public:
 			this->clear();
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Opens an external file.
 	 *  @param  s  The name of the file.
@@ -452,7 +452,7 @@ public:
 			this->setstate(std::ios_base::failbit);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Opens an external file.
 	 *  @param  files  Null terminated strings specifying filenames.
@@ -590,7 +590,7 @@ public:
 		this->open(__s, __mode);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Create an output file stream.
 	 *  @param  s  std::string specifying the filename.
@@ -628,7 +628,7 @@ public:
 		open(__files, __mode);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Create an input file stream.
 	 *  @param  files  Null terminated strings specifying filenames.
@@ -720,7 +720,7 @@ public:
 	void filenames(const __filenames_type& __filenames)
 	{ _M_mfilebuf.filenames(__filenames); }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	void filenames(__filenames_type&& __filenames)
 	{ _M_mfilebuf.filenames(std::move(__filenames)); }
 
@@ -770,7 +770,7 @@ public:
 			this->clear();
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Opens an external file.
 	 *  @param  s  The name of the file.
@@ -811,7 +811,7 @@ public:
 			this->setstate(std::ios_base::failbit);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Opens an external file.
 	 *  @param  files  Null terminated strings specifying filenames.
@@ -957,7 +957,7 @@ public:
 		this->open(__s, __mode);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Create an input/output file stream.
 	 *  @param  s  Null terminated string specifying the filename.
@@ -989,7 +989,7 @@ public:
 		open(__files, __mode);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Create an input file stream.
 	 *  @param  files  Null terminated strings specifying filenames.
@@ -1072,7 +1072,7 @@ public:
 	void filenames(const __filenames_type& __filenames)
 	{ _M_mfilebuf.filenames(__filenames); }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	void filenames(__filenames_type&& __filenames)
 	{ _M_mfilebuf.filenames(std::move(__filenames)); }
 
@@ -1122,7 +1122,7 @@ public:
 			this->clear();
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Opens an external file.
 	 *  @param  s  The name of the file.
@@ -1163,7 +1163,7 @@ public:
 			this->setstate(std::ios_base::failbit);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/**
 	 *  @brief  Opens an external file.
 	 *  @param  files  Null terminated strings specifying filenames.

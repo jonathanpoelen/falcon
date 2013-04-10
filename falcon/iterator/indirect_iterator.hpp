@@ -1,7 +1,7 @@
 #ifndef FALCON_ITERATOR_PROXY_ITERATOR_HPP
 #define FALCON_ITERATOR_PROXY_ITERATOR_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <type_traits>
 #else
 # include <boost/type_traits/remove_pointer.hpp>
@@ -15,7 +15,7 @@ template <typename _Iterator>
 struct __proxy_indirect_iterator
 {
 	typedef typename std::iterator_traits<_Iterator>::value_type argument_type;
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	typedef decltype(**std::declval<_Iterator&>()) result_type;
 #else
 	typedef typename boost::remove_pointer<argument_type>::type& result_type;
@@ -43,7 +43,7 @@ namespace detail {
 			_Proxy
 		>::type __proxy;
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		struct __result_type{
 			typedef typename std::result_of<
 				__proxy(decltype(*std::declval<_Iterator&>()))
@@ -117,7 +117,7 @@ public:
 	{}
 
 	using __base::operator=;
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	indirect_iterator& operator=(const indirect_iterator&) = default;
 #else
 	indirect_iterator& operator=(const indirect_iterator& other)

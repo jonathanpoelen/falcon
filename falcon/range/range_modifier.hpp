@@ -96,7 +96,7 @@ struct range_modifier
 		return *this;
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _Functor, typename... _Args>
 	range_modifier& for_each(_Functor func, const _Args&... x) const
 	{
@@ -125,7 +125,7 @@ struct range_modifier
 		return std::find_if(this->begin(), this->end(), predicate);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 private:
 	template<typename _Predicate>
 	struct __predicat_not
@@ -149,7 +149,7 @@ public:
 	template<typename _Predicate>
 	inline iterator find_if_not(_Predicate predicate) const
 	{
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		return std::find_if_not(this->begin(), this->end(), predicate);
 #else
 		return std::find_if(this->begin(), this->end(),
@@ -165,7 +165,7 @@ public:
 	template<typename _Predicate>
 	inline bool all_of(_Predicate predicate) const
 	{
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		return std::all_of(this->first(), this->end(), predicate);
 #else
 		return this->end() == find_if_not(predicate);
@@ -180,7 +180,7 @@ public:
 	template<typename _Predicate>
 	inline bool none_of(_Predicate predicate) const
 	{
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		return std::none_of(this->first(), this->end(), predicate);
 #else
 		return this->end() == find_if(predicate);

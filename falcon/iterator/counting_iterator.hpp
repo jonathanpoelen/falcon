@@ -1,7 +1,7 @@
 #ifndef FALCON_ITERATOR_COUNTING_ITERATOR_HPP
 #define FALCON_ITERATOR_COUNTING_ITERATOR_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <type_traits>
 #else
 # include <boost/type_traits/remove_pointer.hpp>
@@ -91,7 +91,7 @@ public:
 	{}
 
 	using __base::operator=;
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	counting_iterator& operator=(const counting_iterator&) = default;
 #else
 	counting_iterator& operator=(const counting_iterator& other)

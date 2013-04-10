@@ -5,7 +5,7 @@
 #include <falcon/preprocessor/not_ide_parser.hpp>
 
 namespace falcon {
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename... _Args>
 //void unused_variables(const _Args&...) = kdevelop parser error -_-
 constexpr inline void unused_variables(const _Args&... FALCON_PP_NOT_IDE_PARSER())
@@ -23,7 +23,7 @@ CPP_CONSTEXPR inline void unused_variable(const _T&)
 
 #define FALCON_UNUSED(args...) ::falcon::unused_variables(args)
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define FALCON_UNUSED_PACK(pack) (void)sizeof...(pack)
 #endif
 

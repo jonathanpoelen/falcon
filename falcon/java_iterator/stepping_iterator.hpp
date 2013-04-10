@@ -72,7 +72,7 @@ public:
 
 	using __base::operator=;
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	stepping_iterator(const stepping_iterator&) = default;
 #else
 	stepping_iterator(const stepping_iterator& other)

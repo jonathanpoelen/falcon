@@ -153,7 +153,7 @@ private:
 	&& this->base_reference() == other.base_reference()); }
 };
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template <typename _Iterator>
 using const_bit_iterator = bit_iterator<_Iterator, true>;
 #endif

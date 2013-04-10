@@ -3,7 +3,7 @@
 
 #include <falcon/c++0x/warning.hpp>
 
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus <= 201100L
 
 # include <falcon/type_traits/unspecified_type.hpp>
 
@@ -18,7 +18,7 @@
 // constexpr
 // class {
 // public:
-// 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
+// 	#if __cplusplus > 201100L
 // 	template<class T>
 // 	operator T*() const
 // 	{ return 0; }

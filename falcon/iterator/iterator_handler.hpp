@@ -2,7 +2,7 @@
 #define ITERATOR_ITERATOR_HANDLER_HPP
 
 #include <iterator>
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <utility>
 #else
 # include <boost/type_traits/add_pointer.hpp>
@@ -199,7 +199,7 @@ public:
 	: _M_current(__x)
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	explicit iterator_handler(iterator_type&& __x, int)
 	: _M_current(std::move(__x))
 	{}
@@ -220,7 +220,7 @@ public:
 	: _M_current(iterator_core_access::base_reference(other._M_current))
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _U, class _Enable = typename
 	std::enable_if<!std::is_reference<iterator_type>::value && std::is_convertible<_U, iterator_type>::value>::type>
 	explicit iterator_handler(_U&& __x)

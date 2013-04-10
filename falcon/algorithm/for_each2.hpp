@@ -7,7 +7,7 @@
 #include <falcon/type_traits/disable_if.hpp>
 #include <falcon/type_traits/is_iterator.hpp>
 #include <falcon/c++/boost_or_std.hpp>
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus <= 201100L
 #include <boost/type_traits/remove_const.hpp>
 #endif
 

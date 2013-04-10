@@ -1,7 +1,7 @@
 #ifndef _FALCON_CONTAINER_FIXED_GRID_CROSS_HPP
 #define _FALCON_CONTAINER_FIXED_GRID_CROSS_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <forward_list>
 #endif
 #include <algorithm>
@@ -66,7 +66,7 @@ public:
 		friend_algo::init(*this);
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	fixed_grid_cross(std::initializer_list<value_type> l)
 	: _array{l}
 	{ friend_algo::init(*this); }

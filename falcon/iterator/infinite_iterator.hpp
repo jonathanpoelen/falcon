@@ -83,7 +83,7 @@ public:
 	{}
 
 	using __base::operator=;
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	infinite_iterator& operator=(const infinite_iterator&) = default;
 #else
 	infinite_iterator& operator=(const infinite_iterator& other)

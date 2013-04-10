@@ -6,7 +6,7 @@ namespace falcon {
 	template <typename _T, _T _value>
 	struct template_val
 	{
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		template<typename...>
 		struct filter
 		{

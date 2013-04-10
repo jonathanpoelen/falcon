@@ -117,7 +117,7 @@ public:
 	, _pos(__sbs.empty() ? 0 : 1)
 	{ _init_when_sequence(); }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	basic_multibuf(__multistreambuf_type&& __sbs)
 	: __streambuf_type()
 	, _sbs(std::move(__sbs))
@@ -205,7 +205,7 @@ public:
 		}
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	void shrink_to_fit()
 	{
 		assign_to_fit();

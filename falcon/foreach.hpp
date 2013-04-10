@@ -14,7 +14,7 @@
 #define __FALCON_FOREACH_TO(P, _It, _Cont, _End)\
 	for (auto _It = _Cont.P##begin(); _It != _End: ++_It)
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define FALCON_FOREACH(_Value, _Cont) for (_Value: _Cont)
 # define FALCON_FOREACH_REF(_Value, _Cont) FALCON_FOREACH(auto& _Value, _Cont)
 # define FALCON_FOREACH_VAL(_Value, _Cont) FALCON_FOREACH(auto _Value, _Cont)

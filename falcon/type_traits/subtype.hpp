@@ -1,7 +1,7 @@
 #ifndef _FALCON_TYPE_TRAITS_SUBTYPE_HPP
 #define _FALCON_TYPE_TRAITS_SUBTYPE_HPP
 
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus <= 201100L
 # include <boost/typeof/typeof.hpp>
 #endif
 #include <falcon/type_traits/declval.hpp>
@@ -10,7 +10,7 @@ namespace falcon {
 template <typename _T>
 struct subtype
 {
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	typedef decltype(*std::declval<_T>()) type;
 #else
 	typedef BOOST_TYPEOF(*declval<_T>()) type;

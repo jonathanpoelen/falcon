@@ -9,7 +9,7 @@
 #include <falcon/accessor/range_accessor.hpp>
 #include <falcon/accessor/reference_accessor.hpp>
 #include <falcon/accessor/size_accessor.hpp>
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 #include <falcon/accessor/tuple_get_accessor.hpp>
 #endif
 

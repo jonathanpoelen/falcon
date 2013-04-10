@@ -23,7 +23,7 @@ struct is_tuple<std::array<_T, N> >
 : public true_type
 {};
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename... _Args>
 struct is_tuple<std::tuple<_Args...> >
 : public true_type

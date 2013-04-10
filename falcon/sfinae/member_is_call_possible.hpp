@@ -5,7 +5,7 @@
 #include <falcon/type_traits/invalid_type.hpp>
 #include <falcon/type_traits/cv_selector.hpp>
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define FALCON_CREATE_MEMBER_FUNCTION_IS_CALL_POSSIBLE(_Name, _FuncName, _HasMember)\
 	template <typename _Falcon_T, typename... _Falcon_Args>\
 	class _Name\
@@ -51,7 +51,7 @@
 #define FALCON_CLASS_MEMBER_FUNCTION_IS_CALL_POSSIBLE(_FuncName)\
 	FALCON_CREATE_MEMBER_FUNCTION_IS_CALL_POSSIBLE(FALCON_MEMBER_FUNCTION_IS_CALL_POSSIBLE_NAME(_FuncName), _FuncName, FALCON_HAS_MEMBER_FUNCTION_NAME(_FuncName))
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define FALCON_CREATE_MEMBER_FUNCTION_IS_CALL_POSSIBLE_AND_CONVERTIBLE_RESULT(_Name, _IsCallPossible)\
 	template <typename _Falcon_T, typename _Signature>\
 	class _Name\

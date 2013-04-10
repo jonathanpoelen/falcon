@@ -24,7 +24,7 @@ public:
 	: _value(start)
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	operator const _T&() const
 	{ return _value; }
 #endif

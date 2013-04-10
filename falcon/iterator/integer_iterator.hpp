@@ -91,7 +91,7 @@ public:
 	: __base(other)
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/*explicit*/ integer_iterator(_T&& value)
 	: __base(value)
 	{}
@@ -187,7 +187,7 @@ public:
 	: __base(other)
 	{}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	/*explicit*/ reverse_integer_iterator(_T&& value)
 	: __base(value)
 	{}

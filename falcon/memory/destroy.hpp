@@ -1,7 +1,7 @@
 #ifndef _FALCON_MEMORY_DESTROY_HPP
 #define _FALCON_MEMORY_DESTROY_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <type_traits>
 #endif
 #include <iterator>
@@ -48,8 +48,8 @@ template<typename _ForwardIterator>
 inline void destroy(_ForwardIterator __first, _ForwardIterator __last)
 {
 	__destroy_aux<
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-		std::has_trivial_destructor<typename std::iterator_traits<_ForwardIterator>::value_type>::value
+#if __cplusplus > 201100L
+		std::is_trivially_destructible<typename std::iterator_traits<_ForwardIterator>::value_type>::value
 #else
 		false
 #endif

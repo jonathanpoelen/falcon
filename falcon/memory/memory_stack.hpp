@@ -131,7 +131,7 @@ public:
 	{}
 };
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 constexpr struct emplace_t {} emplace;
 #else
 struct emplace_t {};

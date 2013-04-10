@@ -1,7 +1,7 @@
 #ifndef _FALCON_TYPE_TRAITS_ENABLE_IF_NOT_INTEGRAL_HPP
 #define _FALCON_TYPE_TRAITS_ENABLE_IF_NOT_INTEGRAL_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <type_traits>
 
 namespace falcon {

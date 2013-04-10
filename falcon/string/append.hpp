@@ -2,7 +2,7 @@
 #define FALCON_STRING_APPEND_HPP
 
 #include <iosfwd>
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <falcon/parameter/parameter_pack.hpp>
 # include <falcon/detail/string_size.hpp>
 #else
@@ -34,7 +34,7 @@ namespace falcon {
 	template<std::size_t _N, typename _String>
 	inline _String&
 	append(_String& lhs,
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 				 const typename _String::value_type (& rhs)[_N]
 #else
 				typename boost::add_const<typename _String::value_type>::type (& rhs)[_N]
@@ -46,7 +46,7 @@ namespace falcon {
 		return lhs;
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<std::size_t _N>
 	struct __keep_strlen
 	{
@@ -90,22 +90,40 @@ namespace falcon {
 	void __reserve(_S& lhs, std::size_t n, _KeepLen&)
 	{ lhs.reserve(lhs.size() + n); }
 
-	template<typename _KeepLen, typename _S, typename _String, typename... _Strings>
-	void __reserve(_S& lhs, std::size_t n, _KeepLen& k,
+	template<typename _String, typename _Traits = void>
+	struct __reserve_size
+	{
+		template<typename _KeepLen>
+		static std::size_t __impl(const _String& rhs, _KeepLen&)
+		{ return detail::__string_size<_String>::size(rhs); }
+		template<typename _KeepLen>
+		static const _String& __mksize(const _String& rhs, _KeepLen&)
+		{ return rhs; }
+	};
+
+	template<typename _CharT, typename _Traits>
+	struct __reserve_size<_CharT*, _Traits>
+	{
+		template<typename _KeepLen>
+		static std::size_t __impl(const _CharT* rhs, _KeepLen& k)
+		{ return *k.p++ = _Traits::length(rhs); }
+		template<typename _KeepLen>
+		static auto __mksize(const _CharT* rhs, _KeepLen& k)
+		-> decltype(*k.p++)
+		{ return *k.p++; }
+	};
+
+	template<typename _KeepLen, typename _CharT, typename _Traits, typename _Alloc, typename _String, typename... _Strings>
+	void __reserve(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
+								 std::size_t n, _KeepLen& k,
 								 const _String& rhs, const _Strings&... other)
-	{ __reserve(lhs, n + detail::__string_size<_String>::size(rhs), k, other...); }
+	{ __reserve(lhs, n + __reserve_size<_String, _Traits>::__impl(rhs, k), k, other...); }
 
 	template<typename _KeepLen, std::size_t _N, typename _CharT, typename _Traits, typename _Alloc, typename... _Strings>
 	void __reserve(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
 								 std::size_t n, _KeepLen& k,
 								const _CharT (&)[_N], const _Strings&... other)
 	{ __reserve(lhs, n + (_N?_N-1:0), k, other...); }
-
-	template<typename _KeepLen, typename _CharT, typename _Traits, typename _Alloc, typename... _Strings>
-	void __reserve(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-								 std::size_t n, _KeepLen& k,
-								 const _CharT * rhs, const _Strings&... other)
-	{ __reserve(lhs, n + (*k.p++ = _Traits::length(rhs)), k, other...); }
 
 	template<typename _KeepLen, typename _S>
 	void __append(_S&, _KeepLen&)
@@ -117,7 +135,7 @@ namespace falcon {
 								const _String& rhs,
 							  const _Strings&... other)
 	{
-		append(lhs, rhs);
+		append(lhs, __reserve_size<_String>::__mksize(rhs, k));
 		__append(lhs, k, other...);
 	}
 
@@ -128,15 +146,6 @@ namespace falcon {
 	{
 		if (_N)
 			lhs.append(rhs, _N-1);
-		__append(lhs, k, other...);
-	}
-
-	template<typename _KeepLen, typename _CharT, typename _Traits, typename _Alloc, typename... _Strings>
-	void __append(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-								_KeepLen& k,
-							 const _CharT * rhs, const _Strings&... other)
-	{
-		lhs.append(rhs, *k.p++);
 		__append(lhs, k, other...);
 	}
 

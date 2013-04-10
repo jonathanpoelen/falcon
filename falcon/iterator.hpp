@@ -17,7 +17,7 @@
 #include <falcon/iterator/output_iterator.hpp>
 #include <falcon/iterator/pseudo_iterator.hpp>
 #include <falcon/iterator/subrange_access_iterator.hpp>
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <falcon/iterator/recursive_iterator.hpp>
 # include <falcon/iterator/synchronize_iterator.hpp>
 #endif

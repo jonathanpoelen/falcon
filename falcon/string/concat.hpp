@@ -1,7 +1,7 @@
 #ifndef FALCON_STRING_CONCAT2_HPP
 #define FALCON_STRING_CONCAT2_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # include <utility>
 # include <type_traits>
 #else
@@ -204,7 +204,7 @@ namespace falcon {
 		return ret;
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _CharT, typename _Traits, typename _Alloc, typename _T>
 	inline std::basic_string<_CharT, _Traits, _Alloc>
 	concat(std::basic_string<_CharT, _Traits, _Alloc>&& lhs, const _T& rhs)
@@ -220,7 +220,7 @@ namespace falcon {
 	template<typename _S, typename _T, typename _U>
 	inline void __append2(_S& ret, const _T& lhs, const _U& rhs)
 	{
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 		append(ret, lhs, rhs);
 #else
 		typedef typename detail::__string_size<_T>::__reference __reference;
@@ -252,7 +252,7 @@ namespace falcon {
 		return ret;
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename _Elements, typename _Result, typename _Alloc = void>
 	struct __build_string;
 

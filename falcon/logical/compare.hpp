@@ -23,7 +23,7 @@ inline CPP_CONSTEXPR int compare(const _T& a, const _U& b)
 	return compare<_T, _U, _Lesser, _Greater, _Equaler>(a, b);
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _T, typename _U = _T, typename _Result>
 constexpr _Result compare(const _T& a, const _U& b, _Result&& is_equal, _Result&& is_less, _Result&& is_greater)
 {
@@ -31,7 +31,7 @@ constexpr _Result compare(const _T& a, const _U& b, _Result&& is_equal, _Result&
 }
 #endif
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<
 int _Lesser, int _Greater, int _Equaler,
 	typename _T, typename _U

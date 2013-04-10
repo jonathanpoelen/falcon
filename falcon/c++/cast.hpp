@@ -1,7 +1,7 @@
 #ifndef FALCON_CPP_CAST_HPP
 #define FALCON_CPP_CAST_HPP
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define CPP_EXPLICIT_CAST explicit
 #else
 # define CPP_EXPLICIT_CAST

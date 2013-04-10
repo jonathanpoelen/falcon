@@ -3,7 +3,7 @@
 
 namespace falcon {
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _T>
 inline constexpr _T& first_true(_T& a)
 {
@@ -24,7 +24,7 @@ inline _T& first_true(_T& a, _T& b)
 }
 #endif
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 template<typename _T>
 inline constexpr _T& first_false(_T& a)
 {

@@ -174,7 +174,7 @@ public:
 		return *this;
 	}
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 	template<typename... _Args>
 	void emplace(_Args&&... args)
 	{

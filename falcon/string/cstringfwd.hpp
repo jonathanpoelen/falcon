@@ -27,7 +27,7 @@ typedef basic_cstring<const char, std::char_traits<char> > const_cstring;
 /// A cstring of @c const_wchar_t
 typedef basic_cstring<const wchar_t, std::char_traits<wchar_t> > const_cwstring;
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 /// A cstring of @c char16_t
 typedef basic_cstring<char16_t> u16cstring;
 /// A cstring of @c char32_t

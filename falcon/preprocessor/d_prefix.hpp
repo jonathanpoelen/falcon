@@ -4,7 +4,7 @@
 #define FALCON_PP_D_PREFIX_char
 #define FALCON_PP_D_PREFIX_wchar_t L
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus > 201100L
 # define FALCON_PP_D_PREFIX_char16_t u
 # define FALCON_PP_D_PREFIX_char32_t U
 #endif
