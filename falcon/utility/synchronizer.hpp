@@ -34,83 +34,8 @@ public:
 	typedef __base tuple_type;
 
 
-	constexpr synchronizer() = default;
-
-	explicit constexpr synchronizer(const _Elements&... __elements)
-	: __base(__elements...)
-	{}
-
-	template<typename... _UElements>
-	explicit constexpr synchronizer(_UElements&&... __elements)
-	: __base(std::forward<_UElements>(__elements)...)
-	{}
-
-	constexpr synchronizer(const tuple_type& t)
-	: __base(t)
-	{}
-
-	constexpr synchronizer(tuple_type&& t)
-	: __base(std::forward<tuple_type>(t))
-	{}
-
-	constexpr synchronizer(const synchronizer&) = default;
-	constexpr synchronizer(synchronizer&&) = default;
-	template<typename... _UElements>
-	constexpr synchronizer(synchronizer<_UElements...>&& other)
-	: __base(std::forward<std::tuple<_UElements...>>(other))
-	{}
-
-	template<typename... _UElements>
-	constexpr synchronizer(const std::tuple<_UElements...>& __in)
-	: __base(__in)
-	{}
-
-	template<typename... _UElements>
-	constexpr synchronizer(std::tuple<_UElements...>&& __in)
-	: __base(std::forward<std::tuple<_UElements...>>(__in))
-	{}
-
-	template<typename _Alloc>
-	synchronizer(std::allocator_arg_t __tag, const _Alloc& __a)
-	: __base(__tag, __a)
-	{}
-
-	template<typename _Alloc>
-	synchronizer(std::allocator_arg_t __tag, const _Alloc& __a,
-					   const _Elements&... __elements)
-	: __base(__tag, __a, __elements...)
-	{}
-
-	template<typename _Alloc, typename... _UElements>
-	synchronizer(std::allocator_arg_t __tag, const _Alloc& __a,
-					   _UElements&&... __elements)
-	: __base(__tag, __a, std::forward<_UElements>(__elements)...)
-	{}
-
-	template<typename _Alloc>
-	synchronizer(std::allocator_arg_t __tag, const _Alloc& __a,
-					   const tuple_type& __in)
-	: __base(__tag, __a, __in)
-	{}
-
-	template<typename _Alloc>
-	synchronizer(std::allocator_arg_t __tag, const _Alloc& __a,
-					   tuple_type&& __in)
-	: __base(__tag, __a, __in)
-	{}
-
-	template<typename _Alloc, typename... _UElements>
-	synchronizer(std::allocator_arg_t __tag, const _Alloc& __a,
-					   const std::tuple<_UElements...>& __in)
-	: __base(__tag, __a, __in)
-	{}
-
-	template<typename _Alloc, typename... _UElements>
-	synchronizer(std::allocator_arg_t __tag, const _Alloc& __a,
-					   std::tuple<_UElements...>&& __in)
-	: __base(__tag, __a, std::forward<std::tuple<_UElements...>>(__in))
-	{}
-
+public:
+	using std::tuple<_Elements...>::tuple;
 	using std::tuple<_Elements...>::operator=;
 
 	const tuple_type& tuple() const

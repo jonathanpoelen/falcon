@@ -30,83 +30,8 @@ public:
 	typedef __base tuple_type;
 
 
-	constexpr arguments_wrapper() = default;
-
-	explicit constexpr arguments_wrapper(const _Elements&... __elements)
-	: __base(__elements...)
-	{}
-
-	template<typename... _UElements>
-	explicit constexpr arguments_wrapper(_UElements&&... __elements)
-	: __base(std::forward<_UElements>(__elements)...)
-	{}
-
-	constexpr arguments_wrapper(const tuple_type& t)
-	: __base(t)
-	{}
-
-	constexpr arguments_wrapper(tuple_type&& t)
-	: __base(std::forward<tuple_type>(t))
-	{}
-
-	constexpr arguments_wrapper(const arguments_wrapper&) = default;
-	constexpr arguments_wrapper(arguments_wrapper&&) = default;
-	template<typename... _UElements>
-	constexpr arguments_wrapper(arguments_wrapper<_UElements...>&& other)
-	: __base(std::forward<std::tuple<_UElements...>>(other))
-	{}
-
-	template<typename... _UElements>
-	constexpr arguments_wrapper(const std::tuple<_UElements...>& __in)
-	: __base(__in)
-	{}
-
-	template<typename... _UElements>
-	constexpr arguments_wrapper(std::tuple<_UElements...>&& __in)
-	: __base(std::forward<std::tuple<_UElements...>>(__in))
-	{}
-
-	template<typename _Alloc>
-	arguments_wrapper(std::allocator_arg_t __tag, const _Alloc& __a)
-	: __base(__tag, __a)
-	{}
-
-	template<typename _Alloc>
-	arguments_wrapper(std::allocator_arg_t __tag, const _Alloc& __a,
-					  const _Elements&... __elements)
-	: __base(__tag, __a, __elements...)
-	{}
-
-	template<typename _Alloc, typename... _UElements>
-	arguments_wrapper(std::allocator_arg_t __tag, const _Alloc& __a,
-					  _UElements&&... __elements)
-	: __base(__tag, __a, std::forward<_UElements>(__elements)...)
-	{}
-
-	template<typename _Alloc>
-	arguments_wrapper(std::allocator_arg_t __tag, const _Alloc& __a,
-					  const tuple_type& __in)
-	: __base(__tag, __a, __in)
-	{}
-
-	template<typename _Alloc>
-	arguments_wrapper(std::allocator_arg_t __tag, const _Alloc& __a,
-					  tuple_type&& __in)
-	: __base(__tag, __a, __in)
-	{}
-
-	template<typename _Alloc, typename... _UElements>
-	arguments_wrapper(std::allocator_arg_t __tag, const _Alloc& __a,
-					  const std::tuple<_UElements...>& __in)
-	: __base(__tag, __a, __in)
-	{}
-
-	template<typename _Alloc, typename... _UElements>
-	arguments_wrapper(std::allocator_arg_t __tag, const _Alloc& __a,
-					  std::tuple<_UElements...>&& __in)
-	: __base(__tag, __a, std::forward<std::tuple<_UElements...>>(__in))
-	{}
-
+public:
+	using std::tuple<_Elements...>::tuple;
 	using std::tuple<_Elements...>::operator=;
 
 	const tuple_type& tuple() const
