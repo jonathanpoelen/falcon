@@ -1,0 +1,6 @@
+#ifndef _FALCON_TEST_TREE_BTREE_HPP
+#define _FALCON_TEST_TREE_BTREE_HPP
+
+void btree_test();
+
+#endif //_FALCON_TEST_TREE_BTREE_HPP

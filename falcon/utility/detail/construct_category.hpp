@@ -1,6 +1,8 @@
 #ifndef _UTILITY_DETAIL_CONSTRUCT_CATEGORY_HPP
 #define _UTILITY_DETAIL_CONSTRUCT_CATEGORY_HPP
 
+#include <falcon/config.hpp>
+
 #if __cplusplus > 201100L
 namespace std {
 	template<typename, std::size_t>

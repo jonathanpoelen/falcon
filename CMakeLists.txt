@@ -16,6 +16,7 @@ add_subdirectory(test)
 
 # add_subdirectory(falcon)
 
-enable_testing()
+# enable_testing()
+
 # find test -type f -perm 775 | while read l ; do $l >/dev/null ; done |& grep -v \ passed
 

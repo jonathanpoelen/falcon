@@ -1,0 +1,6 @@
+#ifndef _FALCON_TEST_ARG_ARGS_ARE_SAME_HPP
+#define _FALCON_TEST_ARG_ARGS_ARE_SAME_HPP
+
+void args_are_same_test();
+
+#endif //_FALCON_TEST_ARG_ARGS_ARE_SAME_HPP

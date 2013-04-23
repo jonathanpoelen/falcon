@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_PREPROCESOR_PREFIX_CHAR_HPP
+#define FALCON_TEST_PREPROCESOR_PREFIX_CHAR_HPP
+
+void prefix_char_test();
+
+#endif

@@ -1,0 +1,6 @@
+#ifndef _FALCON_TEST_RANGE_RANGE_HPP
+#define _FALCON_TEST_RANGE_RANGE_HPP
+
+void range_test();
+
+#endif //_FALCON_TEST_RANGE_HPP

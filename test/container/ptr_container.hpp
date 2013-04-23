@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_CONTAINER_PTR_CONTAINER_HPP
+#define FALCON_TEST_CONTAINER_PTR_CONTAINER_HPP
+
+void ptr_container_test();
+
+#endif

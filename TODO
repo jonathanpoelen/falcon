@@ -6,7 +6,7 @@ fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_const
 
 rendre operators.hpp un peu compatible c++89
 
-fonction get<std::size_t, std::initilizer_list>(std::initilizer_list) (fichier get_initializer_list ?). Grace a ça, std::initilizer_list doit fonctionner avec tuple_call<>().
+fonction get<std::size_t, std::initilizer_list>(std::initilizer_list) (fichier get_initializer_list ?). Grace a ça, std::initilizer_list doit fonctionner avec tuple_call<>(). Idem pour les tableaux
 
 modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
 
@@ -179,8 +179,7 @@ is_instance_of -> std::is_base_of ? iostream/is_ios.hpp fonctionne quand même ?
 
 make_range_container2(it,it): meme chose que make_range_container(...) mais retourne un paire contenant reference et numero d'iteration
 
-CPP0X devient CPP11 et utilise {} si __cplusplus > 201100L sinon utilise ()
-La macro speciale IDE_NOT_PARSER remaplacer par CPP11
+CPP0X devient CPP11
 
 local_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau (la copie partage le même storage)
 global_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau static
@@ -188,13 +187,17 @@ pool_allocator: un global_pool_adapter qui utilise des mutex si besoin
 
 static_new et memory_new: Attention aux affectations ou constructeurs qui peuvent lancer des exceptions
 
-synchronizer et argument_wrapper: remplacer tout les constructeurs par un forward constructeur
-
 support des non exceptions (retourne 0 au lieu de bad_alloc). Flag -fno-exceptions pour gcc. Utiliser la macro BOOST_NO_EXCEPTIONS dans boost/config.hpp
 
+déplacer dans falcon/config.hpp les macros lié à la syntaxe ainsi que NO_IDE_PARSER
 
+type_trait, spécification pour T[] (pas de taille)
 
+container toujours trier. Fournir le type de container principal en template. Même interface que vector, list et deque (faire le trie).
 
+container qui trie avec un second container. Le premier contient les valeurs (type en template). Le second est constitué de pointeurs (type en template, par defaut deque/vector)
+
+pod_allocator qui utilise le brace-init (changé le nom car compatible avec tous ?) array_allocator pour les tableaux. allocator<> qui va séléctionner l'allocateur aproprier (array, pod, normal)
 
 
 

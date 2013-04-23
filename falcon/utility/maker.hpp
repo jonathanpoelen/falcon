@@ -1,6 +1,7 @@
 #ifndef _FALCON_UTILITY_MAKER_HPP
 #define _FALCON_UTILITY_MAKER_HPP
 
+#include <falcon/config.hpp>
 #if __cplusplus > 201100L
 # include <utility>
 # include <falcon/utility/detail/construct_category.hpp>
