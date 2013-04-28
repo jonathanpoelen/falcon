@@ -39,7 +39,7 @@ public:
 	, _access(traits)
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename... _Args>
 	container_wrapper(container_type& container, _Args&&... argtraits)
 	: _container(&container)

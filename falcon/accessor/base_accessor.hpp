@@ -16,7 +16,7 @@ struct base_accessor
 		return cont.base();
 	}
 
-	CPP_USE_CONSTEXPR result_type operator()(const _Class& cont) const
+	CPP_CONSTEXPR_OR_CONST result_type operator()(const _Class& cont) const
 	{
 		return cont.base();
 	}

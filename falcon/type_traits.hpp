@@ -26,7 +26,7 @@
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/type_traits/and.hpp>
 # include <falcon/type_traits/build_class.hpp>
 # include <falcon/type_traits/is_tuple.hpp>

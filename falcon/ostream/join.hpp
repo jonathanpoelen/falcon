@@ -197,7 +197,7 @@ join(const _Container& container, _CharT glue)
 	return join_wrapper<_CharT, _CharT, _Container>(container, glue);
 }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _CharT = char, typename _Container>
 #else
 template<typename _CharT, typename _Container>

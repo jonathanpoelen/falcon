@@ -1,7 +1,9 @@
 #ifndef FALCON_CPP_CAST_HPP
 #define FALCON_CPP_CAST_HPP
 
-#if __cplusplus > 201100L
+#include <falcon/config.hpp>
+
+#if __cplusplus >= 201103L
 # define CPP_EXPLICIT_CAST explicit
 #else
 # define CPP_EXPLICIT_CAST

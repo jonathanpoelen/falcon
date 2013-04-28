@@ -3,7 +3,7 @@
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _T>
 inline constexpr _T& first_true(_T& a)
 {
@@ -24,7 +24,7 @@ inline _T& first_true(_T& a, _T& b)
 }
 #endif
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _T>
 inline constexpr _T& first_false(_T& a)
 {

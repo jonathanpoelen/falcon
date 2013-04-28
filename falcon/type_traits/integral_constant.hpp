@@ -1,7 +1,7 @@
 #ifndef _FALCON_TYPE_TRAITS_INTEGRAL_CONSTANT_HPP
 #define _FALCON_TYPE_TRAITS_INTEGRAL_CONSTANT_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <type_traits>
 namespace falcon {
 using std::integral_constant;

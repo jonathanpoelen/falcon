@@ -4,7 +4,7 @@
 #include <functional>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/preprocessor/move.hpp>
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/arg/arg.hpp>
 # include <falcon/tuple/tuple_compose.hpp>
 # include <falcon/type_traits/has.hpp>
@@ -12,7 +12,7 @@
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template <class _WrapArgument, class _WrapResult>
 struct __compose_check_type
 {
@@ -39,7 +39,7 @@ struct __compose_check_type
  * and constructs a @c unary_compose variable for you.
  * @{
  */
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 template <class _Operation1, class _Operation2>
 struct unary_compose
 : public std::unary_function<
@@ -174,7 +174,7 @@ compose1(FALCON_RVALUE(_Operation1) __fn1,
  * functor to other algorithms.
  * @{
  */
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 template <class _Operation1, class _Operation2, class _Operation3 = _Operation2>
 struct binary_compose
 : public std::unary_function<
@@ -303,7 +303,7 @@ compose2(FALCON_RVALUE(_Operation1) __fn1, FALCON_RVALUE(_Operation2) __fn2)
 }
 
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 
 /** The @c mulary_compose is constructed from tuple functors, @c f, @c t.
  * Its @c operator() returns @c f(std::get<0>(t)(x), ...).

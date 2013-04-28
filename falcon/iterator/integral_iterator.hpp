@@ -10,7 +10,7 @@ typedef integer_iterator<int,          integer_iterator_less_comparison_tag> int
 typedef integer_iterator<unsigned int, integer_iterator_less_comparison_tag> uint_iterator;
 typedef integer_iterator<long,         integer_iterator_less_comparison_tag> long_iterator;
 typedef integer_iterator<unsigned long,integer_iterator_less_comparison_tag> ulong_iterator;
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 typedef integer_iterator<long long, integer_iterator_less_comparison_tag> long_long_iterator;
 typedef integer_iterator<unsigned long long, integer_iterator_less_comparison_tag> ulong_long_iterator;
 #endif
@@ -19,7 +19,7 @@ typedef reverse_integer_iterator<int,          integer_iterator_less_comparison_
 typedef reverse_integer_iterator<unsigned int, integer_iterator_less_comparison_tag> reverse_uint_iterator;
 typedef reverse_integer_iterator<long,         integer_iterator_less_comparison_tag> reverse_long_iterator;
 typedef reverse_integer_iterator<unsigned long,integer_iterator_less_comparison_tag> reverse_ulong_iterator;
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 typedef reverse_integer_iterator<long long, integer_iterator_less_comparison_tag> reverse_long_long_iterator;
 typedef reverse_integer_iterator<unsigned long long, integer_iterator_less_comparison_tag> reverse_ulong_long_iterator;
 #endif

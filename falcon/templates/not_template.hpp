@@ -3,7 +3,7 @@
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<template<class...> class _Temp>
 	struct template_not
 	{

@@ -36,7 +36,7 @@ operator>>(std::basic_istream<_CharT, _Traits>& __is, __ws)
 { return __is >> std::ws; }
 
 /// Manipulator functor for std::ws
-CPP_USE_CONSTEXPR __ws ws;
+CPP_CONSTEXPR_OR_CONST __ws ws;
 
 }
 }

@@ -17,7 +17,7 @@ struct first_accessor
 		return pair.first;
 	}
 
-	CPP_USE_CONSTEXPR result_type operator()(const pair_type& pair) const
+	CPP_CONSTEXPR_OR_CONST result_type operator()(const pair_type& pair) const
 	{
 		return pair.first;
 	}
@@ -35,7 +35,7 @@ struct second_accessor
 		return pair.second;
 	}
 
-	CPP_USE_CONSTEXPR result_type operator()(const pair_type& pair) const
+	CPP_CONSTEXPR_OR_CONST result_type operator()(const pair_type& pair) const
 	{
 		return pair.second;
 	}

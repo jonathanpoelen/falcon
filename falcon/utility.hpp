@@ -9,7 +9,7 @@
 #include <falcon/utility/swap_proxy.hpp>
 #include <falcon/utility/to_const.hpp>
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/utility/synchronizer.hpp>
 #endif
 

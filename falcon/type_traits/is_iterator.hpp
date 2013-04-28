@@ -4,7 +4,7 @@
 #include <falcon/type_traits/has.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
 #include <falcon/c++/boost_or_std.hpp>
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 #include <boost/type_traits/is_pointer.hpp>
 #endif
 

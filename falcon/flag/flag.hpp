@@ -4,7 +4,7 @@
 ///TODO faire le trie dans les includes. mettre gxx et les bons headers
 //#include <boost/static_assert.hpp>
 #include <cinttypes>
-#include <falcon/c++0x/syntax.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/bit/fill.hpp>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/preprocessor/getter.hpp>
@@ -330,7 +330,7 @@ struct flag<_T[_N]>
 	value_type _M_flag;
 
 public:
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename _U, typename... _Args, typename _ = typename std::enable_if<std::is_integral<_U>::value>::type>
 	constexpr flag(const _U& __flag, const _Args&... __flags)
 	: _M_flag{__flag, __flags...}
@@ -390,7 +390,7 @@ public:
 
 	///TODO constructeur avec initializer_list + array
 	CPP_CONSTEXPR flag()
-	: _M_flag CPP0X()
+	: _M_flag CPP1X()
 	{}
 
 	_T& operator[](std::size_t n)
@@ -406,7 +406,7 @@ public:
 	const value_type& get() const
 	{ return _M_flag; }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 		///TODO move algorithm : namespace constexpr_algorithm ? namespce cexpr ?
 #define _FALCON_FLAG_MAKE_BINARY_OPERATOR(name, Op)\
 	private:\
@@ -468,7 +468,7 @@ public:
 	self_type& operator-=(const self_type& other)
 	{ return *this ^= other._flag; }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 private:
 	template<std::size_t _Num, typename... _Args>
 	struct op_compl
@@ -574,7 +574,7 @@ public:
 	}
 
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 private:
 	template<std::size_t _Num, typename _U>
 	struct op_eq

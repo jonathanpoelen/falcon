@@ -1,14 +1,14 @@
 #ifndef _FALCON_DETAIL_ADDRESSOF_HPP
 #define _FALCON_DETAIL_ADDRESSOF_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <type_traits>
 #endif
 
 namespace falcon {
 namespace detail {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 using std::addressof;
 #else
 template <typename _T>

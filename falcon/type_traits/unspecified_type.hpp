@@ -9,7 +9,7 @@ namespace falcon {
 struct unspecified_type {};
 typedef unspecified_type unspecified_t;
 
-CPP_USE_CONSTEXPR unspecified_type unspecified;
+CPP_CONSTEXPR_OR_CONST unspecified_type unspecified;
 
 template<typename>
 struct is_unspecified

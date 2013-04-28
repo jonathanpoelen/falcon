@@ -10,7 +10,7 @@
 		typedef bool value_type;\
 		typedef ::falcon::integral_constant<bool, value> type;
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 #define FALCON_HELPER_VALUE_TEST(_T)\
 	__FALCON_HELPER_VALUE_TEST(_T)\
 	constexpr operator bool() { return value; }

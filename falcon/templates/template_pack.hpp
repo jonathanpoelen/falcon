@@ -2,7 +2,7 @@
 #define _FALCON_TEMPLATES_TEMPLATE_PACK_HPP
 
 namespace falcon {
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<template<class...> class... _Temps>
 	class template_pack;
 #else

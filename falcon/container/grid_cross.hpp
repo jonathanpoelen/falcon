@@ -68,7 +68,7 @@ public:
 	, _array(__width * __height)
 	{ friend_algo::init(*this); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	grid_cross(size_type __width, size_type __height, std::initializer_list<value_type> l)
 	: _width(__width)
 	, _height(__height)

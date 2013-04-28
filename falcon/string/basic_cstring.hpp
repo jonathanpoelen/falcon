@@ -6,7 +6,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 # include <boost/type_traits/remove_const.hpp>
 # include <boost/type_traits/remove_reference.hpp>
 # include <boost/type_traits/is_pointer.hpp>
@@ -61,7 +61,7 @@ public:
 	, m_end(0)
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	constexpr basic_cstring(std::nullptr_t) noexcept
 	: m_begin(0)
 	, m_end(0)
@@ -141,7 +141,7 @@ public:
 	basic_cstring& operator=(pointer s) CPP_NOEXCEPT
 	{ return assign(s); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	basic_cstring& operator=(std::nullptr_t) noexcept
 	{ return clear(); }
 
@@ -328,7 +328,7 @@ public:
 	CPP_CONSTEXPR const_reverse_iterator rend() const CPP_NOEXCEPT
 	{ return reverse_iterator(m_begin); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	/**
 	 *  Returns a read-only (constant) iterator that points to the first
 	 *  character in the %string.
@@ -1102,7 +1102,7 @@ private:
 	}
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 
 template <typename _CharT,
 	typename _Traits = std::char_traits<_CharT>, std::size_t _N>
@@ -1616,7 +1616,7 @@ inline void swap(falcon::basic_cstring<_CharT, _Traits>& __lhs,
 __FALCON_BASIC_CSTRING_TO(int, stoi, l)
 __FALCON_BASIC_CSTRING_TO(long, stol, l)
 __FALCON_BASIC_CSTRING_TO(unsigned long, stoul, ul)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 __FALCON_BASIC_CSTRING_TO(long long, stoll, ull)
 __FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 #endif
@@ -1630,7 +1630,7 @@ __FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 
 __FALCON_BASIC_CSTRING_TO(float, stof, f)
 __FALCON_BASIC_CSTRING_TO(double, stod, d)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 __FALCON_BASIC_CSTRING_TO(double long, stold, ld)
 #endif
 
@@ -1650,7 +1650,7 @@ inline std::wstring to_wstring(const falcon::const_cwstring& s)
 { return std::wstring(s.data(), s.size()); }
 
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 
 template<typename _CharT, typename _Traits>
 struct hash<falcon::basic_cstring<_CharT, _Traits> >

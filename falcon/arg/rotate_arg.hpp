@@ -2,7 +2,7 @@
 #define FALCON_ARG_ROTATE_ARG_HPP
 
 #include <utility> //std::swap
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/arg/arg.hpp>
 # include <falcon/preprocessor/not_ide_parser.hpp>
 # include <falcon/parameter/parameter_index.hpp>
@@ -11,7 +11,7 @@
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 
 template <std::size_t _ShiftRight, std::size_t _N>
 struct __rotate_arg

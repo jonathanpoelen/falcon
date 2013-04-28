@@ -1,7 +1,7 @@
 #ifndef _FALCON_MEMORY_UNINITIALIZED_HPP
 #define _FALCON_MEMORY_UNINITIALIZED_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <utility>
 # include <iterator>
 #endif
@@ -15,7 +15,7 @@ namespace falcon {
 template<bool _TrivialValueType>
 struct __uninitialized_emplace
 {
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename _ForwardIterator, typename... _Args>
 	static void __uninit_emplace(_ForwardIterator __first, _ForwardIterator __last, _Args&&... __args)
 	{
@@ -54,14 +54,14 @@ template<>
 struct __uninitialized_emplace<true>
 {
 	template<typename _ForwardIterator, typename _Tp>
-	static void __uninit_emplace(_ForwardIterator __first, _ForwardIterator __last, CPP_RVALUE_OR_CONST_REFERENCE(_Tp) __x)
+	static void __uninit_emplace(_ForwardIterator __first, _ForwardIterator __last, _Tp CPP_RVALUE_OR_CONST_REFERENCE __x)
 	{
 		for (; __first != __last; ++__first)
 			*__first = FALCON_MOVE(__x);
 	}
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 /**
  *  @brief Emplace values args into the range [first,last).
  *  @param first  An input iterator.

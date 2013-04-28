@@ -2,7 +2,7 @@
 #include <cstdint>
 #include "cut_and_place.hpp"
 
-// #undef __cplusplus > 201100L
+// #undef __cplusplus >= 201103L
 #include <falcon/functional/cut_and_place.hpp>
 
 void cut_and_place_test()

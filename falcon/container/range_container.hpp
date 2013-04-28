@@ -43,7 +43,7 @@ public:
 	, _M_last(last)
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	range_container(iterator first, size_type n)
 	: _M_first(first)
 	, _M_last(std::next(first, n))
@@ -194,7 +194,7 @@ inline bool operator>=(const range_container<_Iterator>& x,
 
 template<typename _Iterator>
 range_container<_Iterator> make_range_container(_Iterator first, _Iterator last)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 { return {first, last}; }
 #else
 { return range_container<_Iterator>(first, last); }
@@ -202,7 +202,7 @@ range_container<_Iterator> make_range_container(_Iterator first, _Iterator last)
 
 template<typename _Iterator>
 range_container<_Iterator> make_range_container(_Iterator first, std::size_t n)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 { return {first, n}; }
 #else
 { return range_container<_Iterator>(first, n); }
@@ -211,7 +211,7 @@ range_container<_Iterator> make_range_container(_Iterator first, std::size_t n)
 template<typename _Container>
 range_container<typename range_access_iterator<_Container>::type>
 make_range_container(_Container& cont)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 { return {begin(cont), end(cont)}; }
 #else
 {
@@ -224,7 +224,7 @@ make_range_container(_Container& cont)
 template<typename _Container>
 range_container<typename range_access_iterator<const _Container>::type>
 make_range_container(const _Container& cont)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 { return {begin(cont), end(cont)}; }
 #else
 {

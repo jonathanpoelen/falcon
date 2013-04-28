@@ -33,7 +33,7 @@ operator<<(std::basic_ostream<_CharT, _Traits>& __os, __##manipulator)\
 /**\
  * Manipulator functor for std::manipulator\
  */\
-CPP_USE_CONSTEXPR __##manipulator manipulator;
+CPP_CONSTEXPR_OR_CONST __##manipulator manipulator;
 
 /**
  * Manipulators functors for std::endl, std::ends and std::flush

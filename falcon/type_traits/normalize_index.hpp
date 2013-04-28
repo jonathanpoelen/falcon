@@ -6,7 +6,7 @@ namespace falcon {
 template<int __i, unsigned int Nm>
 class normalize_index
 {
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	static_assert(Nm != 0, "size is 0");
 #endif
 

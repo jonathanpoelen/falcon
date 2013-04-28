@@ -1,7 +1,7 @@
 #ifndef _FALCON_FALCON_COORDINATES_HPP
 #define _FALCON_FALCON_COORDINATES_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/coordinates/array_coord.hpp>
 # include <falcon/coordinates/array_index.hpp>
 #endif

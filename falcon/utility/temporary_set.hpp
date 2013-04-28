@@ -13,7 +13,7 @@ class temporary_set
 	_T _old_value;
 
 public:
-	temporary_set(_T& old_value, CPP_RVALUE_OR_CONST_REFERENCE(_T) new_value)
+	temporary_set(_T& old_value, _T CPP_RVALUE_OR_CONST_REFERENCE new_value)
 	: _value(old_value)
 	, _old_value(FALCON_MOVE(old_value))
 	{

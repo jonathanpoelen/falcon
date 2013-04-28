@@ -87,7 +87,7 @@ public:
 	, _predicate()
 	{ satisfy_predicate(); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	filter_iterator(const filter_iterator&) = default;
 #else
 	filter_iterator(const filter_iterator& other)

@@ -85,7 +85,7 @@ public:
 	, _pos(0)
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	explicit iterator_iterator(std::initializer_list<pair_iterator> __iterators)
 	: __base(std::piecewise_construct, __iterators)
 	, _pos(0)
@@ -97,7 +97,7 @@ public:
 	{}
 #endif
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	iterator_iterator& operator=(const std::vector<pair_iterator>& __v)
 	{
 		this->base_reference() == __v;

@@ -220,7 +220,7 @@ struct __bit_iterator
 	}
 };
 
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 template<std::size_t _Size>
 struct __choose_char
 { typedef wchar_t type; };
@@ -467,7 +467,7 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
  	BOOST_PP_CAT(FALCON_PP_LIST_ENUM_ELEMENT_CHAR_TYPE_, FALCON_PP_VARIADIC_HAS_PARENTHESIS(elem))(elem)
 #define FALCON_PP_LIST_ENUM_ELEMENT_CHAR_TYPE_0(elem) \
 	char
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # define FALCON_PP_LIST_ENUM_ELEMENT_CHAR_TYPE_1(elem)\
 	typename std::remove_const<\
 		typename std::remove_reference<\
@@ -523,7 +523,7 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 #define __FALCON_PP_LIST_ENUMERATOR(name, rule, n, list)\
 	__FALCON_PP_LIST_ENUMERATOR_MAKE(name, FALCON_PP_ENUMERATOR_OPTIMIZE_RULE(rule), n, list)
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 #define __FALCON_PP_LIST_ENUMERATOR_ADJACENT_NAME(r, data, elem)\
 	BOOST_PP_IF(BOOST_PP_EQUAL(r, 2), ,"\0")\
 	__FALCON_PP_LIST_ENUMERATOR_STRINGIZE_NAME_I(elem)

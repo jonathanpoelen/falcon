@@ -43,33 +43,33 @@ struct placeholder
 	template<typename _Index>
 	inline constexpr ___lambda<index<late_parameter_t, _Index>, placeholder<_Num>, const _Index&> operator[](const _Index& idx)
 	{
-		return CPP0X(index<late_parameter_t, _Index>{}, idx);
+		return CPP1X(index<late_parameter_t, _Index>{}, idx);
 	}
 
 	/* use std::bind ?
 	template<typename... _Args>
 	inline ___lambda<functional_operators::function<_Args...>, placeholder<_Num> > bind(_Args&&... args)
-	{ return CPP0X(std::tuple<_Args...>(std::forward<_Args>(args)...)); }*/
+	{ return CPP1X(std::tuple<_Args...>(std::forward<_Args>(args)...)); }*/
 
 	template<typename... _Args>
-	inline CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), arg<_Num-1>(args...))
+	inline CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), arg<_Num-1>(args...))
 
 	template<typename _T>
 	inline constexpr ___lambda<late_affect, placeholder<_Num>, const _T&> operator=(const _T& v)
 	{
-		return CPP0X(late_affect{}, v);
+		return CPP1X(late_affect{}, v);
 	}
 
 	template<typename _T>
 	inline constexpr ___lambda<late_affect, placeholder<_Num>, _T> operator=(_T&& v)
 	{
-		return CPP0X(late_affect{}, v);
+		return CPP1X(late_affect{}, v);
 	}
 
 	template<int _Num2>
 	inline constexpr ___lambda<late_affect, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
 	{
-		return CPP0X(late_affect{});
+		return CPP1X(late_affect{});
 	}
 
 	constexpr std_placeholder_type to_std_placeholderight() const
@@ -80,7 +80,7 @@ struct placeholder
 	template<typename _T, typename _Class>
 	inline constexpr ___lambda<decltype(std::mem_fn(std::declval<_T _Class::*>())), placeholder<_Num>, __force_placearg> operator FALCON_PP_NOT_IDE_PARSER(->*)(_T _Class::* mem)
 	{
-		return CPP0X(std::mem_fn(mem));
+		return CPP1X(std::mem_fn(mem));
 	}
 };
 
@@ -102,7 +102,7 @@ struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, ___lambda<_FuncL2, _Le
 	___lambda<_FuncL2, _Left2, _Right2> right;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right(std::forward<_Args>(args)...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right(std::forward<_Args>(args)...)))
 };
 
 template<typename _Func, typename _FuncL, typename _Left, typename _Right, int _Num>
@@ -112,7 +112,7 @@ struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, placeholder<_Num> >
 	___lambda<_FuncL, _Left, _Right> left;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), arg<_Num-1>(args...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), arg<_Num-1>(args...)))
 };
 
 template<typename _Func, typename _FuncL, typename _Left, typename _Right, int _Num>
@@ -122,7 +122,7 @@ struct ___lambda<_Func, placeholder<_Num>, ___lambda<_FuncL, _Left, _Right> >
 	___lambda<_FuncL, _Left, _Right> right;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right(std::forward<_Args>(args)...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right(std::forward<_Args>(args)...)))
 };
 
 template<typename _Func, typename _FuncL, typename _Left, typename _Right, typename _T>
@@ -133,7 +133,7 @@ struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, _T>
 	_T right;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right))
 };
 
 template<typename _Func, typename _FuncL, typename _Left, typename _Right>
@@ -143,7 +143,7 @@ struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, __placearg>
 	___lambda<_FuncL, _Left, _Right> left;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...)/*, std::forward<_Args>(args)...*/))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...)/*, std::forward<_Args>(args)...*/))
 };
 
 template<typename _Func, typename _FuncL, typename _Left, typename _Right, typename _T>
@@ -154,7 +154,7 @@ struct ___lambda<_Func, _T, ___lambda<_FuncL, _Left, _Right> >
 	___lambda<_FuncL, _Left, _Right> right;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, right(std::forward<_Args>(args)...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, right(std::forward<_Args>(args)...)))
 };
 
 template<typename _Func, int _Num>
@@ -163,7 +163,7 @@ struct ___lambda<_Func, placeholder<_Num>, __force_placearg>
 	_Func function;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), call<_Func&>(
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), call<_Func&>(
 		typename keep_parameter_index<
 			ignore_parameter_index_tag<_Num, 1>,
 			sizeof...(_Args)+1
@@ -177,7 +177,7 @@ struct ___lambda<_Func, placeholder<1>, __force_placearg>
 	_Func function;
 
 	template<typename _T, typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
+	CPP1X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
 };
 
 template<typename _Func, int _Num>
@@ -200,7 +200,7 @@ struct ___lambda<_Func, placeholder<_Num>, __placearg>
 // 	_Func function;
 //
 // 	template<typename... _Args>
-// 	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args),call<_Func&>(
+// 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),call<_Func&>(
 // 		typename keep_parameter_index<
 // 			ignore_parameter_index_tag<_Num, 1>,
 // 			sizeof...(_Args)+1
@@ -214,7 +214,7 @@ struct ___lambda<_Func, placeholder<_Num>, __placearg>
 // 	_Func function;
 //
 // 	template<typename _T, typename... _Args>
-// 	CPP0X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
+// 	CPP1X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
 // };
 
 template<typename _Func, int _Num, typename _Right>
@@ -224,7 +224,7 @@ struct ___lambda<_Func, placeholder<_Num>, _Right>
 	_Right right;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right))
 };
 
 template<typename _Func, typename _Left, int _Num>
@@ -234,7 +234,7 @@ struct ___lambda<_Func, _Left, placeholder<_Num> >
 	_Left left;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, arg<_Num-1>(args...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, arg<_Num-1>(args...)))
 };
 
 template<typename _Func, int _Num, int _Num2>
@@ -243,7 +243,7 @@ struct ___lambda<_Func, placeholder<_Num>, placeholder<_Num2> >
 	_Func function;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), arg<_Num2-1>(args...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), arg<_Num2-1>(args...)))
 };
 
 template<typename _T>
@@ -265,7 +265,7 @@ struct ___lambda<_Func, _Bind, operators::binder>
 	_Bind bind;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(bind(std::forward<_Args>(args)...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(bind(std::forward<_Args>(args)...)))
 };
 
 template<typename _Func, typename _Bind, typename _Bind2>
@@ -276,7 +276,7 @@ struct ___lambda<_Func, ___lambda<operators::binder, _Bind, _Bind2>, operators::
 	_Bind2 right;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right(std::forward<_Args>(args)...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right(std::forward<_Args>(args)...)))
 };
 
 template<typename _Func, typename _Bind, int _Num>
@@ -286,7 +286,7 @@ struct ___lambda<_Func, __pair<_Bind, placeholder<_Num> >, operators::binder>
 	_Bind right;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right(std::forward<_Args>(args)...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right(std::forward<_Args>(args)...)))
 };
 
 template<typename _Func, typename _Bind, int _Num>
@@ -296,7 +296,7 @@ struct ___lambda<_Func, __pair<placeholder<_Num>, _Bind>, operators::binder>
 	_Bind left;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), arg<_Num-1>(args...)))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), arg<_Num-1>(args...)))
 };
 
 template<typename _Bind>
@@ -305,7 +305,7 @@ struct ___lambda<operators::binder, _Bind, void>
 	_Bind bind;
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args), bind(std::forward<_Args>(args)...))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), bind(std::forward<_Args>(args)...))
 };
 
 namespace placeholders {

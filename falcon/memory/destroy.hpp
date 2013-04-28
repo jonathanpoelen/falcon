@@ -1,7 +1,7 @@
 #ifndef _FALCON_MEMORY_DESTROY_HPP
 #define _FALCON_MEMORY_DESTROY_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <type_traits>
 #endif
 #include <iterator>
@@ -48,7 +48,7 @@ template<typename _ForwardIterator>
 inline void destroy(_ForwardIterator __first, _ForwardIterator __last)
 {
 	__destroy_aux<
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 		std::is_trivially_destructible<typename std::iterator_traits<_ForwardIterator>::value_type>::value
 #else
 		false

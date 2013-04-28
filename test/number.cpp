@@ -3,7 +3,7 @@
 
 int main()
 {
-	falcon::number<> number2(CPP0X(255, 255));
+	falcon::number<> number2(CPP1X(255, 255));
 	// 	std::cout << number << std::endl;
 	std::cout << number2 << std::endl;
 	// 	number += number2;

@@ -2,8 +2,8 @@
 #include "test.hpp"
 #include "templates.hpp"
 
-#if __cplusplus > 201100L
-#include <falcon/c++0x/syntax.hpp>
+#if __cplusplus >= 201103L
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/functional/operators.hpp>
 
 template<typename _T, typename _U>

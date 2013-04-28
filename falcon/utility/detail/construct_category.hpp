@@ -3,7 +3,7 @@
 
 #include <falcon/config.hpp>
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 namespace std {
 	template<typename, std::size_t>
 	class array;
@@ -21,7 +21,7 @@ struct construct_category
 	typedef normal_construct_tag type;
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 struct initilizer_list_construct_tag {};
 
 template<typename _T, std::size_t _N>

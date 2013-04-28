@@ -13,11 +13,11 @@ void recursive_for_each_test(/*int argc, char **argv*/)
 	typedef falcon::decrement<int> func_type;
 	typedef falcon::binary_negate<int> filter_type;
 	typedef std::vector<int> subarray;
-	std::vector<subarray> v(CPP0X(
-		CPP0X(1,2,3,4,5),
-		CPP0X(1,2,3,4,5),
-		CPP0X(1,2,3,4,5),
-		CPP0X(1,2,3,4,5)
+	std::vector<subarray> v(CPP1X(
+		CPP1X(1,2,3,4,5),
+		CPP1X(1,2,3,4,5),
+		CPP1X(1,2,3,4,5),
+		CPP1X(1,2,3,4,5)
 	));
 	std::stringstream oss;
 	auto print = oss << falcon::lambda::placeholders::_1 << ',';

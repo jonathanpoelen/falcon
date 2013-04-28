@@ -94,7 +94,7 @@ public:
 	const_reverse_iterator rend() const CPP_NOEXCEPT
 	{ return const_reverse_iterator(begin()); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	const_iterator cbegin() const noexcept
 	{ return const_iterator(_M_first); }
 

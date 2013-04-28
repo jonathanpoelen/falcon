@@ -1,7 +1,7 @@
 #ifndef _FALCON_PREPROCESSOR_MOVE_HPP
 #define _FALCON_PREPROCESSOR_MOVE_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <utility>
 # define FALCON_MOVE(value) std::move(value)
 # define FALCON_FORWARD(type, value) std::forward<type>(value)

@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <falcon/type_traits/yes_no_type.hpp>
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # define FALCON_CREATE_FUNCTION_IS_CALL_POSSIBLE(_Name, _FuncName)\
 	template <typename... _Falcon_Args>\
 	class _Name\
@@ -34,7 +34,7 @@
 FALCON_CREATE_FUNCTION_IS_CALL_POSSIBLE(FALCON_FUNCTION_IS_CALL_POSSIBLE_NAME(_FuncName), _Namespace::_FuncName)
 
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # define FALCON_CREATE_FUNCTION_IS_CALL_POSSIBLE_AND_CONVERTIBLE_RESULT(_Name, _IsCallPossible)\
 	template <typename _Falcon_Signature>\
 	class _Name\

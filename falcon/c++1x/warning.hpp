@@ -1,5 +1,5 @@
-#ifndef FALCON_CPP0X_WARNING_HPP
-#define FALCON_CPP0X_WARNING_HPP
+#ifndef FALCON_CPP1X_WARNING_HPP
+#define FALCON_CPP1X_WARNING_HPP
 
 #ifdef __GNUC__
 # include <bits/c++0x_warning.h>

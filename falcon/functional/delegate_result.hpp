@@ -3,8 +3,8 @@
 
 #include <functional>
 #include <falcon/preprocessor/move.hpp>
-#if __cplusplus > 201100L
-# include <falcon/c++0x/syntax.hpp>
+#if __cplusplus >= 201103L
+# include <falcon/c++1x/syntax.hpp>
 # include <falcon/type_traits/if.hpp>
 # include <falcon/type_traits/has.hpp>
 #endif
@@ -37,7 +37,7 @@ public:
 	, m_g(FALCON_FORWARD(_Functor, g))
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename _Delegate2, typename _Functor2>
 	delegate_result(_Delegate2&& f, _Functor2&& g)
 	: m_f(std::forward<_Delegate2>(f))
@@ -57,7 +57,7 @@ public:
 	result_type operator()() const
 	{ return m_f(m_g()); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename... _Args>
 	result_type operator()(_Args&&... args)
 	{ return m_f(m_g(std::forward<_Args>(args)...)); }
@@ -74,7 +74,7 @@ public:
  * @ingroup utilities
  */
 
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 /**
  * The @c delegate_result functor is constructed from two functions/functors,
  * @c f and @c g.  Calling @c operator() without argument returns @c f(g()).
@@ -117,7 +117,7 @@ public:
 	, m_g(FALCON_FORWARD(_Functor, g))
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename _Delegate2, typename _Functor2>
 	unary_delegate_result(_Delegate2&& f, _Functor2&& g)
 	: m_f(std::forward<_Delegate2>(f))
@@ -171,7 +171,7 @@ public:
 	, m_g(FALCON_FORWARD(_Functor, g))
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename _Delegate2, typename _Functor2>
 	binary_delegate_result(_Delegate2&& f, _Functor2&& g)
 	: m_f(std::forward<_Delegate2>(f))
@@ -192,7 +192,7 @@ public:
 	{ return m_f(m_g(x,y)); }
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _Delegate, typename _Functor>
 struct __delegate_result
 {
@@ -224,11 +224,11 @@ struct __delegate_result
 	{}
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args),
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),
 													this->_m_f(this->_m_g(std::forward<_Args>(args)...)))
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
 													this->_m_f(this->_m_g(std::forward<_Args>(args)...)))
 };
 
@@ -257,7 +257,7 @@ using delegate_result = typename if_c<
 template<typename _Delegate, typename _Functor>
 delegate_result<_Delegate, _Functor>
 delegate(_Delegate f, _Functor g)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 { return {f, g}; }
 #else
 { return delegate_result<_Delegate, _Functor>(f, g); }
@@ -266,7 +266,7 @@ delegate(_Delegate f, _Functor g)
 template<typename _Delegate, typename _Functor>
 unary_delegate_result<_Delegate, _Functor>
 delegate1(_Delegate f, _Functor g)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 { return {f, g}; }
 #else
 { return unary_delegate_result<_Delegate, _Functor>(f, g); }
@@ -275,7 +275,7 @@ delegate1(_Delegate f, _Functor g)
 template<typename _Delegate, typename _Functor>
 binary_delegate_result<_Delegate, _Functor>
 delegate2(_Delegate f, _Functor g)
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 { return {f, g}; }
 #else
 { return binary_delegate_result<_Delegate, _Functor>(f, g); }

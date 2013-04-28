@@ -16,7 +16,7 @@ struct get_accessor
 		return cont.get();
 	}
 
-	CPP_USE_CONSTEXPR result_type operator()(const _Class& cont) const
+	CPP_CONSTEXPR_OR_CONST result_type operator()(const _Class& cont) const
 	{
 		return cont.get();
 	}

@@ -3,7 +3,7 @@
 
 #include <tuple>
 #include <type_traits>
-#include <falcon/c++0x/syntax.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/utility/maker.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/functional/placeholder_for_argument.hpp>
@@ -63,7 +63,7 @@ private:
 		{}
 
 		template<typename... _Args>
-		CPP0X_DELEGATE_FUNCTION(
+		CPP1X_DELEGATE_FUNCTION(
 			operator()(_Args&&... args),
 			_Functor()(this->value, std::forward<_Args>(args)...)
 		)
@@ -85,7 +85,7 @@ private:
 		>::type __tuple;
 
 		template<typename _TupleParameter>
-		CPP0X_DELEGATE_FUNCTION(
+		CPP1X_DELEGATE_FUNCTION(
 			static __impl(_Tuple& t, _TupleParameter parameters),
 			tuple_compose<>(_Maker(), __tuple(to_tuple_reference(t)), parameters)
 		)
@@ -97,13 +97,13 @@ private:
 	{};
 
 	template<typename _Function, typename _TupleParameter, typename _Maker = late_tupe>
-	CPP0X_DELEGATE_FUNCTION(
+	CPP1X_DELEGATE_FUNCTION(
 		__call(_TupleParameter parameters, _Maker = _Maker()),
 		__delegate<_Maker, _Function>::__impl(this->tuple(), parameters)
 	)
 
 	template<typename _Function, typename _TupleParameter, typename _Maker = late_tupe>
-	CPP0X_DELEGATE_FUNCTION(
+	CPP1X_DELEGATE_FUNCTION(
 		__call(_TupleParameter parameters, _Maker = _Maker()) const,
 		__const_delegate<_Maker, _Function>::__impl(this->tuple(), parameters)
 	)
@@ -111,7 +111,7 @@ private:
 public:
 #define _FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type, override)\
 	template<typename _U>\
-	CPP0X_DELEGATE_FUNCTION(operator op(_U&& x) override,\
+	CPP1X_DELEGATE_FUNCTION(operator op(_U&& x) override,\
 							this->__call<late_##func_type>(std::forward_as_tuple(x)))
 
 #define _FALCON_SYNCHRONIZER_OPERATOR2(op, func_type)\
@@ -153,7 +153,7 @@ public:
 #undef _FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER
 #define _FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type, override)\
 	template<typename _U = void>\
-	CPP0X_DELEGATE_FUNCTION(operator op() override,\
+	CPP1X_DELEGATE_FUNCTION(operator op() override,\
 							this->__call<late_##func_type>(std::tuple<>()))
 
 	_FALCON_SYNCHRONIZER_OPERATOR(->, arrow)
@@ -182,25 +182,25 @@ private:
 		{}
 
 		template<typename... _Args>
-		CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
+		CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
 		(this->o->*this->m)(std::forward<_Args>(args)...))
 	};
 
 public:
 	template<typename _Member>
-	CPP0X_DELEGATE_FUNCTION(operator FALCON_PP_NOT_IDE_PARSER(->*)(_Member m),
+	CPP1X_DELEGATE_FUNCTION(operator FALCON_PP_NOT_IDE_PARSER(->*)(_Member m),
 	this->__call<late_maker<__member_to_pointer>>(std::make_tuple(m), late_maker<synchronizer>()))
 
 	template<typename _Member>
-	CPP0X_DELEGATE_FUNCTION(operator FALCON_PP_NOT_IDE_PARSER(->*)(_Member m) const,
+	CPP1X_DELEGATE_FUNCTION(operator FALCON_PP_NOT_IDE_PARSER(->*)(_Member m) const,
 	this->__call<late_maker<__member_to_pointer>>(std::make_tuple(m), late_maker<synchronizer>()))
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args),
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),
 	tuple_compose<>(late_tupe(), this->tuple(), std::forward_as_tuple(args...)))
 
 	template<typename... _Args>
-	CPP0X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
 	tuple_compose<>(late_tupe(), this->tuple(), std::forward_as_tuple(args...)))
 
 	synchronizer& operator++()

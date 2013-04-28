@@ -91,7 +91,7 @@ public:
 	: __base(other)
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	/*explicit*/ integer_iterator(_T&& value)
 	: __base(value)
 	{}
@@ -187,7 +187,7 @@ public:
 	: __base(other)
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	/*explicit*/ reverse_integer_iterator(_T&& value)
 	: __base(value)
 	{}

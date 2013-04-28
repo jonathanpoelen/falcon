@@ -14,7 +14,7 @@ template<typename _Container,
 struct indirect_container_iterator_type
 {
 	template<typename _Iterator
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	, typename _Proxy = use_default,
 		typename _Tp = use_default, typename _Category = use_default,
 		typename _Reference = use_default, typename _Distance = use_default,
@@ -24,7 +24,7 @@ struct indirect_container_iterator_type
 	struct builder
 	{
 		typedef falcon::iterator::indirect_iterator<_Iterator
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 			, _Proxy, _Tp, _Category, _Reference, _Distance, _Pointer
 #endif
 		> type;
@@ -40,7 +40,7 @@ struct indirect_container_iterator_type<_Container, boost::reference_wrapper<_Va
 	{};
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _Container, typename _Value>
 struct indirect_container_iterator_type<_Container, std::reference_wrapper<_Value>>
 {
@@ -86,7 +86,7 @@ indirect_container(_Container& cont, _Build)
 	return __result_type(cont);
 }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _Container,
 	template<class...> class _IteratorBuild = indirect_container_iterator_type<_Container>::template builder,
 	typename... _ArgsIterator>

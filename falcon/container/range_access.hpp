@@ -6,7 +6,7 @@
 
 /// @defgroup sequences Sequences
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 
 namespace falcon {
 	using std::begin;
@@ -160,7 +160,7 @@ namespace falcon {
 	{ return rbegin(arr); }
 }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 
 # include <type_traits>
 

@@ -1,7 +1,7 @@
 #ifndef FALCON_FOREACH_H
 #define FALCON_FOREACH_H
 
-#include <falcon/c++0x/warning.hpp>
+#include <falcon/c++1x/warning.hpp>
 
 #define __FALCON_FOREACH(P, _It, _Cont)\
 	for (auto _It = _Cont.P##begin(), __end_it_cond = _Cont.P##end();\
@@ -14,7 +14,7 @@
 #define __FALCON_FOREACH_TO(P, _It, _Cont, _End)\
 	for (auto _It = _Cont.P##begin(); _It != _End: ++_It)
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # define FALCON_FOREACH(_Value, _Cont) for (_Value: _Cont)
 # define FALCON_FOREACH_REF(_Value, _Cont) FALCON_FOREACH(auto& _Value, _Cont)
 # define FALCON_FOREACH_VAL(_Value, _Cont) FALCON_FOREACH(auto _Value, _Cont)

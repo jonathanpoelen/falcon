@@ -78,7 +78,7 @@
 	FALCON_MEMBER_REND_ITERATOR_ARGS_C0X((begin()))
 
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 
 # define FALCON_MEMBER_BEGIN_ITERATOR(it)\
 	FALCON_MEMBER_BEGIN_ITERATOR_C0X(it)

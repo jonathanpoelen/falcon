@@ -17,7 +17,7 @@
 #include <falcon/iterator/output_iterator.hpp>
 #include <falcon/iterator/pseudo_iterator.hpp>
 #include <falcon/iterator/subrange_access_iterator.hpp>
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/iterator/recursive_iterator.hpp>
 # include <falcon/iterator/synchronize_iterator.hpp>
 #endif

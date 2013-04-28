@@ -2,7 +2,7 @@
 #define FALCON_STRING_APPEND_HPP
 
 #include <iosfwd>
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/parameter/parameter_pack.hpp>
 # include <falcon/detail/string_size.hpp>
 #else
@@ -34,7 +34,7 @@ namespace falcon {
 	template<std::size_t _N, typename _String>
 	inline _String&
 	append(_String& lhs,
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 				 const typename _String::value_type (& rhs)[_N]
 #else
 				typename boost::add_const<typename _String::value_type>::type (& rhs)[_N]
@@ -46,7 +46,7 @@ namespace falcon {
 		return lhs;
 	}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<std::size_t _N>
 	struct __keep_strlen
 	{

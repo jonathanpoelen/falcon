@@ -40,7 +40,7 @@ struct finally
 	: _M_functor()
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	finally(_Functor&& func)
 	: _M_functor(std::forward<_Functor>(func))
 	{}
@@ -56,7 +56,7 @@ struct finally
 	}
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _Functor>
 finally<_Functor> make_finally(_Functor&& func)
 {

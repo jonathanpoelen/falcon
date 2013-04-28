@@ -45,7 +45,7 @@ namespace falcon {
 
 			static const bool __test = !_ErrFirstCallFunctorIsFalse || _TemplateFunctor<_T CPP_EXTEND_PACK>::value;
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 			static_assert(__test, "first call functor is false");
 #endif
 
@@ -86,7 +86,7 @@ namespace falcon {
 
 			static const bool __test = !_ErrFirstCallFunctorIsFalse || _TemplateFunctor<_T CPP_EXTEND_PACK>::value;
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 			static_assert(__test, "first call functor is false");
 #endif
 

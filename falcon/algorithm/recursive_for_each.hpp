@@ -1,7 +1,7 @@
 #ifndef _FALCON_ALGORITHM_RECURSIVE_FOR_EACH_HPP
 #define _FALCON_ALGORITHM_RECURSIVE_FOR_EACH_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <initializer_list>
 #endif
 #include <falcon/c++/constexpr.hpp>
@@ -19,7 +19,7 @@ struct __break_off
 	_Function function;
 	const _T& value;
 
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 	__break_off(const _Function& function, const _T& value)
 	: function(function)
 	, value(value)
@@ -33,7 +33,7 @@ struct __break_if
 	_Function function;
 	_Functor functor;
 
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 	__break_if(const _Function& function, const _T& functor)
 	: function(function)
 	, functor(functor)
@@ -47,7 +47,7 @@ struct __return_off
 	_Function function;
 	const _T& value;
 
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 	__return_off(const _Function& function, const _T& value)
 	: function(function)
 	, value(value)
@@ -61,7 +61,7 @@ struct __return_if
 	_Function function;
 	_Functor functor;
 
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 	__return_if(const _Function& function, const _T& functor)
 	: function(function)
 	, functor(functor)
@@ -69,7 +69,7 @@ struct __return_if
 #endif
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template <typename _Function, typename _T>
 inline __break_off<_Function, _T> break_off(_Function&& function, const _T& value)
 {
@@ -119,7 +119,7 @@ inline __break_if<_Function, _Functor, false> break_if_not(_Function function, _
 }
 #endif
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template <typename _Function, typename _T>
 inline __return_off<_Function, _T> return_off(_Function&& function, const _T& value)
 {
@@ -304,7 +304,7 @@ _Function recursive_for_each(_Container& container, _Function f)
 	return FALCON_MOVE(f);
 }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template <std::size_t _Dimension = -1ul, typename _T, typename _Function>
 _Function recursive_for_each(std::initializer_list<_T> list, _Function f)
 {

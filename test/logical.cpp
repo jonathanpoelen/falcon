@@ -23,7 +23,7 @@ void logical_test()
 	STATIC_ASSERT(0 == falcon::first_false<>(e,f,g));
 	STATIC_ASSERT(1 == falcon::first_false<>(e,g,e));
 
-	std::array<int, 4> arr CPP0X(CPP0X(8,9,0,1));
+	std::array<int, 4> arr CPP1X(CPP1X(8,9,0,1));
 	*falcon::find_if<>(arr, falcon::is_true_wrapper()) += 2;
 	CHECK_EQUAL_VALUE(10, arr[0]);
 	*falcon::find_if<>(arr, falcon::is_false_wrapper()) = -1;

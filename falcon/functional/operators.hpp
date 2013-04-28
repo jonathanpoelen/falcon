@@ -4,7 +4,7 @@
 #include <iosfwd>
 #include <utility>
 #include <type_traits>
-#include <falcon/c++0x/syntax.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/functional/late_parameter.hpp>
 
 namespace falcon {
@@ -279,7 +279,7 @@ typedef parenthesis<late_parameter_t> late_parenthesis;
 #define __FALCON_FUNCTIONAL_OPERATORS_TRANSFORM(_Proto, _Code) _T& _Proto { return _Code; }
 
 #define _FALCON_CREATE_FUNCTIONAL_OPERATORS(name, op)\
-	__FALCON_CREATE_FUNCTIONAL_OPERATORS(name, op, const _T, const _U, CPP0X_DELEGATE_FUNCTION)\
+	__FALCON_CREATE_FUNCTIONAL_OPERATORS(name, op, const _T, const _U, CPP1X_DELEGATE_FUNCTION)\
 	__FALCON_CREATE_FUNCTIONAL_OPERATORS(name##_equal, op##=, _T, const _U, __FALCON_FUNCTIONAL_OPERATORS_TRANSFORM)
 
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(plus      , +)
@@ -398,7 +398,7 @@ struct right_shift<late_parameter_t, late_parameter_t>
 
 #undef _FALCON_CREATE_FUNCTIONAL_OPERATORS
 #define _FALCON_CREATE_FUNCTIONAL_OPERATORS(name, op)\
-	__FALCON_CREATE_FUNCTIONAL_OPERATORS(name, op, _FALCON_QUALIFIER_FUNCTIONAL_OPERATORS _T, const _U, CPP0X_DELEGATE_FUNCTION)\
+	__FALCON_CREATE_FUNCTIONAL_OPERATORS(name, op, _FALCON_QUALIFIER_FUNCTIONAL_OPERATORS _T, const _U, CPP1X_DELEGATE_FUNCTION)\
 
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(equal_to     , ==)
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(not_equal_to , !=)
@@ -415,13 +415,13 @@ _FALCON_CREATE_FUNCTIONAL_OPERATORS(logical_or , ||)
 	template<typename _T>\
 	struct name\
 	{\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(T& a) const, op(a))\
+		inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(T& a) const, op(a))\
 	};\
 	template<>\
 	struct name<late_parameter_t>\
 	{\
 		template<typename _T>\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(T& a) const, op(a))\
+		inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(T& a) const, op(a))\
 	};
 
 #undef _FALCON_CREATE_FUNCTIONAL_OPERATORS
@@ -452,16 +452,16 @@ _FALCON_CREATE_FUNCTIONAL_OPERATORS(decrement, --)
 	template<typename _T>\
 	struct name\
 	{\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, op(a))\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a) const, op(a))\
+		inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, op(a))\
+		inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a) const, op(a))\
 	};\
 	template<>\
 	struct name<late_parameter_t>\
 	{\
 		template<typename _T>\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, op(a))\
+		inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, op(a))\
 		template<typename _T>\
-		inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a) const, op(a))\
+		inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a) const, op(a))\
 	};
 
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(address    , &)
@@ -510,167 +510,167 @@ struct affect<late_parameter_t, late_parameter_t>
 template<typename _T, typename _U>
 struct equivalent
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
 };
 template<typename _T>
 struct equivalent<_T, late_parameter_t>
 {
 	template<typename _U>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
 };
 template<typename _U>
 struct equivalent<late_parameter_t, _U>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
 };
 template<>
 struct equivalent<late_parameter_t, late_parameter_t>
 {
 	template<typename _T, typename _U>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, !(a < b || a > b))
 };
 
 template<typename _T>
 struct post_increment
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a++)
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, a++)
 };
 template<>
 struct post_increment<late_parameter_t>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a++)
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, a++)
 };
 
 template<typename _T>
 struct post_decrement
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a--)
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, a--)
 };
 template<>
 struct post_decrement<late_parameter_t>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a--)
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, a--)
 };
 
 template<typename _T>
 struct arrow
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a.operator->())
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a) const, a.operator->())
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, a.operator->())
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a) const, a.operator->())
 };
 template<>
 struct arrow<late_parameter_t>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a) const, a.operator->())
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a) const, a.operator->())
 };
 
 template<typename _T, typename _Index = int>
 struct index
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, const _Index& __index) const, a[__index])
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, const _Index& __index) const, a[__index])
 };
 template<typename _T>
 struct index<_T, late_parameter_t>
 {
 	template<typename _Index>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
 };
 template<typename _Index>
 struct index<late_parameter_t, _Index>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
 };
 template<>
 struct index<late_parameter_t, late_parameter_t>
 {
 	template<typename _T, typename _Index>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& __index) const, a[__index])
 };
 
 template<typename _T, typename _Index = int>
 struct index_emulation
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, const _Index& index) const, *(a + index))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, const _Index& index) const, *(a + index))
 };
 template<typename _T>
 struct index_emulation<_T, late_parameter_t>
 {
 	template<typename _Index>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
 };
 template<typename _Index>
 struct index_emulation<late_parameter_t, _Index>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
 };
 template<>
 struct index_emulation<late_parameter_t, late_parameter_t>
 {
 	template<typename _T, typename _Index>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _Index& index) const, *(a + index))
 };
 
 
 template<typename _T, typename _U>
 struct comma
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, const _U& b) const, (a , b))
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, _U& b) const, (a , b))
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, (a , b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, const _U& b) const, (a , b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, _U& b) const, (a , b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& a, const _U& b) const, (a , b))
 };
 template<typename _T>
 struct comma<_T, late_parameter_t>
 {
 	template<typename _U>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
 };
 template<typename _U>
 struct comma<late_parameter_t, _U>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
 };
 template<>
 struct comma<late_parameter_t, late_parameter_t>
 {
 	template<typename _T, typename _U>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _U& b) const, (a , b))
 };
 
 template<typename _T, typename _Member>
 struct pointer_to_member
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
 
 	template<typename... _Args>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
 };
 template<typename _T>
 struct pointer_to_member<_T, late_parameter_t>
 {
 	template<typename _Member>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
 
 	template<typename _Member, typename... _Args>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
 };
 template<>
 struct pointer_to_member<late_parameter_t, late_parameter_t>
 {
 	template<typename _T, typename _Member>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _Member m) const, ((a.*m)()))
 
 	template<typename _T, typename _Member, typename... _Args>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& a, _Member m, _Args&&... args) const, (a.*m)(std::forward<_Args>(args)...))
 };
 template<typename _Result, typename _T, typename... _Args>
 struct pointer_to_member<late_parameter_t, _Result(_T::*)(_Args...)>
@@ -684,30 +684,30 @@ struct pointer_to_member<late_parameter_t, _Result(_T::*)(_Args...) const>
 template<typename _T>
 struct parenthesis
 {
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f) const, f())
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& f) const, f())
 
 	template<typename... _Args>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
 
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f) const, f())
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& f) const, f())
 
 	template<typename... _Args>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
 };
 template<>
 struct parenthesis<late_parameter_t>
 {
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f) const, f())
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& f) const, f())
 
 	template<typename _T, typename... _Args>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(_T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(_T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
 
 	template<typename _T>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f) const, f())
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& f) const, f())
 
 	template<typename _T, typename... _Args>
-	inline constexpr CPP0X_DELEGATE_FUNCTION(operator()(const _T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
+	inline constexpr CPP1X_DELEGATE_FUNCTION(operator()(const _T& f, _Args&&... args) const, f(std::forward<_Args>(args)...))
 };
 
 }

@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <falcon/sfinae/member_is_call_possible.hpp>
-#include <falcon/c++0x/syntax.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/container/range_access.hpp>
 #include <falcon/container/container_wrapper.hpp>
 
@@ -40,7 +40,7 @@
 #define __FALCON_ALGORITHM_REF_ARG , _T1& v1
 #define __FALCON_ALGORITHM_REF1_ARG , _T1& v1, _T2 v2
 #define __FALCON_ALGORITHM_REF2_ARG , _T1& v1, _T2 v2, _T3 v3
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # define __FALCON_ALGORITHM_RVALUE_ARG , _T1&& v1
 #else
 # define __FALCON_ALGORITHM_RVALUE_ARG , const _T1& v1
@@ -62,12 +62,12 @@
 	namespace __delegate {\
 		template<bool, typename Container __FALCON_ALGORITHM_##TEMPLATE##_PARTIAL_TEMPLATE>\
 		struct _Name##TEMPLATE##ARG##VAR {\
-			inline static CPP0X_DELEGATE_FUNCTION(exec(Container& container __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(begin(container), end(container) __FALCON_ALGORITHM_##VAR##_VAR))\
+			inline static CPP1X_DELEGATE_FUNCTION(exec(Container& container __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(begin(container), end(container) __FALCON_ALGORITHM_##VAR##_VAR))\
 		};\
 		\
 		__FALCON_ALGORITHM_TEMPLATE(TEMPLATE)\
 		struct _Name##TEMPLATE##ARG##VAR <true, Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE> {\
-			inline static CPP0X_DELEGATE_FUNCTION(exec(Container& container __FALCON_ALGORITHM_##ARG##_ARG), container._Name(__FALCON_ALGORITHM_##VAR##_VAR_CONTAINER))\
+			inline static CPP1X_DELEGATE_FUNCTION(exec(Container& container __FALCON_ALGORITHM_##ARG##_ARG), container._Name(__FALCON_ALGORITHM_##VAR##_VAR_CONTAINER))\
 		};\
 	}
 
@@ -79,13 +79,13 @@
 
 #define __FALCON_ALGORITHM_FUNC(_Name, TEMPLATE, ARG, VAR)\
 	__FALCON_ALGORITHM_TEMPLATE(TEMPLATE)\
-	CPP0X_DELEGATE_FUNCTION(_Name(Container& container __FALCON_ALGORITHM_##ARG##_ARG), __delegate::_Name##TEMPLATE##ARG##VAR <detail::FALCON_MEMBER_FUNCTION_IS_CALL_POSSIBLE_NAME(_Name)<Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::value, Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::exec(container __FALCON_ALGORITHM_##VAR##_VAR))\
+	CPP1X_DELEGATE_FUNCTION(_Name(Container& container __FALCON_ALGORITHM_##ARG##_ARG), __delegate::_Name##TEMPLATE##ARG##VAR <detail::FALCON_MEMBER_FUNCTION_IS_CALL_POSSIBLE_NAME(_Name)<Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::value, Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::exec(container __FALCON_ALGORITHM_##VAR##_VAR))\
 	\
 	template<typename _InitializerT __FALCON_ALGORITHM_PARTIAL_TEMPLATE(TEMPLATE)>\
-	CPP0X_DELEGATE_FUNCTION(_Name(std::initializer_list<_InitializerT> initializer __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(initializer.begin(), initializer.end() __FALCON_ALGORITHM_##VAR##_VAR))\
+	CPP1X_DELEGATE_FUNCTION(_Name(std::initializer_list<_InitializerT> initializer __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(initializer.begin(), initializer.end() __FALCON_ALGORITHM_##VAR##_VAR))\
 	\
 	template<typename _Container, typename _Traits __FALCON_ALGORITHM_PARTIAL_TEMPLATE(TEMPLATE)>\
-	CPP0X_DELEGATE_FUNCTION(_Name(container_wrapper<_Container, _Traits>&& cont __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(cont.begin(), cont.end() __FALCON_ALGORITHM_##VAR##_VAR))
+	CPP1X_DELEGATE_FUNCTION(_Name(container_wrapper<_Container, _Traits>&& cont __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(cont.begin(), cont.end() __FALCON_ALGORITHM_##VAR##_VAR))
 
 #define __FALCON_ALGORITHM_NOT_CLASS_IS_CALL_POSSIBLE(_Name, TEMPLATE, ARG, VAR)\
 	__FALCON_ALGORITHM_DELEGATE(_Name, TEMPLATE, ARG, VAR)\
@@ -97,7 +97,7 @@
 
 #define __FALCON_ALGORITHM2(_Name, TEMPLATE, ARG, VAR)\
 	__FALCON_ALGORITHM_TEMPLATE(TEMPLATE)\
-	inline CPP0X_DELEGATE_FUNCTION(_Name(Container& container __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(container.begin(), container.end(), v1.begin(), v1.end() __FALCON_ALGORITHM_##VAR##_VAR))
+	inline CPP1X_DELEGATE_FUNCTION(_Name(Container& container __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(container.begin(), container.end(), v1.begin(), v1.end() __FALCON_ALGORITHM_##VAR##_VAR))
 
 ///TODO modifier __FALCON_ALGORITHM2 ou faire un __FALCON_ALGORITHM3 pour transform (http://en.cppreference.com/w/cpp/algorithm/transform)
 

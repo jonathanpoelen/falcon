@@ -1,7 +1,7 @@
 #ifndef _FALCON_JAVA_ITERATOR_PARTIAL_JAVA_ITERATOR_HPP
 #define _FALCON_JAVA_ITERATOR_PARTIAL_JAVA_ITERATOR_HPP
 
-#include <falcon/c++0x/keywords.hpp>
+#include <falcon/c++1x/keywords.hpp>
 #include <falcon/preprocessor/incremental.hpp>
 #include <falcon/preprocessor/comparison.hpp>
 #include <falcon/java_iterator/detail/iterator_traits.hpp>
@@ -29,7 +29,7 @@ protected:
 
 	typedef partial_java_iterator<_Iterator> self_type;
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename... _Args>
 	partial_java_iterator(_Args&&... args)
 	: _it(std::forward<_Args>(args)...)

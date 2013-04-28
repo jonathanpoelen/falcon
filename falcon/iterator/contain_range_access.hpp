@@ -3,7 +3,7 @@
 
 #include <falcon/container/range_access.hpp>
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/sfinae/function_is_call_possible.hpp>
 
 namespace falcon {

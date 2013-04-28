@@ -117,7 +117,7 @@ public:
 	, _pos(__sbs.empty() ? 0 : 1)
 	{ _init_when_sequence(); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	basic_multibuf(__multistreambuf_type&& __sbs)
 	: __streambuf_type()
 	, _sbs(std::move(__sbs))
@@ -205,7 +205,7 @@ public:
 		}
 	}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	void shrink_to_fit()
 	{
 		assign_to_fit();

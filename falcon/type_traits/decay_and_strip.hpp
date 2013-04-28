@@ -18,7 +18,7 @@ struct __strip_reference_wrapper
 	typedef _Tp __type;
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _Tp>
 struct __strip_reference_wrapper<std::reference_wrapper<_Tp> >
 {

@@ -1,13 +1,13 @@
 #ifndef _FALCON_TEMPLATES_TEMPLATE_LEFT_ACCUMULATOR_HPP
 #define _FALCON_TEMPLATES_TEMPLATE_LEFT_ACCUMULATOR_HPP
 
-#if __cplusplus <= 201100L
+#if __cplusplus < 201103L
 # include <boost/typeof/typeof.hpp>
 #endif
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<template<class...> class _Temp, typename... _LeftArgs>
 struct template_left_accumulator
 {

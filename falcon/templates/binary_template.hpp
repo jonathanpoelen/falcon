@@ -1,14 +1,14 @@
 #ifndef _FALCON_TEMPLATES_TEMPLATE_BINARY_HPP
 #define _FALCON_TEMPLATES_TEMPLATE_BINARY_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <type_traits>
 #endif
 #include <falcon/detail/typeof.hpp>
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<class _Functor, template<class...> class _Temp, template<class...> class _Temp2>
 	struct template_binary
 	{

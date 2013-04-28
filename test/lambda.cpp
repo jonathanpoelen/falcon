@@ -57,7 +57,7 @@ void lambda_test() {
 	LAMBDA_TEST(11,	1 + phr::_1 + phr::_1, 5);
 
 	{
-		std::vector<int> v CPP0X(1,2,3,4,5,6,7,8,9);
+		std::vector<int> v CPP1X(1,2,3,4,5,6,7,8,9);
 		int index = 0;
 		auto ref = std::ref(index);
 		auto f = phr::_1[ref];

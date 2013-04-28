@@ -89,7 +89,7 @@ public:
 	{ _marchandise = 0; }
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template <
 	typename _T,
 	typename _Functor = static_caster<bool>,

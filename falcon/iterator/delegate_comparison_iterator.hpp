@@ -79,7 +79,7 @@ public:
 	{}
 
 	using __base::operator=;
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	delegate_comparison_iterator& operator=(const delegate_comparison_iterator&) = default;
 #else
 	delegate_comparison_iterator& operator=(const delegate_comparison_iterator& other)

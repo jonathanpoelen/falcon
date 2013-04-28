@@ -1,7 +1,9 @@
 #ifndef _FALCON_CPP_EXTEND_PACK_HPP
 #define _FALCON_CPP_EXTEND_PACK_HPP
 
-#if __cplusplus > 201100L
+#include <falcon/config.hpp>
+
+#if __cplusplus >= 201103L
 # define CPP_EXTEND_PACK ...
 #else
 # define CPP_EXTEND_PACK

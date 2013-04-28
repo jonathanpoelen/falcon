@@ -24,7 +24,7 @@ public:
 	: _value(start)
 	{}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	operator const _T&() const
 	{ return _value; }
 #endif

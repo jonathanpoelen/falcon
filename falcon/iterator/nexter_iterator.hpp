@@ -78,7 +78,7 @@ public:
 	{}
 
 	using __base::operator=;
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	nexter_iterator& operator=(const nexter_iterator&) = default;
 #else
 	nexter_iterator& operator=(const nexter_iterator& other)

@@ -131,7 +131,7 @@ public:
 	{}
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 constexpr struct emplace_t {} emplace;
 #else
 struct emplace_t {};

@@ -174,7 +174,7 @@ public:
 		return *this;
 	}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename... _Args>
 	void emplace(_Args&&... args)
 	{

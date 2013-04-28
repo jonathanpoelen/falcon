@@ -1,13 +1,13 @@
 #ifndef _FALCON_TEMPLATES_OR_TEMPLATE_HPP
 #define _FALCON_TEMPLATES_OR_TEMPLATE_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/templates/template_pack.hpp>
 #endif
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<template<class...> class... _Temps>
 	struct template_or
 	{

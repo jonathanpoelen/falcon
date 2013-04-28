@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <initializer_list>
 #include <iostream> ///TODO déplacer dans number_io.hpp et utiliser des facet
-#include <falcon/c++0x/syntax.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/preprocessor/getter.hpp>
 #include <falcon/preprocessor/comparison.hpp>
 #include <falcon/preprocessor/iterator.hpp>

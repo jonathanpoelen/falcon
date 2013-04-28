@@ -1,7 +1,9 @@
 #ifndef FALCON_CPP_ENUM_HPP
 #define FALCON_CPP_ENUM_HPP
 
-#if __cplusplus <= 201100L
+#include <falcon/config.hpp>
+
+#if __cplusplus < 201103L
 
 # define CPP_SCOPED_ENUM_START(name) struct name { enum enum_t
 # define CPP_SCOPED_ENUM_START2(name, type) CPP_SCOPED_ENUM_START(name)

@@ -2,7 +2,7 @@
 #define _FALCON_UTILITY_MAKER_HPP
 
 #include <falcon/config.hpp>
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <utility>
 # include <falcon/utility/detail/construct_category.hpp>
 #endif
@@ -10,7 +10,7 @@
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _T, typename _Tag = typename ::falcon::detail::construct_category<_T>::type>
 struct __delegate_maker
 {
@@ -63,7 +63,7 @@ struct maker
 	CPP_CONSTEXPR _Tp operator()(const _Tp& v) const
 	{ return _Tp(v); }
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	template<typename... _Args>
 	constexpr _Tp operator()(_Args&&... args) const
 	{ return __delegate_maker<_Tp>::__impl(std::forward<_Args>(args)...); }

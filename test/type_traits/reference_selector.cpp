@@ -7,7 +7,7 @@ void reference_selector_test()
 {
 	using falcon::match_reference_selector;
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	CHECK_TYPE(float&&, match_reference_selector<int&&, float>);
 #endif
 	CHECK_TYPE(int&, match_reference_selector<const int, int&>);

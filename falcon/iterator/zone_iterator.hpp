@@ -80,7 +80,7 @@ public:
 	{}
 
 	using __base::operator=;
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	zone_iterator& operator=(const zone_iterator&) = default;
 #else
 	zone_iterator& operator=(const zone_iterator& other)

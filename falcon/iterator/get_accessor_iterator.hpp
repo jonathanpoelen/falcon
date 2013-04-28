@@ -20,7 +20,7 @@ struct build_get_accessor_iterator
 	> type;
 };
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _Iterator>
 using get_accessor_iterator = typename build_get_accessor_iterator<_Iterator>::type;
 #endif

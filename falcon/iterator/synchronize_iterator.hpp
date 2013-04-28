@@ -193,7 +193,7 @@ private:
 	const iterator_tuple& __cmp_iterator(std::true_type) const
 	{ return iterators(); }
 
-	CPP0X_DELEGATE_FUNCTION(
+	CPP1X_DELEGATE_FUNCTION(
 		__cmp_iterator(std::false_type) const,
 		to_tuple_reference<>(this->iterators(), typename __detail::__cmp_parameter_index())
 	)

@@ -18,7 +18,7 @@ struct at_accessor
 		return cont.at(pos);
 	}
 
-	CPP_USE_CONSTEXPR result_type operator()(const _Class& cont,
+	CPP_CONSTEXPR_OR_CONST result_type operator()(const _Class& cont,
 												const _Position& pos) const
 	{
 		return cont.at();

@@ -3,13 +3,13 @@
 
 #include <cstddef>
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 # include <falcon/arg/arg.hpp>
 #endif
 
 namespace falcon {
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 template<typename _T, std::size_t _Decal, std::size_t _BeginDecal = _Decal>
 struct __cut_and_place
 {

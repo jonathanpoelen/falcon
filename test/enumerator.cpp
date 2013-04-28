@@ -141,7 +141,7 @@ void enumerator_test()
 			(s += *it) += ',';
 		CHECK_EQUAL_VALUE(s, "A,b,C,D,");
 	}
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
 	{
 		std::string s;
 		for (auto str: my_enum_class::strings())
