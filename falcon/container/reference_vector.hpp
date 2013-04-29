@@ -15,9 +15,7 @@ struct built_reference_vector
 		std::reference_wrapper<_T>,
 		mutation_allocator<
 			std::reference_wrapper<_T>,
-			typename _Allocator::template rebind<
-				std::reference_wrapper<_T>
-			>::other
+			_Allocator
 		>
 	> type;
 };

@@ -11,8 +11,10 @@
 #  define CPP_NOEXCEPT_OPERATOR(...) noexcept(__VA_ARGS__)
 # endif
 #else
-# define CPP_NOEXCEPT
+# define CPP_NOEXCEPT throw()
 # define CPP_NOEXCEPT_OPERATOR(...)
 #endif
+
+#define CPP_NOEXCEPT_OPERATOR2(expr...) CPP_NOEXCEPT_OPERATOR(CPP_NOEXCEPT_OPERATOR(expr))
 
 #endif

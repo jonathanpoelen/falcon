@@ -4,7 +4,8 @@
 
 int main(/*int argc, char **argv*/)
 {
-	typedef falcon::stack_allocator<A, 10> allocator_type;
+	std::cout.sync_with_stdio(false);
+	typedef falcon::stack_allocator<A, 10, falcon::stack_allocator_flag::speed_deduction> allocator_type;
 	allocator_type alloc;
 	allocator_type::pointer p;
 	p = alloc.allocate(1);
