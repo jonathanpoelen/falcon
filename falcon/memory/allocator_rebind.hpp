@@ -12,7 +12,7 @@ struct allocator_rebind
 {
 	typedef typename
 #if __cplusplus > 201100L
-		std::allocator_traits<Alloc>::template rebind_alloc<T>::other
+		std::allocator_traits<Alloc>::template rebind_alloc<T>
 #else
 		Alloc::template rebind<T>::other
 #endif

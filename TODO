@@ -200,6 +200,8 @@ tuple/initilizer_list_adapter.hpp contient les fonctions pour manipuler les init
 
 modifier multibuf pour qu'il prenne un 'Nexter' au lieu de gérer un tableau interne. Le nexter gere le passage au fichier suivant en retournant son nom. Ainsi, le tableau de nom pourra ce faire via cet objet. Fournir au moins un generate_filename (ou autre nom) qui sera le parametre par defaut dans la template.
 
+char_traits<>,string et algo partiel. par exemple 'st**rs' == 'starts'. Commencer faire des foncteurs wildcarder ? avec * correspond soit 1 caractère soit une multitude. Ajouter la syntaxe {}, [], ?, .. Cela resemble un peu au regexp.
+
 
 
 

@@ -10,9 +10,9 @@ namespace falcon {
 
 template<typename T, typename AllocBase = std::allocator<T> >
 class pod_allocator
-: public std::allocator_traits<Alloc>::template rebind_alloc<T>::other
+: public std::allocator_traits<AllocBase>::template rebind_alloc<T>::other
 {
-	typedef typename std::allocator_traits<Alloc>::template rebind_alloc<T>::other __allocator_base;
+	typedef typename std::allocator_traits<AllocBase>::template rebind_alloc<T>::other __allocator_base;
 
 public:
 	typedef typename __allocator_base::pointer pointer;

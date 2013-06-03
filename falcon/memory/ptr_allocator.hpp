@@ -2,6 +2,7 @@
 #define FALCON_MEMORY_PTR_ALLOCATOR_HPP
 
 #include <falcon/c++/noexcept.hpp>
+#include <falcon/memory/allocator_swap.hpp>
 
 #include <memory>
 #include <utility>
@@ -112,7 +113,10 @@ public:
 	{ return m_alloc == rhs.m_alloc; }
 
 	void swap(ptr_allocator& other)
-	{ std::swap(m_alloc, other.m_alloc); }
+	{
+		std::swap(m_alloc, other.m_alloc);
+		allocator_swap<__allocator_base>(*this, other);
+	}
 
 	void set(Alloc& other)
 	{ m_alloc = &other; }

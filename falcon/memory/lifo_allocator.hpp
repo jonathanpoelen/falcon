@@ -2,6 +2,8 @@
 #define FALCON_MEMORY_LIFO_ALLOCATOR_HPP
 
 #include <falcon/c++/noexcept.hpp>
+#include <falcon/memory/allocator_rebind.hpp>
+#include <falcon/memory/allocator_swap.hpp>
 
 #include <memory>
 #if __cplusplus > 201100L
@@ -12,13 +14,15 @@
 
 namespace falcon {
 
-template <typename T>
+template <typename T, typename AllocBase = std::allocator<T> >
 class lifo_allocator
-: public std::allocator<T>
+: public allocator_rebind<AllocBase, T>::type
 {
+	typedef typename allocator_rebind<AllocBase, T>::type __allocator_base;
+
 public:
-	typedef typename std::allocator<T>::pointer pointer;
-	typedef typename std::allocator<T>::size_type size_type;
+	typedef typename __allocator_base::pointer pointer;
+	typedef typename __allocator_base::size_type size_type;
 
 #if __cplusplus > 201100L
 	using propagate_on_container_copy_assignment = std::false_type;
@@ -26,13 +30,13 @@ public:
 	using propagate_on_container_swap = std::true_type;
 #endif
 
-	template<typename U>
+	template<typename U, typename AllocBase2 = AllocBase>
 	struct rebind
-	{ typedef lifo_allocator<U> other; };
+	{ typedef lifo_allocator<U, AllocBase2> other; };
 
 public:
-	lifo_allocator(T * first, T * last) CPP_NOEXCEPT
-	: std::allocator<T>()
+	lifo_allocator(T * first, T * last)	CPP_NOEXCEPT_OPERATOR2(__allocator_base())
+	: __allocator_base()
 	, m_current(first)
 	, m_finish(last)
 	{}
@@ -70,6 +74,7 @@ public:
 	{
 		std::swap<>(m_current, other.m_current);
 		std::swap<>(m_finish, other.m_finish);
+		allocator_swap<__allocator_base>(*this, other);
 	}
 
 private:
@@ -80,8 +85,9 @@ private:
 }
 
 namespace std {
-	template<typename T>
-	void swap(falcon::lifo_allocator<T>& a, falcon::lifo_allocator<T>& b)
+	template<typename T, typename AllocBase>
+	void swap(falcon::lifo_allocator<T, AllocBase>& a,
+						falcon::lifo_allocator<T, AllocBase>& b)
 	{ a.swap(b); }
 }
 
