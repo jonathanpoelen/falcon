@@ -1,36 +1,35 @@
 #ifndef FALCON_MEMORY_MUTATION_ALLOCATOR_HPP
 #define FALCON_MEMORY_MUTATION_ALLOCATOR_HPP
 
-#include <memory>
 #include <falcon/c++/noexcept.hpp>
-#if __cplusplus >= 201103L
-# include <type_traits>
-#endif
+#include <falcon/memory/allocator_rebind.hpp>
+
+#include <memory>
 
 namespace falcon {
 
 /**
- *  @brief allocator with @c value_type = @p _T::type, @c reference = @c value_type & and @c const_reference = @c value_type const &.
+ *  @brief allocator with @c value_type = @p T::type, @c reference = @c value_type & and @c const_reference = @c value_type const &.
  *
  *  @ingroup allocators
  *
- *  @tparam _T  Type of allocated object.
- *  @tparam _AllocBase  Allocator base type, defaults to allocator<_T>.
+ *  @tparam T  Type of allocated object.
+ *  @tparam AllocBase  Allocator base type, defaults to allocator<T>.
  */
-template<typename _T, typename _AllocBase = std::allocator<_T> >
+template<typename T, typename AllocBase = std::allocator<T> >
 class mutation_allocator
-: public _AllocBase::template rebind<_U>::other
+: public allocator_rebind<AllocBase, T>::type
 {
-	typedef typename _AllocBase::template rebind<_U>::other __allocator_base;
+	typedef typename allocator_rebind<AllocBase, T>::type __allocator_base;
 
 public:
-	typedef typename _T::type value_type;
+	typedef typename T::type value_type;
 	typedef value_type& reference;
 	typedef const value_type& const_reference;
 
-	template<typename _U, typename _NewAllocBase = _AllocBase>
+	template<typename U, typename NewAllocBase = AllocBase>
 	struct rebind
-	{ typedef mutation_allocator<_U, _NewAllocBase> other; };
+	{ typedef mutation_allocator<U, NewAllocBase> other; };
 
 	mutation_allocator()
 	CPP_NOEXCEPT_OPERATOR2(__allocator_base())
@@ -42,8 +41,8 @@ public:
 	: __allocator_base(__a)
 	{}
 
-	template<typename _Tp1>
-	mutation_allocator(const mutation_allocator<_Tp1>& other)
+	template<typename Tp1>
+	mutation_allocator(const mutation_allocator<Tp1>& other)
 	CPP_NOEXCEPT_OPERATOR2(__allocator_base(other))
 	: __allocator_base(other)
 	{}

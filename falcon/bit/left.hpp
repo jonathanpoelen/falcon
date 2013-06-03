@@ -8,7 +8,7 @@ namespace bit {
 
 template<typename _T>
 struct left
-: integral_constant<_T, _T(1 << (size<_T>::value - 1))>
+: integral_constant<_T, _T(_T(1) << (size<_T>::value - 1))>
 {};
 
 }

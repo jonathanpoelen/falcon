@@ -104,7 +104,7 @@
 namespace falcon {
 
 /**
- * \brief Les classes de ce namespace permettent d'utiliser les fonctions présentent dans <algorithm> en ne donnant que le conteneur. De ceux fait, begin() et end() sont automatiquement utilisées. Si le conteneur possède en méthode le nom de l'algorithme, alors cette dernière sera utilisée.
+ * \brief Using algorithms on a container. If the container has a method name of the algorithm it will be used. Otherwise, the algorithm of the std will be used with interval as that container.
  */
 namespace algorithm {
 

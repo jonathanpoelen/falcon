@@ -26,13 +26,13 @@
 #define __CPP_ASSIGNABLE(class_name) class_name& operator=(const class_name&)
 
 #define CPP_DELETE_COPY_CONSTUCTIBLE(class_name)\
-	__CPP_DELETE_VISIBILITY __CPP_COPY_CONSTRUCTOR(class_name) __CPP_DELETE;
+	__CPP_DELETE_VISIBILITY __CPP_COPY_CONSTRUCTOR(class_name) __CPP_DELETE
 
 #define CPP_DELETE_ASSIGNABLE(class_name)\
-		__CPP_DELETE_VISIBILITY __CPP_ASSIGNABLE(class_name) __CPP_DELETE;
+		__CPP_DELETE_VISIBILITY __CPP_ASSIGNABLE(class_name) __CPP_DELETE
 
 #define CPP_DELETE_SGI_ASSIGNABLE(class_name)\
-	CPP_DELETE_COPY_CONSTUCTIBLE(class_name)\
+	CPP_DELETE_COPY_CONSTUCTIBLE(class_name);\
 	CPP_DELETE_ASSIGNABLE(class_name)
 
 #endif

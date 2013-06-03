@@ -2,8 +2,15 @@
 #define _FALCON_MEMORY_MEMORY_STACK_HPP
 
 #include <utility>
+
 #include <falcon/c++/constexpr.hpp>
-#include <boost/aligned_storage.hpp>
+#include <falcon/c++/boost_or_std.hpp>
+#if __cplusplus > 201100L
+# include <type_traits>
+#else
+#include <boost/type_traits/aligned_storage.hpp>
+#include <boost/type_traits/alignment_of.hpp>
+#endif
 
 namespace falcon {
 
@@ -18,9 +25,9 @@ template<typename _T>
 struct __memory_stack_type<_T, std::size_t(-1u)>
 {
 	typedef _T type;
-	typedef typename boost::aligned_storage<
+	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::aligned_storage<
 		sizeof(_T),
-		boost::alignment_of<_T>::value
+		FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<_T>::value
 	>::type memory_type;
 };
 
@@ -125,6 +132,11 @@ public:
 	void construct(const _U& value)
 	{
 		this->get() = value;
+	}
+
+	void construct(_T&& value)
+	{
+		this->get() = std::forward<_T>(value);
 	}
 
 	void destroy()
@@ -281,6 +293,8 @@ class memory_stack
 public:
 	typedef typename __memory_stack<_T>::type type;
 	typedef typename __memory_stack<_T>::memory_type memory_type;
+	typedef typename __memory_stack<_T>::pointer pointer;
+	typedef typename __memory_stack<_T>::const_pointer const_pointer;
 
 public:
 	memory_stack()

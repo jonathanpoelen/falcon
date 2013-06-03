@@ -16,16 +16,15 @@
 namespace falcon {
 
 struct stack_allocator_flag {
-	enum enum_t {
-		always_one      = 1 << 0,
-		lifo_allocation = 1 << 1,
-		normal_storage  = 1 << 2,
-		minimal_storage = 1 << 3,
-		speed_deduction = 1 << 4,
-	};
+	typedef int flags;
+	static const flags normal_storage  = 1 << 0;
+	static const flags lifo_allocation = 1 << 1;
+	static const flags always_one      = 1 << 2;
+	static const flags minimal_storage = 1 << 3;
+	static const flags speed_deduction = 1 << 4;
 };
 
-template<typename _T, std::size_t _N, stack_allocator_flag::enum_t _Flag>
+template<typename _T, std::size_t _N, stack_allocator_flag::flags _Flag>
 class __stack_allocator_bool_array
 : public std::allocator<_T>
 {
@@ -33,9 +32,9 @@ class __stack_allocator_bool_array
 	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::aligned_storage<
 		sizeof(_T),
 		FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<_T>::value
-	>::type __memory_type;
+	>::type memory_type;
 
-	__memory_type m_memory[_N];
+	memory_type m_memory[_N];
 	bool m_allocate[_N];
 	bool * m_first_free;
 
@@ -76,7 +75,6 @@ public:
 			*m_first_free = true;
 			++m_first_free;
 			return reinterpret_cast<pointer>(&m_memory[m_first_free - n - &m_allocate[0]]);
-
 		}
 		else {
 			if (n > &m_allocate[_N] - m_first_free)
@@ -118,7 +116,7 @@ public:
 	}
 };
 
-template<typename _T, std::size_t _N, stack_allocator_flag::enum_t _Flag>
+template<typename _T, std::size_t _N, stack_allocator_flag::flags _Flag>
 class __stack_allocator_normal_lifo
 : public std::allocator<_T>
 {
@@ -126,10 +124,10 @@ class __stack_allocator_normal_lifo
 	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::aligned_storage<
 		sizeof(_T),
 		FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<_T>::value
-	>::type __memory_type;
+	>::type memory_type;
 
-	__memory_type m_memory[_N];
-	__memory_type * m_pos;
+	memory_type m_memory[_N];
+	memory_type * m_pos;
 
 public:
 	typedef typename __allocator_base::pointer pointer;
@@ -147,11 +145,14 @@ public:
 		else if (n == 0)
 			return 0;
 
-		if (_Flag & stack_allocator_flag::always_one ? m_pos == &m_memory[_N] : m_pos + n >= &m_memory[_N])
+		if (_Flag & stack_allocator_flag::always_one ? m_pos == &m_memory[_N] : m_pos + n > &m_memory[_N])
 			throw std::bad_alloc();
 
+		if (_Flag & stack_allocator_flag::always_one) {
+			return reinterpret_cast<pointer>(m_pos++);
+		}
 		m_pos += n;
-		return m_pos-n;
+		return reinterpret_cast<pointer>(m_pos-n);
 	}
 
 	void deallocate(pointer p, size_type n)
@@ -169,7 +170,7 @@ public:
 	}
 };
 
-template<typename _T, std::size_t _N, stack_allocator_flag::enum_t _Flag>
+template<typename _T, std::size_t _N, stack_allocator_flag::flags _Flag>
 class __stack_allocator_speed_always_one
 : public std::allocator<_T>
 {
@@ -177,11 +178,11 @@ class __stack_allocator_speed_always_one
 	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::aligned_storage<
 		sizeof(_T),
 		FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<_T>::value
-	>::type __memory_type;
+	>::type memory_type;
 
-	__memory_type m_memory[_N];
-	__memory_type * m_free[_N];
-	__memory_type ** m_last_free;
+	memory_type m_memory[_N];
+	memory_type * m_free[_N];
+	memory_type ** m_last_free;
 
 public:
 	typedef typename __allocator_base::pointer pointer;
@@ -192,7 +193,7 @@ public:
 	__stack_allocator_speed_always_one()
 	: m_last_free(&m_free[0])
 	{
-		for (__memory_type * p = m_memory, * e = &m_memory[_N]; p != e; ++p) {
+		for (memory_type * p = m_memory, * e = &m_memory[_N]; p != e; ++p) {
 			*m_last_free = p;
 			++m_last_free;
 		}
@@ -217,12 +218,12 @@ public:
 				&& p < reinterpret_cast<pointer>(&m_memory[_N]));
 		assert(n == 1);
 
-		*m_last_free = reinterpret_cast<__memory_type*>(p);
+		*m_last_free = reinterpret_cast<memory_type*>(p);
 		++m_last_free;
 	}
 };
 
-template<typename _T, std::size_t _N, stack_allocator_flag::enum_t _Flag>
+template<typename _T, std::size_t _N, stack_allocator_flag::flags _Flag>
 class __stack_allocator_minimal_storage
 : public std::allocator<_T>
 {
@@ -270,9 +271,8 @@ private:
 	}
 
 public:
-	pointer allocate(size_type n, const void * hint = 0)
+	pointer allocate(size_type n, const void * = 0)
 	{
-		(void)hint;///TODO from hint to end and from first to hint
 		if (_Flag & stack_allocator_flag::always_one)
 			assert(n == 1);
 		else if (n == 0)
@@ -281,13 +281,11 @@ public:
 		if (__is_end())
 			throw std::bad_alloc();
 
-		if (!(_Flag & stack_allocator_flag::lifo_allocation)) {
-			while ((*m_first_free & (1ul << m_first_free_offset))) {
-				_S_next(m_first_free, m_first_free_offset);
-				if (__is_end())
-					throw std::bad_alloc();
-			};
-		}
+		while ((*m_first_free & (1ul << m_first_free_offset))) {
+			_S_next(m_first_free, m_first_free_offset);
+			if (__is_end())
+				throw std::bad_alloc();
+		};
 
 		if ((_Flag & stack_allocator_flag::always_one) || n == 1)
 		{
@@ -315,11 +313,6 @@ public:
 			if (!nn)
 				break;
 
-			if (_Flag & stack_allocator_flag::lifo_allocation) {
-				throw std::bad_alloc();
-				break;
-			}
-
 			do {
 				if (first_free == __end() && free_offset == (_N % _S_word_bit - 1))
 					throw std::bad_alloc();
@@ -330,10 +323,7 @@ public:
 			kfree_offset = free_offset;
 		}
 
-		if ((_Flag & stack_allocator_flag::lifo_allocation) || kfirst_free != m_first_free) {
-			if (_Flag & stack_allocator_flag::lifo_allocation) {
-				_S_next(first_free, free_offset);
-			}
+		if (kfirst_free != m_first_free) {
 			m_first_free = first_free;
 			m_first_free_offset =  free_offset;
 		}
@@ -358,7 +348,7 @@ public:
 		unsigned long * first_free = &m_is_allocate[0] + d / _S_word_bit;
 		unsigned long first_free_offset = d % _S_word_bit;
 
-		if ((_Flag & stack_allocator_flag::lifo_allocation) || p <= reinterpret_cast<pointer>(m_first_memory)){
+		if (p <= reinterpret_cast<pointer>(m_first_memory)){
 			m_first_memory = reinterpret_cast<memory_type*>(p);
 			m_first_free = first_free;
 			m_first_free_offset = first_free_offset;
@@ -373,7 +363,7 @@ public:
 	}
 };
 
-template<typename _T, std::size_t _N, stack_allocator_flag::enum_t _Flag>
+template<typename _T, std::size_t _N, stack_allocator_flag::flags _Flag>
 struct __stack_allocator_base
 {
 #define FALCON_SELECT_STACK_ALLOCATOR(name)\
@@ -387,15 +377,16 @@ struct __stack_allocator_base
 
 #undef FALCON_SELECT_STACK_ALLOCATOR
 
-	typedef typename if_<
-		_Flag & stack_allocator_flag::minimal_storage,
-		__select_stack_allocator_minimal_storage,
+	typedef 
+	typename if_<
+	_Flag & stack_allocator_flag::lifo_allocation,
+		__select_stack_allocator_normal_lifo,
 		typename if_<
-			_Flag == (stack_allocator_flag::speed_deduction | stack_allocator_flag::always_one),
-			__select_stack_allocator_speed_always_one,
+			_Flag & stack_allocator_flag::minimal_storage,
+			__select_stack_allocator_minimal_storage,
 			typename if_<
-				_Flag & stack_allocator_flag::lifo_allocation,
-				__select_stack_allocator_normal_lifo,
+				_Flag == (stack_allocator_flag::speed_deduction | stack_allocator_flag::always_one),
+				__select_stack_allocator_speed_always_one,
 				__select_stack_allocator_bool_array
 			>::type
 		>::type
@@ -403,9 +394,13 @@ struct __stack_allocator_base
 };
 
 template<typename _T, std::size_t _N,
-	stack_allocator_flag::enum_t _Flag = stack_allocator_flag::normal_storage>
+	stack_allocator_flag::flags _Flag = stack_allocator_flag::normal_storage>
 class stack_allocator
+#if defined(IN_IDE_PARSER)
+: public std::allocator<_T>
+#else
 : public __stack_allocator_base<_T, _N, _Flag>::__type
+#endif
 {
 	typedef typename __stack_allocator_base<_T, _N, _Flag>::__type __allocator_base;
 
@@ -415,15 +410,11 @@ public:
 	typedef typename __allocator_base::const_pointer const_pointer;
 
 	template<typename _U, std::size_t _N2 = _N,
-		stack_allocator_flag::enum_t _Flag2 = _Flag>
+		stack_allocator_flag::flags _Flag2 = _Flag>
 	struct rebind
 	{ typedef stack_allocator<_U, _N2, _Flag2> other; };
 
 	stack_allocator()
-	: __allocator_base()
-	{}
-
-	stack_allocator(const stack_allocator&)
 	: __allocator_base()
 	{}
 

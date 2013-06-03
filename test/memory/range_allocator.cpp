@@ -1,12 +1,15 @@
-// #include <iostream>
+#include <test/test.hpp>
 #include <falcon/memory/range_allocator.hpp>
+#include "range_allocator.hpp"
 #include "test/A.h"
 
-using namespace std;
+#include <boost/io/ios_state.hpp>
 
-int main(/*int argc, char **argv*/)
+void range_allocator_test()
 {
 	std::cout.sync_with_stdio(false);
+	std::stringbuf sbuf;
+	boost::io::ios_rdbuf_saver rdbuf_saver(std::cout, &sbuf);
 
 	constexpr size_t len = 500;
 	falcon::byte_t memory[len];
@@ -31,5 +34,23 @@ int main(/*int argc, char **argv*/)
 	allocator.destroy<>(p+1);
 	allocator.destroy<>(p);
 	allocator.deallocate(p,2);
+
+	CHECK_EQUAL_VALUE(sbuf.str(),
+	"A(2)\n"
+	"A(4)\n"
+	"A(12)\n"
+	"A(14)\n"
+	"A(15)\n"
+	"~A(4)\n"
+	"~A(2)\n"
+	"A(2)\n"
+	"A(4)\n"
+	"~A(15)\n"
+	"~A(14)\n"
+	"~A(12)\n"
+	"~A(4)\n"
+	"~A(2)\n"
+	);
 }
 
+FALCON_TEST_TO_MAIN(range_allocator_test)

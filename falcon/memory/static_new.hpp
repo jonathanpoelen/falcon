@@ -24,7 +24,7 @@ template <typename _T,
 	bool = __static_new_traits<_T>::easily_constructible,
 	bool = __static_new_traits<_T>::easily_destructible>
 class __static_new_base
-: __memory_stack<_T>
+: public __memory_stack<_T>
 {
 public:
 	typedef _T type;
@@ -39,7 +39,7 @@ public:
 	{}
 
 	__static_new_base(const __static_new_base& other)
-	: _ptr(other._ptr ? _ptr = new (data()) _T(other.get()) : 0)
+	: _ptr(other._ptr ? _ptr = new (this->data()) _T(other.get()) : 0)
 	{}
 
 	__static_new_base& operator=(const __static_new_base& other)
@@ -47,7 +47,7 @@ public:
 		if (_ptr)
 		{
 			if (other._ptr)
-				get() = other.get();
+				this->get() = other.get();
 			else
 			{
 				__memory_stack<_T>::destroy();
@@ -55,7 +55,7 @@ public:
 			}
 		}
 		else if (other._ptr)
-			_ptr = new (data()) _T(other.get());
+			_ptr = new (this->data()) _T(other.get());
 		return *this;
 	}
 
@@ -68,9 +68,8 @@ public:
 	template<typename... _Args>
 	void construct(_Args&&... args)
 	{
-		if (_ptr)
-			_ptr->~_T();
-		_ptr = new (data()) _T(std::forward<_Args>(args)...);
+		destroy();
+		_ptr = new (this->data()) _T(std::forward<_Args>(args)...);
 	}
 
 	void destroy()
@@ -82,35 +81,48 @@ public:
 		}
 	}
 
-	using __memory_stack<_T>::get;
-	using __memory_stack<_T>::data;
-	using __memory_stack<_T>::address;
-
 	bool initialized() const
 	{ return _ptr; }
 };
 
 template <typename _T, bool>
 struct __static_new_value
+: __memory_stack<_T>
 {
-	_T _value;
-	void construct() {}
-	void destroy() {}
+	void set_initilize(bool) {}
 	bool initialized() const { return false; };
+	struct guard_initilise{
+		guard_initilise(const __static_new_value&)
+		{}
+		void setinit()
+		{}
+	};
+	guard_initilise guard()
+	{ return {}; }
 };
 
 template <typename _T>
 struct __static_new_value<_T, true>
+: __memory_stack<_T>
 {
-	_T _value;
 	bool _ini = false;
-	void construct() { _ini = true; }
-	void destroy() { _ini = false; }
+	void set_initilize(bool b) { _ini = b; }
 	bool initialized() const { return _ini; };
+	struct guard_initilise{
+		__static_new_value& obj;
+		bool _is_ini = false;
+		void setinit()
+		{ _is_ini = true; }
+		~guard_initilise()
+		{ obj._ini = _is_ini; }
+	};
+	guard_initilise guard()
+	{ return {*this, false}; }
 };
 
 template <typename _T, bool AddInitialized>
 class __static_new_base<_T, AddInitialized, true, true>
+: public __memory_stack<_T>
 {
 public:
 	typedef _T type;
@@ -122,40 +134,12 @@ private:
 	__static_new_value<_T, AddInitialized> _value;
 
 public:
-	type& get()
-	{ return _value._value; }
-
-	const type& get() const
-	{ return _value._value; }
-
-	memory_type& data()
-	{ return _value._value; }
-
-	const memory_type& data() const
-	{ return _value._value; }
-
-	pointer address()
-	{ return std::addressof(_value._value); }
-
-	const_pointer address() const
-	{ return std::addressof(_value._value); }
-
 	template<typename... _Args>
 	void construct(_Args&&... args)
 	{
-		_value.construct();
-		_value._value = {std::forward<_Args>(args)...};
-	}
-
-	void construct(_T&& value)
-	{
-		_value.construct();
-		_value._value = std::forward<_T>(value);
-	}
-
-	void destroy()
-	{
-		_value.destroy();
+		auto guard = _value.guard();
+		__memory_stack<_T>::construct(std::forward<_Args>(args)...);
+		guard.setinit();
 	}
 
 	bool initialized() const
@@ -165,7 +149,7 @@ public:
 
 template <typename _T, std::size_t _N, bool AddInitialized>
 class __static_new_base<_T[_N], AddInitialized, false, false>
-: __memory_stack<_T[_N]>
+: public __memory_stack<_T[_N]>
 {
 public:
 	typedef _T type[_N];
@@ -219,7 +203,7 @@ public:
 	{
 		__destroy();
 		__memory_stack<_T[_N]>::construct(std::forward<_Args>(args)...);
-		_ptr = address();
+		_ptr = this->address();
 	}
 
 	void construct(const emplace_t&)
@@ -230,7 +214,7 @@ public:
 	{
 		__destroy();
 		__memory_stack<_T[_N]>::construct(emplace, std::forward<_Args>(args)...);
-		_ptr = address();
+		_ptr = this->address();
 	}
 
 	void destroy()
@@ -239,17 +223,13 @@ public:
 		_ptr = 0;
 	}
 
-	using __memory_stack<_T[_N]>::get;
-	using __memory_stack<_T[_N]>::data;
-	using __memory_stack<_T[_N]>::address;
-
 	bool initialized() const
 	{ return _ptr; }
 };
 
 template <typename _T, std::size_t _N, bool AddInitialized>
 class __static_new_base<_T[_N], AddInitialized, false, true>
-: __memory_stack<_T[_N]>
+: public __memory_stack<_T[_N]>
 {
 public:
 	typedef _T type[_N];
@@ -291,7 +271,7 @@ public:
 	void construct(_Args&&... args)
 	{
 		__memory_stack<_T[_N]>::construct(std::forward<_Args>(args)...);
-		_ptr = address();
+		_ptr = this->address();
 	}
 
 	void construct(const emplace_t&)
@@ -301,15 +281,11 @@ public:
 	void construct(const emplace_t&, _Args&&... args)
 	{
 		__memory_stack<_T[_N]>::construct(emplace, std::forward<_Args>(args)...);
-		_ptr = address();
+		_ptr = this->address();
 	}
 
 	void destroy()
 	{ _ptr = 0; }
-
-	using __memory_stack<_T[_N]>::get;
-	using __memory_stack<_T[_N]>::data;
-	using __memory_stack<_T[_N]>::address;
 
 	bool initialized() const
 	{ return _ptr; }
@@ -400,6 +376,8 @@ struct static_new
 {
 	typedef _T type;
 	typedef typename __static_new_base<_T>::memory_type memory_type;
+	typedef typename __static_new_base<_T>::pointer pointer;
+	typedef typename __static_new_base<_T>::const_pointer const_pointer;
 
 public:
 	using __static_new_base<_T>::get;
@@ -409,16 +387,16 @@ public:
 	using __static_new_base<_T>::construct;
 
 	operator _T& ()
-	{ return get(); }
+	{ return this->get(); }
 
 	operator const _T& () const
-	{ return get(); }
+	{ return this->get(); }
 
-	_T* operator->()
-	{ return address(); }
+	pointer operator->()
+	{ return this->address(); }
 
-	const _T* operator->() const
-	{ return address(); }
+	const_pointer operator->() const
+	{ return this->address(); }
 };
 
 
@@ -431,6 +409,8 @@ struct static_new2
 {
 	typedef _T type;
 	typedef typename __static_new_base<_T, true>::memory_type memory_type;
+	typedef typename __static_new_base<_T, true>::pointer pointer;
+	typedef typename __static_new_base<_T, true>::const_pointer const_pointer;
 
 public:
 	using __static_new_base<_T, true>::get;
@@ -441,16 +421,16 @@ public:
 	using __static_new_base<_T, true>::initialized;
 
 	operator _T& ()
-	{ return get(); }
+	{ return this->get(); }
 
 	operator const _T& () const
-	{ return get(); }
+	{ return this->get(); }
 
-	_T* operator->()
-	{ return address(); }
+	pointer operator->()
+	{ return this->address(); }
 
-	const _T* operator->() const
-	{ return address(); }
+	const_pointer operator->() const
+	{ return this->address(); }
 };
 
 }
