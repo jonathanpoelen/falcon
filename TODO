@@ -123,6 +123,7 @@ node/*.hpp: peuvent fonctionner de façon transparente avec des std::unique_ptr 
 utiliser optimal_tuple dans recursive_iterator
 
 revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
+changer le nom des java_iterator en range_iterator et merger les fonction make_range_iterator et range_iterator
 
 peut-on supprimer les constructeurs de copie et l'affectation dans les iterateurs sans que cela crée des copies ? il faudra surement faire un move ctor et un move copy
 
@@ -162,6 +163,7 @@ faire un xor_swap (et ranges_xor_swap et iter_xor_swap)
 
 basic_string_reference<String>(String&, start, size)
 string_reference=basic_string_reference<std::string>
+cstring fonctionnant sur pile (alloue un tableau de char). Hérite de cstring (private/protected). Implémenter à travers cstrnig par un CharT = char_type<N, CharT = char> ? (changer le nom de char_type)
 
 is_instance_of -> std::is_base_of ? iostream/is_ios.hpp fonctionne quand même ?
 
@@ -189,19 +191,18 @@ implementation de simple signal
 
 allocator qui gere la copie avec un realloc (si possible). Moyen de realouer la memoire sur le meme pointeur sans copier l'ancien contenu ?
 
-remove iterator/detail
-
 utilisé FALCON_EMPTY pour arguments vide de macro
 
 trouver un autre nom pour static_new
 
-tuple/array_adapter.hpp contient les fonctions pour manipuler les tableaux comme des tuples
-tuple/initilizer_list_adapter.hpp contient les fonctions pour manipuler les initilizer_list comme des tuples
+tuple/initilizer_list_compatibility.hpp contient les fonctions pour manipuler les initilizer_list comme des tuples
 
 modifier multibuf pour qu'il prenne un 'Nexter' au lieu de gérer un tableau interne. Le nexter gere le passage au fichier suivant en retournant son nom. Ainsi, le tableau de nom pourra ce faire via cet objet. Fournir au moins un generate_filename (ou autre nom) qui sera le parametre par defaut dans la template.
 
-char_traits<>,string et algo partiel. par exemple 'st**rs' == 'starts'. Commencer faire des foncteurs wildcarder ? avec * correspond soit 1 caractère soit une multitude. Ajouter la syntaxe {}, [], ?, .. Cela resemble un peu au regexp.
-
+objet qui alloue un seul objet en recyclant la memoire (ce n'est pas vraiment un allocateur) <Alloc, ExpandPolicy = mutation_pointer_trait<Alloc>::policy> -> {newsize > oldsize ? alloc.allocate() : p}(p,oldsize, newsize)
+class mutation_pointer{
+	new()/delete() => fonction extern ?
+}
 
 
 

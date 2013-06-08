@@ -2,6 +2,6 @@
 #define FALCON_RANGE_HPP
 
 #include <falcon/range/range.hpp>
-#include <falcon/range/crange.hpp>
+#include <falcon/range/integer_range.hpp>
 
 #endif

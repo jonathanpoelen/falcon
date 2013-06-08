@@ -322,7 +322,7 @@ make_range(_T&& __x, _T&& __y)
 }
 #else
 template<class _T>
-inline range<_T> make_ranger(_T __x, _T __y)
+inline range<_T> make_range(_T __x, _T __y)
 { return range<_T>(__x, __y); }
 #endif
 

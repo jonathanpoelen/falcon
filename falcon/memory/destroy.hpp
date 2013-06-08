@@ -20,6 +20,14 @@ template<typename _Tp>
 inline void destroy(_Tp* p)
 { p->~_Tp(); }
 
+template<typename _Tp, std::size_t N>
+inline void destroy(_Tp (* p)[N])
+{
+	for (std::size_t i = 0; i < N; ++i) {
+		destroy(&(*p)[i]);
+	}
+}
+
 template<bool>
 struct __destroy_aux
 {

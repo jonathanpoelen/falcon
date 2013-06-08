@@ -59,7 +59,7 @@ add_definitions(
 
 	-Werror
 
-	-std=c++0x
+	-std=c++11
 
 # 	-Wfatal-errors
 )
