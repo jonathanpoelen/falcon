@@ -8,116 +8,102 @@
 #include <falcon/c++/boost_or_std.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(aligned_storage)
 
+#include <falcon/memory/allocator_rebind.hpp>
+#include <falcon/bit/byte_cast.hpp>
+#include <falcon/c++/noexcept.hpp>
+#include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(aligned_storage)
+
 #include <memory>
-#include <vector>
+#if __cplusplus > 201100L
+#include <utility>
+#endif
 
 namespace falcon {
 
-struct free_list_allocator_policies {
-	typedef int policy;
-	static const policy normal_storage  = 1 << 0;
-	static const policy always_one      = 1 << 2;
-	static const policy speed_deduction = 1 << 4;
-};
-
-template<typename T, typename AllocBase, free_list_allocator_policies::policy Policy,
-	bool always_one = (Policy & free_list_allocator_policies::always_one)>
-struct __free_list_allocator_traits {
-	typedef typename allocator_rebind<AllocBase, T>::type allocator_base;
-	typedef typename allocator_base::size_type size_type;
-	typedef typename allocator_base::pointer pointer;
-	typedef std::vector<size_type*> container_t;
+template<typename T>
+class free_list
+{
+	struct Node
+	{
+		Node * next;
+		unsigned char data[1];
+	};
 
 	static const bool _S_align = FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<T>::value;
-	static const bool _S_heap = (_S_align > sizeof(size_type)) ? _S_align : sizeof(size_type);
+	static const bool _S_heap = (_S_align > sizeof(Node)) ? _S_align : sizeof(Node);
 
-	static pointer allocate(container_t& cont, size_type n)
+public:
+	typedef std::allocator<T>::value_type value_type;
+	typedef std::allocator<T>::pointer pointer;
+
+public:
+	explicit free_list(std::size_t size_alloc) CPP_NOEXCEPT
+	: m_node(0)
+	, m_size_alloc(size_alloc)
+	{}
+
+#if __cplusplus > 201100L
+	free_list(free_list&& other) CPP_NOEXCEPT
+	: m_node(other.m_node)
+	, m_size_alloc(other.m_size_alloc)
+	{ other.m_node = 0; }
+
+	free_list(const free_list&) = delete;
+	free_list& operator=(const free_list&) = delete;
+#else
+private:
+	free_list(const free_list&);
+	free_list& operator=(const free_list&);
+public:
+#endif
+
+	~free_list() CPP_NOEXCEPT
 	{
-		if (Policy & free_list_allocator_policies::speed_deduction) {
-			struct EUpper {
-				bool operator()(size_type * a, size_type * b) {
-					return *a >= *b;
-				}
-			};
-			typedef typename container_t::iterator iterator;
-			iterator it = dichotomic_lower_bound<>(cont.begin(), cont.end(), &n, EUpper());
-			if (it != cont.end()) {
-				pointer ret = ptr(*it);
-				cont.erase(it);
-				return ret;
-			}
-		}
-		else {
-			for (std::size_t pos = 0, max = cont.size(); pos < max; ++pos) {
-				if (*cont[pos] >= n) {
-					pointer ret = ptr(cont[pos]);
-					cont[pos] = cont.back();
-					cont.pop_back();
-					return ret;
-				}
-			}
-		}
-		size_type * p = reinterpret_cast<size_type*>(::operator new(_S_heap + n*sizeof(T)));
-		*p = n;
-		return ptr(p);
+		clear();
 	}
 
-	static void deallocate(container_t& cont, pointer p, size_type)
+	pointer alloc()
 	{
-		if (Policy & free_list_allocator_policies::speed_deduction) {
-			struct Upper {
-				bool operator()(size_type * a, size_type * b) {
-					return *a > *b;
-				}
-			};
-			size_type * pf = reinterpret_cast<size_type*>(byte_cast(p) - _S_heap);
-			cont.insert(dichotomic_lower_bound<>(cont.begin(), cont.end(), pf, Upper()), pf);
+		if (m_node) {
+			return static_cast<pointer>(::operator new(_S_heap + m_size_alloc * sizeof(T)));
 		}
-		else {
-			cont.push_back(reinterpret_cast<size_type*>(byte_cast(p) - _S_heap));
-		}
-	}
-
-	static pointer ptr(void * p)
-	{ return reinterpret_cast<pointer>(byte_cast(p) + _S_heap); }
-};
-
-template<typename T, typename AllocBase, free_list_allocator_policies::policy Policy>
-struct __free_list_allocator_traits<T, AllocBase, Policy, true> {
-	typedef typename allocator_rebind<AllocBase, T>::type allocator_base;
-	typedef typename allocator_base::size_type size_type;
-	typedef typename allocator_base::pointer pointer;
-	typedef std::vector<pointer> container_t;
-
-	static pointer allocate(container_t& cont, size_type)
-	{
-		if (cont.empty()) {
-			return static_cast<pointer>(::operator new(sizeof(T)));
-		}
-		pointer ret = cont.back();
-		cont.pop_back();
+		pointer ret = reinterpret_cast<pointer>(m_node->data);
+		m_node = m_node->next;
 		return ret;
 	}
 
-	static void deallocate(container_t& cont, pointer p, size_type)
+	void free(pointer p)
 	{
-		cont.push_back(p);
+		free_list_node * tmp = m_node;
+		m_node = reinterpret_cast<>(byte_cast(p) - _S_heap);
+		m_node->next = tmp;
 	}
+
+	void clear() CPP_NOEXCEPT
+	{
+		while (m_node) {
+			free_list_node * node = m_node->next;
+			::operator delete(_S_heap + m_fixed_size * sizeof(T));
+			m_node = node;
+		}
+	}
+
+private:
+	Node * m_node;
+	std::size_t m_size_alloc;
 };
 
-template<typename T,
-	free_list_allocator_policies::policy Policy = free_list_allocator_policies::normal_storage,
-	typename AllocBase = std::allocator<T> >
+
+template<typename T, typename AllocBase = std::allocator<T> >
 class free_list_allocator
 #if defined(IN_IDE_PARSER)
 : public std::allocator<T>
 #else
-: public __free_list_allocator_traits<T, AllocBase, Policy>::allocator_base
+: public allocator_rebind<AllocBase, T>::type
 #endif
 {
-	typedef __free_list_allocator_traits<T, AllocBase, Policy> __traits;
-	typedef typename __traits::container_t __container_type;
-	typedef typename __traits::allocator_base __allocator_base;
+	typedef typename allocator_rebind<AllocBase, T>::type __allocator_base;
 
 public:
 	typedef typename __allocator_base::pointer pointer;
@@ -125,46 +111,37 @@ public:
 	typedef typename __allocator_base::const_pointer const_pointer;
 
 #if __cplusplus > 201100L
-	using propagate_on_container_copy_assignment = std::true_type;
+	using propagate_on_container_copy_assignment = std::false_type;
 	using propagate_on_container_move_assignment = std::true_type;
 	using propagate_on_container_swap = std::true_type;
 #endif
 
-	template<typename U,
-		free_list_allocator_policies::policy Policy2 = Policy,
-		typename AllocBase2 = AllocBase>
+	template<typename U, typename AllocBase2 = AllocBase>
 	struct rebind
-	{ typedef free_list_allocator<U, Policy2, AllocBase2> other; };
+	{ typedef free_list_allocator<U, AllocBase2> other; };
 
-	free_list_allocator()
+	explicit free_list_allocator(size_type size)
 	: __allocator_base()
-	, m_ptrs()
+	, m_list(size)
 	{}
 
 	free_list_allocator(const free_list_allocator& other)
 	: __allocator_base(other)
-	, m_ptrs()
+	, m_list(other.node_size())
 	{}
 
 #if __cplusplus > 201100L
 	free_list_allocator(free_list_allocator&& other)
 	: __allocator_base(std::forward<__allocator_base>(other))
-	, m_ptrs(std::forward<std::vector<pointer>>(other.m_ptrs))
+	, m_list(std::forward<free_list<T>>(other.m_list))
 	{}
 #endif
 
-	template<typename U, free_list_allocator_policies::policy Policy2, typename AllocBase2>
-	free_list_allocator(const free_list_allocator<U, Policy2, AllocBase2>&)
-	: __allocator_base()
+	template<typename U, typename AllocBase2>
+	free_list_allocator(const free_list_allocator<U, AllocBase2>& other)
+	: __allocator_base(other)
+	, m_fixed_size(other.node_size())
 	{}
-
-	~free_list_allocator()
-	{
-		typedef typename __container_type::iterator iterator;
-		for (iterator first = m_ptrs.begin(), last = m_ptrs.end(); first != last; ++first) {
-			::operator delete(*first);
-		}
-	}
 
 	free_list_allocator& operator=(const free_list_allocator& other)
 	{
@@ -172,30 +149,17 @@ public:
 		return *this;
 	}
 
-#if __cplusplus > 201100L
-	free_list_allocator& operator=(free_list_allocator&& other)
-	{
-		__allocator_base::operator=(std::forward<__allocator_base>(other));
-		other.m_ptrs = std::forward<std::vector<pointer>>(other.m_ptrs);
-		return *this;
-	}
-#endif
+	pointer allocate(size_type /*n*/, const void * = 0)
+	{ return m_list->alloc(); }
 
-	pointer allocate(size_type n, const void * = 0)
-	{
-		return __traits::allocate(m_ptrs, n);
-	}
-
-	void deallocate(pointer p, size_type n)
-	{
-		__traits::deallocate(m_ptrs, p, n);
-	}
+	void deallocate(pointer p, size_type /*n*/)
+	{ return m_list->free(p); }
 
 	void clear()
-	{ m_ptrs.clear(); }
+	{ m_list->clear(); }
 
 private:
-	__container_type m_ptrs;
+	free_list<T> * m_list;
 };
 
 }

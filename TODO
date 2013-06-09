@@ -184,7 +184,7 @@ container qui trie avec un second container. Le premier contient les valeurs (ty
 
 implementation de simple signal
 
-utilisé FALCON_EMPTY pour arguments vide de macro
+utilisé FALCON_EMPTY (BOOST_EMPTY ?) pour arguments vide de macro
 
 faire en sorte que enumerator ne dépende plus de __VA_ARGS__
 
