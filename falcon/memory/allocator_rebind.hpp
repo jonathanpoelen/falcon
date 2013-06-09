@@ -1,6 +1,7 @@
 #ifndef FALCON_MEMORY_ALLOCATOR_REBIND_HPP
 #define FALCON_MEMORY_ALLOCATOR_REBIND_HPP
 
+#include <falcon/config.hpp>
 #if __cplusplus > 201100L
 #include <memory>
 #endif

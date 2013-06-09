@@ -1,5 +1,5 @@
-#ifndef _FALCON_MEMORY_CONSTRUCT_HPP
-#define _FALCON_MEMORY_CONSTRUCT_HPP
+#ifndef FALCON_MEMORY_CONSTRUCT_HPP
+#define FALCON_MEMORY_CONSTRUCT_HPP
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/tuple/array_compatibility.hpp>
@@ -8,7 +8,7 @@
 
 #if __cplusplus >= 201103L
 # include <falcon/parameter/parameter_index.hpp>
-# include <falcon/utility/construct_category.hpp>
+# include <falcon/memory/construct_category.hpp>
 # include <utility>
 #endif
 

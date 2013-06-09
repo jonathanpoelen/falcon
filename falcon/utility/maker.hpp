@@ -4,7 +4,7 @@
 #include <falcon/config.hpp>
 #include <falcon/c++/constexpr.hpp>
 #if __cplusplus >= 201103L
-# include <falcon/utility/construct_category.hpp>
+# include <falcon/memory/construct_category.hpp>
 # include <utility>
 #endif
 

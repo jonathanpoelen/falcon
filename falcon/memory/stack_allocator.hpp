@@ -1,14 +1,14 @@
 #ifndef FALCON_MEMORY_STACK_ALLOCATOR_HPP
 #define FALCON_MEMORY_STACK_ALLOCATOR_HPP
 
-#include <falcon/c++/boost_or_std.hpp>
-#include FALCON_BOOST_OR_STD_TRAITS(aligned_storage)
-
 #include <falcon/bit/size.hpp>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/initialize.hpp>
-#include <falcon/type_traits/eval_if.hpp>
+#include <falcon/type_traits/if.hpp>
 #include <falcon/memory/allocator_rebind.hpp>
+
+#include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(aligned_storage)
 
 #include <cassert>
 #include <cstring>

@@ -6,7 +6,7 @@
 
 namespace std {
 	template<std::size_t I, typename T, std::size_t N>
-	constexpr T& get(T (&a)[N]) noexcept
+	T& get(T (&a)[N]) noexcept
 	{ return a[I]; }
 
 	template<std::size_t I, typename T, std::size_t N>
