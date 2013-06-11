@@ -192,6 +192,9 @@ trouver un autre nom pour static_new
 
 modifier multibuf pour qu'il prenne un 'Nexter' au lieu de gérer un tableau interne. Le nexter gere le passage au fichier suivant en retournant son nom. Ainsi, le tableau de nom pourra ce faire via cet objet. Fournir au moins un generate_filename (ou autre nom) qui sera le parametre par defaut dans la template.
 
+dans les allocateur, ajouter un constructeur qui prend le parent en argument (const& et rvalue).
+
+shared_allocator. Par exemple shared_allocator<free_list_allocator> partage tous le même allocateur. Moyen de le faire avec un scoped_adapter_allocator ?
 
 
 

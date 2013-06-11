@@ -5,11 +5,13 @@
 # include <utility>
 # define FALCON_MOVE(value) std::move(value)
 # define FALCON_FORWARD(type, value) std::forward<type>(value)
-# define FALCON_RVALUE(type) type&&
+# define FALCON_FORWARD2(value, ...) std::forward<__VA_ARGS__>(value)
+# define FALCON_RVALUE(...) __VA_ARGS__&&
 #else
 # define FALCON_MOVE(value) value
 # define FALCON_FORWARD(type, value) value
-# define FALCON_RVALUE(type) const type&
+# define FALCON_FORWARD2(value, ...) value
+# define FALCON_RVALUE(...) const __VA_ARGS__&
 #endif
 
 #endif
