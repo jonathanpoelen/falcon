@@ -1,89 +1,179 @@
 #ifndef _FALCON_CONTAINER_CONTAINER_WRAPPER
 #define _FALCON_CONTAINER_CONTAINER_WRAPPER
 
-#include <iterator>
 #include <falcon/container/range_access_traits.hpp>
+#include <iterator>
+
 
 namespace falcon{
 
-template<typename _Container, typename _Access = range_access_traits<_Container> >
-struct container_wrapper
+template<typename Container, typename Access = range_access_traits<Container> >
+class container_wrapper
 {
-	typedef _Container container_type;
-	typedef _Access access_type;
-	typedef typename _Access::iterator iterator;
+public:
+  typedef Container container_type;
+  typedef Access access_type;
+  typedef typename Access::iterator iterator;
 
 private:
-	typedef std::iterator_traits<iterator> __type_traits;
+  typedef std::iterator_traits<iterator> __type_traits;
 
 public:
-	typedef typename __type_traits::value_type value_type;
-	typedef typename __type_traits::pointer pointer;
-	typedef typename __type_traits::reference reference;
-	typedef typename __type_traits::difference_type difference_type;
-
-
-private:
-	container_type* _container;
-	_Access _access;
+  typedef typename __type_traits::value_type value_type;
+  typedef typename __type_traits::pointer pointer;
+  typedef typename __type_traits::reference reference;
+  typedef typename __type_traits::difference_type difference_type;
 
 
 public:
-	container_wrapper(container_type& container)
-	: _container(&container)
-	, _access()
-	{}
-
-	container_wrapper(container_type& container, const access_type& traits)
-	: _container(&container)
-	, _access(traits)
-	{}
-
 #if __cplusplus >= 201103L
-	template<typename... _Args>
-	container_wrapper(container_type& container, _Args&&... argtraits)
-	: _container(&container)
-	, _access(std::move(argtraits)...)
-	{}
+  explicit container_wrapper(std::nullptr_t)
+  : _container(0)
+  , _access()
+  {}
+
+  bool valid()
+  { return _container != nullptr; }
 #endif
 
-	iterator begin() const
-	{ return _access.begin(base()); }
+  explicit container_wrapper(const access_type& traits)
+  : _container(0)
+  , _access(traits)
+  {}
 
-	iterator end() const
-	{ return _access.end(base()); }
+  explicit container_wrapper(container_type& container)
+  : _container(&container)
+  , _access()
+  {}
 
-	value_type& operator[](difference_type n)
-	{ return *(begin() + n); }
+  container_wrapper(container_type& container, const access_type& traits)
+  : _container(&container)
+  , _access(traits)
+  {}
 
-	void swap(container_wrapper& other)
-	{
-		std::swap(_access, other._access);
-		std::swap(_container, other._container);
-	}
+#if __cplusplus >= 201103L
+  template<typename... Args>
+  container_wrapper(container_type& container, Args&&... argtraits)
+  : _container(&container)
+  , _access(std::forward<Args>(argtraits)...)
+  {}
+#endif
 
-	operator container_type&() const
-	{ return base(); }
+  container_wrapper(const container_wrapper& other)
+  : _container(other._container)
+  , _access(other._access)
+  {}
 
-	container_type& base() const
-	{ return *_container; }
+  container_wrapper& operator=(container_wrapper& other)
+  {
+    _container = other._container;
+    _access = other._access;
+    return *this;
+  }
 
-	container_type& access()
-	{ return _access; }
+  container_wrapper& operator=(container_type& other)
+  {
+    _container = &other;
+    return *this;
+  }
 
-	const container_type& access() const
-	{ return _access; }
+  iterator begin() const
+  { return _access.begin(base()); }
+
+  iterator end() const
+  { return _access.end(base()); }
+
+  value_type& operator[](difference_type n)
+  { return *(begin() + n); }
+
+  void swap(container_wrapper& other)
+  {
+      std::swap(_access, other._access);
+      std::swap(_container, other._container);
+  }
+
+  template<typename Access2>
+  void swap_container(container_wrapper<Container, Access2>& other)
+  {
+      std::swap(_access, other._access);
+  }
+
+  operator container_type&() const
+  { return base(); }
+
+  container_type& base() const
+  { return *_container; }
+
+  container_type& access()
+  { return _access; }
+
+  const container_type& access() const
+  { return _access; }
+
+
+private:
+  container_type* _container;
+  Access _access;
 };
 
-template<typename _Container, typename _Iterator>
+
+template<typename Container, typename _Iterator>
 struct build_container_wrapper
 {
-	typedef container_wrapper<
-		_Container,
-		range_access_traits<_Container, _Iterator>
-	> type;
+  typedef container_wrapper<
+    Container,
+    range_access_traits<Container, _Iterator>
+  > type;
 };
 
+template<typename Container, typename _Iterator>
+struct build_reverse_container_wrapper
+{
+  typedef container_wrapper<
+    Container,
+    reverse_range_access_traits<Container, _Iterator>
+  > type;
+};
+
+#if __cplusplus >= 201103L
+template<typename Container,
+  typename Access = reverse_range_access_traits<Container> >
+using reverse_container_wrapper = container_wrapper<Container, Access>;
+#endif
+
+
+template<typename Container>
+container_wrapper<Container>
+seq(Container& cont)
+{ return container_wrapper<Container>(cont); }
+
+template<typename Container, typename Access>
+container_wrapper<Container, Access>
+seq(Container& cont, const Access& access)
+{ return container_wrapper<Container, Access>(cont, access); }
+
+template<typename Container>
+container_wrapper<Container, reverse_range_access_traits<Container> >
+rseq(Container& cont)
+{ return container_wrapper<Container, reverse_range_access_traits<Container> >(cont); }
+
+template<typename Container>
+container_wrapper<const Container>
+cseq(const Container& cont)
+{ return container_wrapper<const Container>(cont); }
+
+template<typename Container>
+container_wrapper<const Container, reverse_range_access_traits<const Container> >
+crseq(const Container& cont)
+{ return container_wrapper<const Container, reverse_range_access_traits<const Container> >(cont); }
+
+}
+
+namespace std {
+  template<typename Container, typename Access>
+  void swap(falcon::container_wrapper<Container, Access>& a,
+            falcon::container_wrapper<Container, Access>& b)
+  { a.swap(b); }
 }
 
 #endif

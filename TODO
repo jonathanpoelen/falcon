@@ -6,11 +6,9 @@ fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_const
 
 rendre operators.hpp un peu compatible c++89
 
-fonction get<std::size_t, std::initilizer_list>(std::initilizer_list) (fichier get_initializer_list ?). Grace a ça, std::initilizer_list doit fonctionner avec tuple_call<>(). Idem pour les tableaux
-
 modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
 
-Essayer d'enlever un maximum de __VA_ARGS__
+Essayer d'enlever un maximum de macro variable
 
 objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionne avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
 
@@ -23,21 +21,15 @@ optimiser recursive_iterator (et l'algo de recursion) pour les tableaux. En part
 
 faire un algorithmfwd.hpp pour bien nommer les champs
 
-fairer des macros comme BOOST pour la gestion des flux: FALCON_FLUX(ostream) -> std::basic_ostream<typename _CharT, typename _CharTraits> avec des sous macro pour le "paramètrage"
-
 optimisation de taille des enum class: enum class E : typename std::conditional<l.size() == 2, bool, int>::type {…}; (minimal_int<>::type ?)
 
 Mettre constexpr pour les classe d'operateur et enum/operator
 
 ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?). quotient partiel.
 
-refaire les fonctions de bits/ostream_insert.h ? deja mi dans ostream/ostream_insert.hpp ? (toutes ?)
-
-finaliser les tests pour enumeration.cpp. Mettre a jour la doc de enum/enumerator.hpp et y extraire NOTE et TODO
+enumerator: Enleve les macros variable et passer par __VA_ARGS__. Y extraire NOTE et TODO.
 
 revoir btree et btree_base et réactiver les tests
-
-dans container_wrapper.hpp, ajouter des fonctions comme reverse_container, const_container, etc.
 
 faire des traits char_traits qui transforme tout en majuscule, en minuscule et élimine les accents. Faire un string qui fait des comparaisons insensibles à la case. Quel char_traits existe-il dans boost ?
 
@@ -180,8 +172,6 @@ type_trait, spécification pour T[] (pas de taille)
 
 container toujours trier. Fournir le type de container principal en template. Même interface que vector, list et deque (faire le trie). priority_queue ?
 
-container qui trie avec un second container. Le premier contient les valeurs (type en template). Le second est constitué de pointeurs (type en template, par defaut deque/vector)
-
 implementation de simple signal
 
 utilisé FALCON_EMPTY (BOOST_EMPTY ?) pour arguments vide de macro
@@ -193,10 +183,9 @@ trouver un autre nom pour static_new
 modifier multibuf pour qu'il prenne un 'Nexter' au lieu de gérer un tableau interne. Le nexter gere le passage au fichier suivant en retournant son nom. Ainsi, le tableau de nom pourra ce faire via cet objet. Fournir au moins un generate_filename (ou autre nom) qui sera le parametre par defaut dans la template.
 
 dans les allocateur, ajouter un constructeur qui prend le parent en argument (const& et rvalue).
+allocator: operator== si besoin
 
 shared_allocator. Par exemple shared_allocator<free_list_allocator> partage tous le même allocateur. Moyen de le faire avec un scoped_adapter_allocator ?
 
-
-
-
+iterator comme zone mais dans différente direction: http://www.thonky.com/qr-code-tutorial/module-placement-matrix/#pattern-of-placement. Renommer zonne_iterator ?
 
