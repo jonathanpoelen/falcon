@@ -143,6 +143,7 @@ fonction pour simplifier les operations sur buffer (renvoit false si eof):
 	sgetc: bool sgetc(buffer, &c)
 	ios/streambuf.hpp
 mettre certain fichier de {i,o,io}stream/ dans ios/
+intrusive data stream (eback, gptr, egptr, pbase, pptrm epptr). Retourne les valeurs interne de ces pointeurs (mettre dans ios/)
 
 tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui ce comporte comme un tuple
 
@@ -188,4 +189,15 @@ allocator: operator== si besoin
 shared_allocator. Par exemple shared_allocator<free_list_allocator> partage tous le même allocateur. Moyen de le faire avec un scoped_adapter_allocator ?
 
 iterator comme zone mais dans différente direction: http://www.thonky.com/qr-code-tutorial/module-placement-matrix/#pattern-of-placement. Renommer zonne_iterator ?
+
+renommer container_wrapper en sequence_wrapper ?
+
+poc sur objet supportant le placement de paramètre nommé (comme en python)
+
+allocateur mal aligner. C'est le cas de free_node. Vérifier avec avec un vector4 ou un __m256.
+
+revoir iostream/{s,g}et_contents_file.hpp pour ne pas utiliser de stringstream (chercher la taille la taille du fichier dans la structure stat). Amélioré la gestion des erreurs et propagé l'éventuel erreur de lecture.
+
+un stream qui fait un écriture sur 2 flux (ou plus, celon le générateur)
+
 
