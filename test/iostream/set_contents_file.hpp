@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_IOSTREAM_SET_CONTENTS_FILE_HPP
+#define FALCON_TEST_IOSTREAM_SET_CONTENTS_FILE_HPP
+
+void set_contents_file_test();
+
+#endif
