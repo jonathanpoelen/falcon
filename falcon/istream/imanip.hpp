@@ -4,12 +4,6 @@
 #include <istream>
 #include <falcon/c++/constexpr.hpp>
 
-namespace std {
-	template<typename _CharT, typename _Traits>
-	basic_istream<_CharT, _Traits>&
-	ws(basic_istream<_CharT, _Traits>& __is);
-}
-
 namespace falcon {
 namespace istream {
 

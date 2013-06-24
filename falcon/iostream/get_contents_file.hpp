@@ -26,12 +26,14 @@ void __get_contents_file(String& s, const char * name, std::ios_base::iostate * 
   boost::system::error_code ec;
   uintmax_t size = boost::filesystem::file_size(name, ec);
   if (!ec) {
-    s.reserve(static_cast<size_t>(size)+1);
+    size = size - size%4096 + 4097; //NOTE Clang++ reads largest multiples of 4096
+    s.reserve(static_cast<size_t>(size));
     std::basic_filebuf<char_type> sbin;
     if (sbin.open(name, std::ios_base::in)) {
+      sbin.pubsetbuf(data, static_cast<typename std::streamsize>(size));
       char_type* data = const_cast<char_type*>(s.data());
-      std::streamsize ssize = sbin.sgetn(data, static_cast<typename std::streamsize>(size));
-      *(data + ssize) = 0;
+      sbin.sgetc();
+      *(data + sbin.in_avail()) = 0;
       if (err)
         *err = std::ios_base::goodbit;
     }

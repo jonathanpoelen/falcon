@@ -10,7 +10,7 @@ namespace ostream {
 typedef std::ostream&(*omanip_type)(std::ostream&);
 typedef std::wostream&(*womanip_type)(std::wostream&);
 
-#define __FALCON_CRATE_OMANIP(manipulator)\
+#define __FALCON_CREATE_OMANIP(manipulator)\
 struct __##manipulator\
 {\
 	template<typename _CharT, typename _Traits>\
@@ -39,12 +39,12 @@ CPP_CONSTEXPR_OR_CONST __##manipulator manipulator;
  * Manipulators functors for std::endl, std::ends and std::flush
  * @{
  */
-__FALCON_CRATE_OMANIP(endl)
-__FALCON_CRATE_OMANIP(ends)
-__FALCON_CRATE_OMANIP(flush)
+__FALCON_CREATE_OMANIP(endl)
+__FALCON_CREATE_OMANIP(ends)
+__FALCON_CREATE_OMANIP(flush)
 // @}
 
-#undef __FALCON_CRATE_OMANIP
+#undef __FALCON_CREATE_OMANIP
 
 }
 }

@@ -9,7 +9,7 @@ void multibuf_test()
 	std::stringbuf sb3("plop");
 	std::ostringstream oss;
 
-	falcon::multistreambuf sbs(std::vector<std::streambuf*>({&sb1, &sb2, &sb3}));
+    falcon::multistreambuf sbs({&sb1, &sb2, &sb3});
 	std::istream is(&sbs);
 	is >> oss.rdbuf();
 	CHECK_EQUAL_VALUE(oss.str(), "a:a\na\nb:b\nbplop");

@@ -196,8 +196,6 @@ poc sur objet supportant le placement de paramètre nommé (comme en python)
 
 allocateur mal aligner. C'est le cas de free_node. Vérifier avec avec un vector4 ou un __m256.
 
-revoir iostream/{s,g}et_contents_file.hpp pour ne pas utiliser de stringstream (chercher la taille la taille du fichier dans la structure stat). Amélioré la gestion des erreurs et propagé l'éventuel erreur de lecture.
-
-un stream qui fait un écriture sur 2 flux (ou plus, celon le générateur)
+un stream qui fait une écriture sur 2 flux (ou plus, celon le générateur)
 
 

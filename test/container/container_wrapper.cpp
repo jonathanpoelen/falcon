@@ -1,8 +1,7 @@
 #include <test/test.hpp>
 #include <vector>
+#include <algorithm>
 #include <falcon/container/container_wrapper.hpp>
-#include <falcon/functional/operators.hpp>
-#include <falcon/algorithm/algorithm.hpp>
 #include "container_wrapper.hpp"
 
 void container_wrapper_test()
@@ -13,17 +12,24 @@ void container_wrapper_test()
 	CHECK_EQUAL_VALUE(4, (*wrap.begin())++);
 	CHECK_EQUAL_VALUE(5, *wrap.begin());
 
-	falcon::sort(wrap);
+	std::sort(wrap.begin(), wrap.end());
 	CHECK_EQUAL_VALUE(1, *wrap.begin());
 	CHECK_EQUAL_VALUE(2, *(wrap.begin()+1));
 	CHECK_EQUAL_VALUE(4, *(wrap.begin()+2));
 	CHECK_EQUAL_VALUE(5, *(wrap.begin()+3));
 
-	falcon::sort(falcon::container_wrapper<array_type, falcon::reverse_range_access_traits<array_type>>(arr));
+    falcon::container_wrapper<array_type, falcon::reverse_range_access_traits<array_type>> rwrap(arr);
+    std::sort(rwrap.begin(), rwrap.end());
 	CHECK_EQUAL_VALUE(5, *wrap.begin());
 	CHECK_EQUAL_VALUE(4, *(wrap.begin()+1));
 	CHECK_EQUAL_VALUE(2, *(wrap.begin()+2));
 	CHECK_EQUAL_VALUE(1, *(wrap.begin()+3));
+
+    falcon::seq(arr);
+    falcon::seq(wrap);
+    falcon::cseq(arr);
+    falcon::rseq(arr);
+    falcon::crseq(arr);
 }
 
 FALCON_TEST_TO_MAIN(container_wrapper_test)

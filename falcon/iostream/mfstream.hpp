@@ -7,1242 +7,965 @@
 
 namespace falcon {
 
-template<typename _CharT, typename _Traits = std::char_traits<_CharT> >
+class filename_generator
+{
+public:
+  typedef std::string value_type;
+
+  std::vector<std::string> vector;
+  std::size_t position;
+
+public:
+#if __cplusplus >= 201103L
+  filename_generator() = default;
+  filename_generator(const filename_generator&) = default;
+  filename_generator(filename_generator&&) = default;
+
+  filename_generator(std::initializer_list<value_type> l)
+  : vector(l)
+  , position(0)
+  {}
+#else
+  filename_generator()
+  : vector()
+  , position(0)
+  {}
+
+  filename_generator(const filename_generator& other)
+  : vector(other.vector)
+  , position(0)
+  {}
+#endif
+
+  template<typename InputIterator>
+  filename_generator(InputIterator first, InputIterator last)
+  : vector(first, last)
+  , position(0)
+  {}
+
+  const char * operator()()
+  {
+    if (position < vector.size()) {
+      return vector[position++].c_str();
+    }
+    return 0;
+  }
+
+  void push(const std::string& filename)
+  { vector.push_back(filename); }
+
+  void push(const char* filename)
+  { vector.push_back(filename); }
+
+#if __cplusplus >= 201103L
+  void push(std::string&& filename)
+  { vector.emplace_back<>(std::move(filename)); }
+#endif
+
+  template<typename InputIterator>
+  void push(InputIterator first, InputIterator last)
+  { vector.insert(vector.end(), first, last); }
+};
+
+template<typename CharT, typename Traits = std::char_traits<CharT>,
+  typename Generator = filename_generator>
 class basic_mfilebuf;
 
-template<typename _CharT, typename _Traits = std::char_traits<_CharT> >
+template<typename CharT, typename Traits = std::char_traits<CharT>,
+  typename Generator = filename_generator>
 class basic_mifstream;
 
-template<typename _CharT, typename _Traits = std::char_traits<_CharT> >
+template<typename CharT, typename Traits = std::char_traits<CharT>,
+  typename Generator = filename_generator>
 class basic_mofstream;
 
-template<typename _CharT, typename _Traits = std::char_traits<_CharT> >
+template<typename CharT, typename Traits = std::char_traits<CharT>,
+  typename Generator = filename_generator>
 class basic_mfstream;
 
 
-template<typename _CharT, typename _Traits>
+template<typename CharT, typename Traits, typename Generator>
 class basic_mfilebuf
-: public std::basic_filebuf<_CharT, _Traits>
+: public std::basic_filebuf<CharT, Traits>
 {
-	typedef std::basic_filebuf<_CharT, _Traits> __filebuf_type;
+  typedef std::basic_filebuf<CharT, Traits> __filebuf_type;
 
 public:
-	typedef _CharT char_type;
-	typedef _Traits traits_type;
-	typedef typename __filebuf_type::int_type int_type;
-	typedef typename __filebuf_type::pos_type pos_type;
-	typedef typename __filebuf_type::off_type off_type;
-	typedef std::vector<std::string> filenames_type;
-
-protected:
-	filenames_type _M_filenames;
-	std::size_t _M_posname;
+  typedef CharT char_type;
+  typedef Traits traits_type;
+  typedef typename __filebuf_type::int_type int_type;
+  typedef typename __filebuf_type::pos_type pos_type;
+  typedef typename __filebuf_type::off_type off_type;
+  typedef Generator filename_generator;
 
 public:
-	basic_mfilebuf()
-	: __filebuf_type()
-	, _M_filenames()
-	, _M_posname(0)
-	{}
+  basic_mfilebuf()
+  : __filebuf_type()
+  , m_gen()
+  {}
 
-	basic_mfilebuf(std::ios_base::openmode __mode)
-	: __filebuf_type()
-	, _M_filenames()
-	, _M_posname(0)
-	{ this->_M_mode = __mode; }
+  basic_mfilebuf(std::ios_base::openmode __mode)
+  : __filebuf_type()
+  , m_gen()
+  { this->_M_mode = __mode; }
 
-	virtual
-	~basic_mfilebuf()
-	{}
+  basic_mfilebuf(const filename_generator& gen)
+  : __filebuf_type()
+  , m_gen(gen)
+  { }
 
-	bool mode(std::ios_base::openmode __mode)
-	{
-		if (this->is_open())
-			return false;
-		this->_M_mode = __mode;
-		return true;
-	}
-
-	std::ios_base::openmode mode() const
-	{ return this->_M_mode; }
-
-	filenames_type& filenames()
-	{ return _M_filenames; }
-
-	const filenames_type& filenames() const
-	{ return _M_filenames; }
-
-	void filenames(const filenames_type& __filenames)
-	{ _M_filenames = __filenames; }
+  basic_mfilebuf(const filename_generator& gen, std::ios_base::openmode __mode)
+  : __filebuf_type()
+  , m_gen(gen)
+  { this->_M_mode = __mode; }
 
 #if __cplusplus >= 201103L
-	void filenames(filenames_type&& __filenames)
-	{ _M_filenames = std::move(__filenames); }
+  basic_mfilebuf(filename_generator&& gen)
+  : __filebuf_type()
+  , m_gen(std::forward<filename_generator>(gen))
+  { }
 
-	void filenames(std::initializer_list<std::string> __filenames)
-	{ _M_filenames = __filenames; }
-
-	void filenames(std::initializer_list<const char *> __filenames)
-	{ _M_filenames.assign(__filenames.begin(), __filenames.end()); }
+  basic_mfilebuf(filename_generator&& gen, std::ios_base::openmode __mode)
+  : __filebuf_type()
+  , m_gen(std::forward<filename_generator>(gen))
+  { this->_M_mode = __mode; }
 #endif
 
-	template <typename _InputIterator>
-	void filenames(_InputIterator __first, _InputIterator __last)
-	{ _M_filenames.assign(__first, __last); }
+  virtual
+  ~basic_mfilebuf()
+  {}
 
-	std::size_t posname() const
-	{ return _M_posname; }
+  bool mode(std::ios_base::openmode __mode)
+  {
+    if (this->is_open())
+      return false;
+    this->_M_mode = __mode;
+    return true;
+  }
 
-	void posname(std::size_t __n)
-	{ _M_posname = __n; }
+  std::ios_base::openmode mode() const
+  { return this->_M_mode; }
 
-	void erase_is_open()
-	{
-		if (_M_posname)
-		{
-			std::string * __first = &_M_filenames[0];
-			std::string * __pos = &_M_filenames[_M_posname];
-			std::string * __last = &_M_filenames[_M_filenames.size()];
-			for ( ; __pos != __last; ++__first, __pos)
-				*__first = *__pos;
-			_M_filenames.resize(_M_filenames.size() - _M_posname);
-			_M_posname = 0;
-		}
-	}
+  filename_generator& generator_filename()
+  { return m_gen; }
+
+  const filename_generator& generator_filename() const
+  { return m_gen; }
+
+  void generator_filename(const filename_generator& gen)
+  { m_gen = gen; }
 
 #if __cplusplus >= 201103L
-	void shrink_to_fit()
-	{
-		erase_is_open();
-		_M_filenames.shrink_to_fit();
-	}
+  void generator_filename(filename_generator&& gen)
+  { m_gen = std::move(gen); }
 #endif
 
-	bool opennext(std::ios_base::openmode __mode)
-	{
-		if (_M_posname < _M_filenames.size()
-			&& newopen(_M_filenames[_M_posname].c_str(), __mode))
-		{
-			++_M_posname;
-			return true;
-		}
-		return false;
-	}
+  bool opennext(std::ios_base::openmode __mode)
+  {
+    const char * filename = m_gen();
+    return filename && newopen(filename, __mode);
+  }
 
-	bool opennext()
-	{ return opennext(this->_M_mode); }
+  bool opennext()
+  { return opennext(this->_M_mode); }
+
+  virtual bool
+  newopen(const char* s, std::ios_base::openmode __mode)
+  { return this->open(s, __mode); }
 
 protected:
-	bool _M_opennext()
-	{
-		if (!this->is_open())
-			return false;
-		std::ios_base::openmode __mode = this->_M_mode;
-		this->close();
-		return opennext(__mode);
-	}
+  bool _M_opennext()
+  {
+    if (!this->is_open())
+      return false;
+    std::ios_base::openmode __mode = this->_M_mode;
+    this->close();
+    return opennext(__mode);
+  }
 
-	virtual bool
-	newopen(const char* __s, std::ios_base::openmode __mode)
-	{ return this->open(__s, __mode); }
+  virtual int_type
+  underflow()
+  {
+    int_type ret = traits_type::eof();
+    if (this->_M_mode & std::ios_base::in)
+    {
+      ret = __filebuf_type::underflow();
+      while (traits_type::eq_int_type(ret, traits_type::eof()) && _M_opennext())
+      {
+        if (this->gptr() < this->egptr())
+          ret = traits_type::to_int_type(*this->gptr());
+        else
+          ret = __filebuf_type::underflow();
+      }
+    }
+    return ret;
+  }
 
-	virtual int_type
-	underflow()
-	{
-		int_type ret = traits_type::eof();
-		if (this->_M_mode & std::ios_base::in)
-		{
-			ret = __filebuf_type::underflow();
-			while (traits_type::eq_int_type(ret, traits_type::eof()) && _M_opennext())
-			{
-				if (this->gptr() < this->egptr())
-					ret = traits_type::to_int_type(*this->gptr());
-				else
-					ret = __filebuf_type::underflow();
-			}
-		}
-		return ret;
-	}
+  virtual int_type
+  overflow(int_type __c = traits_type::eof())
+  {
+    int_type ret = traits_type::eof();
+    if (this->_M_mode & std::ios_base::out)
+    {
+      ret = __filebuf_type::overflow(__c);
+      while (traits_type::eq_int_type(ret, traits_type::eof()) && _M_opennext())
+      {
+          if (this->pptr() < this->epptr())
+          {
+           *this->pptr() = traits_type::to_char_type(__c);
+            this->pbump(1);
+            ret = traits_type::not_eof(__c);
+          }
+          else
+            ret = __filebuf_type::overflow(__c);
+        }
+    }
+      return ret;
+  }
 
-	virtual int_type
-	overflow(int_type __c = traits_type::eof())
-	{
-		int_type ret = traits_type::eof();
-		if (this->_M_mode & std::ios_base::out)
-		{
-			ret = __filebuf_type::overflow(__c);
-			while (traits_type::eq_int_type(ret, traits_type::eof()) && _M_opennext())
-			{
-				if (this->pptr() < this->epptr())
-				{
-					*this->pptr() = traits_type::to_char_type(__c);
-					this->pbump(1);
-					ret = traits_type::not_eof(__c);
-				}
-				else
-					ret = __filebuf_type::overflow(__c);
-			}
-		}
-		return ret;
-	}
+
+private:
+  filename_generator m_gen;
 };
 
-template<typename _CharT, typename _Traits>
+
+template<typename CharT, typename Traits, typename Generator>
 class basic_mifstream
-: public std::basic_istream<_CharT, _Traits>
+: public std::basic_istream<CharT, Traits>
 {
 public:
-	// Types:
-	typedef _CharT char_type;
-	typedef _Traits traits_type;
-	typedef typename traits_type::int_type int_type;
-	typedef typename traits_type::pos_type pos_type;
-	typedef typename traits_type::off_type off_type;
+  typedef CharT char_type;
+  typedef Traits traits_type;
+  typedef typename traits_type::int_type int_type;
+  typedef typename traits_type::pos_type pos_type;
+  typedef typename traits_type::off_type off_type;
 
 private:
-	typedef basic_mfilebuf<char_type, traits_type> __mfilebuf_type;
-	typedef std::basic_istream<char_type, traits_type> __istream_type;
-	typedef typename __mfilebuf_type::filenames_type __filenames_type;
-
-private:
-	__mfilebuf_type _M_mfilebuf;
+  typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
+  typedef std::basic_istream<char_type, traits_type> __istream_type;
+  typedef typename __mfilebuf_type::filename_generator filename_generator;
 
 public:
-	// Constructors/Destructors:
-	/**
-	 *  @brief  Default constructor.
-	 *
-	 *  Initializes @c sb using its default constructor, and passes
-	 *  @c &sb to the base class initializer.  Does not open any files
-	 *  (you haven't given it a filename to open).
-	 */
-	basic_mifstream()
-	: __istream_type()
-	, _M_mfilebuf()
-	{ this->init(&_M_mfilebuf); }
+  // Constructors/Destructors:
+  /**
+   *  @brief  Default constructor.
+   *
+   *  Initializes @c sb using its default constructor, and passes
+   *  @c &sb to the base class initializer.  Does not open any files
+   *  (you haven't given it a filename to open).
+   */
+  basic_mifstream()
+  : __istream_type()
+  , m_mfilebuf()
+  { this->init(&m_mfilebuf); }
 
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  s  Null terminated string specifying the filename.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::in is automatically included in @a mode.
-	 *
-	 *  Tip:  When using std::string to hold the filename, you must use
-	 *  .c_str() before passing it to this constructor.
-	 */
-	explicit
-	basic_mifstream(const char* __s, std::ios_base::openmode __mode = std::ios_base::in)
-	: __istream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		this->open(__s, __mode);
-	}
-
-#if __cplusplus >= 201103L
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  s  std::string specifying the filename.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::in is automatically included in @a mode.
-	 */
-	explicit
-	basic_mifstream(const std::string& __s,
-									std::ios_base::openmode __mode = std::ios_base::in)
-	: __istream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		this->open(__s, __mode);
-	}
-#endif
-
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::in is automatically included in @a mode.
-	 */
-	explicit
-	basic_mifstream(const __filenames_type& __files,
-									std::ios_base::openmode __mode = std::ios_base::in)
-	: __istream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__files, __mode);
-	}
+  /**
+   *  @brief  Create an input file stream.
+   *  @param  s  Null terminated string specifying the filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::in is automatically included in @a mode.
+   *
+   *  Tip:  When using std::string to hold the filename, you must use
+   *  .c_str() before passing it to this constructor.
+   */
+  explicit
+  basic_mifstream(const char* s, std::ios_base::openmode __mode = std::ios_base::in)
+  : __istream_type()
+  , m_mfilebuf()
+  {
+    this->init(&m_mfilebuf);
+    this->open(s, __mode);
+  }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::in is automatically included in @a mode.
-	 */
-	explicit
-	basic_mifstream(__filenames_type&& __files,
-									std::ios_base::openmode __mode = std::ios_base::in)
-	: __istream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(std::move(__files), __mode);
-	}
-
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::in is automatically included in @a mode.
-	 */
-	explicit
-	basic_mifstream(std::initializer_list<std::string> __files,
-									std::ios_base::openmode __mode = std::ios_base::in)
-	: __istream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__files.begin(), __files.end(), __mode);
-	}
+  /**
+   *  @brief  Create an input file stream.
+   *  @param  s  std::string specifying the filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::in is automatically included in @a mode.
+   */
+  explicit
+  basic_mifstream(const std::string& s,
+                  std::ios_base::openmode __mode = std::ios_base::in)
+  : __istream_type()
+  , m_mfilebuf()
+  {
+    this->init(&m_mfilebuf);
+    this->open(s, __mode);
+  }
 #endif
 
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  first  An input iterator on null terminated strings specifying filenames.
-	 *  @param  last  An input iterator on null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::in is automatically included in @a mode.
-	 */
-	template<typename _InputIterator>
-	basic_mifstream(_InputIterator __first, _InputIterator __last,
-									std::ios_base::openmode __mode = std::ios_base::in)
-	: __istream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__first, __last, __mode);
-	}
-
-	/**
-	 *  @brief  The destructor does nothing.
-	 *
-	 *  The file is closed by the filebuf object, not the formatting
-	 *  stream.
-	 */
-	~basic_mifstream()
-	{ }
-
-	// Members:
-	/**
-	 *  @brief  Accessing the underlying buffer.
-	 *  @return  The current basic_filebuf buffer.
-	 *
-	 *  This hides both signatures of std::basic_ios::rdbuf().
-	 */
-	__mfilebuf_type*
-	rdbuf() const
-	{ return const_cast<__mfilebuf_type*>(&_M_mfilebuf); }
-
-	void push_filename(const std::string& __s)
-	{ filenames().push_back(__s); }
-
-	std::size_t count() const
-	{ return filenames().size() - _M_mfilebuf.posname(); }
-
-	__filenames_type& filenames()
-	{ return _M_mfilebuf.filenames(); }
-
-	const __filenames_type& filenames() const
-	{ return _M_mfilebuf.filenames(); }
-
-	void filenames(const __filenames_type& __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
+  /**
+   *  @brief  Create an input file stream.
+   *  @param  files  Null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::in is automatically included in @a mode.
+   */
+  explicit
+  basic_mifstream(const filename_generator& gen,
+                  std::ios_base::openmode __mode = std::ios_base::in)
+  : __istream_type()
+  , m_mfilebuf(gen)
+  {
+    this->init(&m_mfilebuf);
+    m_mfilebuf.opennext(__mode | std::ios_base::in);
+  }
 
 #if __cplusplus >= 201103L
-	void filenames(__filenames_type&& __filenames)
-	{ _M_mfilebuf.filenames(std::move(__filenames)); }
-
-	void filenames(std::initializer_list<std::string> __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
-
-	void filenames(std::initializer_list<const char *> __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
+  /**
+   *  @brief  Create an input file stream.
+   *  @param  files  Null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::in is automatically included in @a mode.
+   */
+  explicit
+  basic_mifstream(filename_generator&& gen,
+                  std::ios_base::openmode __mode = std::ios_base::in)
+  : __istream_type()
+  , m_mfilebuf(std::move(gen))
+  {
+    this->init(&m_mfilebuf);
+    m_mfilebuf.opennext(__mode | std::ios_base::in);
+  }
 #endif
 
-	template <typename _InputIterator>
-	void filenames(_InputIterator __first, _InputIterator __last)
-	{ _M_mfilebuf.filenames(__first, __last); }
+  /**
+   *  @brief  Create an input file stream.
+   *  @param  first  An input iterator on null terminated strings specifying generator_filename.
+   *  @param  last  An input iterator on null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::in is automatically included in @a mode.
+   */
+  template<typename _InputIterator>
+  basic_mifstream(_InputIterator first, _InputIterator last,
+                  std::ios_base::openmode __mode = std::ios_base::in)
+  : __istream_type()
+  , m_mfilebuf(filename_generator(first, last))
+  {
+    this->init(&m_mfilebuf);
+    m_mfilebuf.opennext(__mode | std::ios_base::in);
+  }
 
-	/**
-	 *  @brief  Wrapper to test for an open file.
-	 *  @return  @c rdbuf()->is_open()
-	 */
-	bool
-	is_open()
-	{ return _M_mfilebuf.is_open(); }
+  /**
+   *  @brief  The destructor does nothing.
+   *
+   *  The file is closed by the filebuf object, not the formatting
+   *  stream.
+   */
+  ~basic_mifstream()
+  { }
 
-	bool
-	is_open() const
-	{ return _M_mfilebuf.is_open(); }
+  // Members:
+  /**
+   *  @brief  Accessing the underlying buffer.
+   *  @return  The current basic_filebuf buffer.
+   *
+   *  This hides both signatures of std::basic_ios::rdbuf().
+   */
+  __mfilebuf_type*
+  rdbuf() const
+  { return const_cast<__mfilebuf_type*>(&m_mfilebuf); }
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  s  The name of the file.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(s,mode|in).  If that function
-	 *  fails, @c failbit is set in the stream's error state.
-	 *
-	 *  Tip:  When using std::string to hold the filename, you must use
-	 *  .c_str() before passing it to this constructor.
-	 */
-	void
-	open(const char* __s, std::ios_base::openmode __mode = std::ios_base::in)
-	{
-		if (!_M_mfilebuf.open(__s, __mode | std::ios_base::in))
-			this->setstate(std::ios_base::failbit);
-		else
-			this->clear();
-	}
+  filename_generator& generator_filename()
+  { return m_mfilebuf.generator_filename(); }
+
+  const filename_generator& generator_filename() const
+  { return m_mfilebuf.generator_filename(); }
+
+  void generator_filename(const filename_generator& gen)
+  { m_mfilebuf.generator_filename(gen); }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  s  The name of the file.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(s,mode|in).  If that function
-	 *  fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(const std::string& __s, std::ios_base::openmode __mode = std::ios_base::in)
-	{
-		if (!_M_mfilebuf.open(__s, __mode | std::ios_base::in))
-			this->setstate(std::ios_base::failbit);
-		else
-			this->clear();
-	}
+  void generator_filename(filename_generator&& gen)
+  { m_mfilebuf.generator_filename(std::move(gen)); }
 #endif
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode|in).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(const __filenames_type& __files,
-			 std::ios_base::openmode __mode = std::ios_base::in)
-	{
-		if (!__files.empty())
-		{
-			filenames().assign(__files.begin() + 1, __files.end());
-			this->open(__files.begin()->c_str(), __mode | std::ios_base::in);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Wrapper to test for an open file.
+   *  @return  @c rdbuf()->is_open()
+   */
+  bool
+  is_open()
+  { return m_mfilebuf.is_open(); }
+
+  bool
+  is_open() const
+  { return m_mfilebuf.is_open(); }
+
+  /**
+   *  @brief  Opens an external file.
+   *  @param  s  The name of the file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode|in).  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   *
+   *  Tip:  When using std::string to hold the filename, you must use
+   *  .c_str() before passing it to this constructor.
+   */
+  void
+  open(const char* s, std::ios_base::openmode __mode = std::ios_base::in)
+  {
+    if (!m_mfilebuf.open(s, __mode | std::ios_base::in))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode|in).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(__filenames_type&& __files,
-			 std::ios_base::openmode __mode = std::ios_base::in)
-	{
-		if (!__files.empty())
-		{
-			filenames() = std::move(__files);
-			_M_mfilebuf.posname(1);
-			this->open(filenames().begin()->c_str(), __mode | std::ios_base::in);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
-
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode|in).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(std::initializer_list<std::string> __files,
-			 std::ios_base::openmode __mode = std::ios_base::in)
-	{
-		if (__files.size())
-		{
-			filenames().assign(__files.begin() + 1, __files.end());
-			this->open(__files.begin()->c_str(), __mode | std::ios_base::in);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Opens an external file.
+   *  @param  s  The name of the file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode|in).  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   */
+  void
+  open(const std::string& s, std::ios_base::openmode __mode = std::ios_base::in)
+  {
+    if (!m_mfilebuf.open(s, __mode | std::ios_base::in))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
 #endif
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  first  An input iterator on null terminated strings specifying filenames.
-	 *  @param  last  An input iterator on null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p first->c_str(), mode|in).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	template<typename _InputIterator>
-	void
-	open(_InputIterator __first, _InputIterator __last,
-			 std::ios_base::openmode __mode = std::ios_base::in)
-	{
-		if (__first != __last)
-		{
-			this->open(__first->c_str(), __mode | std::ios_base::in);
-			filenames().assign(++__first, __last);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Opens an external file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode|in).  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   */
+  void
+  open_next(std::ios_base::openmode __mode = std::ios_base::in)
+  {
+    if (!m_mfilebuf.opennext(__mode | std::ios_base::in))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
 
-	/**
-	 *  @brief  Close the file.
-	 *
-	 *  Calls @c std::basic_filebuf::close().  If that function
-	 *  fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	close()
-	{
-		if (!_M_mfilebuf.close())
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Close the file.
+   *
+   *  Calls @c std::basic_filebuf::close().  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   */
+  void
+  close()
+  {
+    if (!m_mfilebuf.close())
+      this->setstate(std::ios_base::failbit);
+  }
+
+private:
+  __mfilebuf_type m_mfilebuf;
 };
 
 
-template<typename _CharT, typename _Traits>
+template<typename CharT, typename Traits, typename Generator>
 class basic_mofstream
-: public std::basic_ostream<_CharT,_Traits>
+: public std::basic_ostream<CharT,Traits>
 {
 public:
-	// Types:
-	typedef _CharT char_type;
-	typedef _Traits traits_type;
-	typedef typename traits_type::int_type int_type;
-	typedef typename traits_type::pos_type pos_type;
-	typedef typename traits_type::off_type off_type;
+  // Types:
+  typedef CharT char_type;
+  typedef Traits traits_type;
+  typedef typename traits_type::int_type int_type;
+  typedef typename traits_type::pos_type pos_type;
+  typedef typename traits_type::off_type off_type;
 
 private:
-	typedef basic_mfilebuf<char_type, traits_type> __mfilebuf_type;
-	typedef std::basic_ostream<char_type, traits_type> __ostream_type;
-	typedef typename __mfilebuf_type::filenames_type __filenames_type;
-
-private:
-	__mfilebuf_type _M_mfilebuf;
+  typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
+  typedef std::basic_ostream<char_type, traits_type> __ostream_type;
+  typedef typename __mfilebuf_type::filename_generator filename_generator;
 
 public:
-	// Constructors:
-	/**
-	 *  @brief  Default constructor.
-	 *
-	 *  Initializes @c sb using its default constructor, and passes
-	 *  @c &sb to the base class initializer.  Does not open any files
-	 *  (you haven't given it a filename to open).
-	 */
-	basic_mofstream()
-	: __ostream_type()
-	, _M_mfilebuf()
-	{ this->init(&_M_mfilebuf); }
+  // Constructors:
+  /**
+   *  @brief  Default constructor.
+   *
+   *  Initializes @c sb using its default constructor, and passes
+   *  @c &sb to the base class initializer.  Does not open any files
+   *  (you haven't given it a filename to open).
+   */
+  basic_mofstream()
+  : __ostream_type()
+  , m_mfilebuf()
+  { this->init(&m_mfilebuf); }
 
-	/**
-	 *  @brief  Create an output file stream.
-	 *  @param  s  Null terminated string specifying the filename.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::out|ios_base::trunc is automatically included in
-	 *  @a mode.
-	 *
-	 *  Tip:  When using std::string to hold the filename, you must use
-	 *  .c_str() before passing it to this constructor.
-	 */
-	explicit
-	basic_mofstream(const char* __s,
-									std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	: __ostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		this->open(__s, __mode);
-	}
-
-#if __cplusplus >= 201103L
-	/**
-	 *  @brief  Create an output file stream.
-	 *  @param  s  std::string specifying the filename.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::out|ios_base::trunc is automatically included in
-	 *  @a mode.
-	 */
-	explicit
-	basic_mofstream(const std::string& __s,
-									std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	: __ostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		this->open(__s, __mode);
-	}
-#endif
-
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::out|ios_base::trunc is automatically included in
-	 *  @a mode.
-	 */
-	explicit
-	basic_mofstream(const __filenames_type& __files,
-									std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __ostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__files, __mode);
-	}
+  /**
+   *  @brief  Create an output file stream.
+   *  @param  s  Null terminated string specifying the filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::out|ios_base::trunc is automatically included in
+   *  @a mode.
+   *
+   *  Tip:  When using std::string to hold the filename, you must use
+   *  .c_str() before passing it to this constructor.
+   */
+  explicit
+  basic_mofstream(const char* s,
+                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  : __ostream_type()
+  , m_mfilebuf()
+  {
+    this->init(&m_mfilebuf);
+    this->open(s, __mode);
+  }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::out|ios_base::trunc is automatically included in
-	 *  @a mode.
-	 */
-	explicit
-	basic_mofstream(__filenames_type&& __files,
-									std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __ostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(std::move(__files), __mode);
-	}
-
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::out|ios_base::trunc is automatically included in
-	 *  @a mode.
-	 */
-	explicit
-	basic_mofstream(std::initializer_list<std::string> __files,
-									std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __ostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__files.begin(), __files.end(), __mode);
-	}
+  /**
+   *  @brief  Create an output file stream.
+   *  @param  s  std::string specifying the filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::out|ios_base::trunc is automatically included in
+   *  @a mode.
+   */
+  explicit
+  basic_mofstream(const std::string& s,
+                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  : __ostream_type()
+  , m_mfilebuf()
+  {
+    this->init(&m_mfilebuf);
+    this->open(s, __mode);
+  }
 #endif
 
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  first  An input iterator on null terminated strings specifying filenames.
-	 *  @param  last  An input iterator on null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  @c std::ios_base::out|ios_base::trunc is automatically included in
-	 *  @a mode.
-	 */
-	template<typename _InputIterator>
-	basic_mofstream(_InputIterator __first, _InputIterator __last,
-									std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	: __ostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__first, __last, __mode);
-	}
-
-	/**
-	 *  @brief  The destructor does nothing.
-	 *
-	 *  The file is closed by the filebuf object, not the formatting
-	 *  stream.
-	 */
-	~basic_mofstream()
-	{ }
-
-	// Members:
-	/**
-	 *  @brief  Accessing the underlying buffer.
-	 *  @return  The current basic_filebuf buffer.
-	 *
-	 *  This hides both signatures of std::basic_ios::rdbuf().
-	 */
-	__mfilebuf_type*
-	rdbuf() const
-	{ return const_cast<__mfilebuf_type*>(&_M_mfilebuf); }
-
-	void push_filename(const std::string& __s)
-	{ filenames().push_back(__s); }
-
-	std::size_t count() const
-	{ return filenames().size() - _M_mfilebuf.posname(); }
-
-	__filenames_type& filenames()
-	{ return _M_mfilebuf.filenames(); }
-
-	const __filenames_type& filenames() const
-	{ return _M_mfilebuf.filenames(); }
-
-	void filenames(const __filenames_type& __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
+  /**
+   *  @brief  Create an output file stream.
+   *  @param  files  Null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::out|ios_base::trunc is automatically included in
+   *  @a mode.
+   */
+  explicit
+  basic_mofstream(const filename_generator& gen,
+                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  : __ostream_type()
+  , m_mfilebuf(gen)
+  {
+    this->init(&m_mfilebuf);
+    m_mfilebuf.opennext(__mode | std::ios_base::out);
+  }
 
 #if __cplusplus >= 201103L
-	void filenames(__filenames_type&& __filenames)
-	{ _M_mfilebuf.filenames(std::move(__filenames)); }
+  /**
+   *  @brief  Create an output file stream.
+   *  @param  files  Null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::out|ios_base::trunc is automatically included in
+   *  @a mode.
+   */
+  explicit
+  basic_mofstream(filename_generator&& gen,
+                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  : __ostream_type()
+  , m_mfilebuf(std::move(gen))
+  {
+      this->init(&m_mfilebuf);
+      m_mfilebuf.opennext(__mode | std::ios_base::out);
+  }
+  #endif
 
-	void filenames(std::initializer_list<std::string> __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
+  /**
+   *  @brief  Create an output file stream.
+   *  @param  first  An output iterator on null terminated strings specifying generator_filename.
+   *  @param  last  An output iterator on null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  @c std::ios_base::out|ios_base::trunc is automatically included in @a mode.
+   */
+  template<typename _InputIterator>
+  basic_mofstream(_InputIterator first, _InputIterator last,
+                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  : __ostream_type()
+  , m_mfilebuf(filename_generator(first, last))
+  {
+    this->init(&m_mfilebuf);
+    m_mfilebuf.opennext(__mode | std::ios_base::out);
+  }
 
-	void filenames(std::initializer_list<const char *> __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
-#endif
+  /**
+   *  @brief  The destructor does nothing.
+   *
+   *  The file is closed by the filebuf object, not the formatting
+   *  stream.
+   */
+  ~basic_mofstream()
+  { }
 
-	template <typename _InputIterator>
-	void filenames(_InputIterator __first, _InputIterator __last)
-	{ _M_mfilebuf.filenames(__first, __last); }
+  // Members:
+  /**
+   *  @brief  Accessing the underlying buffer.
+   *  @return  The current basic_filebuf buffer.
+   *
+   *  This hides both signatures of std::basic_ios::rdbuf().
+   */
+  __mfilebuf_type*
+  rdbuf() const
+  { return const_cast<__mfilebuf_type*>(&m_mfilebuf); }
 
-	/**
-	 *  @brief  Wrapper to test for an open file.
-	 *  @return  @c rdbuf()->is_open()
-	 */
-	bool
-	is_open()
-	{ return _M_mfilebuf.is_open(); }
+  filename_generator& generator_filename()
+  { return m_mfilebuf.generator_filename(); }
 
-	// _GLIBCXX_RESOLVE_LIB_DEFECTS
-	// 365. Lack of const-qualification in clause 27
-	bool
-	is_open() const
-	{ return _M_mfilebuf.is_open(); }
+  const filename_generator& generator_filename() const
+  { return m_mfilebuf.generator_filename(); }
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  s  The name of the file.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(s,mode|out|trunc).  If that
-	 *  function fails, @c failbit is set in the stream's error state.
-	 *
-	 *  Tip:  When using std::string to hold the filename, you must use
-	 *  .c_str() before passing it to this constructor.
-	 */
-	void
-	open(const char* __s,
-			 std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	{
-		if (!_M_mfilebuf.open(__s, __mode | std::ios_base::out))
-			this->setstate(std::ios_base::failbit);
-		else
-			this->clear();
-	}
-
-#if __cplusplus >= 201103L
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  s  The name of the file.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(s,mode|out|trunc).  If that
-	 *  function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(const std::string& __s,
-			 std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	{
-		if (!_M_mfilebuf.open(__s, __mode | std::ios_base::out))
-			this->setstate(std::ios_base::failbit);
-		else
-			this->clear();
-	}
-#endif
-
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode|out|trunc).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(const __filenames_type& __files,
-			 std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	{
-		if (!__files.empty())
-		{
-			filenames().assign(__files.begin() + 1, __files.end());
-			this->open(__files.begin()->c_str(), __mode | std::ios_base::out);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  void generator_filename(const filename_generator& gen)
+  { m_mfilebuf.generator_filename(gen); }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode|out|trunc).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(__filenames_type&& __files,
-			 std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	{
-		if (!__files.empty())
-		{
-			filenames() = std::move(__files);
-			_M_mfilebuf.posname(1);
-			this->open(filenames().begin()->c_str(), __mode | std::ios_base::out);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
-
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode|out|trunc).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(std::initializer_list<std::string> __files,
-			 std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	{
-		if (__files.size())
-		{
-			filenames().assign(__files.begin() + 1, __files.end());
-			this->open(__files.begin()->c_str(), __mode | std::ios_base::out);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  void generator_filename(filename_generator&& gen)
+  { m_mfilebuf.generator_filename(std::move(gen)); }
 #endif
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  first  An input iterator on null terminated strings specifying filenames.
-	 *  @param  last  An input iterator on null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p first->c_str(), mode|out|trunc).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	template<typename _InputIterator>
-	void
-	open(_InputIterator __first, _InputIterator __last,
-			 std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-	{
-		if (__first != __last)
-		{
-			this->open(__first->c_str(), __mode | std::ios_base::out);
-			filenames().assign(++__first, __last);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Wrapper to test for an open file.
+   *  @return  @c rdbuf()->is_open()
+   */
+  bool
+  is_open()
+  { return m_mfilebuf.is_open(); }
 
-	/**
-	 *  @brief  Close the file.
-	 *
-	 *  Calls @c std::basic_filebuf::close().  If that function
-	 *  fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	close()
-	{
-		if (!_M_mfilebuf.close())
-			this->setstate(std::ios_base::failbit);
-	}
+  // _GLIBCXX_RESOLVE_LIB_DEFECTS
+  // 365. Lack of const-qualification in clause 27
+  bool
+  is_open() const
+  { return m_mfilebuf.is_open(); }
+
+  /**
+   *  @brief  Opens an external file.
+   *  @param  s  The name of the file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode|out|trunc).  If that
+   *  function fails, @c failbit is set in the stream's error state.
+   *
+   *  Tip:  When using std::string to hold the filename, you must use
+   *  .c_str() before passing it to this constructor.
+   */
+  void
+  open(const char* s,
+       std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  {
+    if (!m_mfilebuf.open(s, __mode | std::ios_base::out))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
+
+#if __cplusplus >= 201103L
+  /**
+   *  @brief  Opens an external file.
+   *  @param  s  The name of the file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode|out|trunc).  If that
+   *  function fails, @c failbit is set in the stream's error state.
+   */
+  void
+  open(const std::string& s,
+       std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  {
+    if (!m_mfilebuf.open(s, __mode | std::ios_base::out))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
+#endif
+
+  /**
+   *  @brief  Opens an external file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode|in).  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   */
+  void
+  open_next(std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  {
+    if (!m_mfilebuf.opennext(__mode | std::ios_base::out))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
+
+  /**
+   *  @brief  Close the file.
+   *
+   *  Calls @c std::basic_filebuf::close().  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   */
+  void
+  close()
+  {
+      if (!m_mfilebuf.close())
+          this->setstate(std::ios_base::failbit);
+  }
+
+
+private:
+  __mfilebuf_type m_mfilebuf;
 };
 
 
 // [27.8.1.11] Template class basic_mfstream
 /**
- *  @brief  Controlling input and output for files.
- *  @ingroup io
- *
- *  This class supports reading from and writing to named files, using
- *  the inherited functions from std::basic_iostream.  To control the
- *  associated sequence, an instance of std::basic_filebuf is used, which
- *  this page refers to as @c sb.
- */
-template<typename _CharT, typename _Traits>
+*  @brief  Controlling input and output for files.
+*  @ingroup io
+*
+*  This class supports reading from and writing to named files, using
+*  the inherited functions from std::basic_iostream.  To control the
+*  associated sequence, an instance of std::basic_filebuf is used, which
+*  this page refers to as @c sb.
+*/
+template<typename CharT, typename Traits, typename Generator>
 class basic_mfstream
-: public std::basic_iostream<_CharT, _Traits>
+: public std::basic_iostream<CharT, Traits>
 {
 public:
-	// Types:
-	typedef _CharT char_type;
-	typedef _Traits traits_type;
-	typedef typename traits_type::int_type int_type;
-	typedef typename traits_type::pos_type pos_type;
-	typedef typename traits_type::off_type off_type;
+  typedef CharT char_type;
+  typedef Traits traits_type;
+  typedef typename traits_type::int_type int_type;
+  typedef typename traits_type::pos_type pos_type;
+  typedef typename traits_type::off_type off_type;
 
 private:
-	typedef basic_mfilebuf<char_type, traits_type> __mfilebuf_type;
-	typedef std::basic_ios<char_type, traits_type> __ios_type;
-	typedef std::basic_iostream<char_type, traits_type> __iostream_type;
-	typedef typename __mfilebuf_type::filenames_type __filenames_type;
-
-private:
-	__mfilebuf_type _M_mfilebuf;
+  typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
+  typedef std::basic_ios<char_type, traits_type> __ios_type;
+  typedef std::basic_iostream<char_type, traits_type> __iostream_type;
+  typedef typename __mfilebuf_type::filename_generator filename_generator;
 
 public:
-	// Constructors/destructor:
-	/**
-	 *  @brief  Default constructor.
-	 *
-	 *  Initializes @c sb using its default constructor, and passes
-	 *  @c &sb to the base class initializer.  Does not open any files
-	 *  (you haven't given it a filename to open).
-	 */
-	basic_mfstream()
-	: __iostream_type()
-	, _M_mfilebuf()
-	{ this->init(&_M_mfilebuf); }
+  // Constructors/destructor:
+  /**
+   *  @brief  Default constructor.
+   *
+   *  Initializes @c sb using its default constructor, and passes
+   *  @c &sb to the base class initializer.  Does not open any files
+   *  (you haven't given it a filename to open).
+   */
+  basic_mfstream()
+  : __iostream_type()
+  , m_mfilebuf()
+  { this->init(&m_mfilebuf); }
 
-	/**
-	 *  @brief  Create an input/output file stream.
-	 *  @param  s  Null terminated string specifying the filename.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 *
-	 *  Tip:  When using std::string to hold the filename, you must use
-	 *  .c_str() before passing it to this constructor.
-	 */
-	explicit
-	basic_mfstream(const char* __s,
-								 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __iostream_type(0)
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		this->open(__s, __mode);
-	}
-
-#if __cplusplus >= 201103L
-	/**
-	 *  @brief  Create an input/output file stream.
-	 *  @param  s  Null terminated string specifying the filename.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 */
-	explicit
-	basic_mfstream(const std::string& __s,
-								 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __iostream_type(0)
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		this->open(__s, __mode);
-	}
-#endif
-
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 */
-	explicit
-	basic_mfstream(const __filenames_type& __files,
-								 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __iostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__files, __mode);
-	}
+  /**
+   *  @brief  Create an input/output file stream.
+   *  @param  s  Null terminated string specifying the filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   *
+   *  Tip:  When using std::string to hold the filename, you must use
+   *  .c_str() before passing it to this constructor.
+   */
+  explicit
+  basic_mfstream(const char* s,
+                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  : __iostream_type(0)
+  , m_mfilebuf()
+  {
+    this->init(&m_mfilebuf);
+    this->open(s, __mode);
+  }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 */
-	explicit
-	basic_mfstream(__filenames_type&& __files,
-								 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __iostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(std::move(__files), __mode);
-	}
-
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 */
-	explicit
-	basic_mfstream(std::initializer_list<std::string> __files,
-								 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __iostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__files.begin(), __files.end(), __mode);
-	}
+  /**
+   *  @brief  Create an input/output file stream.
+   *  @param  s  Null terminated string specifying the filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   */
+  explicit
+  basic_mfstream(const std::string& s,
+                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  : __iostream_type(0)
+  , m_mfilebuf()
+  {
+    this->init(&m_mfilebuf);
+    this->open(s, __mode);
+  }
 #endif
 
-	/**
-	 *  @brief  Create an input file stream.
-	 *  @param  first  An input iterator on null terminated strings specifying filenames.
-	 *  @param  last  An input iterator on null terminated strings specifying filenames.
-	 *  @param  mode  Open file in specified mode (see std::ios_base).
-	 */
-	template<typename _InputIterator>
-	basic_mfstream(_InputIterator __first, _InputIterator __last,
-								 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	: __iostream_type()
-	, _M_mfilebuf()
-	{
-		this->init(&_M_mfilebuf);
-		open(__first, __last, __mode);
-	}
-
-	/**
-	 *  @brief  The destructor does nothing.
-	 *
-	 *  The file is closed by the filebuf object, not the formatting
-	 *  stream.
-	 */
-	~basic_mfstream()
-	{ }
-
-	// Members:
-	/**
-	 *  @brief  Accessing the underlying buffer.
-	 *  @return  The current basic_filebuf buffer.
-	 *
-	 *  This hides both signatures of std::basic_ios::rdbuf().
-	 */
-	__mfilebuf_type*
-	rdbuf() const
-	{ return const_cast<__mfilebuf_type*>(&_M_mfilebuf); }
-
-	void push_filename(const std::string& __s)
-	{ filenames().push_back(__s); }
-
-	std::size_t count() const
-	{ return filenames().size() - _M_mfilebuf.posname(); }
-
-	__filenames_type& filenames()
-	{ return _M_mfilebuf.filenames(); }
-
-	const __filenames_type& filenames() const
-	{ return _M_mfilebuf.filenames(); }
-
-	void filenames(const __filenames_type& __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
+  /**
+   *  @brief  Create an input/output file stream.
+   *  @param  files  Null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   */
+  explicit
+  basic_mfstream(const filename_generator& gen,
+                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  : __iostream_type()
+  , m_mfilebuf(gen)
+  {
+    this->init(&m_mfilebuf);
+    m_mfilebuf.opennext(__mode);
+  }
 
 #if __cplusplus >= 201103L
-	void filenames(__filenames_type&& __filenames)
-	{ _M_mfilebuf.filenames(std::move(__filenames)); }
-
-	void filenames(std::initializer_list<std::string> __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
-
-	void filenames(std::initializer_list<const char *> __filenames)
-	{ _M_mfilebuf.filenames(__filenames); }
+  /**
+   *  @brief  Create an input/output file stream.
+   *  @param  files  Null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   */
+  explicit
+  basic_mfstream(filename_generator&& gen,
+                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  : __iostream_type()
+  , m_mfilebuf(std::move(gen))
+  {
+      this->init(&m_mfilebuf);
+      m_mfilebuf.opennext(__mode);
+  }
 #endif
 
-	template <typename _InputIterator>
-	void filenames(_InputIterator __first, _InputIterator __last)
-	{ _M_mfilebuf.filenames(__first, __last); }
+  /**
+   *  @brief  Create an input/output file stream.
+   *  @param  first  An input/output iterator on null terminated strings specifying generator_filename.
+   *  @param  last  An input/output iterator on null terminated strings specifying generator_filename.
+   *  @param  mode  Open file in specified mode (see std::ios_base).
+   */
+  template<typename _InputIterator>
+  basic_mfstream(_InputIterator first, _InputIterator last,
+                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  : __iostream_type()
+  , m_mfilebuf(filename_generator(first, last))
+  {
+      this->init(&m_mfilebuf);
+      m_mfilebuf.opennext(__mode);
+  }
 
-	/**
-	 *  @brief  Wrapper to test for an open file.
-	 *  @return  @c rdbuf()->is_open()
-	 */
-	bool
-	is_open()
-	{ return _M_mfilebuf.is_open(); }
+  /**
+   *  @brief  The destructor does nothing.
+   *
+   *  The file is closed by the filebuf object, not the formatting
+   *  stream.
+   */
+  ~basic_mfstream()
+  { }
 
-	// _GLIBCXX_RESOLVE_LIB_DEFECTS
-	// 365. Lack of const-qualification in clause 27
-	bool
-	is_open() const
-	{ return _M_mfilebuf.is_open(); }
+  // Members:
+  /**
+   *  @brief  Accessing the underlying buffer.
+   *  @return  The current basic_filebuf buffer.
+   *
+   *  This hides both signatures of std::basic_ios::rdbuf().
+   */
+  __mfilebuf_type*
+  rdbuf() const
+  { return const_cast<__mfilebuf_type*>(&m_mfilebuf); }
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  s  The name of the file.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(s,mode).  If that
-	 *  function fails, @c failbit is set in the stream's error state.
-	 *
-	 *  Tip:  When using std::string to hold the filename, you must use
-	 *  .c_str() before passing it to this constructor.
-	 */
-	void
-	open(const char* __s,
-			 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	{
-		if (!_M_mfilebuf.open(__s, __mode))
-			this->setstate(std::ios_base::failbit);
-		else
-			this->clear();
-	}
+  filename_generator& generator_filename()
+  { return m_mfilebuf.generator_filename(); }
+
+  const filename_generator& generator_filename() const
+  { return m_mfilebuf.generator_filename(); }
+
+  void generator_filename(const filename_generator& gen)
+  { m_mfilebuf.generator_filename(gen); }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  s  The name of the file.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(s,mode).  If that
-	 *  function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(const std::string& __s,
-			 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	{
-		if (!_M_mfilebuf.open(__s, __mode))
-			this->setstate(std::ios_base::failbit);
-		else
-			this->clear();
-	}
+  void generator_filename(filename_generator&& gen)
+  { m_mfilebuf.generator_filename(std::move(gen)); }
 #endif
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(const __filenames_type& __files,
-			 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	{
-		if (!__files.empty())
-		{
-			filenames().assign(__files.begin() + 1, __files.end());
-			this->open(__files.begin()->c_str(), __mode);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Wrapper to test for an open file.
+   *  @return  @c rdbuf()->is_open()
+   */
+  bool
+  is_open()
+  { return m_mfilebuf.is_open(); }
+
+  // _GLIBCXX_RESOLVE_LIB_DEFECTS
+  // 365. Lack of const-qualification in clause 27
+  bool
+  is_open() const
+  { return m_mfilebuf.is_open(); }
+
+  /**
+   *  @brief  Opens an external file.
+   *  @param  s  The name of the file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode).  If that
+   *  function fails, @c failbit is set in the stream's error state.
+   *
+   *  Tip:  When using std::string to hold the filename, you must use
+   *  .c_str() before passing it to this constructor.
+   */
+  void
+  open(const char* s,
+       std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  {
+    if (!m_mfilebuf.open(s, __mode))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
 
 #if __cplusplus >= 201103L
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(__filenames_type&& __files,
-			 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	{
-		if (!__files.empty())
-		{
-			filenames() = std::move(__files);
-			_M_mfilebuf.posname(1);
-			this->open(filenames().begin()->c_str(), __mode);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
-
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  files  Null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p files.begin()->c_str(), mode).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	open(std::initializer_list<std::string> __files,
-			 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	{
-		if (__files.size())
-		{
-			filenames().assign(__files.begin() + 1, __files.end());
-			this->open(__files.begin()->c_str(), __mode);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Opens an external file.
+   *  @param  s  The name of the file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode).  If that
+   *  function fails, @c failbit is set in the stream's error state.
+   */
+  void
+  open(const std::string& s,
+       std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  {
+    if (!m_mfilebuf.open(s, __mode))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
 #endif
 
-	/**
-	 *  @brief  Opens an external file.
-	 *  @param  first  An input iterator on null terminated strings specifying filenames.
-	 *  @param  last  An input iterator on null terminated strings specifying filenames.
-	 *  @param  mode  The open mode flags.
-	 *
-	 *  Calls @c std::basic_filebuf::open(@p first->c_str(), mode).
-	 *  If that function fails, @c failbit is set in the stream's error state.
-	 */
-	template<typename _InputIterator>
-	void
-	open(_InputIterator __first, _InputIterator __last,
-			 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-	{
-		if (__first != __last)
-		{
-			this->open(__first->c_str(), __mode);
-			filenames().assign(++__first, __last);
-		}
-		else
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Opens an external file.
+   *  @param  mode  The open mode flags.
+   *
+   *  Calls @c std::basic_filebuf::open(s,mode|in).  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   */
+  void
+  open_next(std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  {
+    if (!m_mfilebuf.opennext(__mode))
+      this->setstate(std::ios_base::failbit);
+    else
+      this->clear();
+  }
 
-	/**
-	 *  @brief  Close the file.
-	 *
-	 *  Calls @c std::basic_filebuf::close().  If that function
-	 *  fails, @c failbit is set in the stream's error state.
-	 */
-	void
-	close()
-	{
-		if (!_M_mfilebuf.close())
-			this->setstate(std::ios_base::failbit);
-	}
+  /**
+   *  @brief  Close the file.
+   *
+   *  Calls @c std::basic_filebuf::close().  If that function
+   *  fails, @c failbit is set in the stream's error state.
+   */
+  void
+  close()
+  {
+      if (!m_mfilebuf.close())
+          this->setstate(std::ios_base::failbit);
+  }
+
+private:
+  __mfilebuf_type m_mfilebuf;
 };
 
 typedef basic_mfilebuf<char> mfilebuf;
