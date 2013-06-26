@@ -28,7 +28,7 @@ template<typename _Falcon_T>\
 		template<typename _U>\
 		static ::falcon::yes_type test(_U*, typename __type_yes_test<typename _U::_TypeName>::type = 0);\
 		static ::falcon::no_type test(...);\
-		FALCON_HELPER_VALUE_TEST(_Falcon_T);\
+		FALCON_HELPER_VALUE_TEST(_Falcon_T)\
 	}
 
 #define FALCON_HAS_TYPE_NAME(_TypeName) has_##_TypeName

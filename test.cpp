@@ -1,11 +1,8 @@
-// #include <iostream>
+#include <iostream>
 // #include <memory>
 // #include <vector>
 // #include <array>
 // #include <falcon/container/container_wrapper.hpp>
-#include <iostream>
-#include <string>
-#include <fstream>
 
 #include <falcon/iostream/mfstream.hpp>
 
@@ -13,6 +10,7 @@
 
 int main(/*int argc, char **argv*/)
 {
-  falcon::mfstream mfs;
+  falcon::mfstream mfs(falcon::mfstream::filename_generator{"/tmp/l.html","/tmp/l.sh"});
+  std::cout << mfs.rdbuf();
 }
 

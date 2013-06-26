@@ -1,40 +1,66 @@
 #ifndef FALCON_DELETE_ALL_HPP
 #define FALCON_DELETE_ALL_HPP
 
-#include <falcon/c++/boost_or_std.hpp>
-#include FALCON_BOOST_OR_STD_TRAITS(remove_pointer)
-#include FALCON_BOOST_OR_STD_TRAITS(remove_reference)
 #include <falcon/memory/destroy.hpp>
 #include <falcon/container/range_access.hpp>
+
+#if __cplusplus >= 201103L
+# include <type_traits>
+#else
+#include <boost/type_traits/remove_pointer.hpp>
+#endif
 
 namespace falcon
 {
 
+#if __cplusplus >= 201103L
+
 template<
-	typename _Container,
-	typename _T = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_pointer<
-		typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<
-			typename range_access_subtype<_Container>::type
-		>::type
-	>::type
+  typename ForwardIterator,
+  typename T = typename std::remove_pointer<
+    typename std::iterator_traits<ForwardIterator>::value_type
+  >::type
 >
-inline void delete_all(_Container& container)
+inline void delete_all(ForwardIterator first, ForwardIterator last)
 {
-	std::for_each<>(begin(container), end(container), default_delete_wrapper<_T>());
+  default_delete_wrapper<T> deleter;
+  for (; first != last; ++first) {
+    deleter(*first);
+  }
 }
 
 template<
-	typename _ForwardIterator,
-	typename _T = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_pointer<
-		typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<
-			typename std::iterator_traits<_ForwardIterator>::value_type
-		>::type
-	>::type
+  typename Container,
+  typename T = typename std::remove_pointer<
+    typename range_access_subtype<Container>::type
+  >::type
 >
-inline void delete_all(_ForwardIterator first, _ForwardIterator last)
+inline void delete_all(Container& container)
 {
-	std::for_each<>(first, last, default_delete_wrapper<_T>());
+  typedef typename range_access_iterator<Container>::type iterator;
+  delete_all<iterator, T>(begin(container), end(container));
 }
+
+#else
+
+template<typename ForwardIterator>
+inline void delete_all(ForwardIterator first, ForwardIterator last)
+{
+  default_delete_wrapper<
+    typename boost::remove_pointer<
+      typename std::iterator_traits<ForwardIterator>::value_type
+    >::type
+  > deleter;
+  for (; first != last; ++first) {
+    deleter(*first);
+  }
+}
+
+template<typename Container>
+inline void delete_all(Container& container)
+{ delete_all(begin(container), end(container)); }
+
+#endif
 
 }
 

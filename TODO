@@ -8,14 +8,15 @@ rendre operators.hpp un peu compatible c++89
 
 modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
 
-Essayer d'enlever un maximum de macro variable
+Essayer d'enlever un maximum de macro variable et passer par __VA_ARGS__
 
-objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionne avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
+objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionner avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
 
 iota(begin(), end(), first_value): le faire avec iota(container, first_value)
 
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
 flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
+enlever la hack qui permet une fonction consexpr en n'utilisant pas de boucle. C++14 permet les fonctions consexpr avec des boucle. Nouvelle macro ?
 
 optimiser recursive_iterator (et l'algo de recursion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
 
@@ -26,8 +27,6 @@ optimisation de taille des enum class: enum class E : typename std::conditional<
 Mettre constexpr pour les classe d'operateur et enum/operator
 
 ajouter le calcul (A+(B-1))/B qui permet de calculer le nombre requis de B pour mettre A (equivalent à A/B+(A%B?1:0) qui est le plus rapide ? le compilateur gènére le même code ? optimisation ?). quotient partiel.
-
-enumerator: Enleve les macros variable et passer par __VA_ARGS__. Y extraire NOTE et TODO.
 
 revoir btree et btree_base et réactiver les tests
 
@@ -51,11 +50,11 @@ structure englopant un type et pour chaque operateur suceptible de changer le ty
 Permet ainsi de s'affranchir des enum_* en passant par les foncteurs sur operateurs: enum_plus<enum_t> -> plus<integral_wrapper<enum_t>>, enum_increment<enum_t> -> increment<integral_wrapper<enum_t&>>
 ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?). La classe generique heriter des operateurs de la façon décrit au-dessus.
 
-amélioré algorithm.hpp en "optimisant" les algos quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé. falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
+amélioré algorithm.hpp en "optimisant" les algos quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé (vraiment !?). falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
 
 singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>. Voir aussi call_once
 
-container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des conditions à la compilation.
+container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des conditions à la compilation. Un truc comme ça existe déjà dans boost
 
 les lambdas toujours par reference ou il faut parfois utiliser std::ref ? Pas le cas pour while_loop et co...
 
@@ -65,7 +64,7 @@ temporary_tuple_cat (tuple concatener par reference ?)
 
 tuple_organizer<_Tag, bool no_tuple_parameter_is_tuple = true> pour faire une agglomération de tuple et filtrer les éléments non voulut. tuple_organizer<_Functor, _Tag> avec _Tag parameter-tag, parameter_index<> ou wrapper avec organizer_for_each_tag (ex organizer_for_each_tag<_Tag>) qui va s'appliquer indépendament sur chaque tuple. Passer par un traits pour faire appliquer ces tags: organizer_tag_to_parameter_index<_Tag, _Tuples>::type
 
-les tuple_* doivent fonctionner avec std::pair<>, faire des tests
+les tuple_* doivent fonctionner avec std::pair<>/std::array<>, faire des tests
 
 unary_compose et binary_compose doivent pouvoir deviné le type des fonctions
 
@@ -91,9 +90,7 @@ Ajouter dans les iterators les fonctions pour acceder aux fonctorx lorsque ceux-
 
 algorithm.hpp : ne prend pas en compte les containers constant…
 
-tuple_get_accessor → get_idx_accessor ? getidx_accessor ? get_index_accessor ?
-
-flag.hpp: pb avec le decalage de bit de flag. flag.cpp: good for gcc-4.7, fail with gcc-4.6…
+tuple_get_accessor → get_idx_accessor ? get_index_accessor ?
 
 late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…) { return _FunctorAllocator(…) } ; _FunctorAllocator -> return _ClassTemplate<_T>()
 
@@ -101,7 +98,7 @@ ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui se
 
 tuple_*: ignorer les valeurs de type std::ignore_t. Les fonctions retournant void voient leur type changer en std::ignore_t.
 
-literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les entegrals et l'hexadecimal pour les flottants (voir pdf plus bas pour les suffix).
+literal/utility.hpp: support de la convertion de flottant et faire le support de l'hexadecimal et octal pour les integrals et l'hexadecimal pour les flottants (voir pdf plus bas pour les suffix).
 implémenter la proposition de suffix dans la nouvelle norme: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3402.pdf
 ne pas oublier de prendre en compte les unités (non mis dans la norme) avec les abréviations udl ou iso
 
@@ -116,12 +113,13 @@ utiliser optimal_tuple dans recursive_iterator
 
 revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
 changer le nom des java_iterator en range_iterator et merger les fonction make_range_iterator et range_iterator
+Renommer les java_iterator (range_iterator ?)
 
 peut-on supprimer les constructeurs de copie et l'affectation dans les iterateurs sans que cela crée des copies ? il faudra surement faire un move ctor et un move copy
 
 preprocessor/move.hpp -> c++/move.hpp ?
 
-faire un range qui prend des iterateur pour creer un container_wrapper et être utiliser avec for(auto& v:range(it, it+3)). ainsi qu'un ref_range qui ne va pas copier le first et end mais prendre des references (sauf end si rref)
+faire un range qui prend des iterateur pour creer un container_wrapper et être utiliser avec for(auto& v:range(it, it+3)). ainsi qu'un ref_range qui ne va pas copier le first et end mais prendre des references (sauf end si rref). Un make_container_wrapper en fait (crange et reverse_crange?)
 
 mettre des rref quand un foncteur est demander dans les fonctions (tuple_assign, etc)
 
@@ -147,7 +145,7 @@ intrusive data stream (eback, gptr, egptr, pbase, pptrm epptr). Retourne les val
 
 tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui ce comporte comme un tuple
 
-classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.h). (header different pour vs++ ?)
+classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.h). (header different pour vs++ ?). Voir boost.simd
 
 macro FALCON_PROPERTY_{READ,WRITE,RW,GET,SET,ACCESS}
 property.hpp: remplacer properties et properties_t par un enum class properties et using properties_t = properties_t ?
@@ -156,9 +154,7 @@ faire un xor_swap (et ranges_xor_swap et iter_xor_swap)
 
 basic_string_reference<String>(String&, start, size)
 string_reference=basic_string_reference<std::string>
-cstring fonctionnant sur pile (alloue un tableau de char). Hérite de cstring (private/protected). Implémenter à travers cstrnig par un CharT = char_type<N, CharT = char> ? (changer le nom de char_type)
-
-is_instance_of -> std::is_base_of ? iostream/is_ios.hpp fonctionne quand même ?
+cstring fonctionnant sur pile (alloue un tableau de char). Hérite de cstring (private/protected). Implémenter à travers cstring par un CharT = char_type<N, CharT = char> ? (changer le nom de char_type)
 
 make_range_container2(it,it): meme chose que make_range_container(...) mais retourne un paire contenant reference et numero d'iteration
 
@@ -177,11 +173,9 @@ implementation de simple signal
 
 utilisé FALCON_EMPTY (BOOST_EMPTY ?) pour arguments vide de macro
 
-faire en sorte que enumerator ne dépende plus de __VA_ARGS__
+faire en sorte que enumerator ne dépende plus de __VA_ARGS__ (ou séparer la partie qui en dépend).
 
 trouver un autre nom pour static_new
-
-modifier multibuf pour qu'il prenne un 'Nexter' au lieu de gérer un tableau interne. Le nexter gere le passage au fichier suivant en retournant son nom. Ainsi, le tableau de nom pourra ce faire via cet objet. Fournir au moins un generate_filename (ou autre nom) qui sera le parametre par defaut dans la template.
 
 dans les allocateur, ajouter un constructeur qui prend le parent en argument (const& et rvalue).
 allocator: operator== si besoin
@@ -197,5 +191,10 @@ poc sur objet supportant le placement de paramètre nommé (comme en python)
 allocateur mal aligner. C'est le cas de free_node. Vérifier avec avec un vector4 ou un __m256.
 
 un stream qui fait une écriture sur 2 flux (ou plus, celon le générateur)
+
+les moyen mit en oeuvre pour verifier l'implementation d'une fonction (sfinae/) ont un cout (executable plus lourd...). Passer par des decltype plutot que des methodes statiques ?
+
+
+
 
 

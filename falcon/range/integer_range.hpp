@@ -179,15 +179,15 @@ prefix##range(type first, type last, unsigned step)\
 
 ///integer_range<int>(first, last)
 FALCON_BUILD_INTEGER_RANGE(i, int)
-///unsignedeger_range<unsigned>(first, last)
+///integer_range<unsigned>(first, last)
 FALCON_BUILD_INTEGER_RANGE(u, unsigned)
-///longeger_range<long>(first, last)
+///integer_range<long>(first, last)
 FALCON_BUILD_INTEGER_RANGE(l, long)
-///unsigned longeger_range<unsigned long>(first, last)
+///integer_range<unsigned long>(first, last)
 FALCON_BUILD_INTEGER_RANGE(ul, unsigned long)
-///long longeger_range<long long>(first, last)
+///integer_range<long long>(first, last)
 FALCON_BUILD_INTEGER_RANGE(ll, long long)
-///unsigned long longeger_range<unsigned long long>(first, last)
+///integer_range<unsigned long long>(first, last)
 FALCON_BUILD_INTEGER_RANGE(ull, unsigned long long)
 
 #undef _FALCON_BUILD_INTEGER_RANGE

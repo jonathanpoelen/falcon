@@ -243,6 +243,8 @@ public:
 private:
   typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
   typedef std::basic_istream<char_type, traits_type> __istream_type;
+
+public:
   typedef typename __mfilebuf_type::filename_generator filename_generator;
 
 public:
@@ -485,6 +487,8 @@ public:
 private:
   typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
   typedef std::basic_ostream<char_type, traits_type> __ostream_type;
+
+public:
   typedef typename __mfilebuf_type::filename_generator filename_generator;
 
 public:
@@ -747,6 +751,8 @@ private:
   typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
   typedef std::basic_ios<char_type, traits_type> __ios_type;
   typedef std::basic_iostream<char_type, traits_type> __iostream_type;
+
+public:
   typedef typename __mfilebuf_type::filename_generator filename_generator;
 
 public:
