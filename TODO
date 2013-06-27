@@ -188,13 +188,11 @@ renommer container_wrapper en sequence_wrapper ?
 
 poc sur objet supportant le placement de paramètre nommé (comme en python)
 
-allocateur mal aligner. C'est le cas de free_node. Vérifier avec avec un vector4 ou un __m256.
-
 un stream qui fait une écriture sur 2 flux (ou plus, celon le générateur)
 
 les moyen mit en oeuvre pour verifier l'implementation d'une fonction (sfinae/) ont un cout (executable plus lourd...). Passer par des decltype plutot que des methodes statiques ?
 
-
+preprocessor/variatic -> preprocessor/variadic + nom de macro de garde
 
 
 
