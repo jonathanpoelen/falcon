@@ -1,13 +1,13 @@
-#ifndef _FALCON_PREPROCESSOR_VARIATIC_SIZE_HPP
-#define _FALCON_PREPROCESSOR_VARIATIC_SIZE_HPP
+#ifndef _FALCON_PREPROCESSOR_VARIADIC_SIZE_HPP
+#define _FALCON_PREPROCESSOR_VARIADIC_SIZE_HPP
 
 #include <boost/preprocessor/if.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/comparison/equal.hpp>
 #include <falcon/preprocessor/d_punctuation.hpp>
-#include <falcon/preprocessor/variatic/call.hpp>
-#include <falcon/preprocessor/variatic/d_values.hpp>
-#include <falcon/preprocessor/variatic/punctuation.hpp>
+#include <falcon/preprocessor/variadic/call.hpp>
+#include <falcon/preprocessor/variadic/d_values.hpp>
+#include <falcon/preprocessor/variadic/punctuation.hpp>
 
 #define FALCON_PP_VARIADIC_SIZE(elem...)\
 	__FALCON_PP_VARIADIC_CHECK_SIZE(\

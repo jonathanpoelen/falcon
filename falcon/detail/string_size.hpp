@@ -2,6 +2,7 @@
 #define FALCON_DETAIL_STRING_SIZE_HPP
 
 #include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(is_integral)
 
 namespace falcon {
 namespace detail {

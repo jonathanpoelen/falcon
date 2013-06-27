@@ -9,14 +9,14 @@
 
 #include <falcon/preprocessor/d_prefix.hpp>
 #include <falcon/preprocessor/d_punctuation.hpp>
-#include <falcon/preprocessor/variatic/punctuation.hpp>
-#include <falcon/preprocessor/variatic/call.hpp>
-#include <falcon/preprocessor/variatic/arg.hpp>
-#include <falcon/preprocessor/variatic/enum.hpp>
-#include <falcon/preprocessor/variatic/d_values.hpp>
-#include <falcon/preprocessor/variatic/size.hpp>
-#include <falcon/preprocessor/variatic/is_empty.hpp>
-#include <falcon/preprocessor/variatic/has_parenthesis.hpp>
+#include <falcon/preprocessor/variadic/punctuation.hpp>
+#include <falcon/preprocessor/variadic/call.hpp>
+#include <falcon/preprocessor/variadic/arg.hpp>
+#include <falcon/preprocessor/variadic/enum.hpp>
+#include <falcon/preprocessor/variadic/d_values.hpp>
+#include <falcon/preprocessor/variadic/size.hpp>
+#include <falcon/preprocessor/variadic/is_empty.hpp>
+#include <falcon/preprocessor/variadic/has_parenthesis.hpp>
 
 #include <falcon/iterator/nexter_iterator.hpp>
 #include <falcon/iterator/integer_iterator.hpp>

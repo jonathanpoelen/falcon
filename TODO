@@ -189,7 +189,6 @@ poc sur objet supportant le placement de paramètre nommé (comme en python)
 
 les moyen mit en oeuvre pour verifier l'implementation d'une fonction (sfinae/) ont un cout (executable plus lourd...). Passer par des decltype plutot que des methodes statiques ?
 
-preprocessor/variatic -> preprocessor/variadic + nom de macro de garde
 
 
 
