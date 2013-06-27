@@ -1,4 +1,4 @@
-#include <falcon/iostream/is_ios.hpp>
+#include <falcon/iostreams/is_ios.hpp>
 #include "test/test.hpp"
 #include <fstream>
 #include "is_ios.hpp"

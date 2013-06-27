@@ -1,7 +1,7 @@
 #include <test/test.hpp>
 #define FALCON_NO_BOOST_FILESYSTEM
-#include <falcon/iostream/set_contents_file.hpp>
-#include <falcon/iostream/get_contents_file.hpp>
+#include <falcon/iostreams/set_contents_file.hpp>
+#include <falcon/iostreams/get_contents_file.hpp>
 #include "set_contents_file.hpp"
 
 void set_contents_file_test()

@@ -1,7 +1,7 @@
 #include <tuple>
 #include <test/test.hpp>
 #include <falcon/tuple/tuple_for_each.hpp>
-#include <falcon/iostream/put_and_get.hpp>
+#include <falcon/iostreams/put_and_get.hpp>
 #include "tuple_for_each.hpp"
 
 void tuple_for_each_test()

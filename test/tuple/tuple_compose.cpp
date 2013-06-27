@@ -1,6 +1,6 @@
 #include <test/test.hpp>
 #include <falcon/tuple/tuple_compose.hpp>
-#include <falcon/iostream/put_and_get.hpp>
+#include <falcon/iostreams/put_and_get.hpp>
 #include <falcon/utility/maker.hpp>
 #include "tuple_compose.hpp"
 

@@ -2,7 +2,7 @@
 #define _FALCON_IOSTREAM_IOSTREAM_HPP
 
 #include <iostream>
-#include <falcon/iostream/put_and_get.hpp>
+#include <falcon/iostreams/put_and_get.hpp>
 
 namespace falcon {
 

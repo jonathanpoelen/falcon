@@ -1,5 +1,5 @@
 #include <test/test.hpp>
-#include <falcon/iostream/multibuf.hpp>
+#include <falcon/iostreams/multibuf.hpp>
 #include "multibuf.hpp"
 
 void multibuf_test()

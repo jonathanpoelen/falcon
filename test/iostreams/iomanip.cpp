@@ -1,6 +1,6 @@
 #include <sstream>
 #include <test/test.hpp>
-#include <falcon/iostream/iomanip.hpp>
+#include <falcon/iostreams/iomanip.hpp>
 #include <falcon/lambda/lambda.hpp>
 #include "iomanip.hpp"
 

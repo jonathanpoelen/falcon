@@ -140,7 +140,6 @@ fonction pour simplifier les operations sur buffer (renvoit false si eof):
 	sgetn: bool sgetn(buffer, s, n)
 	sgetc: bool sgetc(buffer, &c)
 	ios/streambuf.hpp
-mettre certain fichier de {i,o,io}stream/ dans ios/
 intrusive data stream (eback, gptr, egptr, pbase, pptrm epptr). Retourne les valeurs interne de ces pointeurs (mettre dans ios/)
 
 tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui ce comporte comme un tuple
@@ -187,8 +186,6 @@ iterator comme zone mais dans différente direction: http://www.thonky.com/qr-co
 renommer container_wrapper en sequence_wrapper ?
 
 poc sur objet supportant le placement de paramètre nommé (comme en python)
-
-un stream qui fait une écriture sur 2 flux (ou plus, celon le générateur)
 
 les moyen mit en oeuvre pour verifier l'implementation d'une fonction (sfinae/) ont un cout (executable plus lourd...). Passer par des decltype plutot que des methodes statiques ?
 

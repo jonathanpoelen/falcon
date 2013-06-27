@@ -7,7 +7,7 @@
 #include <falcon/parameter/keep_parameter_index.hpp>
 #include <falcon/arg/arg.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
-#include <falcon/iostream/is_ios.hpp>
+#include <falcon/iostreams/is_ios.hpp>
 
 namespace falcon {
 namespace lambda {

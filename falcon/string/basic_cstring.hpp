@@ -99,7 +99,7 @@ private:
 		CPP_CONSTEXPR static pointer begin(_String&& s)
 		{ return &s[0]; }
 		CPP_CONSTEXPR static pointer end(_String&& s)
-		{ return &s[0] + std::rank<_String>::value; }
+		{ return &s[0] + std::extent<typename std::remove_reference<_String>::type>::value - 1; }
 	};
 
 public:

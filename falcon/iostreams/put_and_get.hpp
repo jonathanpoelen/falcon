@@ -111,7 +111,7 @@ public:
   {}
 
   basic_istream_functor(const basic_istream_functor& other)
-  : m_is(other._is)
+  : m_is(other.m_is)
   {}
 
   basic_istream_functor& operator=(istream_type& is)

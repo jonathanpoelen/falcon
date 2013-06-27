@@ -6,19 +6,19 @@
 namespace falcon {
 namespace istream {
 
-template <typename _CharT, typename _Traits>
-std::size_t gets(std::basic_streambuf<_CharT, _Traits>* buf,
-								 const _CharT* s, std::streamsize n)
+template <typename CharT, typename Traits>
+std::streamsize gets(std::basicstreambuf<CharT, Traits>* buf,
+                     const CharT* s, std::streamsize n)
 { return buf->sgetn(s, n); }
 
-template <typename _CharT, typename _Traits>
-std::size_t gets(std::basic_streambuf<_CharT, _Traits>& buf,
-								 const _CharT* s, std::streamsize n)
+template <typename CharT, typename Traits>
+std::streamsize gets(std::basicstreambuf<CharT, Traits>& buf,
+                     const CharT* s, std::streamsize n)
 { return buf.sgetn(s, n); }
 
-template <typename _CharT, typename _Traits>
-std::size_t gets(std::basic_ostream<_CharT, _Traits>& out,
-								 const _CharT* s, std::streamsize n)
+template <typename CharT, typename Traits>
+std::streamsize gets(std::basicostream<CharT, Traits>& out,
+                     const CharT* s, std::streamsize n)
 { return out.rdbuf()->sgetn(s, n); }
 
 }

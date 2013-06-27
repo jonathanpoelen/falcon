@@ -1,7 +1,7 @@
 #ifndef FALCON_IOSTREAM_GET_CONTENTS_FILE_HPP
 #define FALCON_IOSTREAM_GET_CONTENTS_FILE_HPP
 
-#include <falcon/iostream/set_contents_file.hpp>
+#include <falcon/iostreams/set_contents_file.hpp>
 
 #include <fstream>
 
