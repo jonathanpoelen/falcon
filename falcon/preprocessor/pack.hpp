@@ -1,0 +1,6 @@
+#ifndef FALCON_PREPROCESSOR_PACK_HPP
+#define FALCON_PREPROCESSOR_PACK_HPP
+
+#define FALCON_PP_PACK(...) __VA_ARGS__
+
+#endif

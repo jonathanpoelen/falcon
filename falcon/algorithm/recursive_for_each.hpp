@@ -8,7 +8,7 @@
 #include <falcon/iterator/subrange_access_iterator.hpp>
 #include <falcon/type_traits/dimension.hpp>
 #include <falcon/type_traits/ignore.hpp>
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/utility/move.hpp>
 
 namespace falcon {
 namespace algorithm {

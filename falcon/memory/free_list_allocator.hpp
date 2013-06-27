@@ -5,7 +5,7 @@
 #include <falcon/memory/allocator_rebind.hpp>
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/extend_pack.hpp>
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/utility/move.hpp>
 
 namespace falcon {
 
@@ -42,7 +42,8 @@ public:
 	{}
 
 	template<typename CPP_EXTEND_PACK Args>
-	free_list_allocator(size_type size, FALCON_RVALUE(Args)CPP_EXTEND_PACK args)
+	free_list_allocator(size_type size,
+                        Args CPP_RVALUE_OR_CONST_REFERENCE CPP_EXTEND_PACK args)
 	CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_EXTEND_PACK))
 	: m_list(size, FALCON_FORWARD(Args, args)CPP_EXTEND_PACK)
 	{}

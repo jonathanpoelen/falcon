@@ -2,7 +2,8 @@
 #define FALCON_FUNCTIONAL_DELEGATE_RESULT_HPP
 
 #include <functional>
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/utility/move.hpp>
+#include <falcon/c++/reference.hpp>
 #if __cplusplus >= 201103L
 # include <falcon/c++1x/syntax.hpp>
 # include <falcon/type_traits/if.hpp>
@@ -27,12 +28,13 @@ public:
 	, m_g()
 	{}
 
-	delegate_result(FALCON_RVALUE(_Delegate) f)
+	delegate_result(_Delegate CPP_RVALUE_OR_CONST_REFERENCE f)
 	: m_f(FALCON_FORWARD(_Delegate, f))
 	, m_g()
 	{}
 
-	delegate_result(FALCON_RVALUE(_Delegate) f, FALCON_RVALUE(_Functor) g)
+	delegate_result(_Delegate CPP_RVALUE_OR_CONST_REFERENCE f,
+                    _Functor CPP_RVALUE_OR_CONST_REFERENCE g)
 	: m_f(FALCON_FORWARD(_Delegate, f))
 	, m_g(FALCON_FORWARD(_Functor, g))
 	{}
@@ -106,13 +108,13 @@ public:
 	, m_g()
 	{}
 
-	unary_delegate_result(FALCON_RVALUE(_Delegate) f)
+	unary_delegate_result(_Delegate CPP_RVALUE_OR_CONST_REFERENCE f)
 	: m_f(FALCON_FORWARD(_Delegate, f))
 	, m_g()
 	{}
 
-	unary_delegate_result(FALCON_RVALUE(_Delegate) f,
-												FALCON_RVALUE(_Functor) g)
+	unary_delegate_result(_Delegate CPP_RVALUE_OR_CONST_REFERENCE f,
+                          _Functor CPP_RVALUE_OR_CONST_REFERENCE g)
 	: m_f(FALCON_FORWARD(_Delegate, f))
 	, m_g(FALCON_FORWARD(_Functor, g))
 	{}
@@ -160,13 +162,13 @@ public:
 	, m_g()
 	{}
 
-	binary_delegate_result(FALCON_RVALUE(_Delegate) f)
+	binary_delegate_result(_Delegate CPP_RVALUE_OR_CONST_REFERENCE f)
 	: m_f(FALCON_FORWARD(_Delegate, f))
 	, m_g()
 	{}
 
-	binary_delegate_result(FALCON_RVALUE(_Delegate) f,
-												 FALCON_RVALUE(_Functor) g)
+	binary_delegate_result(_Delegate CPP_RVALUE_OR_CONST_REFERENCE f,
+                           _Functor CPP_RVALUE_OR_CONST_REFERENCE g)
 	: m_f(FALCON_FORWARD(_Delegate, f))
 	, m_g(FALCON_FORWARD(_Functor, g))
 	{}
@@ -225,11 +227,11 @@ struct __delegate_result
 
 	template<typename... _Args>
 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),
-													this->_m_f(this->_m_g(std::forward<_Args>(args)...)))
+                            this->_m_f(this->_m_g(std::forward<_Args>(args)...)))
 
 	template<typename... _Args>
 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
-													this->_m_f(this->_m_g(std::forward<_Args>(args)...)))
+                            this->_m_f(this->_m_g(std::forward<_Args>(args)...)))
 };
 
 /**

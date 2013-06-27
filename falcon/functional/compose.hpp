@@ -3,7 +3,8 @@
 
 #include <functional>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/c++/reference.hpp>
+#include <falcon/utility/move.hpp>
 #if __cplusplus >= 201103L
 # include <falcon/arg/arg.hpp>
 # include <falcon/tuple/tuple_compose.hpp>
@@ -147,8 +148,8 @@ public:
 
 template <class _Operation1, class _Operation2>
 inline unary_compose<_Operation1, _Operation2>
-compose1(FALCON_RVALUE(_Operation1) __fn1,
-		 FALCON_RVALUE(_Operation2) __fn2)
+compose1(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
+         _Operation2 CPP_RVALUE_OR_CONST_REFERENCE __fn2)
 {
 	return unary_compose<_Operation1,_Operation2>(
 		FALCON_FORWARD(_Operation1, __fn1),
@@ -281,9 +282,9 @@ public:
 
 template <class _Operation1, class _Operation2, class _Operation3 = _Operation2>
 inline binary_compose<_Operation1, _Operation2, _Operation3>
-compose2(FALCON_RVALUE(_Operation1) __fn1,
-		 FALCON_RVALUE(_Operation2) __fn2,
-		 FALCON_RVALUE(_Operation3) __fn3)
+compose2(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
+		 _Operation2 CPP_RVALUE_OR_CONST_REFERENCE __fn2,
+         _Operation3 CPP_RVALUE_OR_CONST_REFERENCE __fn3)
 {
 	return binary_compose<_Operation1,_Operation2,_Operation3>(
 		FALCON_FORWARD(_Operation1, __fn1),
@@ -294,7 +295,8 @@ compose2(FALCON_RVALUE(_Operation1) __fn1,
 
 template <class _Operation1, class _Operation2>
 inline binary_compose<_Operation1, _Operation2, _Operation2>
-compose2(FALCON_RVALUE(_Operation1) __fn1, FALCON_RVALUE(_Operation2) __fn2)
+compose2(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
+         _Operation2 CPP_RVALUE_OR_CONST_REFERENCE __fn2)
 {
 	return binary_compose<_Operation1, _Operation2, _Operation2>(
 		FALCON_FORWARD(_Operation1, __fn1),

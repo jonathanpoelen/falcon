@@ -1,7 +1,7 @@
 #ifndef FALCON_ALGORITHM_FIND_FIRST_NOT_OF_HPP
 #define FALCON_ALGORITHM_FIND_FIRST_NOT_OF_HPP
 
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/utility/move.hpp>
 
 namespace falcon {
 

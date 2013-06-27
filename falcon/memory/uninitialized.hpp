@@ -8,7 +8,7 @@
 #include <falcon/c++/reference.hpp>
 #include <falcon/memory/construct.hpp>
 #include <falcon/memory/destroy.hpp>
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/utility/move.hpp>
 
 namespace falcon {
 

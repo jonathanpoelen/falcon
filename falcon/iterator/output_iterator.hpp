@@ -3,7 +3,7 @@
 
 #include <iterator>
 #include <boost/typeof/typeof.hpp>
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/utility/move.hpp>
 #include <falcon/c++/extend_parameter.hpp>
 
 namespace falcon {

@@ -2,7 +2,7 @@
 #define _FALCON_UTILITY_SWAP_PROXY_HPP
 
 #include <utility>
-#include <falcon/preprocessor/move.hpp>
+#include <falcon/utility/move.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_all_extents)
 
