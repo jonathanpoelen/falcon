@@ -1,4 +1,4 @@
-#include <iostream>
+// #include <iostream>
 // #include <string>
 // #include <vector>
 // #include <array>
@@ -6,8 +6,18 @@
 
 // using namespace std;
 
+// #include <falcon/sfinae/has_member.hpp>
+//
+// FALCON_CLASS_HAS_MEMBER_FUNCTION(f);
+// FALCON_CLASS_HAS_SIGNATURE(f);
+//
+// struct A {
+//   void f(){};
+// };
+// struct B {typedef int type; };
 
 int main(/*int argc, char **argv*/)
 {
+  return 1;
 }
 

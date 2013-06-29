@@ -106,11 +106,11 @@ public:
 
 	template<typename U>
 	bool operator==(const ptr_allocator<U>& rhs) const
-	{ return m_alloc == rhs.m_alloc; }
+	{ return m_alloc == rhs.m_alloc || *m_alloc == *rhs.m_alloc; }
 
 	template<typename U>
 	bool operator!=(const ptr_allocator<U>& rhs) const
-	{ return m_alloc == rhs.m_alloc; }
+	{ return !operator==(rhs); }
 
 	void swap(ptr_allocator& other)
 	{

@@ -187,10 +187,6 @@ renommer container_wrapper en sequence_wrapper ?
 
 poc sur objet supportant le placement de paramètre nommé (comme en python) et qu'il soit pod.
 
-les moyen mit en oeuvre pour verifier l'implementation d'une fonction (sfinae/) ont un cout (executable plus lourd...). Passer par des decltype plutot que des methodes statiques ?
-
-preprocessor/move.hpp ->  utility/move.hpp
-
 renommer les CPP_ et CPP11_ en FALCON_* et FALCON_CPP11_* ?
 
 

@@ -59,7 +59,7 @@
 		template <typename T, typename _Member>\
 		struct impl\
 		{\
-			template <typename U> static yes_type test(U*, ::falcon::sfinae::helper<_Member, &U::_FuncName>* = 0);\
+			template <typename U> static ::falcon::yes_type test(U*, ::falcon::sfinae::helper<_Member, &U::_FuncName>* = 0);\
 			static ::falcon::no_type test(...);\
 			FALCON_HELPER_VALUE_TEST(_Falcon_T);\
 		};\

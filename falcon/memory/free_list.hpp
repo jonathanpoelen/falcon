@@ -124,13 +124,13 @@ public:
     }
   }
 
-  size_type node_size() const
+  size_type count_by_alloc() const
   { return m_size_alloc; }
 
-  void move_list_to(free_list& other)
+  void merge(free_list& other)
   {
     if (other.m_size_alloc < m_size_alloc) {
-      throw std::underflow_error("free_list::move_list_to");
+      throw std::underflow_error("free_list::merge");
     }
 
     if (m_node) {
@@ -146,6 +146,12 @@ public:
 
     other.m_node = 0;
   }
+
+  bool operator==(const free_list& rhs) const
+  { return m_size_alloc == rhs.m_size_alloc && m_allocator == rhs.m_allocator; }
+
+  bool operator!=(const free_list& rhs) const
+  { return !operator==(rhs); }
 
 private:
   Node * m_node;
