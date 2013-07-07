@@ -10,9 +10,8 @@ void range_test()
 
 	container_type v({1,2,3,4});
 
-	falcon::make_range_modifier(v) += 2;
+	falcon::make_range_modifier(v) += 4;
 	falcon::make_range(v.begin(), v.begin()+2).modifier() += 2;
-	falcon::range_iterator(v).modifier() += 2;
 
 	CHECK_EQUAL_VALUE(7, v[0]);
 	CHECK_EQUAL_VALUE(8, v[1]);

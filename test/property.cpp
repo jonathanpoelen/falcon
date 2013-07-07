@@ -15,9 +15,7 @@ void property_test()
 		attr_read<int> num = n;
 		attr_get<int> num2 = n;
 
-#define READ_ATTR(name, value) attr_read<decltype(value)> name = value
-		READ_ATTR(num3, n);
-#undef READ_ATTR
+        FALCON_PROPERTY_READ(num3, n);
 
 		void f()
 		{ ++n; }

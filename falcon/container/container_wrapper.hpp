@@ -7,6 +7,9 @@
 
 namespace falcon{
 
+/**
+ * @ingroup sequences
+ */
 template<typename Container, typename Access = range_access_traits<Container> >
 class container_wrapper
 {

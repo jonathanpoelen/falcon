@@ -16,7 +16,7 @@ iota(begin(), end(), first_value): le faire avec iota(container, first_value)
 
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
 flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
-enlever la hack qui permet une fonction consexpr en n'utilisant pas de boucle. C++14 permet les fonctions consexpr avec des boucle. Nouvelle macro ?
+enlever la hack qui permet une fonction consexpr en n'utilisant pas de boucle. C++14 permet les fonctions constexpr avec des boucles. Nouvelle macro ?
 
 optimiser recursive_iterator (et l'algo de recursion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
 
@@ -60,7 +60,7 @@ les lambdas toujours par reference ou il faut parfois utiliser std::ref ? Pas le
 
 faire un make_parameter_adapter() et un make_tuple_applier().
 
-temporary_tuple_cat (tuple concatener par reference ?)
+temporary_tuple_cat (tuple concatener par reference ? tuple_cat_reference)
 
 tuple_organizer<_Tag, bool no_tuple_parameter_is_tuple = true> pour faire une agglomération de tuple et filtrer les éléments non voulut. tuple_organizer<_Functor, _Tag> avec _Tag parameter-tag, parameter_index<> ou wrapper avec organizer_for_each_tag (ex organizer_for_each_tag<_Tag>) qui va s'appliquer indépendament sur chaque tuple. Passer par un traits pour faire appliquer ces tags: organizer_tag_to_parameter_index<_Tag, _Tuples>::type
 
@@ -76,6 +76,8 @@ unary_compose, binary_compose et mulary_compose supporte falcon::ignore quand on
 faire un function_compose<...> (+ fonction composef()) comme mulary_compose mais prend un nombre de paramètre allant de 0 à infinit.
 
 dans enumerator faire une allocation de la chaîne en tant que expression constante (déjà fait ?)
+
+support des enumeration à valeur aléatoire dans enumerator.hpp
 
 tester les compose() avec les distributions (voir random_device ? (exemple dans cppreference.com avec les distributions))
 
@@ -146,16 +148,9 @@ tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour 
 
 classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.h). (header different pour vs++ ?). Voir boost.simd
 
-macro FALCON_PROPERTY_{READ,WRITE,RW,GET,SET,ACCESS}
-property.hpp: remplacer properties et properties_t par un enum class properties et using properties_t = properties_t ?
-
-faire un xor_swap (et ranges_xor_swap et iter_xor_swap)
-
 basic_string_reference<String>(String&, start, size)
 string_reference=basic_string_reference<std::string>
 cstring fonctionnant sur pile (alloue un tableau de char). Hérite de cstring (private/protected). Implémenter à travers cstring par un CharT = char_type<N, CharT = char> ? (changer le nom de char_type)
-
-make_range_container2(it,it): meme chose que make_range_container(...) mais retourne un paire contenant reference et numero d'iteration
 
 local_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau (la copie partage le même storage)
 global_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau static
@@ -164,9 +159,7 @@ les mêmes allocateur (de pool) mais qui sont utilisé avec scoped_adapter_alloc
 
 support des non exceptions (retourne 0 au lieu de bad_alloc). Flag -fno-exceptions pour gcc. Utiliser la macro BOOST_NO_EXCEPTIONS dans boost/config.hpp
 
-type_trait, spécification pour T[] (pas de taille)
-
-container toujours trier. Fournir le type de container principal en template. Même interface que vector, list et deque (faire le trie). priority_queue ?
+container toujours trier. Fournir le type de container principal en template. Même interface que vector, list et deque (faire le trie). priority_queue ? Boost en fournit un à valeur non constante
 
 implementation de simple signal
 
@@ -177,7 +170,6 @@ faire en sorte que enumerator ne dépende plus de __VA_ARGS__ (ou séparer la pa
 trouver un autre nom pour static_new
 
 dans les allocateur, ajouter un constructeur qui prend le parent en argument (const& et rvalue).
-allocator: operator== si besoin
 
 shared_allocator. Par exemple shared_allocator<free_list_allocator> partage tous le même allocateur. Moyen de le faire avec un scoped_adapter_allocator ?
 
@@ -185,9 +177,9 @@ iterator comme zone mais dans différente direction: http://www.thonky.com/qr-co
 
 renommer container_wrapper en sequence_wrapper ?
 
-poc sur objet supportant le placement de paramètre nommé (comme en python) et qu'il soit pod.
+vector avec fonction de redirection d'indice (type template). Permet par exemple un vecteur 2D (avec en template la fonction/wrapper coord()).
 
-renommer les CPP_ et CPP11_ en FALCON_* et FALCON_CPP11_* ?
+
 
 
 

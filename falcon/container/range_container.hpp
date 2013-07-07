@@ -43,12 +43,14 @@ public:
 	, _M_last(last)
 	{}
 
-#if __cplusplus >= 201103L
 	range_container(iterator first, size_type n)
 	: _M_first(first)
+#if __cplusplus >= 201103L
 	, _M_last(std::next(first, n))
-	{}
+#else
+    , _M_last(first+n)
 #endif
+	{}
 
 	CPP_CONSTEXPR range_container(const range_container& other)
 	: _M_first(other._M_first)
@@ -111,14 +113,14 @@ public:
 
 template<typename _Iterator>
 inline bool __dispath_equal(const range_container<_Iterator>& x,
-														const range_container<_Iterator>& y,
-														std::random_access_iterator_tag)
+                            const range_container<_Iterator>& y,
+                            std::random_access_iterator_tag)
 { return (x.size() == y.size() && std::equal(x.begin(), x.end(), y.begin())); }
 
 template<typename _Iterator, typename _Tag>
 inline bool __dispath_equal(const range_container<_Iterator>& x,
-														const range_container<_Iterator>& y,
-														_Tag)
+                            const range_container<_Iterator>& y,
+                            _Tag)
 {
 	typedef typename range_container<_Iterator>::iterator iterator;
 	iterator first = x.begin();
@@ -144,7 +146,7 @@ inline bool __dispath_equal(const range_container<_Iterator>& x,
  */
 template<typename _Iterator>
 inline bool operator==(const range_container<_Iterator>& x,
-											 const range_container<_Iterator>& y)
+                       const range_container<_Iterator>& y)
 {
 	typedef typename std::iterator_traits<
 		typename range_container<_Iterator>::iterator
@@ -165,31 +167,31 @@ inline bool operator==(const range_container<_Iterator>& x,
  */
 template<typename _Iterator>
 inline bool operator<(const range_container<_Iterator>& x,
-											const range_container<_Iterator>& y)
+                      const range_container<_Iterator>& y)
 { return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end()); }
 
 /// Based on operator==
 template<typename _Iterator>
 inline bool operator!=(const range_container<_Iterator>& x,
-											 const range_container<_Iterator>& y)
+                       const range_container<_Iterator>& y)
 { return !(x == y); }
 
 /// Based on operator<
 template<typename _Iterator>
 inline bool operator>(const range_container<_Iterator>& x,
-											const range_container<_Iterator>& y)
+                      const range_container<_Iterator>& y)
 { return y < x; }
 
 /// Based on operator<
 template<typename _Iterator>
 inline bool operator<=(const range_container<_Iterator>& x,
-											 const range_container<_Iterator>& y)
+                       const range_container<_Iterator>& y)
 { return !(y < x); }
 
 /// Based on operator<
 template<typename _Iterator>
 inline bool operator>=(const range_container<_Iterator>& x,
-											 const range_container<_Iterator>& y)
+                       const range_container<_Iterator>& y)
 { return !(x < y); }
 
 template<typename _Iterator>
@@ -234,12 +236,32 @@ make_range_container(const _Container& cont)
 }
 #endif
 
+namespace container {
+  template<typename _Iterator>
+  range_container<_Iterator> range(_Iterator first, _Iterator last)
+  { return make_range_container(first, last); }
+
+  template<typename _Iterator>
+  range_container<_Iterator> range(_Iterator first, std::size_t n)
+  { return make_range_container(first, n); }
+
+  template<typename _Container>
+  range_container<typename range_access_iterator<_Container>::type>
+  range(_Container& cont)
+  { return make_range_container(cont); }
+
+  template<typename _Container>
+  range_container<typename range_access_iterator<const _Container>::type>
+  range(const _Container& cont)
+  { return make_range_container(cont); }
+}
+
 }
 
 namespace std {
 	template<typename _Iterator>
-	void swap(const falcon::range_container<_Iterator>& x,
-						const falcon::range_container<_Iterator> y)
+	void swap(falcon::range_container<_Iterator>& x,
+              falcon::range_container<_Iterator> y)
 	{ x.swap(y); }
 }
 

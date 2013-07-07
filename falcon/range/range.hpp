@@ -326,19 +326,6 @@ inline range<_T> make_range(_T __x, _T __y)
 { return range<_T>(__x, __y); }
 #endif
 
-template<typename _Iterator>
-inline CPP_CONSTEXPR range<_Iterator> range_iterator(_Iterator left, _Iterator right)
-{
-	return range<_Iterator>(left, right);
-}
-
-template<typename _Container>
-inline CPP_CONSTEXPR range<typename range_access_iterator<_Container>::type> range_iterator(_Container& container)
-{
-	typedef typename range_access_iterator<_Container>::type __type;
-	return range<__type>(begin(container), end(container));
-}
-
 }
 
 namespace std {

@@ -272,6 +272,14 @@ using attr_write = class_property<properties::attribute, _T, void, _Set>;
 template <typename _T, typename _Get = use_default, typename _Set = use_default>
 using attr_rw = class_property<properties::attribute, _T, _Get, _Set>;
 
+
+#define FALCON_PROPERTY_READ(name, ref)   attr_read   <decltype(ref)> name = ref
+#define FALCON_PROPERTY_WRITE(name, ref)  attr_write  <decltype(ref)> name = ref
+#define FALCON_PROPERTY_RW(name, ref)     attr_rw     <decltype(ref)> name = ref
+#define FALCON_PROPERTY_GET(name, ref)    attr_get    <decltype(ref)> name = ref
+#define FALCON_PROPERTY_SET(name, ref)    attr_set    <decltype(ref)> name = ref
+#define FALCON_PROPERTY_ACCESS(name, ref) attr_access <decltype(ref)> name = ref
+
 }}
 
 #endif
