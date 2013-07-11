@@ -4,6 +4,8 @@
 #include <falcon/tuple/detail/is_tuple.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 
+#include <utility>
+
 namespace falcon {
 
 template <std::size_t _Index, typename _Tuple, typename _FunctionOrFunctions>
@@ -23,16 +25,18 @@ constexpr auto __tuple_transform_get(std::false_type, _Tuple&& t, _Functor&& fun
 template<typename _Tuple, typename _FunctionOrFunctions, std::size_t... _Indexes,
 typename _Tupleuple = std::tuple<decltype(
 	__tuple_transform_get<_Indexes>(
-		typename detail::has_tuple_impl<_FunctionOrFunctions>::type(),
+		typename is_tuple_impl<_FunctionOrFunctions>::type(),
 		std::declval<_Tuple>(),
 		std::declval<_FunctionOrFunctions>()
 	)
 )...>>
 constexpr _Tupleuple tuple_transform(_Tuple&& t, _FunctionOrFunctions&& funcs, const parameter_index<_Indexes...>&)
 {
-	return _Tupleuple(__tuple_transform_get<_Indexes>(typename detail::has_tuple_impl<_FunctionOrFunctions>::type(),
-																										std::forward<_Tuple>(t),
-																										std::forward<_FunctionOrFunctions>(funcs))...);
+	return _Tupleuple(__tuple_transform_get<_Indexes>(
+        typename is_tuple_impl<_FunctionOrFunctions>::type(),
+        std::forward<_Tuple>(t),
+        std::forward<_FunctionOrFunctions>(funcs)
+    )...);
 }
 
 template<typename _Tuple, typename _FunctionOrFunctions,
@@ -41,8 +45,8 @@ constexpr auto tuple_transform(_Tuple&& t, _FunctionOrFunctions && funcs)
 -> decltype(tuple_transform(t, funcs, _Indexes()))
 {
 	return tuple_transform(std::forward<_Tuple>(t),
-												 std::forward<_FunctionOrFunctions>(funcs),
-												 _Indexes());
+                           std::forward<_FunctionOrFunctions>(funcs),
+                           _Indexes());
 }
 
 }

@@ -4,8 +4,8 @@
 #include <falcon/literal/detail/literal_support.hpp>
 
 namespace std {
-	template<std::size_t>
-	class bitset;
+  template<std::size_t>
+  class bitset;
 }
 
 namespace falcon {
@@ -27,8 +27,8 @@ struct __check_bits<>
 template<char... Bits>
 inline constexpr std::bitset<sizeof...(Bits)> operator "" _bits()
 {
-	static_assert(__check_bits<Bits...>::valid, "invalid digit in binary string");
-	return std::bitset<sizeof...(Bits)>((const char []){Bits...}, sizeof...(Bits));
+  static_assert(__check_bits<Bits...>::valid, "invalid digit in binary string");
+  return std::bitset<sizeof...(Bits)>((const char []){Bits...}, sizeof...(Bits));
 }
 
 }

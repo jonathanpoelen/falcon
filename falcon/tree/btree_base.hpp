@@ -59,13 +59,22 @@ public:
 	{ return std::make_pair(_left, _right); }
 
 	void swap_value(self_type& other)
-	{ std::swap(other._value, _value); }
+    {
+        using std::swap;
+        swap(other._value, _value);
+    }
 
 	void swap_left(self_type& other)
-	{ std::swap(_left, other._left); }
+    {
+        using std::swap;
+        swap(_left, other._left);
+    }
 
 	void swap_right(self_type& other)
-	{ std::swap(_right, other._right); }
+    {
+        using std::swap;
+        swap(_right, other._right);
+    }
 
 	void swap_tree(self_type& other)
 	{
@@ -230,14 +239,16 @@ public:
 	{
 		if (!_is_leaf)
 			throw std::runtime_error("btree_base::swap");
-		std::swap(_wrap.pointer, pointer);
+        using std::swap;
+        swap(_wrap.pointer, pointer);
 	}
 
 	void swap(value_type& value)
 	{
 		if (!_is_leaf)
 			throw std::runtime_error("btree_base::swap");
-		std::swap(*_wrap.pointer, value);
+        using std::swap;
+        swap(*_wrap.pointer, value);
 	}
 
 	pointer_type detach_pointer()
@@ -317,29 +328,33 @@ protected:
 	{
 		if (_is_leaf || other._is_leaf)
 			throw std::runtime_error("btree_base::swap_value");
-		std::swap(_wrap.pointer, other._wrap.pointer);
+        using std::swap;
+        swap(_wrap.pointer, other._wrap.pointer);
 	}
 
 	void swap_left(self_type& other)
 	{
 		if (!_is_leaf || !other._is_leaf)
 			throw std::runtime_error("btree_base::swap_left");
-		std::swap(_wrap.children.left, other._wrap.children.left);
+        using std::swap;
+        swap(_wrap.children.left, other._wrap.children.left);
 	}
 
 	void swap_right(self_type& other)
 	{
 		if (!_is_leaf || !other._is_leaf)
 			throw std::runtime_error("btree_base::swap_right");
-		std::swap(_wrap.children.right, other._wrap.children.right);
+        using std::swap;
+        swap(_wrap.children.right, other._wrap.children.right);
 	}
 
 	void swap_children(self_type& other)
 	{
 		if (!_is_leaf || !other._is_leaf)
 			throw std::runtime_error("btree_base::swap_children");
-		std::swap(_wrap.children.left, other._wrap.children.left);
-		std::swap(_wrap.children.right, other._wrap.children.right);
+        using std::swap;
+        swap(_wrap.children.left, other._wrap.children.left);
+		swap(_wrap.children.right, other._wrap.children.right);
 	}
 
 	void swap(self_type& other)

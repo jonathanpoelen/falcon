@@ -61,7 +61,10 @@ public:
 	{ return tuple_apply<_Functor&>(indexes, func, tuple()); }
 
 	void swap(arguments_wrapper& other)
-	{ std::swap(tuple(), other.tuple()); }
+	{
+        using std::swap;
+        swap(tuple(), other.tuple());
+    }
 };
 
 template<typename... _Elements>
@@ -78,6 +81,10 @@ constexpr arguments_wrapper<_Elements&&...>
 forward_as_arguments(_Elements&&... __args) noexcept
 { return arguments_wrapper<_Elements&&...>(std::forward<_Elements>(__args)...); }
 
+template<typename... _Elements>
+void swap(arguments_wrapper<_Elements...>& x, arguments_wrapper<_Elements...>& y)
+{ x.swap(y); };
+
 }
 
 namespace std
@@ -90,11 +97,6 @@ namespace std
 	struct tuple_element<_Index, falcon::arguments_wrapper<_Elements...>>
 	: tuple_element<_Index, std::tuple<_Elements...>>
 	{};
-
-	template<typename... _Elements>
-	void swap(falcon::arguments_wrapper<_Elements...>& a,
-			  falcon::arguments_wrapper<_Elements...>& b)
-	{ a.swap(b); };
 }
 
 #endif

@@ -72,8 +72,9 @@ public:
 
   void swap(lifo_allocator& other) CPP_NOEXCEPT
   {
-    std::swap<>(m_current, other.m_current);
-    std::swap<>(m_finish, other.m_finish);
+    using std::swap;
+    swap(m_current, other.m_current);
+    swap(m_finish, other.m_finish);
     allocator_swap<__allocator_base>(*this, other);
   }
 
@@ -89,22 +90,19 @@ private:
 };
 
 template<typename T, typename AllocBase>
-bool operator==(const falcon::lifo_allocator<T, AllocBase>& a,
-                const falcon::lifo_allocator<T, AllocBase>& b)
+bool operator==(const lifo_allocator<T, AllocBase>& a,
+                const lifo_allocator<T, AllocBase>& b)
 { return &a == &b; }
 
 template<typename T, typename AllocBase>
-bool operator!=(const falcon::lifo_allocator<T, AllocBase>& a,
-                const falcon::lifo_allocator<T, AllocBase>& b)
+bool operator!=(const lifo_allocator<T, AllocBase>& a,
+                const lifo_allocator<T, AllocBase>& b)
 { return &a != &b; }
 
-}
+template<typename T, typename AllocBase>
+void swap(lifo_allocator<T, AllocBase>& a, lifo_allocator<T, AllocBase>& b)
+{ a.swap(b); }
 
-namespace std {
-  template<typename T, typename AllocBase>
-  void swap(falcon::lifo_allocator<T, AllocBase>& a,
-            falcon::lifo_allocator<T, AllocBase>& b)
-  { a.swap(b); }
 }
 
 #endif

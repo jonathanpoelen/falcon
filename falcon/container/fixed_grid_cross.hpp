@@ -229,16 +229,16 @@ protected:
 	{ return &_array[0]; }
 };
 
+template<typename _Tp, std::size_t _Width, std::size_t _Height>
+inline void swap(fixed_grid_cross<_Tp, _Width, _Height>& __one,
+                 fixed_grid_cross<_Tp, _Width, _Height>& __two)
+{ __one.swap(__two); }
+
 }
 
 }
 
 namespace std {
-
-// Specialized algorithms [6.2.2.2].
-template<typename _Tp, std::size_t _Width, std::size_t _Height>
-inline void swap(falcon::container::fixed_grid_cross<_Tp, _Width, _Height>& __one, falcon::container::fixed_grid_cross<_Tp, _Width, _Height>& __two)
-{ __one.swap(__two); }
 
 /// tuple_size
 template<typename _Tp>

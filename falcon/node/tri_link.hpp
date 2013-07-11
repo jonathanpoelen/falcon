@@ -1,8 +1,8 @@
 #ifndef _FALCON_NODE_TRI_LINK_HPP
 #define _FALCON_NODE_TRI_LINK_HPP
 
-#include <utility> //std::swap
 #include <falcon/c++/constexpr.hpp>
+#include <falcon/arg/rotate_arg.hpp>
 
 namespace falcon{ namespace node {
 
@@ -82,7 +82,10 @@ struct tri_link
 	{ falcon::rotate_arg<2>(up, right, left); }
 
 	void rotate_vertical()
-	{ std::swap<>(left, right); }
+    {
+      using std::swap;
+      swap(left, right);
+    }
 };
 
 template<typename _Up, typename _Left, typename _Right>

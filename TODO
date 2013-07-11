@@ -179,6 +179,7 @@ renommer container_wrapper en sequence_wrapper ?
 
 vector avec fonction de redirection d'indice (type template). Permet par exemple un vecteur 2D (avec en template la fonction/wrapper coord()).
 
+multi_new<T...>(size_t...). Alloue plusieurs objet de taille différente en un seul bloc (un new).
 
 
 

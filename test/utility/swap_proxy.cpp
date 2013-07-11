@@ -40,7 +40,7 @@ void swap_proxy_test()
 		A a = {1};
 		B b = {56};
 
-		falcon::swap_proxy<B, A, int>(b, a);
+		falcon::swap_proxy<int>(b, a);
 		CHECK_EQUAL_VALUE(56, a.i);
 		CHECK_EQUAL_VALUE(1, b.i);
 	}
@@ -49,7 +49,7 @@ void swap_proxy_test()
 		double d = 484.578848;
 		float f = 4.448f;
 
-		falcon::swap_proxy<double, float, int>(d, f);
+		falcon::swap_proxy<int>(d, f);
 		CHECK_EQUAL_VALUE(F<double>(4.448f), d);
 		CHECK_EQUAL_VALUE(F<float>(484), f);
 	}

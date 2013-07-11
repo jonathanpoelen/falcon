@@ -101,9 +101,10 @@ public:
 
   void swap(range_minimal_heap_allocator& other) CPP_NOEXCEPT
   {
-    std::swap<>(m_start, other.m_start);
-    std::swap<>(m_finish, other.m_finish);
-    std::swap<>(m_current, other.m_current);
+    using std::swap;
+    swap(m_start, other.m_start);
+    swap(m_finish, other.m_finish);
+    swap(m_current, other.m_current);
     allocator_swap<__allocator_base>(*this, other);
   }
 
@@ -264,9 +265,10 @@ public:
 
   void swap(range_fixed_allocator& other) CPP_NOEXCEPT
   {
-    std::swap<>(m_free, other.m_free);
-    std::swap<>(m_finish, other.m_finish);
-    std::swap<>(m_size, other.m_size);
+    using std::swap;
+    swap(m_free, other.m_free);
+    swap(m_finish, other.m_finish);
+    swap(m_size, other.m_size);
     allocator_swap<__allocator_base>(*this, other);
   }
 
@@ -452,9 +454,10 @@ public:
 
   void swap(range_allocator& other) CPP_NOEXCEPT
   {
-    std::swap<>(m_finish, other.m_finish);
-    std::swap<>(m_used, other.m_used);
-    std::swap<>(m_free, other.m_free);
+    using std::swap;
+    swap(m_finish, other.m_finish);
+    swap(m_used, other.m_used);
+    swap(m_free, other.m_free);
     allocator_swap<__allocator_base>(*this, other);
   }
 
@@ -529,53 +532,49 @@ public:
 
 
 template<typename T, typename AllocBase>
-bool operator==(const falcon::range_minimal_heap_allocator<T, AllocBase>& a,
-                const falcon::range_minimal_heap_allocator<T, AllocBase>& b)
+bool operator==(const range_minimal_heap_allocator<T, AllocBase>& a,
+                const range_minimal_heap_allocator<T, AllocBase>& b)
 { return &a == &b; }
 
 template<typename T, typename AllocBase>
-bool operator!=(const falcon::range_minimal_heap_allocator<T, AllocBase>& a,
-                const falcon::range_minimal_heap_allocator<T, AllocBase>& b)
+bool operator!=(const range_minimal_heap_allocator<T, AllocBase>& a,
+                const range_minimal_heap_allocator<T, AllocBase>& b)
 { return &a != &b; }
 
 template<typename T, typename AllocBase>
-bool operator==(const falcon::range_fixed_allocator<T, AllocBase>& a,
-                const falcon::range_fixed_allocator<T, AllocBase>& b)
+bool operator==(const range_fixed_allocator<T, AllocBase>& a,
+                const range_fixed_allocator<T, AllocBase>& b)
 { return &a == &b; }
 
 template<typename T, typename AllocBase>
-bool operator!=(const falcon::range_fixed_allocator<T, AllocBase>& a,
-                const falcon::range_fixed_allocator<T, AllocBase>& b)
+bool operator!=(const range_fixed_allocator<T, AllocBase>& a,
+                const range_fixed_allocator<T, AllocBase>& b)
 { return &a != &b; }
 
 template<typename T, typename AllocBase>
-bool operator==(const falcon::range_allocator<T, AllocBase>& a,
-                const falcon::range_allocator<T, AllocBase>& b)
+bool operator==(const range_allocator<T, AllocBase>& a,
+                const range_allocator<T, AllocBase>& b)
 { return &a == &b; }
 
 template<typename T, typename AllocBase>
-bool operator!=(const falcon::range_allocator<T, AllocBase>& a,
-                const falcon::range_allocator<T, AllocBase>& b)
+bool operator!=(const range_allocator<T, AllocBase>& a,
+                const range_allocator<T, AllocBase>& b)
 { return &a != &b; }
 
-}
+template<typename T, typename AllocBase>
+void swap(range_minimal_heap_allocator<T, AllocBase>& a,
+          range_minimal_heap_allocator<T, AllocBase>& b)
+{ a.swap(b); }
 
+template<typename T, typename AllocBase>
+void swap(range_fixed_allocator<T, AllocBase>& a,
+          range_fixed_allocator<T, AllocBase>& b)
+{ a.swap(b); }
 
-namespace std {
-  template<typename T, typename AllocBase>
-  void swap(falcon::range_minimal_heap_allocator<T, AllocBase>& a,
-            falcon::range_minimal_heap_allocator<T, AllocBase>& b)
-  { a.swap(b); }
-
-  template<typename T, typename AllocBase>
-  void swap(falcon::range_fixed_allocator<T, AllocBase>& a,
-            falcon::range_fixed_allocator<T, AllocBase>& b)
-  { a.swap(b); }
-
-  template<typename T, typename AllocBase>
-  void swap(falcon::range_allocator<T, AllocBase>& a,
-            falcon::range_allocator<T, AllocBase>& b)
-  { a.swap(b); }
+template<typename T, typename AllocBase>
+void swap(range_allocator<T, AllocBase>& a,
+          range_allocator<T, AllocBase>& b)
+{ a.swap(b); }
 }
 
 #endif

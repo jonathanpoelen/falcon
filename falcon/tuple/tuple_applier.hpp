@@ -3,6 +3,7 @@
 
 #include <falcon/tuple/tuple_apply.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
+#include <utility>
 
 namespace falcon {
 
@@ -11,53 +12,54 @@ namespace falcon {
  *
  * Tag is \link indexes-tag indexes-tag \endlink or \p parameter_index
  */
-template <typename _Functor, typename _Tag = full_parameter_index_tag>
+template <typename Functor, typename Tag = full_parameter_index_tag>
 struct tuple_applier
 {
-	_Functor _M_func;
+  Functor _M_func;
 
 private:
-	typedef typename parameter_index_or_tag_to_tag<_Tag>::type __tag;
+  typedef typename parameter_index_or_tag_to_tag<Tag>::type __tag;
 
 public:
-	template<typename _T, typename _BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<_T>::value>::type>
-	constexpr auto operator()(_T&& t) const
-	-> decltype(tuple_apply<const _Functor&>(_BuildIndexes(), _M_func,
-																					 std::forward<_T>(t)))
-	{
-		return tuple_apply<const _Functor&>(_BuildIndexes(), _M_func, std::forward<_T>(t));
-	}
+  template<typename T, typename BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<T>::value>::type>
+  constexpr auto operator()(T&& t) const
+  -> decltype(tuple_apply<const Functor&>(BuildIndexes(),
+                      _M_func, std::forward<T>(t)))
+  { return tuple_apply<const Functor&>(BuildIndexes(), _M_func, std::forward<T>(t)); }
 
-	template<typename _T, typename _BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<_T>::value>::type>
-	auto operator()(_T&& t)
-	-> decltype(tuple_apply<_Functor&>(_BuildIndexes(), _M_func, std::forward<_T>(t)))
-	{
-		return tuple_apply<_Functor&>(_BuildIndexes(), _M_func, std::forward<_T>(t));
-	}
+  template<typename T, typename BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<T>::value>::type>
+  auto operator()(T&& t)
+  -> decltype(tuple_apply<Functor&>(BuildIndexes(), _M_func, std::forward<T>(t)))
+  { return tuple_apply<Functor&>(BuildIndexes(), _M_func, std::forward<T>(t)); }
 
-	void swap(tuple_applier& other)
-	{ std::swap(_M_func, other._M_func); }
+  void swap(tuple_applier& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 
-	template<typename _Tag2>
-	void swap(tuple_applier<_Functor, _Tag2>& other)
-	{ std::swap(_M_func, other._M_func); }
+  template<typename Tag2>
+  void swap(tuple_applier<Functor, Tag2>& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 };
 
-template <typename _Functor>
-tuple_applier<_Functor> make_tuple_applier(_Functor&& func)
-{ return {std::forward<_Functor>(func)}; }
+template <typename Functor>
+tuple_applier<Functor> make_tuple_applier(Functor&& func)
+{ return {std::forward<Functor>(func)}; }
 
-}
+template <typename Functor, typename Tag>
+void swap(tuple_applier<Functor, Tag>& a,
+          tuple_applier<Functor, Tag>& b)
+{ a.swap(b); }
 
-namespace std {
-template <typename _Functor, typename _Tag>
-void swap(falcon::tuple_applier<_Functor, _Tag>& a,
-					falcon::tuple_applier<_Functor, _Tag>& b)
+template <typename Functor, typename Tag, typename Tag2>
+void swap(tuple_applier<Functor, Tag>& a,
+          tuple_applier<Functor, Tag2>& b)
 { a.swap(b); }
-template <typename _Functor, typename _Tag, typename _Tag2>
-void swap(falcon::tuple_applier<_Functor, _Tag>& a,
-					falcon::tuple_applier<_Functor, _Tag2>& b)
-{ a.swap(b); }
+
 }
 
 #endif

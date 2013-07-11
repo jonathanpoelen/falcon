@@ -4,6 +4,8 @@
 #include <falcon/tuple/detail/is_tuple.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 
+#include <utility>
+
 namespace falcon {
 
 template <typename _Indexes>
@@ -30,8 +32,8 @@ struct __tuple_assign<parameter_index<_Index, _Indexes...>>
 	template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors>
 	static void __assign(_Tuple& t, _Tuple2& t2, _FunctorOrFunctors && t_func)
 	{
-		__impl_assign(typename detail::has_tuple_impl<_FunctorOrFunctors>::type(),
-									t, t2, std::forward<_FunctorOrFunctors>(t_func));
+		__impl_assign(typename is_tuple_impl<_FunctorOrFunctors>::type(),
+                      t, t2, std::forward<_FunctorOrFunctors>(t_func));
 		__tuple_assign<parameter_index<_Indexes...>>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func));
 	}
 };

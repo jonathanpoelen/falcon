@@ -55,11 +55,17 @@ public:
 	}
 
 	void swap(parameter_index_adapter& other)
-	{ std::swap(_M_func, other._M_func); }
+	{
+      using std::swap;
+      swap(_M_func, other._M_func);
+    }
 
 	template<typename _Tag2>
 	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
-	{ std::swap(_M_func, other._M_func); }
+    {
+      using std::swap;
+      swap(_M_func, other._M_func);
+    }
 };
 
 template <typename _Functor, std::size_t _NumberArg>
@@ -82,11 +88,17 @@ struct parameter_index_adapter<_Functor, call_partial_param_loop_tag<_NumberArg>
 	}
 
 	void swap(parameter_index_adapter& other)
-	{ std::swap(_M_func, other._M_func); }
+	{
+      using std::swap;
+      swap(_M_func, other._M_func);
+    }
 
 	template<typename _Tag2>
 	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
-	{ std::swap(_M_func, other._M_func); }
+	{
+      using std::swap;
+      swap(_M_func, other._M_func);
+    }
 };
 
 template <typename _Functor, std::size_t _NumberArg>
@@ -109,24 +121,31 @@ struct parameter_index_adapter<_Functor, call_partial_recursive_param_loop_tag<_
 	}
 
 	void swap(parameter_index_adapter& other)
-	{ std::swap(_M_func, other._M_func); }
+    {
+      using std::swap;
+      swap(_M_func, other._M_func);
+    }
 
 	template<typename _Tag2>
 	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
-	{ std::swap(_M_func, other._M_func); }
+    {
+      using std::swap;
+      swap(_M_func, other._M_func);
+    }
 };
 
 //@}
 
-}
-
-namespace std {
 template <typename _Functor, typename _Tag>
-void swap(falcon::parameter_index_adapter<_Functor, _Tag>& a, falcon::parameter_index_adapter<_Functor, _Tag>& b)
-{ a.swap(b); }
+void swap(parameter_index_adapter<_Functor, _Tag>& x,
+          parameter_index_adapter<_Functor, _Tag>& y)
+{ x.swap(y); }
+
 template <typename _Functor, typename _Tag, typename _Tag2>
-void swap(falcon::parameter_index_adapter<_Functor, _Tag>& a, falcon::parameter_index_adapter<_Functor, _Tag2>& b)
-{ a.swap(b); }
+void swap(parameter_index_adapter<_Functor, _Tag>& x,
+          parameter_index_adapter<_Functor, _Tag2>& y)
+{ x.swap(y); }
+
 }
 
 #endif

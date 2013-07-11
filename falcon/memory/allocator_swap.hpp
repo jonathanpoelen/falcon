@@ -14,7 +14,10 @@ namespace detail {
 
 	template<typename Allocator>
 	void allocator_swap_impl(Allocator& a, Allocator& b, std::true_type)
-	{ std::swap(a, b); }
+    {
+      using std::swap;
+      swap(a, b);
+    }
 }
 
 template<typename Allocator>
@@ -47,7 +50,10 @@ namespace detail {
 	struct allocator_swap_impl<Allocator, true>
 	{
 		static void swap_impl(Allocator& a, Allocator& b, std::true_type)
-		{ std::swap(a, b); }
+        {
+          using std::swap;
+          swap(a, b);
+        }
 		static void swap_impl(Allocator&, Allocator&, std::false_type)
 		{}
 		static void swap(Allocator& a, Allocator& b)

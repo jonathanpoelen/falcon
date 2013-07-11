@@ -90,9 +90,10 @@ public:
 	{ return _M_data; }
 
 	void swap(placeholder_for_argument& other)
-	{
-		std::swap(other._M_data, _M_data);
-		std::swap(other._M_functor, _M_functor);
+    {
+        using std::swap;
+		swap(other._M_data, _M_data);
+		swap(other._M_functor, _M_functor);
 	}
 };
 
@@ -104,13 +105,10 @@ placeholder_for_argument<_Position, _Functor, _T> bound_argument(_Functor&& func
 	);
 }
 
-}
-
-namespace std {
-
 template <int _Position, typename _Functor, typename _T>
-void swap(falcon::placeholder_for_argument<_Position, _Functor, _T>& a, falcon::placeholder_for_argument<_Position, _Functor, _T>& b)
-{ a.swap(b); }
+void swap(placeholder_for_argument<_Position, _Functor, _T>& x,
+          placeholder_for_argument<_Position, _Functor, _T>& y)
+{ x.swap(y); }
 
 }
 

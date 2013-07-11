@@ -1,7 +1,7 @@
 #ifndef _FALCON_NODE_ROPE_LINK_HPP
 #define _FALCON_NODE_ROPE_LINK_HPP
 
-#include <utility> //std::swap
+#include <falcon/utility/swap.hpp>
 #include <falcon/c++/constexpr.hpp>
 
 namespace falcon{ namespace node {
@@ -59,7 +59,10 @@ struct rope_link
 	}
 
 	void reverse()
-	{ std::swap<>(left, right); }
+    {
+      using std::swap;
+      swap(left, right);
+    }
 };
 
 template<typename _Left, typename _Right>

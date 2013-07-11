@@ -106,8 +106,9 @@ public:
 
 	void swap(range_container& other)
 	{
-		std::swap<>(_M_first, other._M_first);
-		std::swap<>(_M_last, other._M_last);
+        using std::swap;
+		swap(_M_first, other._M_first);
+		swap(_M_last, other._M_last);
 	}
 };
 
@@ -256,13 +257,10 @@ namespace container {
   { return make_range_container(cont); }
 }
 
-}
+template<typename _Iterator>
+void swap(range_container<_Iterator>& x, range_container<_Iterator> y)
+{ x.swap(y); }
 
-namespace std {
-	template<typename _Iterator>
-	void swap(falcon::range_container<_Iterator>& x,
-              falcon::range_container<_Iterator> y)
-	{ x.swap(y); }
 }
 
 #endif

@@ -4,6 +4,8 @@
 #if __cplusplus >= 201103L
 # include <falcon/tuple/tuple_apply.hpp>
 # include <falcon/utility/maker.hpp>
+#else
+# include <algorithm> //std::swap
 #endif
 #include <utility> //std::swap, std::pair
 #include <falcon/c++/constexpr.hpp>
@@ -191,8 +193,9 @@ struct range
 	}
 
 	void reverse()
-	{
-		std::swap(left, right);
+    {
+        using std::swap;
+        swap(left, right);
 	}
 
 	void swap(std::pair<_T, _T>& other)
@@ -326,25 +329,18 @@ inline range<_T> make_range(_T __x, _T __y)
 { return range<_T>(__x, __y); }
 #endif
 
-}
-
-namespace std {
 
 template<typename _T>
-inline void swap(falcon::range<_T>& __x, falcon::range<_T>& __y)
-{
-	__x.swap(__y);
-}
+inline void swap(range<_T>& __x, range<_T>& __y)
+{ __x.swap(__y); }
+
 template<typename _T>
-inline void swap(falcon::range<_T>& __x, pair<_T, _T>& __y)
-{
-	__x.swap(__y);
-}
+inline void swap(range<_T>& __x, std::pair<_T, _T>& __y)
+{ __x.swap(__y); }
+
 template<typename _T>
-inline void swap(pair<_T, _T>& __x, falcon::range<_T>& __y)
-{
-	__y.swap(__x);
-}
+inline void swap(std::pair<_T, _T>& __x, range<_T>& __y)
+{ __y.swap(__x); }
 
 }
 

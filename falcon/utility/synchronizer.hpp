@@ -250,7 +250,10 @@ public:
 	{ return assign(x); }
 
 	void swap(synchronizer& other)
-	{ std::swap(this->tuple(), other.tuple()); }
+	{
+      using std::swap;
+      swap(this->tuple(), other.tuple());
+    }
 };
 
 template<typename... _Elements>
@@ -277,6 +280,11 @@ template<typename... _Elements>
 const synchronizer<_Elements...>& tuple_synchronise(const std::tuple<_Elements...>& t)
 { return static_cast<const synchronizer<_Elements...>&>(t); }
 
+template<typename... _Elements>
+void swap(falcon::synchronizer<_Elements...>& a,
+          falcon::synchronizer<_Elements...>& b)
+{ a.swap(b); };
+
 }
 
 namespace std
@@ -289,11 +297,6 @@ namespace std
 	struct tuple_element<_Index, falcon::synchronizer<_Elements...>>
 	: tuple_element<_Index, std::tuple<_Elements...>>
 	{};
-
-	template<typename... _Elements>
-	void swap(falcon::synchronizer<_Elements...>& a,
-			  falcon::synchronizer<_Elements...>& b)
-	{ a.swap(b); };
 }
 
 #endif

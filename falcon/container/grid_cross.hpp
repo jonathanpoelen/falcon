@@ -174,9 +174,10 @@ public:
 
 	void swap(self_type& other)
 	{
+        using std::swap;
 		_array.swap(other._array);
-		std::swap<>(_width, other._width);
-		std::swap<>(_height, other._height);
+		swap(_width, other._width);
+		swap(_height, other._height);
 	}
 
 	FALCON_MEMBER_DELEGATE_ALL_ITERATOR(_array)
@@ -194,19 +195,19 @@ public:
 	{ return _array.at(n); }
 
 	bool in_grid(const node_type* node) const
-	{ return std::find<>(_array.begin(), _array.end(), node) == _array.end(); }
+	{ return std::find(_array.begin(), _array.end(), node) == _array.end(); }
 
 	size_type index(const node_type* node) const
-	{ return std::find<>(_array.begin(), _array.end(), node) - _array.begin(); }
+	{ return std::find(_array.begin(), _array.end(), node) - _array.begin(); }
 
 	size_type index(size_type x, size_type y) const
 	{ return coordinates::index(width(),x,y); }
 
 	size_type coord_x(size_type __index) const
-	{ return coordinates::coord_x<>(width(), __index); }
+	{ return coordinates::coord_x(width(), __index); }
 
 	size_type coord_y(size_type __index) const
-	{ return coordinates::coord_y<>(width(), __index); }
+	{ return coordinates::coord_y(width(), __index); }
 
 	template<typename _Result = std::pair<size_type, size_type> >
 	_Result coord(size_type __index) const
@@ -237,76 +238,71 @@ public:
 	{ return _array.back(); }
 
 	bool is_back_to_first() const
-	{ return friend_algo::is_back_to_first<>(*this); }
+	{ return friend_algo::is_back_to_first(*this); }
 
 	void back_to_first(bool connect = true)
-	{ friend_algo::back_to_first<>(*this, connect); }
+	{ friend_algo::back_to_first(*this, connect); }
 
 	bool is_back_to_first_each_line() const
-	{ return friend_algo::is_back_to_first_each_line<>(*this); }
+	{ return friend_algo::is_back_to_first_each_line(*this); }
 
 	void back_to_first_each_line(bool connect = true)
-	{ friend_algo::back_to_first_each_line<>(*this, connect); }
+	{ friend_algo::back_to_first_each_line(*this, connect); }
 
 	bool is_back_to_first_column() const
-	{ return friend_algo::is_back_to_first_column<>(*this); }
+	{ return friend_algo::is_back_to_first_column(*this); }
 
 	void back_to_first_column(bool connect = true)
-	{ friend_algo::back_to_first_column<>(*this, connect); }
+	{ friend_algo::back_to_first_column(*this, connect); }
 
 	bool is_back_to_first_each_column() const
-	{ return friend_algo::is_back_to_first_each_column<>(*this); }
+	{ return friend_algo::is_back_to_first_each_column(*this); }
 
 	void back_to_first_each_column(bool connect = true)
-	{ friend_algo::back_to_first_each_column<>(*this, connect); }
+	{ friend_algo::back_to_first_each_column(*this, connect); }
 
 	bool is_edge_connect_horizontal() const
-	{ return friend_algo::is_edge_connect_horizontal<>(*this); }
+	{ return friend_algo::is_edge_connect_horizontal(*this); }
 
 	void edge_connect_horizontal(bool connect = true)
-	{ friend_algo::edge_connect_horizontal<>(*this, connect); }
+	{ friend_algo::edge_connect_horizontal(*this, connect); }
 
 	bool is_edge_connect_vertical() const
-	{ return friend_algo::is_edge_connect_vertical<>(*this); }
+	{ return friend_algo::is_edge_connect_vertical(*this); }
 
 	void edge_connect_vertical(bool connect = true)
-	{ friend_algo::edge_connect_vertical<>(*this, connect); }
+	{ friend_algo::edge_connect_vertical(*this, connect); }
 
 	void edge_connect(bool connect = true)
-	{ friend_algo::edge_connect<>(*this, connect); }
+	{ friend_algo::edge_connect(*this, connect); }
 
 	bool is_edge_up(size_type __index) const
-	{ return friend_algo::is_edge_up<>(*this, __index); }
+	{ return friend_algo::is_edge_up(*this, __index); }
 
 	bool is_edge_down(size_type __index) const
-	{ return friend_algo::is_edge_down<>(*this, __index); }
+	{ return friend_algo::is_edge_down(*this, __index); }
 
 	bool is_edge_horizontal(size_type __index) const
-	{ return friend_algo::is_edge_connect_horizontal<>(*this, __index); }
+	{ return friend_algo::is_edge_connect_horizontal(*this, __index); }
 
 	bool is_edge_left(size_type __index) const
-	{ return friend_algo::is_edge_left<>(*this, __index); }
+	{ return friend_algo::is_edge_left(*this, __index); }
 
 	bool is_edge_right(size_type __index) const
-	{ return friend_algo::is_edge_right<>(*this, __index); }
+	{ return friend_algo::is_edge_right(*this, __index); }
 
 	bool is_edge_vertical(size_type __index) const
-	{ return friend_algo::is_edge_vertical<>(*this, __index); }
+	{ return friend_algo::is_edge_vertical(*this, __index); }
 
 	bool is_edge(size_type __index) const
 	{ return friend_algo::is_edge(*this, __index); }
 };
 
-}
-
-}
-
-namespace std {
-
-// Specialized algorithms [6.2.2.2].
 template<typename _Tp>
-inline void swap(falcon::container::grid_cross<_Tp>& __one, falcon::container::grid_cross<_Tp>& __two)
+inline void swap(grid_cross<_Tp>& __one, grid_cross<_Tp>& __two)
 { __one.swap(__two); }
+
+}
 
 }
 

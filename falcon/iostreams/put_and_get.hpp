@@ -82,7 +82,10 @@ public:
   { return *m_os; }
 
   void swap(basic_ostream_functor& other)
-  { std::swap(m_os, other.m_os); }
+  {
+    using std::swap;
+    swap(m_os, other.m_os);
+  }
 
 private:
   ostream_type* m_os;
@@ -134,7 +137,10 @@ public:
   { return *m_is; }
 
   void swap(basic_istream_functor& other)
-  { std::swap(m_is, other.m_is); }
+  {
+    using std::swap;
+    swap(m_is, other.m_is);
+  }
 
 private:
   istream_type* m_is;
@@ -148,17 +154,15 @@ basic_istream_functor<CharT, Traits>
 make_istream_functor(std::basic_istream<CharT, Traits>& is)
 { return basic_istream_functor<CharT, Traits>(is); }
 
-}
+template<typename CharT, typename Traits>
+void swap(basic_istream_functor<CharT, Traits>& x,
+          basic_istream_functor<CharT, Traits>& y)
+{ x.swap(y); }
 
-namespace std {
-  template<typename CharT, typename Traits>
-  void swap(falcon::basic_istream_functor<CharT, Traits>& a,
-            falcon::basic_istream_functor<CharT, Traits>& b)
-  { a.swap(b); }
-  template<typename CharT, typename Traits>
-  void swap(falcon::basic_ostream_functor<CharT, Traits>& a,
-            falcon::basic_ostream_functor<CharT, Traits>& b)
-  { a.swap(b); }
+template<typename CharT, typename Traits>
+void swap(basic_ostream_functor<CharT, Traits>& x,
+          basic_ostream_functor<CharT, Traits>& y)
+{ x.swap(y); }
 }
 
 #endif

@@ -113,8 +113,9 @@ public:
 	{ return !operator==(rhs); }
 
 	void swap(ptr_allocator& other)
-	{
-		std::swap(m_alloc, other.m_alloc);
+    {
+        using std::swap;
+        swap(m_alloc, other.m_alloc);
 		allocator_swap<__allocator_base>(*this, other);
 	}
 
@@ -131,12 +132,10 @@ private:
 	Alloc * m_alloc;
 };
 
-}
+template<typename Alloc>
+void swap(ptr_allocator<Alloc>& a, ptr_allocator<Alloc>& b)
+{ a.swap(b); }
 
-namespace std {
-	template<typename Alloc>
-	void swap(falcon::ptr_allocator<Alloc>& a, falcon::ptr_allocator<Alloc>& b)
-	{ a.swap(b); }
 }
 
 #endif

@@ -304,8 +304,9 @@ public:
 
 	void swap(basic_cstring& s) CPP_NOEXCEPT
 	{
-		std::swap<>(m_begin, s.m_begin);
-		std::swap<>(m_end, s.m_end);
+        using std::swap;
+        swap(m_begin, s.m_begin);
+		swap(m_end, s.m_end);
 	}
 
 	iterator begin() CPP_NOEXCEPT
@@ -1570,7 +1571,6 @@ operator+=(std::basic_string<typename _Traits::char_type, _Traits, _Alloc>& __lh
 					 const basic_cstring<const _CharT, _Traits>& __rhs)
 { return __lhs.append(__rhs.c_str(), __rhs.size()); }
 
-}
 
 /**
  *  @brief  Write string to a stream.
@@ -1584,12 +1584,10 @@ operator+=(std::basic_string<typename _Traits::char_type, _Traits, _Alloc>& __lh
 template<typename _CharT, typename _Traits, typename _StringCharT, typename _StringTraits>
 inline std::basic_ostream<_CharT, _Traits>&
 operator<<(std::basic_ostream<_CharT, _Traits>& __os,
-					 const falcon::basic_cstring<_StringCharT, _StringTraits>& __str)
-{
-	return falcon::ostream_insert(__os, __str.data(), __str.size());
-}
+           const basic_cstring<_StringCharT, _StringTraits>& __str)
+{ return ostream_insert(__os, __str.data(), __str.size()); }
 
-namespace std {
+
 /**
  *  @brief  Swap contents of two strings.
  *  @param lhs  First string.
@@ -1598,14 +1596,17 @@ namespace std {
  *  Exchanges the contents of @a lhs and @a rhs in constant time.
  */
 template<typename _CharT, typename _Traits>
-inline void swap(falcon::basic_cstring<_CharT, _Traits>& __lhs,
-								 falcon::basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
+inline void swap(basic_cstring<_CharT, _Traits>& __lhs,
+                 basic_cstring<_CharT, _Traits>& __rhs) CPP_NOEXCEPT
 { __lhs.swap(__rhs); }
 
+}
+
+namespace std {
 #define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type fname(const falcon::cstring_type& __str, size_t* __idx = 0, int __base = 10)\
-	{ return falcon::detail::stoa<result_type>\
-	(&std::std_fname, #fname, __str.c_str(), __idx, __base); }
+	{ return ::falcon::detail::stoa<result_type>\
+	(&std_fname, #fname, __str.c_str(), __idx, __base); }
 
 #define __FALCON_BASIC_CSTRING_TO(result_type, fname, type)\
 	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, cstring)\
@@ -1625,8 +1626,8 @@ __FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 
 #define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type fname(const falcon::cstring_type& __str, size_t* __idx = 0)\
-	{ return falcon::detail::stoa<result_type>\
-	(&std::std_fname, #fname, __str.c_str(), __idx); }
+	{ return ::falcon::detail::stoa<result_type>\
+	(&std_fname, #fname, __str.c_str(), __idx); }
 
 __FALCON_BASIC_CSTRING_TO(float, stof, f)
 __FALCON_BASIC_CSTRING_TO(double, stod, d)
@@ -1637,17 +1638,17 @@ __FALCON_BASIC_CSTRING_TO(double long, stold, ld)
 #undef __FALCON_BASIC_CSTRING_TO
 #undef __FALCON_BASIC_CSTRING_TO_IMPL
 
-inline std::string to_string(const falcon::cstring& s)
-{ return std::string(s.data(), s.size()); }
+inline string to_string(const falcon::cstring& s)
+{ return string(s.data(), s.size()); }
 
-inline std::string to_string(const falcon::const_cstring& s)
-{ return std::string(s.data(), s.size()); }
+inline string to_string(const falcon::const_cstring& s)
+{ return string(s.data(), s.size()); }
 
-inline std::wstring to_wstring(const falcon::cwstring& s)
-{ return std::wstring(s.data(), s.size()); }
+inline wstring to_wstring(const falcon::cwstring& s)
+{ return wstring(s.data(), s.size()); }
 
-inline std::wstring to_wstring(const falcon::const_cwstring& s)
-{ return std::wstring(s.data(), s.size()); }
+inline wstring to_wstring(const falcon::const_cwstring& s)
+{ return wstring(s.data(), s.size()); }
 
 
 #if __cplusplus >= 201103L

@@ -14,15 +14,15 @@ namespace falcon {
  *
  * @ingroup sequences
  */
-template<typename _T>
+template<typename T>
 class ptr_container
 {
 public:
-	typedef _T value_type;
-	typedef _T* pointer;
-	typedef const _T* const_pointer;
-	typedef _T& reference;
-	typedef const _T& const_reference;
+	typedef T value_type;
+	typedef T* pointer;
+	typedef const T* const_pointer;
+	typedef T& reference;
+	typedef const T& const_reference;
 	typedef std::ptrdiff_t difference_type;
 
 	typedef std::size_t size_type;
@@ -154,8 +154,9 @@ public:
 
 	void swap(ptr_container& other) CPP_NOEXCEPT
 	{
-		std::swap<>(_M_first, other._M_first);
-		std::swap<>(_M_last, other._M_last);
+        using std::swap;
+		swap(_M_first, other._M_first);
+		swap(_M_last, other._M_last);
 	}
 };
 
@@ -169,8 +170,8 @@ public:
  * ptr_containers. Ptr_containers are considered equivalent if their sizes are equal,
  * and if corresponding elements compare equal.
  */
-template<typename _Tp>
-inline bool operator==(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
+template<typename Tp>
+inline bool operator==(const ptr_container<Tp>& x, const ptr_container<Tp>& y)
 { return (x.size() == y.size() && std::equal(x.begin(), x.end(), y.begin())); }
 
 /**
@@ -184,60 +185,58 @@ inline bool operator==(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
  *
  * See std::lexicographical_compare() for how the determination is made.
  */
-template<typename _Tp>
-inline bool operator<(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
+template<typename Tp>
+inline bool operator<(const ptr_container<Tp>& x, const ptr_container<Tp>& y)
 { return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end()); }
 
 /// Based on operator==
-template<typename _Tp>
-inline bool operator!=(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
+template<typename Tp>
+inline bool operator!=(const ptr_container<Tp>& x, const ptr_container<Tp>& y)
 { return !(x == y); }
 
 /// Based on operator<
-template<typename _Tp>
-inline bool operator>(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
+template<typename Tp>
+inline bool operator>(const ptr_container<Tp>& x, const ptr_container<Tp>& y)
 { return y < x; }
 
 /// Based on operator<
-template<typename _Tp>
-inline bool operator<=(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
+template<typename Tp>
+inline bool operator<=(const ptr_container<Tp>& x, const ptr_container<Tp>& y)
 { return !(y < x); }
 
 /// Based on operator<
-template<typename _Tp>
-inline bool operator>=(const ptr_container<_Tp>& x, const ptr_container<_Tp>& y)
+template<typename Tp>
+inline bool operator>=(const ptr_container<Tp>& x, const ptr_container<Tp>& y)
 { return !(x < y); }
 
-template<typename _T>
-ptr_container<_T> make_ptr_container(_T * first, _T * last) CPP_NOEXCEPT
-{ return ptr_container<_T>(first, last); }
+template<typename T>
+ptr_container<T> make_ptr_container(T * first, T * last) CPP_NOEXCEPT
+{ return ptr_container<T>(first, last); }
 
-template<typename _T>
-ptr_container<_T> make_ptr_container(_T * first, std::size_t n) CPP_NOEXCEPT
-{ return ptr_container<_T>(first, n); }
+template<typename T>
+ptr_container<T> make_ptr_container(T * first, std::size_t n) CPP_NOEXCEPT
+{ return ptr_container<T>(first, n); }
 
-template<typename _T>
-ptr_container<const _T> make_ptr_container(const _T * first, const _T * last) CPP_NOEXCEPT
-{ return ptr_container<const _T>(first, last); }
+template<typename T>
+ptr_container<const T> make_ptr_container(const T * first, const T * last) CPP_NOEXCEPT
+{ return ptr_container<const T>(first, last); }
 
-template<typename _T>
-ptr_container<const _T> make_ptr_container(const _T * first, std::size_t n) CPP_NOEXCEPT
-{ return ptr_container<const _T>(first, n); }
+template<typename T>
+ptr_container<const T> make_ptr_container(const T * first, std::size_t n) CPP_NOEXCEPT
+{ return ptr_container<const T>(first, n); }
 
-template<typename _T, std::size_t _N>
-ptr_container<_T> make_ptr_container(_T(&cont)[_N]) CPP_NOEXCEPT
-{ return ptr_container<const _T>(&cont[0], &cont[_N]); }
+template<typename T, std::size_t _N>
+ptr_container<T> make_ptr_container(T(&cont)[_N]) CPP_NOEXCEPT
+{ return ptr_container<const T>(&cont[0], &cont[_N]); }
 
-template<typename _T, std::size_t _N>
-ptr_container<const _T> make_ptr_container(const _T(&cont)[_N]) CPP_NOEXCEPT
-{ return ptr_container<const _T>(&cont[0], &cont[_N]); }
+template<typename T, std::size_t _N>
+ptr_container<const T> make_ptr_container(const T(&cont)[_N]) CPP_NOEXCEPT
+{ return ptr_container<const T>(&cont[0], &cont[_N]); }
 
-}
+template<typename T>
+void swap(ptr_container<T>& x, ptr_container<T>& y) CPP_NOEXCEPT
+{ x.swap(y); }
 
-namespace std {
-	template<typename _T>
-	void swap(const falcon::ptr_container<_T>& x, const falcon::ptr_container<_T> y) CPP_NOEXCEPT
-	{ x.swap(y); }
 }
 
 #endif

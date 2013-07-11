@@ -1,7 +1,6 @@
 #ifndef _FALCON_NODE_CROSS_LINK_HPP
 #define _FALCON_NODE_CROSS_LINK_HPP
 
-#include <utility> //std::swap
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/arg/rotate_arg.hpp>
 
@@ -92,19 +91,27 @@ struct cross_link
 	{ falcon::rotate_arg<3>(up, right, down, left); }
 
 	void rotate_horizontal()
-	{ std::swap<>(up, down); }
+    {
+        using std::swap;
+        swap(up, down);
+    }
 	void rotate_vertical()
-	{ std::swap<>(left, right); }
+    {
+        using std::swap;
+        swap(left, right);
+    }
 
 	void rotate_left_down()
-	{
-		std::swap<>(up, right);
-		std::swap<>(left, down);
+    {
+        using std::swap;
+        swap(up, right);
+		swap(left, down);
 	}
 	void rotate_down_right()
-	{
-		std::swap<>(up, left);
-		std::swap<>(right, down);
+    {
+        using std::swap;
+		swap(up, left);
+		swap(right, down);
 	}
 
 	void reverse()

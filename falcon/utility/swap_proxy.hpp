@@ -1,47 +1,62 @@
 #ifndef _FALCON_UTILITY_SWAP_PROXY_HPP
 #define _FALCON_UTILITY_SWAP_PROXY_HPP
 
+#if __cplusplus >= 201103L
+#include <falcon/type_traits/use.hpp>
 #include <utility>
-#include <falcon/utility/move.hpp>
-#include <falcon/c++/boost_or_std.hpp>
-#include FALCON_BOOST_OR_STD_TRAITS(remove_all_extents)
+#else
+#include <algorithm>
+#endif
 
 namespace falcon {
 
-template <typename _T1, typename _T2, typename _Intermediary>
+template <typename T1, typename T2, typename Intermediary>
 struct __swap_proxy
 {
-	static void swap_proxy(_T1& a, _T2& b)
-	{
-		_Intermediary tmp = static_cast<_Intermediary>(a);
-		a = static_cast<_T1>(b);
-		b = static_cast<_T2>(tmp);
-	}
+  static void swap_proxy(T1& a, T2& b)
+  {
+    Intermediary tmp = static_cast<Intermediary>(a);
+    a = static_cast<T1>(b);
+    b = static_cast<T2>(tmp);
+  }
 };
 
-template <typename _T>
-struct __swap_proxy<_T, _T, _T>
+template <typename T>
+struct __swap_proxy<T, T, T>
 {
-	static void swap_proxy(_T& a, _T& b)
-	{
-		std::swap<>(a, b);
-	}
+  static void swap_proxy(T& a, T& b)
+  {
+    using std::swap;
+    swap(a, b);
+  }
 };
 
+#if __cplusplus >= 201103L
+template <typename T1, typename T2>
+struct __swap_proxy<T1, T2, use_default>
+: __swap_proxy<T1, T2, typename std::remove_all_extents<T1>::type>
+{};
+#endif
 
 ///Swap for different type
-template <typename _T1, typename _T2, typename _Intermediary = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_all_extents<_T1>::type>
-void swap_proxy(_T1& a, _T2& b)
-{
-	__swap_proxy<_T1, _T2, _Intermediary>::swap_proxy(a,b);
-}
+#if __cplusplus >= 201103L
+template <typename Intermediary = use_default, typename T1, typename T2>
+#else
+template <typename Intermediary, typename T1, typename T2>
+#endif
+void swap_proxy(T1& a, T2& b)
+{ __swap_proxy<T1, T2, Intermediary>::swap_proxy(a,b); }
 
 ///Swap for different type array
-template <typename _T1, typename _T2, std::size_t _N, typename _Intermediary = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_all_extents<_T1>::type>
-void swap_proxy(_T1 (&a) [_N], _T2 (&b) [_N])
+#if __cplusplus >= 201103L
+template <typename Intermediary = use_default, typename T1, typename T2, std::size_t _N>
+#else
+template <typename Intermediary, typename T1, typename T2, std::size_t _N>
+#endif
+void swap_proxy(T1 (&a) [_N], T2 (&b) [_N])
 {
-	for (std::size_t i = 0; i < _N; ++i)
-		swap_proxy<_T1, _T2, _Intermediary>(a[i], b[i]);
+  for (std::size_t i = 0; i < _N; ++i)
+    swap_proxy<Intermediary>(a[i], b[i]);
 }
 }
 

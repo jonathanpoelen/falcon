@@ -1,7 +1,7 @@
 #ifndef FALCON_TUPLE_ARRAY_COMPATIBILITY_HPP
 #define FALCON_TUPLE_ARRAY_COMPATIBILITY_HPP
 
-#include <falcon/tuple/detail/tuplefwd.hpp>
+#include <falcon/tuple/detail/is_tuple.hpp>
 #include <utility>
 
 namespace std {
@@ -26,6 +26,15 @@ struct tuple_size<T[N]>
 template<std::size_t I, typename T, std::size_t N>
 struct tuple_element<I, T[N]>
 { typedef T type; };
+
+}
+
+namespace falcon {
+
+template<typename _T, std::size_t _N>
+struct is_tuple_impl<_T[_N]>
+: std::true_type
+{};
 
 }
 

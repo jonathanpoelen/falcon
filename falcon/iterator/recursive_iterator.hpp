@@ -300,7 +300,7 @@ private:
 public:
 	template<typename _Container>
 	explicit basic_recursive_iterator(_Container& __cont, int = 1)
-	: __base(__maker_tuple::__make(std::make_pair(std::begin(__cont), std::end(__cont))))
+	: __base(__maker_tuple::__make(std::make_pair(begin(__cont), end(__cont))))
 	{}
 
 	explicit basic_recursive_iterator(__first_iterator __first, __first_iterator __last)

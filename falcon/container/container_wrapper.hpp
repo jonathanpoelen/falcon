@@ -91,14 +91,16 @@ public:
 
   void swap(container_wrapper& other)
   {
-      std::swap(_access, other._access);
-      std::swap(_container, other._container);
+    using std::swap;
+    swap(_access, other._access);
+    swap(_container, other._container);
   }
 
   template<typename Access2>
   void swap_container(container_wrapper<Container, Access2>& other)
   {
-      std::swap(_access, other._access);
+    using std::swap;
+    swap(_access, other._access);
   }
 
   operator container_type&() const
@@ -170,13 +172,11 @@ container_wrapper<const Container, reverse_range_access_traits<const Container> 
 crseq(const Container& cont)
 { return container_wrapper<const Container, reverse_range_access_traits<const Container> >(cont); }
 
-}
+template<typename Container, typename Access>
+void swap(container_wrapper<Container, Access>& a,
+          container_wrapper<Container, Access>& b)
+{ a.swap(b); }
 
-namespace std {
-  template<typename Container, typename Access>
-  void swap(falcon::container_wrapper<Container, Access>& a,
-            falcon::container_wrapper<Container, Access>& b)
-  { a.swap(b); }
 }
 
 #endif

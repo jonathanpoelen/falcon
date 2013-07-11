@@ -38,15 +38,17 @@ namespace detail {
 		{
 			self_type::move_parent(other._parent, _parent);
 			self_type::move_parent(_parent, other._parent);
-			std::swap(_parent, other._parent);
+            using std::swap;
+            swap(_parent, other._parent);
 		}
 
 		static void swap_left(_T* _this, _T& other)
-		{
+        {
+            using std::swap;
 			_T* p1 = other.left();
 			_T* p2 = _this->left();
 			if (p1 && p2)
-				std::swap(p1->_parent, p2->_parent);
+                swap(p1->_parent, p2->_parent);
 			else if (p1)
 				p1->_parent = 0;
 			else if (p2)
@@ -55,11 +57,12 @@ namespace detail {
 		}
 
 		static void swap_right(_T* _this, _T& other)
-		{
+        {
+            using std::swap;
 			_T* p1 = other.right();
 			_T* p2 = _this->right();
 			if (p1 && p2)
-				std::swap(p1->_parent, p2->_parent);
+				swap(p1->_parent, p2->_parent);
 			else if (p1)
 				p1->_parent = 0;
 			else if (p2)

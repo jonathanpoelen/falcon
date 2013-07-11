@@ -1,6 +1,6 @@
 #ifndef _FALCON_NODE_UNIQUE_LINK_HPP
 #define _FALCON_NODE_UNIQUE_LINK_HPP
-#include <utility> // std::swap
+
 #include <falcon/c++/constexpr.hpp>
 
 namespace falcon { namespace node {
