@@ -1,5 +1,5 @@
-#ifndef _FALCON_CONTAINER_CONTAINER_WRAPPER
-#define _FALCON_CONTAINER_CONTAINER_WRAPPER
+#ifndef FALCON_CONTAINER_CONTAINER_WRAPPER
+#define FALCON_CONTAINER_CONTAINER_WRAPPER
 
 #include <falcon/container/range_access_traits.hpp>
 #include <iterator>
@@ -166,6 +166,11 @@ template<typename Container>
 container_wrapper<const Container>
 cseq(const Container& cont)
 { return container_wrapper<const Container>(cont); }
+
+template<typename Container, typename Access>
+container_wrapper<const Container, Access>
+cseq(const Container& cont, const Access& access)
+{ return container_wrapper<const Container, Access>(cont, access); }
 
 template<typename Container>
 container_wrapper<const Container, reverse_range_access_traits<const Container> >

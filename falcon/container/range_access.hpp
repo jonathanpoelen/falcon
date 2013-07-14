@@ -11,26 +11,30 @@
 namespace falcon {
 	using std::begin;
 	using std::end;
+#if __cplusplus > 201103L
+    using std::rbegin;
+    using std::rend;
+#else
+    template<class _Container>
+    inline auto rbegin(_Container& cont)
+    -> decltype(cont.rbegin())
+    { return cont.rbegin(); }
 
-	template<class _Container>
-	inline auto rbegin(_Container& cont)
-	-> decltype(cont.rbegin())
-	{ return cont.rbegin(); }
+    template<class _Container>
+    inline auto rbegin(const _Container& cont)
+    -> decltype(cont.rbegin())
+    { return cont.rbegin(); }
 
-	template<class _Container>
-	inline auto rbegin(const _Container& cont)
-	-> decltype(cont.rbegin())
-	{ return cont.rbegin(); }
+    template<class _Container>
+    inline auto rend(_Container& cont)
+    -> decltype(cont.rend())
+    { return cont.rend(); }
 
-	template<class _Container>
-	inline auto rend(_Container& cont)
-	-> decltype(cont.rend())
-	{ return cont.rend(); }
-
-	template<class _Container>
-	inline auto rend(const _Container& cont)
-	-> decltype(cont.rend())
-	{ return cont.rend(); }
+    template<class _Container>
+    inline auto rend(const _Container& cont)
+    -> decltype(cont.rend())
+    { return cont.rend(); }
+#endif
 
 	template<class _Container>
 	inline auto cbegin(const _Container& cont)
@@ -135,13 +139,15 @@ namespace falcon {
 #endif
 
 namespace falcon {
-	template<class _Tp, size_t _Nm>
-	inline std::reverse_iterator<_Tp*> rbegin(_Tp (&arr)[_Nm])
-	{ return std::reverse_iterator<_Tp*>(begin(arr)); }
+#if !(__cplusplus > 201103L)
+    template<class _Tp, size_t _Nm>
+    inline std::reverse_iterator<_Tp*> rbegin(_Tp (&arr)[_Nm])
+    { return std::reverse_iterator<_Tp*>(begin(arr)); }
 
-	template<class _Tp, size_t _Nm>
-	inline std::reverse_iterator<_Tp*> rend(_Tp (&arr)[_Nm])
-	{ return std::reverse_iterator<_Tp*>(end(arr)); }
+    template<class _Tp, size_t _Nm>
+    inline std::reverse_iterator<_Tp*> rend(_Tp (&arr)[_Nm])
+    { return std::reverse_iterator<_Tp*>(end(arr)); }
+#endif
 
 	template<class _Tp, size_t _Nm>
 	inline const _Tp* cbegin(const _Tp (&arr)[_Nm])

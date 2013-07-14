@@ -8,7 +8,7 @@ rendre operators.hpp un peu compatible c++89
 
 modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
 
-Essayer d'enlever un maximum de macro variable et passer par __VA_ARGS__
+enlever les macros variable et passer par __VA_ARGS__
 
 objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionner avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
 
