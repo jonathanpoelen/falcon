@@ -54,8 +54,6 @@ amélioré algorithm.hpp en "optimisant" les algos quand possible (nottament qua
 
 singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>. Voir aussi call_once
 
-container trier de façon static. version map et set et unordered. Faire un static_check<obj, compare, predicate>() ou un truc du genre. Pour permettre de vérifier des conditions à la compilation. Un truc comme ça existe déjà dans boost
-
 les lambdas toujours par reference ou il faut parfois utiliser std::ref ? Pas le cas pour while_loop et co...
 
 faire un make_parameter_adapter() et un make_tuple_applier().
@@ -159,8 +157,6 @@ les mêmes allocateur (de pool) mais qui sont utilisé avec scoped_adapter_alloc
 
 support des non exceptions (retourne 0 au lieu de bad_alloc). Flag -fno-exceptions pour gcc. Utiliser la macro BOOST_NO_EXCEPTIONS dans boost/config.hpp
 
-container toujours trier. Fournir le type de container principal en template. Même interface que vector, list et deque (faire le trie). priority_queue ? Boost en fournit un à valeur non constante
-
 implementation de simple signal
 
 utilisé FALCON_EMPTY (BOOST_EMPTY ?) pour arguments vide de macro
@@ -181,8 +177,9 @@ vector avec fonction de redirection d'indice (type template). Permet par exemple
 
 multi_new<T...>(size_t...). Alloue plusieurs objet de taille différente en un seul bloc (un new).
 
+changer tous les prefix __ en _. (__ interdit et _ uinterdit dans le namesapce global)
 
-
+optimal_tuple utilise optimal_parameter
 
 
 
