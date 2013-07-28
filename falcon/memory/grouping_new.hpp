@@ -1,10 +1,7 @@
 #ifndef FALCON_MEMORY_GROUPING_NEW_HPP
 #define FALCON_MEMORY_GROUPING_NEW_HPP
 
-#include <falcon/c++1x/syntax.hpp>
-#include <falcon/c++/extend_pack.hpp>
 #include <falcon/parameter/parameter_pack.hpp>
-#include <falcon/parameter/manip.hpp>
 #include <falcon/tuple/optimal_tuple.hpp>
 #include <falcon/memory/construct.hpp>
 #include <falcon/arg/arg.hpp>
@@ -14,7 +11,7 @@
 
 namespace falcon {
 
-void* align(size_t alignment, size_t size, void*& ptr, size_t& space)
+inline void* align(size_t alignment, size_t size, void*& ptr, size_t& space)
 {
 #if defined(__GNUC__)
   void* r = nullptr;

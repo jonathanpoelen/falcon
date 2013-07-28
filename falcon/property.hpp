@@ -62,10 +62,6 @@ struct __set_property_through_base
 };
 
 
-template<typename _Assign = use_default>
-struct set_by_base;
-
-
 template<typename _T, typename _Get>
 struct __get_property_traits
 : default_or_type<use<__get_property<_T>>, _Get>
@@ -88,16 +84,6 @@ struct __set_property_through_get_traits
 
 template<typename _T, typename _Set>
 struct __set_property_through_get_traits<_T, void, _Set>
-: use<__set_property_through_base<_T, _Set>>
-{};
-
-template<typename _T, typename _Get, typename _Set>
-struct __set_property_through_get_traits<_T, _Get, set_by_base<_Set>>
-: use<__set_property_through_base<_T, _Set>>
-{};
-
-template<typename _T, typename _Set>
-struct __set_property_through_get_traits<_T, void, set_by_base<_Set>>
 : use<__set_property_through_base<_T, _Set>>
 {};
 

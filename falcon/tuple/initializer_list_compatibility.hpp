@@ -6,26 +6,28 @@
 #include <utility>
 
 namespace std {
-  template<std::size_t I, typename T>
+  template<size_t I, typename T>
   T& get(initializer_list<T>& l) noexcept
   { return l.begin()[I]; }
 
-  template<std::size_t I, typename T>
+  template<size_t I, typename T>
   constexpr const T& get(const initializer_list<T>& l) noexcept
   { return l.begin()[I]; }
 
-  template<std::size_t I, typename T>
+  template<size_t I, typename T>
   struct tuple_element<I, std::initializer_list<T>>
   { typedef T type; };
 }
 
 namespace falcon {
+namespace detail {
 
-template<typename _T>
+template<typename T>
 struct is_tuple_impl<std::initializer_list<T>>
 : std::true_type
 {};
 
+}
 }
 
 #endif

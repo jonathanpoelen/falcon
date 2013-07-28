@@ -21,24 +21,27 @@ struct eval_if
  */
 template<bool c, class _TrueClass, class _FalseClass>
 struct eval_not_if
-: eval_if<!c, _TrueClass, _FalseClass>
-{};
+{
+  typedef typename eval_if<!c, _TrueClass, _FalseClass>::type type;
+};
 
 /**
  * shorcut notation for eval_if< _T::value, _TrueType, _FalseType>.
  */
 template<class _T, class _TrueClass, class _FalseClass>
 struct eval_if_c
-: eval_if<_T::value, _TrueClass, _FalseClass>
-{};
+{
+  typedef typename eval_if<_T::value, _TrueClass, _FalseClass>::type type;
+};
 
 /**
  * shorcut notation for eval_not_if< _T::value, _TrueType, _FalseType>.
  */
 template<class _T, class _TrueClass, class _FalseClass>
 struct eval_not_if_c
-: eval_if<!_T::value, _TrueClass, _FalseClass>
-{};
+{
+  typedef typename eval_if<!_T::value, _TrueClass, _FalseClass>::type type;
+};
 
 }
 

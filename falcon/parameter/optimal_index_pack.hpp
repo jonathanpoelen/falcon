@@ -1,97 +1,102 @@
-#ifndef FALCON_PARAMETER_OPTIMAL_INDEX_PACK_HPP
-#define FALCON_PARAMETER_OPTIMAL_INDEX_PACK_HPP
+#ifndef FALCON_PARAMETER_OPTIMALINDEX_PACK_HPP
+#define FALCON_PARAMETER_OPTIMALINDEX_PACK_HPP
 
+#include <falcon/parameter/pack_element.hpp>
 #include <falcon/parameter/parameter_pack.hpp>
 #include <falcon/parameter/parameter_index.hpp>
+#include <falcon/parameter/parameter_element.hpp>
+#include <falcon/parameter/keep_parameter_index.hpp>
 
 namespace falcon {
 
-template<typename _T, std::size_t _I>
+template<typename T, std::size_t I>
 struct __parameter_with_index
 {
-  typedef _T __type;
-  static const std::size_t __index = _I;
-  static const std::size_t __size = alignof(_T);
+  typedef T __type;
+  static const std::size_t __index = I;
+  static const std::size_t __size = alignof(T);
 };
 
-template<typename _Pack, typename _PackWithIndex = parameter_pack<>, std::size_t _I = 0>
+template<typename Pack, typename PackWithIndex = parameter_pack<>, std::size_t I = 0>
 struct __build_parameter_with_index;
 
-template<typename... _ElementsWithIndex, std::size_t _I>
+template<typename... ElementsWithIndex, std::size_t I>
 struct __build_parameter_with_index<
   parameter_pack<>,
-  parameter_pack<_ElementsWithIndex...>,
-  _I
+  parameter_pack<ElementsWithIndex...>,
+  I
 >
-{ typedef parameter_pack<_ElementsWithIndex...> __type; };
+{ typedef parameter_pack<ElementsWithIndex...> __type; };
 
-template<typename _T, typename... _Elements, typename... _ElementsWithIndex, std::size_t _I>
+template<typename T, typename... Elements, typename... ElementsWithIndex, std::size_t I>
 struct __build_parameter_with_index<
-  parameter_pack<_T, _Elements...>,
-  parameter_pack<_ElementsWithIndex...>,
-  _I
+  parameter_pack<T, Elements...>,
+  parameter_pack<ElementsWithIndex...>,
+  I
 >
 {
   typedef typename __build_parameter_with_index<
-    parameter_pack<_Elements...>,
-    parameter_pack<__parameter_with_index<_T, _I>, _ElementsWithIndex...>,
-    _I + 1
-  >::type type;
+    parameter_pack<Elements...>,
+    parameter_pack<__parameter_with_index<T, I>, ElementsWithIndex...>,
+    I + 1
+  >::__type __type;
 };
 
-template <std::size_t _Size, std::size_t _K, std::size_t _I,
-  typename _T, typename... _Elements>
+template <std::size_t Size, std::size_t K, std::size_t I,
+  typename T, typename... Elements>
 struct __maximal_size_element
+: __maximal_size_element<
+  (Size > T::__size) ? Size : T::__size,
+  (Size > T::__size) ? K : I,
+  I + 1,
+  Elements...
+>::__type
+{};
+
+template <std::size_t Size, std::size_t K, std::size_t I, typename T>
+struct __maximal_size_element<Size, K, I, T>
 {
-  typedef typename __maximal_size_element<
-    (_Size > _T::__size) ? _Size : _T::__size,
-    (_Size > _T::__size) ? _K : _I,
-    _I + 1,
-    _Elements...
-  >::type type;
+  static const std::size_t __value = (Size > T::__size) ? K : I;
+  typedef __maximal_size_element __type;
 };
 
-template <std::size_t _Size, std::size_t _K, std::size_t _I, typename _T>
-struct __maximal_size_element<_Size, _K, _I, _T>
-{ static const std::size_t __value = (_Size > _T::__size) ? _K : _I; };
-
-template <typename _Pack, typename _Indexes = parameter_index<>>
+template <typename Pack, typename Indexes = parameter_index<>>
 struct __optimal_index_pack;
 
-template <typename... _Elements, std::size_t... _Indexes>
+template <typename... Elements, std::size_t... Indexes>
 struct __optimal_index_pack<
-  parameter_pack<_Elements...>,
-  parameter_index<_Indexes...>
+  parameter_pack<Elements...>,
+  parameter_index<Indexes...>
 >
 {
   static const std::size_t __max_element = __maximal_size_element<
-      0, 0, 0, _Elements...
+      0, 0, 0, Elements...
   >::__value;
-  typedef parameter_pack<_Elements...> __pack;
+  typedef parameter_pack<Elements...> __pack;
   typedef typename __optimal_index_pack<
     typename parameter::pack_element<
       __pack,
       typename keep_parameter_index<
         ignore_parameter_index_tag<__max_element>,
-        sizeof...(_Elements)
+        sizeof...(Elements)
       >::type
     >::type,
     parameter_index<
-      _Indexes...,
+      Indexes...,
       parameter_element<__max_element, __pack>::type::__index
     >
   >::__indexes __indexes;
 };
 
-template <std::size_t... _Indexes>
-struct __optimal_index_pack<parameter_pack<>, parameter_index<_Indexes...>>
-{ typedef parameter_index<_Indexes...> __indexes; };
+template <std::size_t... Indexes>
+struct __optimal_index_pack<parameter_pack<>, parameter_index<Indexes...>>
+{ typedef parameter_index<Indexes...> __indexes; };
 
-template<typename _Pack>
+template<typename Pack>
 struct optimal_index_pack
 {
   typedef typename __optimal_index_pack<
-    typename __build_parameter_with_index<_Pack>::__type
+    typename __build_parameter_with_index<Pack>::__type
   >::__indexes type;
 };
 

@@ -162,6 +162,22 @@ container_wrapper<Container, reverse_range_access_traits<Container> >
 rseq(Container& cont)
 { return container_wrapper<Container, reverse_range_access_traits<Container> >(cont); }
 
+#if __cplusplus >= 201103L
+template<typename Container>
+auto cseq(const Container& cont)
+-> decltype(seq(cont))
+{ return seq(cont); }
+
+template<typename Container, typename Access>
+auto cseq(const Container& cont, const Access& access)
+-> decltype(seq(cont, access))
+{ return seq(cont, access); }
+
+template<typename Container>
+auto crseq(const Container& cont)
+->decltype(rseq(cont))
+{ return rseq(cont); }
+#else
 template<typename Container>
 container_wrapper<const Container>
 cseq(const Container& cont)
@@ -176,6 +192,7 @@ template<typename Container>
 container_wrapper<const Container, reverse_range_access_traits<const Container> >
 crseq(const Container& cont)
 { return container_wrapper<const Container, reverse_range_access_traits<const Container> >(cont); }
+#endif
 
 template<typename Container, typename Access>
 void swap(container_wrapper<Container, Access>& a,
