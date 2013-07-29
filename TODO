@@ -181,7 +181,9 @@ move semantique pour class_property + property read_only + operator= pour évite
 
 dans les rbegin, rend pour les tableaux. utiliser un opposite_iterator ?
 
-
+faire le menage dans les classes de sfinae. Les choose_* sont-elles vraiments indispensable ? faire étendre les classes d'integral_constant. utiliser decltype en C++11 pour alleger le code ?
+FALCON_CREATE_* -> FALCON_*_TRAIT_NAMED_DEF
+FALCON_CLASS_* -> FALCON_TRAIT_*_TRAIT_DEF
 
 
 

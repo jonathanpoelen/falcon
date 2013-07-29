@@ -2,63 +2,69 @@
 #define FALCON_LOGICAL_COMPARE_HPP
 
 #include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/reference.hpp>
 
 namespace falcon {
-template<typename _T, typename _U = _T,
-		int _Lesser = -1,
-		int _Greater = -_Lesser,
-		int _Equaler = 0
-		>
-CPP_CONSTEXPR int compare(const _T& a, const _U& b)
+
+template<int Lesser, int Greater, int Equal, typename T, typename U>
+CPP_CONSTEXPR int compare(const T& a, const U& b)
 {
-	return a == b ? _Equaler : a < b ? _Lesser : _Greater;
+  return a == b ? Equal : a < b ? Lesser : Greater;
 }
 
-template<int _Lesser, int _Greater, int _Equaler,
-		typename _T,
-		typename _U = _T
-		>
-inline CPP_CONSTEXPR int compare(const _T& a, const _U& b)
+template<int Lesser, int Greater, typename T, typename U>
+CPP_CONSTEXPR int compare(const T& a, const U& b)
 {
-	return compare<_T, _U, _Lesser, _Greater, _Equaler>(a, b);
+  return compare<Lesser, Greater, 0>(a, b);
+}
+
+template<int Lesser, typename T, typename U>
+CPP_CONSTEXPR int compare(const T& a, const U& b)
+{
+  return compare<Lesser, -Lesser, 0>(a, b);
+}
+
+template<typename T, typename U>
+CPP_CONSTEXPR int compare(const T& a, const U& b)
+{
+  return compare<-1, 1, 0>(a, b);
+}
+
+
+template<typename T, typename U, typename Result>
+CPP_CONSTEXPR Result compare(const T& a, const U& b,
+                             Result CPP_RVALUE_OR_CONST_REFERENCE is_equal,
+                             Result CPP_RVALUE_OR_CONST_REFERENCE is_less,
+                             Result CPP_RVALUE_OR_CONST_REFERENCE is_greater)
+{
+  return a == b ? is_equal : a < b ? is_less : is_greater;
 }
 
 #if __cplusplus >= 201103L
-template<typename _T, typename _U = _T, typename _Result>
-constexpr _Result compare(const _T& a, const _U& b, _Result&& is_equal, _Result&& is_less, _Result&& is_greater)
-{
-	return a == b ? is_equal : a < b ? is_less : is_greater;
-}
-#endif
-
-#if __cplusplus >= 201103L
 template<
-int _Lesser, int _Greater, int _Equaler,
-	typename _T, typename _U
-	>
-constexpr int mcompare(const _T& a, const _U& b)
+  int Lesser, int Greater, int Equal,
+  typename T, typename U
+>
+constexpr int mcompare(const T& a, const U& b)
 {
-	return compare<_T,_U, _Lesser, _Greater, _Equaler>(a,b);
+  return compare<Lesser, Greater, Equal, T, U>(a,b);
 }
 
 template<
-int _Lesser, int _Greater, int _Equaler,
-	typename _T, typename _U, typename... _Others
-	>
-constexpr int mcompare(const _T& a, const _U& b, const _Others&... other)
+  int Lesser, int Greater, int Equal,
+  typename T, typename U, typename... _Others
+>
+constexpr int mcompare(const T& a, const U& b, const _Others&... other)
 {
-	return compare<_T,_U, _Lesser, _Greater, _Equaler>(a,b)
-		+ mcompare<_Lesser, _Greater, _Equaler>(a, other...);
+  return compare<Lesser, Greater, Equal, T, U>(a,b)
+    + mcompare<Lesser, Greater, Equal>(a, other...);
 }
 
-template<typename _T, typename... _Others>
-inline constexpr int mcompare(const _T& a, const _Others&... other)
+template<typename T, typename... _Others>
+inline constexpr int mcompare(const T& a, const _Others&... other)
 {
-	return mcompare<-1, 1, 0>(a, other...);
+  return mcompare<-1, 1, 0>(a, other...);
 }
-#else
-template<int _Lesser, int _Greater, int _Equaler, typename _T>
-inline int mcompare(...);
 #endif
 
 }
