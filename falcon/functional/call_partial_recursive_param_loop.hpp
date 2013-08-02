@@ -27,11 +27,11 @@ struct __call_partial_recursive_param_loop_traits_impl<
 		_Current,
 		__stop
 	>::type __impl_indexes;
-	typedef typename parameter::result_pack_of<
+	typedef typename parameter::result_of<
 		_Function,
-		typename parameter::pack_cat<
+		typename parameter::cat<
 			parameter_pack<_CurrentResult&&>,
-			typename parameter::pack_element<
+			typename parameter::elements<
 				parameter_pack<_Args&&...>,
 				__impl_indexes
 			>::type
@@ -63,11 +63,11 @@ template <std::size_t... _Indexes, std::size_t _NumberArg, std::size_t _End, typ
 struct __call_partial_recursive_param_loop_traits_impl<true, parameter_index<_Indexes...>, _NumberArg, _End, _End, _CurrentResult, _Function, _Args...>
 {
 	typedef parameter_index<_Indexes...> __indexes;
-	typedef typename parameter::result_pack_of<
+	typedef typename parameter::result_of<
 		_Function,
-		typename parameter::pack_cat<
+		typename parameter::cat<
 			parameter_pack<_CurrentResult&&>,
-			typename parameter::pack_element<
+			typename parameter::elements<
 				parameter_pack<_Args&&...>,
 				__indexes
 			>::type

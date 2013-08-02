@@ -6,15 +6,20 @@
 
 namespace falcon {
 
-template<typename _Elements>
+template<typename T>
 struct is_parameter_pack
 : false_type
 {};
 
-template<typename... _Elements>
-struct is_parameter_pack<parameter_pack<_Elements...>>
+template<typename... Elements>
+struct is_parameter_pack<parameter_pack<Elements...>>
 : true_type
 {};
+
+namespace paramter {
+  template<typename T>
+  using is_pack = is_parameter_pack<T>;
+}
 
 }
 

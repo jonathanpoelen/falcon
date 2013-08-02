@@ -45,10 +45,10 @@ void synchronize_iterator_test()
 		std::ostringstream ss;
 
 		std::for_each<>(falcon::iterator::make_synchronize_iterator<>(&a[0], &a2[0]),
-										falcon::iterator::make_synchronize_iterator<>(&a[10], &a2[10]),
-										falcon::make_tuple_applier([&ss](int i,int i2){
-											ss << i << '-' << i2 << '\n';
-										}));
+                        falcon::iterator::make_synchronize_iterator<>(&a[10], &a2[10]),
+                        falcon::make_tuple_applier([&ss](int i,int i2){
+                          ss << i << '-' << i2 << '\n';
+                        }));
 		CHECK_EQUAL_VALUE(ss.str(), "0-1\n1-2\n2-3\n3-4\n4-5\n5-6\n6-7\n7-8\n8-9\n9-10\n");
 	}
 }

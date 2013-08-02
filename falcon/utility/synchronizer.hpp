@@ -70,7 +70,7 @@ private:
 	};
 
 	typedef typename tuple_to_parameter_pack<__base>::type __parameter_pack;
-	typedef typename parameter::pack_modifier<std::add_const, __parameter_pack>::type __const_parameter_pack;
+	typedef typename parameter::modifier<std::add_const, __parameter_pack>::type __const_parameter_pack;
 
 	typedef late_maker<std::tuple> late_tupe;
 
@@ -78,7 +78,7 @@ private:
 	struct __delegate
 	{
 		typedef typename parameter_pack_to_tuple<
-			typename parameter::pack_modifier<
+			typename parameter::modifier<
 				template_left_accumulator<__functor_wrapper, _Functor>::template wrapper,
 				_Pack
 			>::type

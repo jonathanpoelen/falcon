@@ -10,9 +10,9 @@ namespace falcon {
 template <typename _Function, typename _Indexes, typename... _Args>
 struct __call_result_of
 {
-	typedef typename parameter::result_pack_of<
+	typedef typename parameter::result_of<
 		_Function,
-		typename parameter::pack_element<
+		typename parameter::elements<
 			parameter_pack<_Args&&...>,
 			_Indexes
 		>::type

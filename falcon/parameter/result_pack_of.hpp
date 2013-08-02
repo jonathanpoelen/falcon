@@ -1,22 +1,26 @@
-#ifndef _FALCON_PARAMETER_RESULT_PACK_OF_HPP
-#define _FALCON_PARAMETER_RESULT_PACK_OF_HPP
+#ifndef FALCON_PARAMETER_RESULT_PACK_OF_HPP
+#define FALCON_PARAMETER_RESULT_PACK_OF_HPP
 
 #include <type_traits>
 #include <falcon/parameter/parameter_pack.hpp>
 
 namespace falcon {
-namespace parameter {
 
-template<typename _Signature, typename _Packs>
+template<typename Signature, typename Pack>
 class result_pack_of;
 
-template<typename _Functor, typename... _Parameters>
-struct result_pack_of<_Functor, parameter_pack<_Parameters...>>
+template<typename Functor, typename... Parameters>
+struct result_pack_of<Functor, parameter_pack<Parameters...>>
 {
-	typedef typename std::result_of<_Functor(_Parameters...)>::type type;
+	typedef typename std::result_of<Functor(Parameters...)>::type type;
 };
 
+
+namespace parameter {
+  template<typename Signature, typename Pack>
+  using result_of = result_pack_of<Signature, Pack>;
 }
+
 }
 
 #endif

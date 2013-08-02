@@ -5,12 +5,14 @@
 #include <falcon/tuple/optimal_tuple.hpp>
 #include <falcon/memory/construct.hpp>
 #include <falcon/arg/arg.hpp>
+#include <falcon/utility/maker.hpp>
 
 #include <array>
 #include <tuple>
 
 namespace falcon {
 
+///TODO memory/align.hpp
 inline void* align(size_t alignment, size_t size, void*& ptr, size_t& space)
 {
 #if defined(__GNUC__)
@@ -41,7 +43,7 @@ struct __initialize_optimal_grouping_allocae_tuple
   static void init(Tuple& t, const Sizes& szs)
   {
     std::get<I+1>(t) = reinterpret_cast<
-    typename std::tuple_element<I+1, Tuple>::type*
+      typename std::tuple_element<I+1, Tuple>::type
     >(static_cast<char*>(std::get<0>(t)) + szs[Idx]);
     __initialize_optimal_grouping_allocae_tuple<I+1,N,Indexes...>::init(t, szs);
   }
@@ -60,19 +62,20 @@ std::tuple<void*, Elements*...>
 __optimal_grouping_allocate(parameter_index<Indexes...>, parameter_pack<Elements...>,
                             Allocate& allocate, S... sizes)
 {
+  typedef parameter_pack<Elements...> pack_t;
   typedef std::array<std::size_t, sizeof...(Indexes)> array_t;
-  constexpr array_t a{{alignof(arg_element<Indexes, Elements...>())...}};
-  constexpr array_t szt{{sizeof(arg_element<Indexes, Elements...>())...}};
+  constexpr array_t a{{alignof(typename parameter_element<Indexes, pack_t>::type)...}};
+  constexpr array_t szt{{sizeof(typename parameter_element<Indexes, pack_t>::type)...}};
 
-  std::tuple<void*, Elements*...> ret(0);
+  std::tuple<void*, Elements*...> ret(nullptr, maker<Elements*>()(nullptr)...);
   array_t szs{{arg<Indexes>(sizes...)...}};
   char * p = 0;
   size_t sz = -1u;
 
   for (std::size_t i = 0; i < sizeof...(Elements); ++i) {
     std::size_t size = szt[i] * szs[i];
-    if (align(a[i], size, p, sz)) {
-      szs[i] = p-0;
+    if (align(a[i], size, reinterpret_cast<void*&>(p), sz)) {
+      szs[i] = p-static_cast<char*>(0);
       p += size;
       sz -= size;
     }
@@ -82,34 +85,38 @@ __optimal_grouping_allocate(parameter_index<Indexes...>, parameter_pack<Elements
   }
 
   std::get<0>(ret) = allocate(-1u - sz);
-  __initialize_optimal_grouping_allocae_tuple<0,sizeof...(Elements), Indexes..., 0>
+  __initialize_optimal_grouping_allocae_tuple<0, sizeof...(Elements), Indexes..., 0>
   ::init(ret, szs);
 
   return ret;
 }
 
-template <typename>
-class __grouping_allocate_result;
-
 template <typename... Elements>
-struct __grouping_allocate_result<parameter_pack<Elements...>>
-{ typedef std::tuple<void*, Elements*...> type; };
+struct __grouping_allocate_result
+{
+  typedef parameter_pack<Elements*...> pack;
+  typedef typename optimal_index_pack<pack>::type indexes;
+  typedef typename parameter::pack_element<pack, indexes>::type optimal_parameter_pack;
+  typedef typename parameter_pack_to_tuple<
+    typename parameter::pack_add_left<optimal_parameter_pack, void*>::type
+  >::type tuple;
+};
 
 
 template <typename... Elements, typename Allocate, typename... S>
-typename __grouping_allocate_result<
-  typename optimal_index_pack<parameter_pack<Elements...>>::type
->::type
+typename __grouping_allocate_result<Elements...>::tuple
 optimal_grouping_allocate(Allocate allocate, S... sizes)
 {
+  typedef __grouping_allocate_result<Elements...> __result_handler;
   typedef parameter_pack<Elements...> elements;
-  typedef typename optimal_index_pack<elements>::type indexes;
+  typedef typename __result_handler::indexes indexes;
   return __optimal_grouping_allocate<>(indexes(), elements(), allocate, sizes...);
 }
 
-template <typename... Elements, typename... S>
-CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(S... sizes),
-                        optimal_grouping_allocate(allocate_wrapper<char>(), sizes...))
+//TODO
+// template <typename... Elements, typename... S>
+// CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(S... sizes),
+//                         optimal_grouping_allocate(allocate_wrapper<char>(), sizes...))
 
 
 
@@ -120,7 +127,7 @@ struct __initialize_grouping_allocae_tuple
   static void init(Tuple& t, const Sizes& szs)
   {
     std::get<I>(t) = reinterpret_cast<
-      typename std::tuple_element<I, Tuple>::type*
+      typename std::tuple_element<I, Tuple>::type
     >(static_cast<char*>(std::get<0>(t)) + szs[I]);
     __initialize_grouping_allocae_tuple<I+1,N>::init(t, szs);
   }
@@ -142,15 +149,15 @@ grouping_allocate(Allocate allocate, S... sizes)
   constexpr array_t a{{alignof(Elements)...}};
   constexpr array_t szt{{sizeof(Elements)...}};
 
-  std::tuple<Elements*...> ret(0);
+  std::tuple<Elements*...> ret;
   array_t szs{{sizes...}};
   char * p = 0;
   size_t sz = -1u;
 
   for (std::size_t i = 0; i < sizeof...(Elements); ++i) {
     std::size_t size = szt[i] * szs[i];
-    if (align(a[i], size, p, sz)) {
-      szs[i] = p-0;
+    if (align(a[i], size, reinterpret_cast<void*&>(p), sz)) {
+      szs[i] = p-static_cast<char*>(0);
       p += size;
       sz -= size;
     }
@@ -168,6 +175,11 @@ grouping_allocate(Allocate allocate, S... sizes)
 template <typename... Elements, typename... S>
 std::tuple<Elements*...> grouping_allocate(S... sizes)
 { return grouping_allocate(allocate_wrapper<char>(), sizes...); }
+
+//TODO
+// template <typename... Elements, typename... S>
+// CPP1X_DELEGATE_FUNCTION(grouping_allocate(S... sizes),
+//                         grouping_allocate(allocate_wrapper<char>(), sizes...))
 
 
 

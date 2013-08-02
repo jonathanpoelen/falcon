@@ -9,10 +9,10 @@ namespace falcon {
 namespace iterator {
 
 template<typename _Iterator>
-struct build_get_accessor_iterator
+class build_get_accessor_iterator
 {
 	typedef typename std::iterator_traits<_Iterator>::value_type __value_type;
-
+public:
 	typedef falcon::iterator::indirect_iterator<
 		_Iterator,
 		falcon::get_accessor<__value_type>,

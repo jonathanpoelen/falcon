@@ -6,15 +6,20 @@
 
 namespace falcon {
 
-template<typename _Indexes>
+template<typename T>
 struct is_parameter_index
 : false_type
 {};
 
-template<std::size_t... _Indexes>
-struct is_parameter_index<parameter_index<_Indexes...>>
+template<std::size_t... Indexes>
+struct is_parameter_index<parameter_index<Indexes...>>
 : true_type
 {};
+
+namespace parameter {
+  template<typename T>
+  using is_index = is_parameter_index<T>;
+}
 
 }
 

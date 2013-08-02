@@ -12,7 +12,7 @@ class result_range_of;
 template<std::size_t _Begin, std::size_t _Len, typename _Function, typename... _Args>
 struct result_range_of<_Begin, _Len, _Function(_Args...)>
 {
-	typedef typename parameter::result_pack_of<_Function, typename arg_range<_Begin, _Len, _Args...>::type>::type type;
+	typedef typename parameter::result_of<_Function, typename arg_range<_Begin, _Len, _Args...>::type>::type type;
 };
 
 }

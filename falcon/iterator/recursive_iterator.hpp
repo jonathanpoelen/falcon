@@ -44,9 +44,9 @@ namespace detail {
 	{
 		typedef parameter_pack<_Iterators...> __parameter;
 
-		typedef typename parameter::pack_modifier<
+		typedef typename parameter::modifier<
 			iterator_to_recursive_iterator_access_adapter,
-			typename parameter::pack_element<
+			typename parameter::elements<
 				__parameter,
 				typename build_parameter_index<sizeof...(_Iterators) - 1>::type
 			>::type
@@ -57,12 +57,12 @@ namespace detail {
 			__parameter
 		>::type __last_iterator;
 
-		typedef typename parameter::pack_add_right<
-			typename parameter::pack_use_type<__parameter_adapter>::type,
+		typedef typename parameter::push_back<
+			typename parameter::use_type<__parameter_adapter>::type,
 			std::pair<__last_iterator, __last_iterator>
 		>::type __parameter_pair_iterator;
 
-		typedef typename parameter::pack_add_left<
+		typedef typename parameter::push_front<
 			__parameter_pair_iterator,
 			bool
 		>::type __parameter_tuple;
@@ -283,7 +283,7 @@ public:
 
 	explicit basic_recursive_iterator(bool __is_valid, __last_iterator __x)
 	: __base(__make_last_iterator_in_recursive_iterator<
-		typename parameter::pack_element<
+		typename parameter::elements<
 			__parameter_pair_iterator,
 			typename build_parameter_index<sizeof...(_Iterators)-1>::type
 		>::type
@@ -409,7 +409,7 @@ struct __recursive_iterator_info
 	struct __recursive_iterator_info_impl<0, _T, _Elements...>
 	{
 		typedef basic_recursive_iterator<
-			typename parameter::pack_reverse<parameter_pack<_T, _Elements...>>::type,
+			typename parameter::reverse<parameter_pack<_T, _Elements...>>::type,
 			_ComparisonParameterTag
 		> type;
 	};

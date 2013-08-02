@@ -14,7 +14,7 @@ template <template<class...> class _Modifier, typename _Tuple,
 struct tuple_modifier
 {
 	typedef typename parameter_pack_to_tuple<
-		typename parameter::pack_modifier<
+		typename parameter::modifier<
 			_Modifier,
 			typename tuple_to_parameter_pack_with_parameter_index<
 				_Tuple, _Indexes

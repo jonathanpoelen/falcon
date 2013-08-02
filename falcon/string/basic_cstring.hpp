@@ -1638,16 +1638,16 @@ __FALCON_BASIC_CSTRING_TO(double long, stold, ld)
 #undef __FALCON_BASIC_CSTRING_TO
 #undef __FALCON_BASIC_CSTRING_TO_IMPL
 
-inline string to_string(const cstring& s)
+inline std::string to_string(const cstring& s)
 { return std::string(s.data(), s.size()); }
 
-inline string to_string(const const_cstring& s)
+inline std::string to_string(const const_cstring& s)
 { return std::string(s.data(), s.size()); }
 
-inline wstring to_wstring(const cwstring& s)
+inline std::wstring to_wstring(const cwstring& s)
 { return std::wstring(s.data(), s.size()); }
 
-inline wstring to_wstring(const const_cwstring& s)
+inline std::wstring to_wstring(const const_cwstring& s)
 { return std::wstring(s.data(), s.size()); }
 
 }

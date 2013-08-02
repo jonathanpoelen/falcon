@@ -1,27 +1,27 @@
-#ifndef _FALCON_PARAMETER_PARAMETER_INDEX_HPP
-#define _FALCON_PARAMETER_PARAMETER_INDEX_HPP
+#ifndef FALCON_PARAMETER_PARAMETER_INDEX_HPP
+#define FALCON_PARAMETER_PARAMETER_INDEX_HPP
 
 #include <cstddef>
 
 namespace falcon {
 
 /// Stores a arguments of indices.
-template<std::size_t... _Indexes>
+template<std::size_t... Indexes>
 struct parameter_index
 {};
 
 
-template<std::size_t... _Indexes>
+template<std::size_t... Indexes>
 struct __Parameter_index
 {
-	typedef __Parameter_index<_Indexes..., sizeof...(_Indexes)> __next;
-	typedef parameter_index<_Indexes...> __parameter_index;
+	typedef __Parameter_index<Indexes..., sizeof...(Indexes)> __next;
+	typedef parameter_index<Indexes...> __parameter_index;
 };
 
-template<std::size_t _Num>
+template<std::size_t Num>
 struct __Build_parameter_index
 {
-	typedef typename __Build_parameter_index<_Num-1>::__type::__next __type;
+	typedef typename __Build_parameter_index<Num-1>::__type::__next __type;
 };
 
 template<>
@@ -30,125 +30,149 @@ struct __Build_parameter_index<0>
 	typedef __Parameter_index<> __type;
 };
 
-/// Builds an parameter_index<0, 1, 2, ..., _Num-1>.
-template<std::size_t _Num>
+/// Builds an parameter_index<0, 1, 2, ..., Num-1>.
+template<std::size_t Num>
 struct build_parameter_index
 {
-	typedef typename __Build_parameter_index<_Num>::__type::__parameter_index type;
+	typedef typename __Build_parameter_index<Num>::__type::__parameter_index type;
 };
 
 
-template<std::size_t _Start, std::size_t _Current, std::size_t _Stop, std::size_t _Step, typename _Indexes>
+template<std::size_t Start, std::size_t Current, std::size_t Stop, std::size_t Step, typename Indexes>
 struct __Build_range_parameter_index;
 
 template<
-	std::size_t _Start, std::size_t _Current, std::size_t _Stop,
-	std::size_t _Step, std::size_t... _Indexes
+	std::size_t Start, std::size_t Current, std::size_t Stop,
+	std::size_t Step, std::size_t... Indexes
 >
 struct __Build_range_parameter_index<
-	_Start, _Current, _Stop,
-	_Step, parameter_index<_Indexes...>
+	Start, Current, Stop,
+	Step, parameter_index<Indexes...>
 > : __Build_range_parameter_index<
-	_Start,
-	((_Current + _Step) < _Stop ? _Current+_Step : _Stop),
-	_Stop,
-	_Step,
-	parameter_index<_Indexes..., _Current>
+	Start,
+	((Current + Step) < Stop ? Current+Step : Stop),
+	Stop,
+	Step,
+	parameter_index<Indexes..., Current>
 >
 {};
 
-template<std::size_t _Start, std::size_t _Stop, std::size_t _Step, std::size_t... _Indexes>
+template<std::size_t Start, std::size_t Stop, std::size_t Step, std::size_t... Indexes>
 struct __Build_range_parameter_index<
-	_Start, _Stop, _Stop,
-	_Step, parameter_index<_Indexes...>
+	Start, Stop, Stop,
+	Step, parameter_index<Indexes...>
 >
 {
-	typedef parameter_index<_Indexes...> __type;
+	typedef parameter_index<Indexes...> __type;
 };
 
-/// Builds an parameter_index<_Start, ..., _Stop-1>.
-template<std::size_t _Start, std::size_t _Stop, std::size_t _Step = 1>
+/// Builds an parameter_index<Start, ..., Stop-1>.
+template<std::size_t Start, std::size_t Stop, std::size_t Step = 1>
 struct build_range_parameter_index
 {
-	static_assert(_Start <= _Stop, "_Start <= _Stop");
-	static_assert(_Step, "_Step is zero");
+	static_assert(Start <= Stop, "Start <= Stop");
+	static_assert(Step, "Step is zero");
 
-	typedef typename __Build_range_parameter_index<_Start, _Start, _Stop, _Step, parameter_index<>>::__type type;
+	typedef typename __Build_range_parameter_index<Start, Start, Stop, Step, parameter_index<>>::__type type;
 };
 
-template<typename... _Indexes>
+template<typename... Indexes>
 class __parameter_index_cat;
 
-template<std::size_t... _Indexes, std::size_t... _Indexes2, typename... _Others>
-struct __parameter_index_cat<parameter_index<_Indexes...>, parameter_index<_Indexes2...>, _Others...>
-: __parameter_index_cat<parameter_index<_Indexes..., _Indexes2...>, _Others...>
+template<std::size_t... Indexes, std::size_t... Indexes2, typename... _Others>
+struct __parameter_index_cat<parameter_index<Indexes...>, parameter_index<Indexes2...>, _Others...>
+: __parameter_index_cat<parameter_index<Indexes..., Indexes2...>, _Others...>
 {};
 
-template<std::size_t... _Indexes, std::size_t... _Indexes2>
-struct __parameter_index_cat<parameter_index<_Indexes...>, parameter_index<_Indexes2...>>
+template<std::size_t... Indexes, std::size_t... Indexes2>
+struct __parameter_index_cat<parameter_index<Indexes...>, parameter_index<Indexes2...>>
 {
-	typedef parameter_index<_Indexes..., _Indexes2...> type;
+	typedef parameter_index<Indexes..., Indexes2...> type;
 };
 
-template<std::size_t... _Indexes>
-struct __parameter_index_cat<parameter_index<_Indexes...>>
+template<std::size_t... Indexes>
+struct __parameter_index_cat<parameter_index<Indexes...>>
 {
-	typedef parameter_index<_Indexes...> type;
+	typedef parameter_index<Indexes...> type;
 };
 
-template<typename... _Indexes>
+template<typename... Indexes>
 struct parameter_index_cat
 {
-	typedef typename __parameter_index_cat<_Indexes...>::type type;
+	typedef typename __parameter_index_cat<Indexes...>::type type;
 };
 
 
-template <typename _Indexes, typename _Indexes2>
+template <typename Indexes, typename Indexes2>
 struct __parameter_index_reverse;
 
-template <std::size_t... _Indexes, std::size_t _Index, std::size_t... _IndexesOther>
-struct __parameter_index_reverse<parameter_index<_Indexes...>, parameter_index<_Index, _IndexesOther...>>
+template <std::size_t... Indexes, std::size_t _Index, std::size_t... IndexesOther>
+struct __parameter_index_reverse<parameter_index<Indexes...>, parameter_index<_Index, IndexesOther...>>
 : __parameter_index_reverse<
-parameter_index<_Index, _Indexes...>,
-parameter_index<_IndexesOther...>
+parameter_index<_Index, Indexes...>,
+parameter_index<IndexesOther...>
 >
 {};
 
-template <std::size_t... _Indexes>
-struct __parameter_index_reverse<parameter_index<_Indexes...>, parameter_index<>>
+template <std::size_t... Indexes>
+struct __parameter_index_reverse<parameter_index<Indexes...>, parameter_index<>>
 {
-	typedef parameter_index<_Indexes...> __type;
+	typedef parameter_index<Indexes...> __type;
 };
 
 /**
- * @brief Reverse indexes of _Indexes
+ * @brief Reverse indexes of Indexes
  * _Pack must is a @ref parameter_index
  */
-template <typename _Indexes>
+template <typename Indexes>
 struct parameter_index_reverse
-{ typedef typename __parameter_index_reverse<parameter_index<>, _Indexes>::__type type; };
+{ typedef typename __parameter_index_reverse<parameter_index<>, Indexes>::__type type; };
 
 
 template<typename, std::size_t>
 struct __parameter_index_increment;
 
-template<std::size_t... _Indexes, std::size_t _N>
-struct __parameter_index_increment<parameter_index<_Indexes...>, _N>
-{ typedef parameter_index<_N + _Indexes...> __type; };
+template<std::size_t... Indexes, std::size_t N>
+struct __parameter_index_increment<parameter_index<Indexes...>, N>
+{ typedef parameter_index<N + Indexes...> __type; };
 
 /**
- * @brief Increment each index of _N
+ * @brief Increment each index of N
  */
-template<typename _Indexes, std::size_t _N = 1>
+template<typename Indexes, std::size_t N = 1>
 struct parameter_index_increment
-{ typedef typename __parameter_index_increment<_Indexes, _N>::__type type; };
+{ typedef typename __parameter_index_increment<Indexes, N>::__type type; };
 
 /**
- * @brief Decrement each index of _N
+ * @brief Decrement each index of N
  */
-template<typename _Indexes, std::size_t _N = 1>
+template<typename Indexes, std::size_t N = 1>
 struct parameter_index_decrement
-{ typedef typename __parameter_index_increment<_Indexes, -_N>::__type type; };
+{ typedef typename __parameter_index_increment<Indexes, -N>::__type type; };
+
+
+namespace parameter {
+  template<std::size_t... Indexes>
+  using indexes = parameter_index<Indexes...>;
+
+  template<std::size_t Num>
+  using build_indexes = build_parameter_index<Num>;
+
+  template<std::size_t Start, std::size_t Stop, std::size_t Step = 1>
+  using build_range_index = build_range_parameter_index<Start, Stop, Step>;
+
+  template<typename... Indexes>
+  using indexes_cat = parameter_index_cat<Indexes...>;
+
+  template <typename Indexes>
+  using indexes_reverse = parameter_index_reverse<Indexes>;
+
+  template<typename Indexes, std::size_t N = 1>
+  using indexes_increment = parameter_index_increment<Indexes, N>;
+
+  template<typename Indexes, std::size_t N = 1>
+  using indexes_decrement = parameter_index_decrement<Indexes, N>;
+}
 
 }
 

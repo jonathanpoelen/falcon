@@ -181,11 +181,23 @@ move semantique pour class_property + property read_only + operator= pour évite
 
 dans les rbegin, rend pour les tableaux. utiliser un opposite_iterator ?
 
-faire le menage dans les classes de sfinae. Les choose_* sont-elles vraiments indispensable ? faire étendre les classes d'integral_constant. utiliser decltype en C++11 pour alleger le code ?
+faire le menage dans les classes de sfinae. Les choose_* sont-elles vraiments indispensable ? faire hériter les classes d'integral_constant. utiliser decltype en C++11 pour alleger le code ?
 FALCON_CREATE_* -> FALCON_*_TRAIT_NAMED_DEF
 FALCON_CLASS_* -> FALCON_TRAIT_*_TRAIT_DEF
+faire un has_member qui vérifie l'existance quelque soit le type.
+boost/sfinae ce comporte pareil ? pas de coup à la compil ?
 
+make_iterator_iterator() + amélioration de la construction avec possibilité de passer des container
 
+iterator/get_accessor_iterator.hpp: make_get_accessor_iterator
 
+intrusive_cast: essaye de caster un type vers un autre en utilisant le déréférencement et get
+
+push_back dans cstring (C++11) et méthode de modification de la chaine (insert, etc)
+
+parameter: dans le namespace parameter ne pas mettre pack_ (pack_size -> size)
+
+un objet qui permet de créer un objet en fonction d'un id dynamique et de la passer ¹a une callback
+???<A1, A2, ...>([bool&err,] id, callback, parameter...)
 
 

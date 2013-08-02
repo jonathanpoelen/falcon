@@ -9,7 +9,7 @@ struct _Result_pack_of_test
 
 void result_pack_of_test()
 {
-	typedef falcon::parameter::result_pack_of<
+	typedef falcon::parameter::result_of<
 		_Result_pack_of_test,
 		falcon::parameter_pack<int>
 	> result_pack;

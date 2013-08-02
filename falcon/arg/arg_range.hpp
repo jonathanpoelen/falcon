@@ -10,7 +10,7 @@ namespace falcon {
 template<std::size_t _Start, std::size_t _Len, typename... _Args>
 struct arg_range
 {
-	typedef typename parameter::pack_element<
+	typedef typename parameter::elements<
 		parameter_pack<_Args...>,
 		typename keep_parameter_index<
 			range_parameter_index_tag<_Start, _Len>,

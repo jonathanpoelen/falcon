@@ -47,9 +47,9 @@ public:
 			typename build_range_parameter_index<_CutPosition, sizeof...(_Args)+1>::type
 		>::type
 	>
-	constexpr typename parameter::result_pack_of<
+	constexpr typename parameter::result_of<
 		const _Functor&,
-		typename parameter::pack_element<
+		typename parameter::elements<
 			parameter_pack<const _T&, _Args&&...>,
 			_Indexes
 		>::type
@@ -67,9 +67,9 @@ public:
 			typename build_range_parameter_index<_CutPosition, sizeof...(_Args)+1>::type
 		>::type
 	>
-	typename parameter::result_pack_of<
+	typename parameter::result_of<
 		_Functor&,
-		typename parameter::pack_element<
+		typename parameter::elements<
 			parameter_pack<_T&, _Args&&...>,
 			_Indexes
 		>::type

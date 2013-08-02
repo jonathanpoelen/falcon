@@ -88,7 +88,7 @@ namespace detail {
 
 		struct __iterators_with_tag
 		{
-			typedef typename parameter::pack_element<
+			typedef typename parameter::elements<
 				__parameter_pack,
 				typename build_parameter_index<sizeof...(_Iterators) - 1>::type
 			>::type type;
@@ -110,7 +110,7 @@ namespace detail {
 			__cmp_parameter_index
 		>::value;
 
-		typedef typename parameter::pack_wrapper<
+		typedef typename parameter::wrap<
 			std::iterator_traits,
 			__iterators
 		>::type __pack_traits;
@@ -119,7 +119,7 @@ namespace detail {
 		struct __subtype
 		: build_class<
 			synchronizer,
-			typename parameter::pack_modifier<_W, __pack_traits>::type
+			typename parameter::modifier<_W, __pack_traits>::type
 		>
 		{};
 
@@ -128,7 +128,7 @@ namespace detail {
 			typename build_class<synchronizer, __iterators>::type,
 			typename build_class<
 				__synchronize_category,
-				typename parameter::pack_modifier<use_iterator_category, __pack_traits>::type
+				typename parameter::modifier<use_iterator_category, __pack_traits>::type
 			>::type::iterator_category,
 			typename __subtype<use_value_type>::type,
 			__no_difference_type,

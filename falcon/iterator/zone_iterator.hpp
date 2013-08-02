@@ -179,15 +179,15 @@ private:
 template <typename _Iterator>
 zone_iterator<_Iterator>
 make_zone_iterator(_Iterator x,
-									 typename zone_iterator<_Iterator>::difference_type width,
-									 typename zone_iterator<_Iterator>::difference_type sub_width)
+                   typename zone_iterator<_Iterator>::difference_type width,
+                   typename zone_iterator<_Iterator>::difference_type sub_width)
 { return zone_iterator<_Iterator>(x, width, sub_width); }
 
 template <typename _Iterator>
 zone_iterator<_Iterator>
 make_zone_iterator(_Iterator x, _Iterator end,
-									 typename zone_iterator<_Iterator>::difference_type width,
-									 typename zone_iterator<_Iterator>::difference_type sub_width)
+                   typename zone_iterator<_Iterator>::difference_type width,
+                   typename zone_iterator<_Iterator>::difference_type sub_width)
 { return zone_iterator<_Iterator>(x, end, width, sub_width); }
 
 }}

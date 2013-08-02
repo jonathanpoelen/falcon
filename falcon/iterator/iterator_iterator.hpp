@@ -115,7 +115,7 @@ public:
 	iterator_iterator& operator=(const iterator_iterator& other)
 	{
 		this->base_reference().assign(&other.base_reference()[oter._pos],
-																	&other.base_reference()[oter._M_count()]);
+                                      &other.base_reference()[oter._M_count()]);
 		_pos = 0;
 		return *this;
 	}

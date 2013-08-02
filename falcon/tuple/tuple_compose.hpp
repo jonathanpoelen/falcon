@@ -42,10 +42,10 @@ struct __tuple_compose_result<
 		)) type;
 	};
 
-	typedef typename parameter::pack_use_type<
+	typedef typename parameter::use_type<
 		parameter_pack<__result_element<_IndexElements>...>
 	>::type __pack;
-	typedef typename parameter::result_pack_of<_Function, __pack>::type __type;
+	typedef typename parameter::result_of<_Function, __pack>::type __type;
 };
 
 template <std::size_t _I, std::size_t _N, typename _Function,
