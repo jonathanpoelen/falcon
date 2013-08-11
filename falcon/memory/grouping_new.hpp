@@ -13,9 +13,9 @@
 namespace falcon {
 
 ///TODO memory/align.hpp
+#if defined(__GNUC__)
 inline void* align(size_t alignment, size_t size, void*& ptr, size_t& space)
 {
-#if defined(__GNUC__)
   void* r = nullptr;
   if (size <= space)
   {
@@ -30,10 +30,10 @@ inline void* align(size_t alignment, size_t size, void*& ptr, size_t& space)
     }
   }
   return r;
-#else
-  std::align(alignment, size, ptr, space);
-#endif
 }
+#else
+using std::align;
+#endif
 
 
 template<std::size_t I, std::size_t N, std::size_t Idx, std::size_t... Indexes>

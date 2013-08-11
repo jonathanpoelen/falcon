@@ -189,15 +189,19 @@ boost/sfinae ce comporte pareil ? pas de coup à la compil ?
 
 make_iterator_iterator() + amélioration de la construction avec possibilité de passer des container
 
-iterator/get_accessor_iterator.hpp: make_get_accessor_iterator
-
-intrusive_cast: essaye de caster un type vers un autre en utilisant le déréférencement et get
-
 push_back dans cstring (C++11) et méthode de modification de la chaine (insert, etc)
 
-parameter: dans le namespace parameter ne pas mettre pack_ (pack_size -> size)
+parameter/manip.hpp: séparer chaque fonctionnalite dans des fichier separer et ajouter pop_back et pop_front. Avec une posibilité de retourné un type (plutot  qu'une erreur de compile) quand le pack est vide
 
-un objet qui permet de créer un objet en fonction d'un id dynamique et de la passer ¹a une callback
-???<A1, A2, ...>([bool&err,] id, callback, parameter...)
+object qui possède des constructeur noexcept et peut être caster en T. Sert pour utiliser une classe non noexcept comme une classe noexcept (noattament dans les container comme vvector::resize()) (noexcept_class<T>)
+
+mpl (comme boost) mais qui utilise parameter_pack et co
+
+
+
+
+
+
+
 
 

@@ -8,22 +8,30 @@
 namespace falcon {
 namespace iterator {
 
-template<typename _Iterator>
+template<typename Iterator>
 class build_get_accessor_iterator
 {
-	typedef typename std::iterator_traits<_Iterator>::value_type __value_type;
+	typedef typename std::iterator_traits<Iterator>::value_type __value_type;
 public:
 	typedef falcon::iterator::indirect_iterator<
-		_Iterator,
+		Iterator,
 		falcon::get_accessor<__value_type>,
 		typename __value_type::type
 	> type;
 };
 
 #if __cplusplus >= 201103L
-template<typename _Iterator>
-using get_accessor_iterator = typename build_get_accessor_iterator<_Iterator>::type;
+template<typename Iterator>
+using get_accessor_iterator = typename build_get_accessor_iterator<Iterator>::type;
 #endif
+
+template<typename Iterator>
+typename build_get_accessor_iterator<Iterator>::type
+make_get_accessor_iterator(Iterator iter)
+{
+  typedef typename build_get_accessor_iterator<Iterator>::type iterator_type;
+  return iterator_type(iter); 
+}
 
 }
 }

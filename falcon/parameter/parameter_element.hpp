@@ -50,6 +50,9 @@ struct parameter_element
 namespace parameter {
   template <std::size_t __i, typename Pack>
   using at = ::falcon::parameter_element<__i, Pack>;
+
+  template <std::size_t __i, typename... Elements>
+  using element = at<__i, pack<Elements...>>;
 }
 
 }
