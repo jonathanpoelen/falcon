@@ -8,13 +8,15 @@
 #include <falcon/type_traits/use.hpp>
 #include <type_traits>
 
+#include <iterator>
+
 namespace falcon {
 namespace mpl {
 
 template<typename... Args>
 struct seq
 {
-  typedef seq type;
+  using type = seq;
 };
 
 template <typename>
@@ -33,12 +35,6 @@ template <template <class...> class T, typename... Args>
 struct seq2pack<T<Args...>>
 {
   typedef parameter_pack<Args...> type;
-};
-
-template <typename>
-struct iterator_category
-{
-  typedef void type;
 };
 
 
@@ -251,6 +247,8 @@ namespace placeholders {
   {
     typedef placeholder type;
 
+    static const unsigned value = N;
+
     template<typename... Args>
     using apply = at_c_impl<seq<Args...>, N-1>;
   };
@@ -273,19 +271,6 @@ struct get_value_impl
 template<typename Seq, unsigned N>
 struct get_value_impl<Seq, placeholders::placeholder<N>>
 { typedef typename at_c_impl<Seq, N-1>::type type; };
-
-
-template <typename T, bool, typename... Args>
-struct apply_or_type_impl
-{
-  using type = T;
-};
-
-template <typename T, typename... Args>
-struct apply_or_type_impl<T, true, Args...>
-{
-  using type = typename T::template mpl_apply<Args...>::type;
-};
 
 
 template <template<class...>class T>
@@ -311,23 +296,9 @@ constexpr bool has_mpl_type_impl(unsigned)
   return 0;
 }
 
+
 template<typename T>
 using is_mpl_type = std::integral_constant<bool, (has_mpl_type_impl<T>(1))>;
-
-
-template <typename T, typename... Args>
-struct apply_or_type_decay_impl
-{
-  typedef typename get_value_impl<seq<Args...>, T>::type value_type;
-  typedef typename apply_or_type_impl<
-    value_type,
-    has_mpl_type_impl<value_type>(1),
-    Args...
-  >::type type;
-};
-
-template <typename T, typename... Args>
-using apply_or_type_impl_t = typename apply_or_type_decay_impl<T, Args...>::type;
 
 
 template<typename T>
@@ -335,30 +306,41 @@ struct protect
 { using type = T; };
 
 
-template<typename F, typename... Args>
-class apply_impl;
+template<typename T, typename SeqArgs>
+struct apply_impl
+{ using type = T; };
 
-template <typename T, typename... Args>
-struct apply_impl<protect<T>, Args...>
+template<typename T, typename SeqArgs>
+struct apply_impl<protect<T>, SeqArgs>
 { using type = protect<T>; };
 
-template <template <class...> class T, typename... Args, typename... Args2>
-struct apply_impl<T<Args...>, Args2...>
-{ using type = typename T<apply_or_type_impl_t<Args, Args2...>...>::type; };
+template<unsigned N, typename SeqArgs>
+struct apply_impl<placeholders::placeholder<N>, SeqArgs>
+{ using type = typename at_c_impl<SeqArgs, N-1>::type; };
 
-template <template <typename U, U, class...> class T, typename U, U V,
-  typename... Args, typename... Args2>
-struct apply_impl<T<U, V, Args...>, Args2...>
-{ using type = typename T<U, V, apply_or_type_impl_t<Args, Args2...>...>::type; };
+template <typename T, typename SeqArgs, bool = has_mpl_type_impl<T>(1)>
+struct mpl_type_or_type_impl
+{ using type = T; };
 
-template <template <bool, class...> class T, bool V, typename... Args, typename... Args2>
-struct apply_impl<T<V, Args...>, Args2...>
-{ using type = typename T<V, apply_or_type_impl_t<Args, Args2...>...>::type; };
+template <typename T, typename... Args>
+struct mpl_type_or_type_impl<T, seq<Args...>, true>
+{ using type = typename T::type; };
+
+template<template<class...> class T, typename... Args, typename SeqArgs>
+struct apply_impl<T<Args...>, SeqArgs>
+{
+  using type = typename mpl_type_or_type_impl<
+    T<typename apply_impl<Args, SeqArgs>::type...>,
+    SeqArgs
+  >::type;
+};
 
 
 template<typename F, typename... Args>
 struct apply
-{ using type = typename apply_impl<F, Args...>::type; };
+{
+  using type = typename apply_impl<F, seq<Args...>>::type;
+};
 
 
 
@@ -377,29 +359,22 @@ struct arg
 
 template<typename T, bool = T::value>
 constexpr bool has_bool_value_impl(int)
-{
-  return 1;
-}
+{ return 1; }
 
 template<typename T>
 constexpr bool has_bool_value_impl(unsigned)
-{
-  return 0;
-}
+{ return 0; }
 
 
-template<typename T>
 struct mpl_apply_def
 {
   using mpl_type = std::true_type;
-  template <typename... Args>
-  using mpl_apply = apply_impl<T, Args...>;
 };
 
 
 template<typename T1, typename T2>
 struct pair
-: mpl_apply_def<pair<T1,T2>>
+: mpl_apply_def
 {
   typedef pair type;
   typedef T1 first;
@@ -407,10 +382,18 @@ struct pair
 };
 
 
+template<typename T>
+struct first
+{ using type = typename T::first; };
+
+template<typename T>
+struct second
+{ using type = typename T::second; };
+
 
 template<typename C, typename TrueT, typename FalseT>
 struct if_
-: mpl_apply_def<::falcon::if_c<C, TrueT, FalseT>>
+: mpl_apply_def
 {
   using type = typename ::falcon::eval_if<
     has_bool_value_impl<C>(1),
@@ -422,7 +405,7 @@ struct if_
 
 template<bool c, typename TrueT, typename FalseT>
 struct if_c
-: mpl_apply_def<::falcon::if_<c, TrueT, FalseT>>
+: mpl_apply_def
 {
   using type = typename ::falcon::if_<c, TrueT, FalseT>::type;
 };
@@ -430,7 +413,7 @@ struct if_c
 
 template<typename C, typename TrueT, typename FalseT>
 struct eval_if_
-: mpl_apply_def<::falcon::eval_if_c<C, TrueT, FalseT>>
+: mpl_apply_def
 {
   using type = typename ::falcon::if_<
     has_bool_value_impl<C>(1),
@@ -442,36 +425,153 @@ struct eval_if_
 
 template<bool c, typename TrueT, typename FalseT>
 struct eval_if_c
-: mpl_apply_def<::falcon::eval_if<c, TrueT, FalseT>>
+: mpl_apply_def
 {
   using type = typename ::falcon::eval_if<c, TrueT, FalseT>::type;
 };
 
 
-template <typename T>
-class next
+template<typename T>
+struct sizeof_
 {
-  using type = typename T::next;
+  using type = sizeof_;
+  static const std::size_t value = sizeof(T);
 };
+
+
+struct mpl_iterator_def
+{
+  using mpl_iterator = std::true_type;
+};
+
+
+template <typename Iterator>
+struct iterator_category
+{
+  using type = std::random_access_iterator_tag;
+};
+
+class na;
+
+template<typename Seq, typename Key, typename Tag = typename iterator_category<Seq>::type>
+class iterator_impl;
+
+
+
+template<typename Seq, typename Key, typename Tag>
+struct iterator_impl<Seq, Key, std::forward_iterator_tag>
+: mpl_iterator_def
+{
+  using type = typename ::falcon::eval_if<
+  (Key::value < 0 || Key::value >= size_impl<Seq>::value),
+  protect<na>,
+  at_c_impl<Seq, Key::value>
+  >::type;
+  using next = iterator_impl<Seq, std::integral_constant<int, Key::value+1>, Tag>;
+};
+
+template<typename Seq, typename Key, typename Tag>
+struct iterator_impl<Seq, Key, std::bidirectional_iterator_tag>
+: iterator_impl<std::forward_iterator_tag>
+{
+  using type = typename ::falcon::eval_if<
+    (Key::value < 0 || Key::value >= size_impl<Seq>::value),
+    protect<na>,
+    at_c_impl<Seq, Key::value>
+  >::type;
+  using next = iterator_impl<Seq, std::integral_constant<int, Key::value+1>, Tag>;
+  using prior = iterator_impl<Seq, std::integral_constant<int, Key::value-1>, Tag>;
+};
+
+template<typename Seq, typename Key, typename Tag>
+struct iterator_impl<Seq, Key, std::random_access_iterator_tag>
+: iterator_impl<std::bidirectional_iterator_tag>
+{
+  template<typename Key::type N>
+  struct advance
+  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value+N>, Tag>; };
+
+  template<typename Key::type N>
+  struct recoil
+  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value-N>, Tag>; };
+};
+
+template <typename Seq>
+struct begin
+{
+  using type = iterator_impl<Seq, std::integral_constant<int, 0>>;
+};
+
+template <typename Seq>
+struct end
+{
+  using type = iterator_impl<Seq, std::integral_constant<int, size_impl<Seq>::value>>;
+};
+
+
+template<typename T, typename = typename T::next>
+constexpr bool has_next(int)
+{ return 1; }
+
+template<typename T>
+constexpr bool has_next(unsigned)
+{ return 0; }
+
+
+template <typename Iterator, bool = has_next<Iterator>(1)>
+struct next_impl
+{ using type = Iterator; };
+
+template <typename Iterator>
+struct next_impl<Iterator, true>
+{ using type = typename Iterator::next; };
 
 template <typename T, T N>
-struct next<std::integral_constant<T, N>>
+struct next_impl<std::integral_constant<T, N>, false>
+{ using type = std::integral_constant<T, N+1>; };
+
+template <typename Iterator>
+struct next
 {
-  using type = std::integral_constant<T, N+1>;
+  using type = typename Iterator::next;
 };
 
 
-template <typename T>
-class prior
-{
-  using type = typename T::prior;
-};
+template<typename T, typename = typename T::prior>
+constexpr bool has_prior(int)
+{ return 1; }
+
+template<typename T>
+constexpr bool has_prior(unsigned)
+{ return 0; }
+
+
+template <typename Iterator, bool = has_prior<Iterator>(1)>
+struct prior_impl
+{ using type = Iterator; };
+
+template <typename Iterator>
+struct prior_impl<Iterator, true>
+{ using type = typename Iterator::prior; };
 
 template <typename T, T N>
-struct prior<std::integral_constant<T, N>>
+struct prior_impl<std::integral_constant<T, N>, false>
+{ using type = std::integral_constant<T, N-1>; };
+
+template <typename Iterator>
+struct prior
 {
-  using type = std::integral_constant<T, N-1>;
+  using type = typename Iterator::prior;
 };
+
+
+template <typename Iterator>
+struct deref
+{
+  using type = typename Iterator::type;
+};
+
+
 
 
 

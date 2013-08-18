@@ -197,6 +197,9 @@ object qui possède des constructeur noexcept et peut être caster en T. Sert po
 
 mpl (comme boost) mais qui utilise parameter_pack et co
 
+mettre operator() des foncteurs en constant (et uniquement en constant). Si une version non constant est requis, il faudra passer par std::ref. Ceci permet d'éviter les bug/erreur liée au copie dans un algorithme
+
+trait équivalence<T,U>: vrai si le T équivaut U. <char[], char*> oui, <char*, char[]> non
 
 
 
