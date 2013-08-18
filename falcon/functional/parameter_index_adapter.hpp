@@ -23,127 +23,101 @@ struct call_partial_recursive_param_loop_tag {};
  * Tag is \p call_partial_param_loop_tag for used \p call_partial_param_loop(), \p call_partial_recursive_param_loop_tag for used \p call_partial_recursive_param_loop(), each tag of \link indexes-tag indexes-tag \endlink or \p parameter_index
  * @{
  */
-template <typename _Functor, typename _Tag = full_parameter_index_tag>
+template <typename Functor, typename Tag = full_parameter_index_tag>
 struct parameter_index_adapter
 {
-	_Functor _M_func;
+  Functor _M_func;
 
 private:
-	typedef typename parameter_index_or_tag_to_tag<_Tag>::type __tag;
+  typedef typename parameter_index_or_tag_to_tag<Tag>::type __tag;
 
 public:
-	template<typename... _Args, typename _BuildIndexes = typename keep_parameter_index<__tag, sizeof...(_Args)>::type>
-	constexpr typename __call_result_of<
-		const _Functor,
-		_BuildIndexes,
-		_Args...
-	>::__type operator()(_Args&&... args) const
-	{
-		return call<const _Functor&>(_BuildIndexes(), _M_func,
-																 std::forward<_Args>(args)...);
-	}
+  template<typename... _Args, typename _BuildIndexes = typename keep_parameter_index<__tag, sizeof...(_Args)>::type>
+  constexpr typename __call_result_of<
+    const Functor,
+    _BuildIndexes,
+    _Args...
+  >::__type operator()(_Args&&... args) const
+  {
+    return call<const Functor&>(_BuildIndexes(), _M_func, std::forward<_Args>(args)...);
+  }
 
-	template<typename... _Args, typename _BuildIndexes = typename keep_parameter_index<__tag, sizeof...(_Args)>::type>
-	typename __call_result_of<
-		_Functor,
-		_BuildIndexes,
-		_Args...
-	>::__type operator()(_Args&&... args)
-	{
-		return call<_Functor&>(_BuildIndexes(), _M_func,
-													 std::forward<_Args>(args)...);
-	}
+  void swap(parameter_index_adapter& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 
-	void swap(parameter_index_adapter& other)
-	{
-      using std::swap;
-      swap(_M_func, other._M_func);
-    }
-
-	template<typename _Tag2>
-	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
-    {
-      using std::swap;
-      swap(_M_func, other._M_func);
-    }
+  template<typename Tag2>
+  void swap(parameter_index_adapter<Functor, Tag2>& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 };
 
-template <typename _Functor, std::size_t _NumberArg>
-struct parameter_index_adapter<_Functor, call_partial_param_loop_tag<_NumberArg>>
+template <typename Functor, std::size_t _NumberArg>
+struct parameter_index_adapter<Functor, call_partial_param_loop_tag<_NumberArg>>
 {
-	_Functor _M_func;
+  Functor _M_func;
 
-	template<typename... _Args>
-	constexpr typename __call_partial_param_loop_traits<_NumberArg, const _Functor, _Args...>::__result_type operator()(_Args&&... args) const
-	{
-		return call_partial_param_loop<_NumberArg, const _Functor&>(
-			_M_func, std::forward<_Args>(args)...);
-	}
+  template<typename... _Args>
+  constexpr typename __call_partial_param_loop_traits<_NumberArg, const Functor, _Args...>::__result_type operator()(_Args&&... args) const
+  {
+    return call_partial_param_loop<_NumberArg, const Functor&>(
+      _M_func, std::forward<_Args>(args)...);
+  }
 
-	template<typename... _Args>
-	typename __call_partial_param_loop_traits<_NumberArg, _Functor, _Args...>::__result_type operator()(_Args&&... args)
-	{
-		return call_partial_param_loop<_NumberArg, _Functor&>(
-			_M_func, std::forward<_Args>(args)...);
-	}
+  void swap(parameter_index_adapter& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 
-	void swap(parameter_index_adapter& other)
-	{
-      using std::swap;
-      swap(_M_func, other._M_func);
-    }
-
-	template<typename _Tag2>
-	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
-	{
-      using std::swap;
-      swap(_M_func, other._M_func);
-    }
+  template<typename Tag2>
+  void swap(parameter_index_adapter<Functor, Tag2>& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 };
 
-template <typename _Functor, std::size_t _NumberArg>
-struct parameter_index_adapter<_Functor, call_partial_recursive_param_loop_tag<_NumberArg>>
+template <typename Functor, std::size_t _NumberArg>
+struct parameter_index_adapter<Functor, call_partial_recursive_param_loop_tag<_NumberArg>>
 {
-	_Functor _M_func;
+  Functor _M_func;
 
-	template<typename... _Args>
-	constexpr typename __call_partial_recursive_param_loop_traits<_NumberArg, const _Functor, _Args...>::__result_type operator()(_Args&&... args) const
-	{
-		return call_partial_recursive_param_loop<_NumberArg, const _Functor&>(
-			_M_func, std::forward<_Args>(args)...);
-	}
+  template<typename... _Args>
+  constexpr typename __call_partial_recursive_param_loop_traits<_NumberArg, const Functor, _Args...>::__result_type operator()(_Args&&... args) const
+  {
+    return call_partial_recursive_param_loop<_NumberArg, const Functor&>(
+      _M_func, std::forward<_Args>(args)...);
+  }
 
-	template<typename... _Args>
-	typename __call_partial_recursive_param_loop_traits<_NumberArg, _Functor, _Args...>::__result_type operator()(_Args&&... args)
-	{
-		return call_partial_recursive_param_loop<_NumberArg, _Functor&>(
-			_M_func, std::forward<_Args>(args)...);
-	}
+  void swap(parameter_index_adapter& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 
-	void swap(parameter_index_adapter& other)
-    {
-      using std::swap;
-      swap(_M_func, other._M_func);
-    }
-
-	template<typename _Tag2>
-	void swap(parameter_index_adapter<_Functor, _Tag2>& other)
-    {
-      using std::swap;
-      swap(_M_func, other._M_func);
-    }
+  template<typename Tag2>
+  void swap(parameter_index_adapter<Functor, Tag2>& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
 };
 
 //@}
 
-template <typename _Functor, typename _Tag>
-void swap(parameter_index_adapter<_Functor, _Tag>& x,
-          parameter_index_adapter<_Functor, _Tag>& y)
+template <typename Functor, typename Tag>
+void swap(parameter_index_adapter<Functor, Tag>& x,
+        parameter_index_adapter<Functor, Tag>& y)
 { x.swap(y); }
 
-template <typename _Functor, typename _Tag, typename _Tag2>
-void swap(parameter_index_adapter<_Functor, _Tag>& x,
-          parameter_index_adapter<_Functor, _Tag2>& y)
+template <typename Functor, typename Tag, typename Tag2>
+void swap(parameter_index_adapter<Functor, Tag>& x,
+        parameter_index_adapter<Functor, Tag2>& y)
 { x.swap(y); }
 
 }

@@ -1,58 +1,61 @@
 #ifndef _FALCON_FUNCTIONAL_INCREMENTAL_GENERATOR_HPP
 #define _FALCON_FUNCTIONAL_INCREMENTAL_GENERATOR_HPP
 
+#include <falcon/c++/reference.hpp>
+#include <falcon/utility/move.hpp>
+
 namespace falcon {
 /**
-* std::bind(falcon::post_increment<_T>, val)
-*/
-template<typename _T>
+ * std::bind(falcon::post_increment<T>, val)
+ */
+template<typename T>
 struct incremental_generator
 {
 private:
-	_T _value;
+	T value;
 
 public:
-	typedef _T result_type;
+	typedef T result_type;
 
 public:
 	incremental_generator()
-	: _value()
+	: value()
 	{}
 
-	incremental_generator(const _T& begin)
-	: _value(begin)
+	incremental_generator(T CPP_RVALUE_OR_CONST_REFERENCE begin)
+    : value(FALCON_FORWARD(T, begin))
 	{}
 
-	_T operator() ()
+	T operator() ()
 	{
-		return _value++;
+		return value++;
 	}
 };
 
 /**
-* std::bind(falcon::increment<_T>, val)
-*/
-template<typename _T>
+ * std::bind(falcon::increment<T>, val)
+ */
+template<typename T>
 struct preincremental_generator
 {
 private:
-	_T _value;
+	T value;
 
 public:
-	typedef _T result_type;
+	typedef T result_type;
 
 public:
 	preincremental_generator()
-	: _value()
+	: value()
 	{}
 
-	preincremental_generator(const _T& begin)
-	: _value(begin)
+	preincremental_generator(T CPP_RVALUE_OR_CONST_REFERENCE begin)
+    : value(FALCON_FORWARD(T, begin))
 	{}
 
-	_T operator() ()
+	T operator() ()
 	{
-		return ++_value;
+		return ++value;
 	}
 };
 }

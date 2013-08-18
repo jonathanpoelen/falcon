@@ -1,58 +1,61 @@
 #ifndef _FALCON_FUNCTIONAL_DECREMENTAL_GENERATOR_HPP
 #define _FALCON_FUNCTIONAL_DECREMENTAL_GENERATOR_HPP
 
+#include <falcon/c++/reference.hpp>
+#include <falcon/utility/move.hpp>
+
 namespace falcon {
 /**
-* std::bind(falcon::post_decrement<_T>, val)
-*/
-template<typename _T>
+ * std::bind(falcon::post_decrement<T>, val)
+ */
+template<typename T>
 struct decremental_generator
 {
 private:
-	_T _value;
+	T value;
 
 public:
-	typedef _T result_type;
+	typedef T result_type;
 
 public:
 	decremental_generator()
-	: _value()
+	: value()
 	{}
 
-	decremental_generator(const _T& begin)
-	: _value(begin)
+	decremental_generator(T CPP_RVALUE_OR_CONST_REFERENCE begin)
+    : value(FALCON_FORWARD(T, begin))
 	{}
 
-	_T operator() ()
+	T operator() ()
 	{
-		return _value--;
+		return value--;
 	}
 };
 
 /**
-* std::bind(falcon::decrement<_T>, val)
-*/
-template<typename _T>
+ * std::bind(falcon::decrement<T>, val)
+ */
+template<typename T>
 struct predecremental_generator
 {
 private:
-	_T _value;
+	T value;
 
 public:
-	typedef _T result_type;
+	typedef T result_type;
 
 public:
 	predecremental_generator()
-	: _value()
+	: value()
 	{}
 
-	predecremental_generator(const _T& begin)
-	: _value(begin)
+	predecremental_generator(T CPP_RVALUE_OR_CONST_REFERENCE begin)
+    : value(FALCON_FORWARD(T, begin))
 	{}
 
-	_T operator() ()
+	T operator() ()
 	{
-		return --_value;
+		return --value;
 	}
 };
 }

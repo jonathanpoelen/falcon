@@ -458,21 +458,9 @@ class iterator_impl;
 
 
 
-template<typename Seq, typename Key, typename Tag>
-struct iterator_impl<Seq, Key, std::forward_iterator_tag>
+template<typename Seq, typename Key, typename Tag = std::forward_iterator_tag>
+struct forward_iterator_impl
 : mpl_iterator_def
-{
-  using type = typename ::falcon::eval_if<
-  (Key::value < 0 || Key::value >= size_impl<Seq>::value),
-  protect<na>,
-  at_c_impl<Seq, Key::value>
-  >::type;
-  using next = iterator_impl<Seq, std::integral_constant<int, Key::value+1>, Tag>;
-};
-
-template<typename Seq, typename Key, typename Tag>
-struct iterator_impl<Seq, Key, std::bidirectional_iterator_tag>
-: iterator_impl<std::forward_iterator_tag>
 {
   using type = typename ::falcon::eval_if<
     (Key::value < 0 || Key::value >= size_impl<Seq>::value),
@@ -480,12 +468,28 @@ struct iterator_impl<Seq, Key, std::bidirectional_iterator_tag>
     at_c_impl<Seq, Key::value>
   >::type;
   using next = iterator_impl<Seq, std::integral_constant<int, Key::value+1>, Tag>;
+};
+
+template<typename Seq, typename Key>
+struct iterator_impl<Seq, Key, std::forward_iterator_tag>
+: forward_iterator_impl<Seq, Key>
+{};
+
+template<typename Seq, typename Key, typename Tag = std::bidirectional_iterator_tag>
+struct bidirectional_iterator_impl
+: forward_iterator_impl<Seq, Key, Tag>
+{
   using prior = iterator_impl<Seq, std::integral_constant<int, Key::value-1>, Tag>;
 };
 
-template<typename Seq, typename Key, typename Tag>
-struct iterator_impl<Seq, Key, std::random_access_iterator_tag>
-: iterator_impl<std::bidirectional_iterator_tag>
+template<typename Seq, typename Key>
+struct iterator_impl<Seq, Key, std::bidirectional_iterator_tag>
+: bidirectional_iterator_impl<Seq, Key>
+{};
+
+template<typename Seq, typename Key, typename Tag = std::random_access_iterator_tag>
+struct random_access_iterator_impl
+: bidirectional_iterator_impl<Seq, Key, Tag>
 {
   template<typename Key::type N>
   struct advance
@@ -495,6 +499,11 @@ struct iterator_impl<Seq, Key, std::random_access_iterator_tag>
   struct recoil
   { using type = iterator_impl<Seq, std::integral_constant<int, Key::value-N>, Tag>; };
 };
+
+template<typename Seq, typename Key>
+struct iterator_impl<Seq, Key, std::random_access_iterator_tag>
+: random_access_iterator_impl<Seq, Key>
+{};
 
 template <typename Seq>
 struct begin

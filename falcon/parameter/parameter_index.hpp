@@ -70,7 +70,7 @@ struct __Build_range_parameter_index<
 template<std::size_t Start, std::size_t Stop, std::size_t Step = 1>
 struct build_range_parameter_index
 {
-	static_assert(Start < Stop, "Start <= Stop");
+	static_assert(Start <= Stop, "Start > Stop");
 	static_assert(Step, "Step is zero");
 
 	typedef typename __Build_range_parameter_index<Start, Start, Stop, Step, parameter_index<>>::__type type;

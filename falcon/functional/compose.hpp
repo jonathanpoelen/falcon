@@ -66,10 +66,6 @@ public:
 	typename _Operation1::result_type
 	operator()(typename _Operation2::argument_type& __x) const
 	{ return _M_fn1(_M_fn2(__x)); }
-
-	typename _Operation1::result_type
-	operator()(typename _Operation2::argument_type& __x)
-	{ return _M_fn1(_M_fn2(__x)); }
 };
 
 #else
@@ -135,12 +131,6 @@ public:
 	constexpr typename std::result_of<_Operation1&(
 		typename std::result_of<_Operation2&(_T&)>::type
 	)>::type operator()(_T& __x) const
-	{ return _M_fn1(_M_fn2(__x)); }
-
-	template<typename _T>
-	typename std::result_of<_Operation1&(
-		typename std::result_of<_Operation2&(_T&)>::type
-	)>::type operator()(_T& __x)
 	{ return _M_fn1(_M_fn2(__x)); }
 };
 
@@ -267,13 +257,6 @@ public:
 		const _Operation2&(_T&),
 		const _Operation3&(_T&)
 	)>::type operator()(_T& __x) const
-	{ return _M_fn1(_M_fn2(__x), _M_fn3(__x)); }
-
-	template<typename _T>
-	constexpr typename std::result_of<_Operation1&(
-		_Operation2&(_T&),
-		_Operation3&(_T&)
-	)>::type operator()(_T& __x)
 	{ return _M_fn1(_M_fn2(__x), _M_fn3(__x)); }
 };
 //@}
@@ -433,22 +416,6 @@ public:
 	>::__result_type operator()(_T& __x) const
 	{
 		return tuple_compose<const _Operation&>(
-			parameter_index<0>(),
-			_M_fn,
-			_M_fns,
-			std::tuple<_T&>(__x)
-		);
-	}
-
-	template<typename _T>
-	typename __tuple_compose_base<
-		0, sizeof...(_Operations), _Operation,
-		std::tuple<_Operations...>,
-		const std::tuple<_T&>,
-		parameter_index<0>
-	>::__result_type operator()(_T& __x)
-	{
-		return tuple_compose<_Operation&>(
 			parameter_index<0>(),
 			_M_fn,
 			_M_fns,
