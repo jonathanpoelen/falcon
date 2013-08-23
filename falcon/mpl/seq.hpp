@@ -491,13 +491,13 @@ template<typename Seq, typename Key, typename Tag = std::random_access_iterator_
 struct random_access_iterator_impl
 : bidirectional_iterator_impl<Seq, Key, Tag>
 {
-  template<typename Key::type N>
+  template<typename T>
   struct advance
-  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value+N>, Tag>; };
+  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value+T::value>, Tag>; };
 
-  template<typename Key::type N>
+  template<typename T>
   struct recoil
-  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value-N>, Tag>; };
+  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value-T::value>, Tag>; };
 };
 
 template<typename Seq, typename Key>

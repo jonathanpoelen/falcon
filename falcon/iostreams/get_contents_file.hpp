@@ -1,20 +1,11 @@
-#ifndef FALCON_IOSTREAM_GET_CONTENTS_FILE_HPP
-#define FALCON_IOSTREAM_GET_CONTENTS_FILE_HPP
-
-#include <falcon/iostreams/set_contents_file.hpp>
+#ifndef FALCON_IOSTREAMS_GET_CONTENTS_FILE_HPP
+#define FALCON_IOSTREAMS_GET_CONTENTS_FILE_HPP
 
 #include <fstream>
-
-#ifndef FALCON_NO_BOOST_FILESYSTEM
-#include <boost/filesystem/operations.hpp>
-#else
-#include <sstream>
-#endif
 
 namespace falcon {
 
 
-#ifndef FALCON_NO_BOOST_FILESYSTEM
 template<typename String>
 void __get_contents_file(String& s, const char * name, std::ios_base::iostate * err = 0)
 {
@@ -22,49 +13,33 @@ void __get_contents_file(String& s, const char * name, std::ios_base::iostate * 
     *err = std::ios_base::failbit;
 
   typedef typename String::value_type char_type;
+  typedef typename String::traits_type traits_type;
 
-  boost::system::error_code ec;
-  uintmax_t size = boost::filesystem::file_size(name, ec);
-  if (!ec) {
-    size = size - size%4096 + 4097; //NOTE Clang++ reads largest multiples of 4096
-    s.reserve(static_cast<size_t>(size));
-    std::basic_filebuf<char_type> sbin;
-    if (sbin.open(name, std::ios_base::in)) {
-      sbin.pubsetbuf(data, static_cast<typename std::streamsize>(size));
-      char_type* data = const_cast<char_type*>(s.data());
-      sbin.sgetc();
-      *(data + sbin.in_avail()) = 0;
-      if (err)
-        *err = std::ios_base::goodbit;
-    }
+  std::basic_filebuf<char_type, traits_type> buf;
+
+  if (buf.open(name, std::ios::in)) {
+#if __cplusplus >= 201103L
+    s.resize(buf.in_avail());
+    const std::streamsize n = buf.sgetn(&s[0], s.size());
+#else
+    const std::streamsize sz = buf.in_avail();
+    char_type * cs = new char_type[sz];
+    const std::streamsize n = buf.sgetn(cs, sz);
+    s.assign(cs, sz);
+    delete[] cs;
+#endif
+    if (err && n == static_cast<std::streamsize>(s.size()))
+      *err = std::ios_base::goodbit;
   }
 }
-#endif
 
 template<typename String>
 String
 __get_contents_file(const char * name, std::ios_base::iostate * err = 0)
 {
-#ifndef FALCON_NO_BOOST_FILESYSTEM
   String s;
   __get_contents_file<>(s, name, err);
   return s;
-#else
-  typedef typename String::value_type char_type;
-  typedef std::basic_filebuf<char_type> filebuf;
-  if (err)
-    *err = std::ios_base::failbit;
-  filebuf sbin;
-  if (sbin.open(name, std::ios_base::in))
-  {
-    std::basic_ostringstream<char_type> oss;
-    __set_contents_file(oss.rdbuf(), &sbin);
-    if (err)
-      *err = std::ios_base::goodbit;
-    return oss.str();
-  }
-  return String();
-#endif
 }
 
 #if __cplusplus >= 201103L
