@@ -1,12 +1,12 @@
-#ifndef _FALCON_TYPE_TRAITS_IDENTITY_HPP
-#define _FALCON_TYPE_TRAITS_IDENTITY_HPP
+#ifndef FALCON_TYPE_TRAITS_IDENTITY_HPP
+#define FALCON_TYPE_TRAITS_IDENTITY_HPP
 
 namespace falcon {
 
-template<typename _T>
+template<typename T>
 struct identity
 {
-	typedef _T type;
+	typedef T type;
 };
 
 }

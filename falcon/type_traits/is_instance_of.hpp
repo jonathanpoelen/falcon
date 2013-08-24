@@ -26,7 +26,7 @@ class __is_instance_of
   static two __test(...);
 
 public:
-  static const bool value = sizeof(__test(static_cast<T*>(0))) == 1;
+  static const bool value = sizeof(__test(static_cast<T*>(0))) == sizeof(one);
 };
 
 /**

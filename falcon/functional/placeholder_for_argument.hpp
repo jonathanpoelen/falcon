@@ -3,7 +3,6 @@
 
 #include <utility>
 #include <falcon/functional/call.hpp>
-#include <falcon/type_traits/declval.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
 
 namespace falcon {

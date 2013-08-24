@@ -1,5 +1,5 @@
-#ifndef _FALCON_TYPE_TRAITS_INVALID_TYPE_HPP
-#define _FALCON_TYPE_TRAITS_INVALID_TYPE_HPP
+#ifndef FALCON_TYPE_TRAITS_INVALID_TYPE_HPP
+#define FALCON_TYPE_TRAITS_INVALID_TYPE_HPP
 
 #include <falcon/type_traits/integral_constant.hpp>
 
@@ -10,11 +10,11 @@ struct invalid_type
 
 template<typename>
 struct is_invalid
-: public false_type { };
+: false_type { };
 
 template<>
 struct is_invalid<invalid_type>
-: public true_type { };
+: true_type { };
 
 }
 

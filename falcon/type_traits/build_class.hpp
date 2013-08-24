@@ -1,36 +1,41 @@
 #ifndef FALCON_TYPE_TRAITS_BUILD_CLASS_HPP
 #define FALCON_TYPE_TRAITS_BUILD_CLASS_HPP
 
-#include <falcon/parameter/parameter_pack.hpp>
-
 namespace falcon
 {
 
-template <template<typename...> class _W, typename _Pack>
+template <template<typename...> class W, typename Pack>
 class __build_class;
 
-template <template<typename...> class _W, typename... _Elements>
-struct __build_class<_W, parameter_pack<_Elements...>>
-{ typedef _W<_Elements...> type; };
+template <template<typename...> class W
+, template<typename...> class Pack
+, typename... Elements
+>
+struct __build_class<W, Pack<Elements...>>
+{ typedef W<Elements...> type; };
 
-template <template<typename...> class _W, typename _Pack>
+template <template<typename...> class W, typename Pack>
 struct build_class
-{ typedef typename __build_class<_W, _Pack>::type type; };
+{ typedef typename __build_class<W, Pack>::type type; };
 
-template <template<typename...> class _W, typename... _Elements>
+template <template<typename...> class W, typename... Elements>
 struct build_class2
-{ typedef _W<_Elements...> type; };
+{ typedef W<Elements...> type; };
 
-template <typename _T, template<_T...> class _W, typename _Pack>
+template <typename T, template<T...> class W, typename Pack>
 class __build_class_by_value;
 
-template <typename _T, template<_T...> class _W, typename... _Elements>
-struct __build_class_by_value<_T, _W, parameter_pack<_Elements...>>
-{ typedef _W<_Elements::value...> type; };
+template <typename T
+, template<T...> class W
+, template<typename...> class Pack
+, typename... Elements
+>
+struct __build_class_by_value<T, W, Pack<Elements...>>
+{ typedef W<Elements::value...> type; };
 
-template <typename _T, template<_T...> class _W, typename _Pack>
+template <typename T, template<T...> class W, typename Pack>
 struct build_class_by_value
-{ typedef typename __build_class_by_value<_T, _W, _Pack>::type type; };
+{ typedef typename __build_class_by_value<T, W, Pack>::type type; };
 
 }
 

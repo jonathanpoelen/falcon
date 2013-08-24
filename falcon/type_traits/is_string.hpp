@@ -25,20 +25,10 @@ namespace detail {
 template<typename T> struct is_string : false_type {};
 template<> struct is_string<char*> : true_type {};
 template<> struct is_string<wchar_t*> : true_type {};
+#if __cplusplus >= 201103L
 template<> struct is_string<char16_t*> : true_type {};
 template<> struct is_string<char32_t*> : true_type {};
-template<> struct is_string<const char*> : true_type {};
-template<> struct is_string<const wchar_t*> : true_type {};
-template<> struct is_string<const char16_t*> : true_type {};
-template<> struct is_string<const char32_t*> : true_type {};
-template<> struct is_string<volatile char*> : true_type {};
-template<> struct is_string<volatile wchar_t*> : true_type {};
-template<> struct is_string<volatile char16_t*> : true_type {};
-template<> struct is_string<volatile char32_t*> : true_type {};
-template<> struct is_string<volatile const char*> : true_type {};
-template<> struct is_string<volatile const wchar_t*> : true_type {};
-template<> struct is_string<volatile const char16_t*> : true_type {};
-template<> struct is_string<volatile const char32_t*> : true_type {};
+#endif
 template<typename CharT, typename Trait, typename Allocator>
 struct is_string<std::basic_string<CharT, Trait, Allocator> > : true_type {};
 template<typename CharT, typename Trait>
@@ -48,7 +38,7 @@ struct is_string<basic_cstring<CharT, Trait> > : true_type {};
 template<typename T>
 struct is_string
 : ::falcon::detail::is_string<
-typename FALCON_BOOST_OR_STD_NAMESPACE::remove_cv<T>::type
+  typename FALCON_BOOST_OR_STD_NAMESPACE::remove_cv<T>::type
 > {};
 
 template<typename T, std::size_t N>

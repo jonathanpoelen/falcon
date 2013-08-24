@@ -1,18 +1,20 @@
-#ifndef _FALCON_TYPE_TRAITS_ADD_N_POINTER_HPP
-#define _FALCON_TYPE_TRAITS_ADD_N_POINTER_HPP
+#ifndef FALCON_TYPE_TRAITS_ADD_N_POINTER_HPP
+#define FALCON_TYPE_TRAITS_ADD_N_POINTER_HPP
+
+#include <cstddef>
 
 namespace falcon {
 
-template<typename _T, std::size_t _N>
+template<typename T, std::size_t N>
 struct add_n_pointer
 {
-	typedef typename add_n_pointer<_T*, _N-1>::type type;
+	typedef typename add_n_pointer<T*, N-1>::type type;
 };
 
-template<typename _T>
-struct add_n_pointer<_T, 0>
+template<typename T>
+struct add_n_pointer<T, 0>
 {
-	typedef _T type;
+	typedef T type;
 };
 
 }

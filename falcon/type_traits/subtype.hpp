@@ -1,33 +1,35 @@
 #ifndef _FALCON_TYPE_TRAITS_SUBTYPE_HPP
 #define _FALCON_TYPE_TRAITS_SUBTYPE_HPP
 
-#if __cplusplus < 201103L
+#if __cplusplus >= 201103L
+# include <utility>
+#else
+# include <falcon/utility/declval.hpp>
 # include <boost/typeof/typeof.hpp>
 #endif
-#include <falcon/type_traits/declval.hpp>
 
 namespace falcon {
-template <typename _T>
+template <typename T>
 struct subtype
 {
 #if __cplusplus >= 201103L
-	typedef decltype(*std::declval<_T>()) type;
+	typedef decltype(*std::declval<T>()) type;
 #else
-	typedef BOOST_TYPEOF(*declval<_T>()) type;
+	typedef BOOSTTYPEOF(*declval<T>()) type;
 #endif
 };
 
 #if 0
-template <typename _T, std::size_t _N>
-struct subtype<_T[_N]>
+template <typename T, std::size_t _N>
+struct subtype<T[_N]>
 {
-	typedef _T type;
+	typedef T type;
 };
 
-template <typename _T>
-struct subtype<_T*>
+template <typename T>
+struct subtype<T*>
 {
-	typedef _T type;
+	typedef T type;
 };
 #endif
 }

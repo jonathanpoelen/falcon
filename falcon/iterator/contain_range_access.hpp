@@ -7,37 +7,37 @@
 # include <falcon/sfinae/function_is_call_possible.hpp>
 
 namespace falcon {
-	template <typename _T>
+	template <typename T>
 	class contain_range_access_iterator
 	{
 		FALCON_CLASS_FUNCTION_IS_CALL_POSSIBLE(begin);
 
 	public:
-		static const bool value = FALCON_FUNCTION_IS_CALL_POSSIBLE_NAME(begin)<_T&>::value;
+		static const bool value = FALCON_FUNCTION_IS_CALL_POSSIBLE_NAME(begin)<T&>::value;
 	};
 
-	template <typename _T>
+	template <typename T>
 	struct contain_range_access_reverse_iterator
 	{
 		FALCON_CLASS_FUNCTION_IS_CALL_POSSIBLE(rbegin);
 
 	public:
-		static const bool value = FALCON_FUNCTION_IS_CALL_POSSIBLE_NAME(rbegin)<_T&>::value;
+		static const bool value = FALCON_FUNCTION_IS_CALL_POSSIBLE_NAME(rbegin)<T&>::value;
 	};
 }
 
 #else
-#include <falcon/helper/has_type_helper.hpp>
+#include <falcon/type_traits/has.hpp>
 
 namespace falcon {
-	template <typename _T>
+	template <typename T>
 	struct contain_range_access_iterator
-	: helper::has_type_helper<range_access_iterator<_T> >
+	: has_type<range_access_iterator<T> >
 	{};
 
-	template <typename _T>
+	template <typename T>
 	struct contain_range_access_reverse_iterator
-	: helper::has_type_helper<range_access_reverse_iterator<_T> >
+	: has_type<range_access_reverse_iterator<T> >
 	{};
 }
 

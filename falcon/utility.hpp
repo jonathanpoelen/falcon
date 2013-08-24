@@ -1,6 +1,7 @@
 #ifndef FALCON_UTILITY_HPP
 #define FALCON_UTILITY_HPP
 
+#include <falcon/utility/declval.hpp>
 #include <falcon/utility/finally.hpp>
 #include <falcon/utility/inheritance.hpp>
 #include <falcon/utility/inheritance_with_index.hpp>

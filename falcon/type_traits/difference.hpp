@@ -2,7 +2,7 @@
 #define _FALCON_TYPE_TRAITS_DIFFERENCE_HPP
 
 #if __cplusplus >= 201103L
-# include <type_traits>
+# include <utility>
 namespace falcon {
 template <typename _T>
 struct difference

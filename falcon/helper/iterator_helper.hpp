@@ -3,8 +3,6 @@
 
 #include <falcon/type_traits/has.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
-#include <falcon/helper/iterator_function_has_member.hpp>
-#include <falcon/helper/iterator_function_is_call_possible.hpp>
 
 namespace falcon {
 namespace helper {

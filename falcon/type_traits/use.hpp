@@ -7,7 +7,7 @@ namespace falcon{
 
 struct use_default;
 
-template<typename _T>
+template<typename T>
 struct is_default
 : false_type
 {};
@@ -17,24 +17,24 @@ struct is_default<use_default>
 : true_type
 {};
 
-template <typename _T>
+template <typename T>
 struct use
-{ typedef _T type; };
+{ typedef T type; };
 
-template <typename _T, typename _Unless>
+template <typename T, typename Unless>
 struct late_use
-{ typedef _T type; };
+{ typedef T type; };
 
 /**
- * Use _Default::type if the type of _T is use_default, otherwise use _T
+ * Use Default::type if the type of T is use_default, otherwise use T
  */
-template<typename _Default, typename _T>
+template<typename Default, typename T>
 struct default_or_type
-{ typedef _T type; };
+{ typedef T type; };
 
-template<typename _Default>
-struct default_or_type<_Default, use_default>
-{ typedef typename _Default::type type; };
+template<typename Default>
+struct default_or_type<Default, use_default>
+{ typedef typename Default::type type; };
 
 }
 

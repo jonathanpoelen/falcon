@@ -13,8 +13,10 @@ template<> struct is_character<signed char> : true_type {};
 template<> struct is_character<unsigned char> : true_type {};
 template<> struct is_character<char> : true_type {};
 template<> struct is_character<wchar_t> : true_type {};
+#if __cplusplus >= 201103L
 template<> struct is_character<char16_t> : true_type {};
 template<> struct is_character<char32_t> : true_type {};
+#endif
 }
 
 template<typename T> struct is_character

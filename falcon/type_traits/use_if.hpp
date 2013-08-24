@@ -8,11 +8,11 @@ namespace falcon
 {
 
 /**
- * shorcut notation for eval_if< _T::value, _T, _Default>.
+ * shorcut notation for eval_if< T::value, T, Default>.
  */
-template <typename _T, typename _Default>
+template <typename T, typename Default>
 struct use_if
-: eval_if<_T::value, _T, _Default>
+: eval_if<T::value, T, Default>
 {};
 
 }

@@ -4,13 +4,13 @@
 namespace falcon
 {
 
-template <typename _T>
+template <typename T>
 struct add_const_if_reference
-{ typedef _T type; };
+{ typedef T type; };
 
-template <typename _T>
-struct add_const_if_reference<_T&>
-{ typedef const _T& type; };
+template <typename T>
+struct add_const_if_reference<T&>
+{ typedef const T& type; };
 
 }
 

@@ -4,7 +4,6 @@
 #include <falcon/type_traits/add_const_if_reference.hpp>
 #include <falcon/type_traits/add_n_pointer.hpp>
 #include <falcon/type_traits/decay_and_strip.hpp>
-#include <falcon/type_traits/declval.hpp>
 #include <falcon/type_traits/difference.hpp>
 #include <falcon/type_traits/dimension.hpp>
 #include <falcon/type_traits/disable_if.hpp>
