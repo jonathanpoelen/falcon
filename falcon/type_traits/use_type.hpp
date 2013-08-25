@@ -1,61 +1,51 @@
 #ifndef FALCON_TYPE_TRAITS_USE_TYPE_HPP
 #define FALCON_TYPE_TRAITS_USE_TYPE_HPP
 
-#include <falcon/type_traits/has.hpp>
+#include <falcon/type_traits/use_def.hpp>
 
 namespace falcon
 {
 
-#define FALCON_CONVERT_NAME_TYPE(name)\
-template <typename _T, bool = has_##name<_T>::value>\
-struct __use_##name\
-{\
-	typedef typename _T::name type;\
-	static const bool value = true;\
-};\
-template <typename _T>\
-struct __use_##name<_T, false>\
-{\
-	static const bool value = false;\
-};\
-template <typename _T>\
-struct use_##name\
-: __use_##name<_T>\
-{}
+#define FALCON_USE_XXX_TRAIT(name)\
+  FALCON_USE_XXX_TRAIT_NAMED_DEF(name, __use_##name)\
+  template <typename T>\
+  struct use_##name\
+  : __use_##name<T>\
+  {}
 
-FALCON_CONVERT_NAME_TYPE(type);
-FALCON_CONVERT_NAME_TYPE(value_type);
-FALCON_CONVERT_NAME_TYPE(reference);
-FALCON_CONVERT_NAME_TYPE(const_reference);
-FALCON_CONVERT_NAME_TYPE(pointer);
-FALCON_CONVERT_NAME_TYPE(difference_type);
-FALCON_CONVERT_NAME_TYPE(iterator_category);
-FALCON_CONVERT_NAME_TYPE(iterator_type);
-FALCON_CONVERT_NAME_TYPE(iterator);
-FALCON_CONVERT_NAME_TYPE(const_iterator);
-FALCON_CONVERT_NAME_TYPE(reverse_iterator);
-FALCON_CONVERT_NAME_TYPE(const_reverse_iterator);
-FALCON_CONVERT_NAME_TYPE(argument_type);
-FALCON_CONVERT_NAME_TYPE(first_argument_type);
-FALCON_CONVERT_NAME_TYPE(second_argument_type);
-FALCON_CONVERT_NAME_TYPE(result_type);
-FALCON_CONVERT_NAME_TYPE(allocator_type);
-FALCON_CONVERT_NAME_TYPE(first_type);
-FALCON_CONVERT_NAME_TYPE(second_type);
-FALCON_CONVERT_NAME_TYPE(key_type);
-FALCON_CONVERT_NAME_TYPE(key_compare);
-FALCON_CONVERT_NAME_TYPE(value_compare);
-FALCON_CONVERT_NAME_TYPE(compare_type);
-FALCON_CONVERT_NAME_TYPE(accessor_type);
-FALCON_CONVERT_NAME_TYPE(functor_type);
-FALCON_CONVERT_NAME_TYPE(traits_type);
-FALCON_CONVERT_NAME_TYPE(char_type);
-FALCON_CONVERT_NAME_TYPE(int_type);
-FALCON_CONVERT_NAME_TYPE(pos_type);
-FALCON_CONVERT_NAME_TYPE(off_type);
-FALCON_CONVERT_NAME_TYPE(size_type);
+FALCON_USE_XXX_TRAIT(type);
+FALCON_USE_XXX_TRAIT(value_type);
+FALCON_USE_XXX_TRAIT(reference);
+FALCON_USE_XXX_TRAIT(const_reference);
+FALCON_USE_XXX_TRAIT(pointer);
+FALCON_USE_XXX_TRAIT(difference_type);
+FALCON_USE_XXX_TRAIT(iterator_category);
+FALCON_USE_XXX_TRAIT(iterator_type);
+FALCON_USE_XXX_TRAIT(iterator);
+FALCON_USE_XXX_TRAIT(const_iterator);
+FALCON_USE_XXX_TRAIT(reverse_iterator);
+FALCON_USE_XXX_TRAIT(const_reverse_iterator);
+FALCON_USE_XXX_TRAIT(argument_type);
+FALCON_USE_XXX_TRAIT(first_argument_type);
+FALCON_USE_XXX_TRAIT(second_argument_type);
+FALCON_USE_XXX_TRAIT(result_type);
+FALCON_USE_XXX_TRAIT(allocator_type);
+FALCON_USE_XXX_TRAIT(first_type);
+FALCON_USE_XXX_TRAIT(second_type);
+FALCON_USE_XXX_TRAIT(key_type);
+FALCON_USE_XXX_TRAIT(key_compare);
+FALCON_USE_XXX_TRAIT(value_compare);
+FALCON_USE_XXX_TRAIT(compare_type);
+FALCON_USE_XXX_TRAIT(accessor_type);
+FALCON_USE_XXX_TRAIT(functor_type);
+FALCON_USE_XXX_TRAIT(traits_type);
+FALCON_USE_XXX_TRAIT(char_type);
+FALCON_USE_XXX_TRAIT(int_type);
+FALCON_USE_XXX_TRAIT(pos_type);
+FALCON_USE_XXX_TRAIT(off_type);
+FALCON_USE_XXX_TRAIT(size_type);
 
-#undef FALCON_CONVERT_NAME_TYPE
+#undef FALCON_USE_XXX_TRAIT
 
 }
 
