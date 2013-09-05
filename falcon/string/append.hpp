@@ -1,179 +1,104 @@
 #ifndef FALCON_STRING_APPEND_HPP
 #define FALCON_STRING_APPEND_HPP
 
-#include <iosfwd>
+#include <falcon/detail/string_size.hpp>
+
 #if __cplusplus >= 201103L
-# include <falcon/parameter/parameter_pack.hpp>
-# include <falcon/detail/string_size.hpp>
-#else
-# include <boost/type_traits/add_const.hpp>
-#endif
+
+#include <falcon/c++1x/unpack.hpp>
+
+#include <cassert>
+#include <utility>
+#include <type_traits>
+#include <initializer_list>
 
 namespace falcon {
 
-	template<typename _CharT, typename _Traits, typename _Alloc, typename _T>
-	inline std::basic_string<_CharT, _Traits, _Alloc>&
-	append(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-				 const _T& rhs)
-	{ return lhs += rhs; }
+template<typename T>
+std::size_t __verify_size(T const x)
+{
+  assert("x must be a positive integer" && x >= 0);
+  return x;
+}
 
-	template<std::size_t _N, typename _CharT, typename _Traits, typename _Alloc>
-	inline std::basic_string<_CharT, _Traits, _Alloc>&
-	append(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-				 const _CharT (& rhs)[_N])
-	{
-		if (_N)
-			lhs.append(rhs, _N-1);
-		return lhs;
-	}
+template<typename T>
+void __append(T& s, T&& other, unsigned& pos, const std::initializer_list<std::size_t>&)
+{ s += std::forward<T>(other); ++pos; }
 
-	template<typename _String, typename _T>
-	inline _String& append(_String& lhs, const _T& rhs)
-	{ return lhs += rhs; }
+template<typename T, typename U>
+void __append(T& s, U&& other, unsigned& pos, const std::initializer_list<std::size_t>&)
+///TODO use trait (append_trait< T,U>)
+{ s += other.data(); ++pos; }
 
-	template<std::size_t _N, typename _String>
-	inline _String&
-	append(_String& lhs,
-#if __cplusplus >= 201103L
-				 const typename _String::value_type (& rhs)[_N]
-#else
-				typename boost::add_const<typename _String::value_type>::type (& rhs)[_N]
-#endif
-	)
-	{
-		if (_N)
-			lhs.append(rhs, _N-1);
-		return lhs;
-	}
+template<typename T, typename U>
+void __append(T& s, const U * other, unsigned& pos,
+              const std::initializer_list<std::size_t>& sz)
+{ s.append(other, *(sz.begin() + pos++)); }
 
-#if __cplusplus >= 201103L
-	template<std::size_t _N>
-	struct __keep_strlen
-	{
-		std::size_t array[_N];
-		std::size_t * p = &array[0];
-
-		void reset()
-		{ p = &array[0]; }
-	};
-
-	template<>
-	struct __keep_strlen<0>
-	{
-		void reset()
-		{}
-	};
-
-	template <std::size_t _N, typename _Elements>
-	struct __build_keep_strlen;
-
-	template <std::size_t _N, typename _T, typename... _Elements>
-	struct __build_keep_strlen<_N, parameter_pack<_T, _Elements...>>
-	: __build_keep_strlen<_N, parameter_pack<_Elements...>>
-	{};
-
-	template <std::size_t _N, typename _T, typename... _Elements>
-	struct __build_keep_strlen<_N, parameter_pack<_T*, _Elements...>>
-	: __build_keep_strlen<_N+1, parameter_pack<_Elements...>>
-	{};
-
-	template <std::size_t _N, typename _T, typename... _Elements>
-	struct __build_keep_strlen<_N, parameter_pack<const _T*, _Elements...>>
-	: __build_keep_strlen<_N+1, parameter_pack<_Elements...>>
-	{};
-
-	template <std::size_t _N>
-	struct __build_keep_strlen<_N, parameter_pack<>>
-	{ typedef __keep_strlen<_N> __type; };
-
-	template<typename _KeepLen, typename _S>
-	void __reserve(_S& lhs, std::size_t n, _KeepLen&)
-	{ lhs.reserve(lhs.size() + n); }
-
-	template<typename _String, typename _Traits = void>
-	struct __reserve_size
-	{
-		template<typename _KeepLen>
-		static std::size_t __impl(const _String& rhs, _KeepLen&)
-		{ return detail::__string_size<_String>::size(rhs); }
-		template<typename _KeepLen>
-		static const _String& __mksize(const _String& rhs, _KeepLen&)
-		{ return rhs; }
-	};
-
-	template<typename _CharT, typename _Traits>
-	struct __reserve_size<_CharT*, _Traits>
-	{
-		template<typename _KeepLen>
-		static std::size_t __impl(const _CharT* rhs, _KeepLen& k)
-		{ return *k.p++ = _Traits::length(rhs); }
-		template<typename _KeepLen>
-		static auto __mksize(const _CharT* rhs, _KeepLen& k)
-		-> decltype(*k.p++)
-		{ return *k.p++; }
-	};
-
-	template<typename _KeepLen, typename _CharT, typename _Traits, typename _Alloc, typename _String, typename... _Strings>
-	void __reserve(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-								 std::size_t n, _KeepLen& k,
-								 const _String& rhs, const _Strings&... other)
-	{ __reserve(lhs, n + __reserve_size<_String, _Traits>::__impl(rhs, k), k, other...); }
-
-	template<typename _KeepLen, std::size_t _N, typename _CharT, typename _Traits, typename _Alloc, typename... _Strings>
-	void __reserve(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-								 std::size_t n, _KeepLen& k,
-								const _CharT (&)[_N], const _Strings&... other)
-	{ __reserve(lhs, n + (_N?_N-1:0), k, other...); }
-
-	template<typename _KeepLen, typename _S>
-	void __append(_S&, _KeepLen&)
-	{}
-
-	template<typename _KeepLen, typename _CharT, typename _Traits, typename _Alloc, typename _String, typename... _Strings>
-	void __append(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-								_KeepLen& k,
-								const _String& rhs,
-							  const _Strings&... other)
-	{
-		append(lhs, __reserve_size<_String>::__mksize(rhs, k));
-		__append(lhs, k, other...);
-	}
-
-	template<typename _KeepLen, std::size_t _N, typename _CharT, typename _Traits, typename _Alloc, typename... _Strings>
-	void __append(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-								_KeepLen& k,
-							  const _CharT (&rhs)[_N], const _Strings&... other)
-	{
-		if (_N)
-			lhs.append(rhs, _N-1);
-		__append(lhs, k, other...);
-	}
-
-	template<typename _CharT, typename _Traits, typename _Alloc, typename _String1, typename _String2, typename... _Strings>
-	inline std::basic_string<_CharT, _Traits, _Alloc>&
-	append(std::basic_string<_CharT, _Traits, _Alloc>& lhs,
-				 const _String1& rhs, const _String2& rhs2, const _Strings&... other)
-	{
-		typename __build_keep_strlen<0, parameter_pack<_String1, _String2, _Strings...>>::__type k;
-		__reserve(lhs, 0, k, rhs, rhs2, other...);
-		k.reset();
-		__append(lhs, k, rhs, rhs2, other...);
-		return lhs;
-	}
-
-	template<typename String, typename _String1, typename _String2, typename... _Strings>
-	inline String&
-	append(String& lhs,
-				 const _String1& rhs, const _String2& rhs2, const _Strings&... other)
-	{
-		typename __build_keep_strlen<0, parameter_pack<_String1, _String2, _Strings...>>::__type k;
-		__reserve(lhs, 0, k, rhs, rhs2, other...);
-		k.reset();
-		__append(lhs, k, rhs, rhs2, other...);
-		return lhs;
-	}
-#endif
+template<typename T, typename... Ts>
+T& append(T& s, Ts&&... ss)
+{
+  std::size_t len_sum = 0;
+  std::size_t len_amt;
+  auto const len_max = s.max_size();
+  std::initializer_list<std::size_t> sz {(
+    len_amt = __verify_size(::falcon::detail::string_size<
+      typename std::remove_reference<Ts>::type
+    >::size(ss)),
+    assert(len_max-len_sum >= len_amt),
+    len_sum += len_amt,
+    len_amt
+  )...};
+  s.reserve(len_sum);
+  unsigned pos = 0;
+  CPP1X_UNPACK(__append(s, std::forward<Ts>(ss), pos, sz));
+  return s;
+}
 
 }
+
+#else
+
+namespace falcon {
+
+template<typename T, typename U>
+void __append(T& s, const U& other, std::size_t)
+{ s += other; }
+
+template<typename T, typename U>
+void __append(T& s, const U * other, std::size_t size)
+{ s.append(other, size); }
+
+template<typename T, typename U>
+inline T& append(T& lhs, const U& rhs)
+{ return lhs += rhs; }
+
+template<typename T, typename U1, typename U2>
+inline T& append(T& lhs, const U1& rhs1, const U2& rhs2)
+{
+  std::size_t sz1 = ::falcon::detail::string_size::size(rhs1);
+  std::size_t sz2 = ::falcon::detail::string_size::size(rhs2);
+  lhs.reserve(sz1 + sz2);
+  __append(lhs, rhs1, sz1);
+  __append(lhs, rhs2, sz2);
+  return lhs;
+}
+
+template<typename T, typename U1, typename U2, typename U3>
+inline T& append(T& lhs, const U1& rhs1, const U2& rhs2, const U3& rhs3)
+{
+  std::size_t sz1 = ::falcon::detail::string_size::size(rhs1);
+  std::size_t sz2 = ::falcon::detail::string_size::size(rhs2);
+  std::size_t sz3 = ::falcon::detail::string_size::size(rhs3);
+  lhs.reserve(sz1 + sz2 + sz3);
+  __append(lhs, rhs1, sz1);
+  __append(lhs, rhs2, sz2);
+  __append(lhs, rhs3, sz3);
+  return lhs;
+}
+
+}
+
+#endif
 
 #endif

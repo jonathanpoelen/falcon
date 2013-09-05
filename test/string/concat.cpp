@@ -20,7 +20,6 @@ void concat_test()
 	CHECK_EQUAL_VALUE(ret, "ploplalaiii");
 	std::string ret2 = falcon::concat<>(std::move(ret), cs);
 	CHECK_EQUAL_VALUE(ret2, "ploplalaiiii");
-	CHECK_EQUAL_VALUE(ret, "");
 }
 
 FALCON_TEST_TO_MAIN(concat_test)
