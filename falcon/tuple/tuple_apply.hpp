@@ -1,22 +1,24 @@
-#ifndef _FALCON_TUPLE_TUPLE_APPLY_HPP
-#define _FALCON_TUPLE_TUPLE_APPLY_HPP
+#ifndef FALCON_TUPLE_TUPLE_APPLY_HPP
+#define FALCON_TUPLE_TUPLE_APPLY_HPP
 
 #include <falcon/tuple/parameter_index.hpp>
 
+#include <utility>
+
 namespace falcon {
 
-template <typename _Function, typename _Tuple, std::size_t... _Indexes>
-constexpr auto tuple_apply(const parameter_index<_Indexes...>&,
-													 _Function&& __func, _Tuple&& __t)
--> decltype(__func(std::get<_Indexes>(std::forward<_Tuple>(__t))...))
-{ return __func(std::get<_Indexes>(std::forward<_Tuple>(__t))...); }
+template <typename Function, typename Tuple, std::size_t... Indexes>
+constexpr auto tuple_apply(const parameter_index<Indexes...>&,
+                           Function&& func, Tuple&& t)
+-> decltype(func(std::get<Indexes>(std::forward<Tuple>(t))...))
+{ return func(std::get<Indexes>(std::forward<Tuple>(t))...); }
 
-template <typename _Function, typename _Tuple,
-	typename _Indexes = typename build_tuple_index<typename std::decay<_Tuple>::type>::type
+template <typename Function, typename Tuple,
+	typename Indexes = build_tuple_index_t<typename std::decay<Tuple>::type>
 >
-constexpr auto tuple_apply(_Function&& __func, _Tuple&& __t)
--> decltype(tuple_apply(_Indexes(), std::forward<_Function>(__func), std::forward<_Tuple>(__t)))
-{ return tuple_apply(_Indexes(), std::forward<_Function>(__func), std::forward<_Tuple>(__t)); }
+constexpr auto tuple_apply(Function&& func, Tuple&& t)
+-> decltype(tuple_apply(Indexes(), std::forward<Function>(func), std::forward<Tuple>(t)))
+{ return tuple_apply(Indexes(), std::forward<Function>(func), std::forward<Tuple>(t)); }
 
 }
 

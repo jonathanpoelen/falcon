@@ -25,4 +25,10 @@
 	CPP1X_PROTO(Func, decltype(__VA_ARGS__)) { return __VA_ARGS__; }
 #endif
 
+#if defined(IN_IDE_PARSER)
+# define CPP1X_DECL_RESULT(Func, impl...) decltype(impl) { return impl; }
+#else
+# define CPP1X_DECL_RESULT(Func, ...) decltype(__VA_ARGS__) { return __VA_ARGS__; }
+#endif
+
 #endif

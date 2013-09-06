@@ -1,83 +1,57 @@
-#ifndef _FALCON_TUPLE_TUPLE_ASSIGN_HPP
-#define _FALCON_TUPLE_TUPLE_ASSIGN_HPP
+#ifndef FALCON_TUPLE_TUPLE_ASSIGN_HPP
+#define FALCON_TUPLE_TUPLE_ASSIGN_HPP
 
+#include <falcon/c++1x/unpack.hpp>
 #include <falcon/tuple/detail/is_tuple.hpp>
+#include <falcon/tuple/parameter_index.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 
 #include <utility>
 
 namespace falcon {
 
-template <typename _Indexes>
-struct __tuple_assign
+template<typename Tuple1, typename Tuple2, typename Functor, std::size_t... Indexes>
+void __tuple_assign(std::false_type, parameter_index<Indexes...>,
+                    Tuple1& t1, Tuple2 && t2, Functor && func)
 {
-	template<typename _T, typename _U, typename _FunctorOrFunctors>
-	static void __assign(const _T&, const _U&, const _FunctorOrFunctors&)
-	{}
-};
+  CPP1X_UNPACK(
+    std::get<Indexes>(t1)
+    = func(std::get<Indexes>(std::forward<Tuple2>(t2))));
+}
 
-template <std::size_t _Index, std::size_t... _Indexes>
-struct __tuple_assign<parameter_index<_Index, _Indexes...>>
+template<typename Tuple1, typename Tuple2, typename Functors, std::size_t... Indexes>
+void __tuple_assign(std::true_type, parameter_index<Indexes...>,
+                    Tuple1& t1, Tuple2 && t2, Functors && t_func)
 {
-	template<typename _Tuple, typename _Tuple2, typename _Functors>
-	static void __impl_assign(std::true_type,
-							  _Tuple& t, _Tuple2& t2, _Functors && t_func)
-	{ std::get<_Index>(t) = std::get<_Index>(t_func)(std::get<_Index>(t2)); }
-
-	template<typename _Tuple, typename _Tuple2, typename _Functor>
-	static void __impl_assign(std::false_type,
-							  _Tuple& t, _Tuple2& t2, _Functor && func)
-	{ std::get<_Index>(t) = func(std::get<_Index>(t2)); }
-
-	template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors>
-	static void __assign(_Tuple& t, _Tuple2& t2, _FunctorOrFunctors && t_func)
-	{
-		__impl_assign(typename is_tuple_impl<_FunctorOrFunctors>::type(),
-                      t, t2, std::forward<_FunctorOrFunctors>(t_func));
-		__tuple_assign<parameter_index<_Indexes...>>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func));
-	}
-};
-
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors, std::size_t... _Indexes>
-void tuple_assign(const parameter_index<_Indexes...>&,
-				  _Tuple& t, _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<parameter_index<_Indexes...>>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
-
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors, std::size_t... _Indexes>
-void tuple_assign(const parameter_index<_Indexes...>&,
-				  const _Tuple& t, _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<parameter_index<_Indexes...>>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
-
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors, std::size_t... _Indexes>
-void tuple_assign(const parameter_index<_Indexes...>&,
-				  _Tuple& t, const _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<parameter_index<_Indexes...>>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
-
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors, std::size_t... _Indexes>
-void tuple_assign(const parameter_index<_Indexes...>&,
-				  const _Tuple& t, const _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<parameter_index<_Indexes...>>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
+  CPP1X_UNPACK(
+    std::get<Indexes>(t1)
+    = std::get<Indexes>(std::forward<Functors>(t_func))
+    (std::get<Indexes>(std::forward<Tuple2>(t2))));
+}
 
 
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors,
-	typename _Indexes = typename build_tuple_index<_Tuple>::type>
-void tuple_assign(_Tuple& t, _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<_Indexes>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
+template<typename Tuple1, typename Tuple2,
+  typename FunctorOrFunctors, std::size_t... Indexes>
+void tuple_assign(const parameter_index<Indexes...>&,
+				  Tuple1 & t1, Tuple2 && t2,
+                  FunctorOrFunctors && t_func)
+{
+  __tuple_assign(is_tuple_impl<FunctorOrFunctors>(),
+                 parameter_index<Indexes...>(),
+                 t1,
+                 std::forward<Tuple2>(t2),
+                 std::forward<FunctorOrFunctors>(t_func));
+}
 
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors,
-	typename _Indexes = typename build_tuple_index<_Tuple>::type>
-void tuple_assign(const _Tuple& t, _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<_Indexes>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
-
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors,
-	typename _Indexes = typename build_tuple_index<_Tuple>::type>
-void tuple_assign(_Tuple& t, const _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<_Indexes>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
-
-template<typename _Tuple, typename _Tuple2, typename _FunctorOrFunctors,
-	typename _Indexes = typename build_tuple_index<_Tuple>::type>
-void tuple_assign(const _Tuple& t, const _Tuple2& t2, _FunctorOrFunctors && t_func)
-{ __tuple_assign<_Indexes>::__assign(t, t2, std::forward<_FunctorOrFunctors>(t_func)); }
+template<typename Tuple1, typename Tuple2, typename FunctorOrFunctors>
+void tuple_assign(Tuple1 & t1, Tuple2 && t2, FunctorOrFunctors && t_func)
+{
+  __tuple_assign(is_tuple_impl<FunctorOrFunctors>(),
+                 build_tuple_index_t<Tuple1>(),
+                 t1,
+                 std::forward<Tuple2>(t2),
+                 std::forward<FunctorOrFunctors>(t_func));
+}
 
 }
 

@@ -6,25 +6,31 @@
 
 namespace falcon {
 
-template<typename _T, typename _Indexes>
+template<typename T, typename Indexes>
 struct build_tuple_reference
 {
-	typedef typename parameter_pack_to_tuple<
-		typename pack_reference<
-			typename tuple_to_parameter_pack_with_parameter_index<_T, _Indexes>::type
-		>::type
-	>::type type;
+  typedef typename parameter_pack_to_tuple<
+    typename pack_reference<
+      typename tuple_to_parameter_pack_with_parameter_index<T, Indexes>::type
+    >::type
+  >::type type;
 };
 
-template<typename _T, typename _Indexes>
+template<typename T, typename Indexes>
 struct build_tuple_const_reference
 {
-	typedef typename parameter_pack_to_tuple<
-		typename pack_const_reference<
-			typename tuple_to_parameter_pack_with_parameter_index<_T, _Indexes>::type
-		>::type
-	>::type type;
+  typedef typename parameter_pack_to_tuple<
+    typename pack_const_reference<
+      typename tuple_to_parameter_pack_with_parameter_index<T, Indexes>::type
+    >::type
+  >::type type;
 };
+
+template <typename T, typename Indexes>
+using build_tuple_reference_t = typename build_tuple_reference<T, Indexes>::type;
+
+template <typename T, typename Indexes>
+using build_tuple_const_reference_t = typename build_tuple_const_reference<T, Indexes>::type;
 
 }
 
