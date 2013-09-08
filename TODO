@@ -195,9 +195,9 @@ parameter/manip.hpp: séparer chaque fonctionnalite dans des fichier separer et 
 
 mpl (comme boost) mais qui utilise parameter_pack et co
 
-simplifier tuple_{compose,transform} et celle dans function/{special_call,compose}.hpp
+simplifier function/{special_call,compose}.hpp
 
-
+faire les helper type: `template<...> xxx_t = typename xxx<...>::type` et les macros pour aider à leur construction: FALCON_HELPER_TYPE_2_DEF(name, T, U)
 
 
 

@@ -37,6 +37,9 @@ struct build_parameter_index
 	typedef typename __Build_parameter_index<Num>::__type::__parameter_index type;
 };
 
+template<std::size_t Num>
+using build_parameter_index_t = typename build_parameter_index<Num>::type;
+
 
 template<std::size_t Start, std::size_t Current, std::size_t Stop, std::size_t Step, typename Indexes>
 struct __Build_range_parameter_index;
@@ -75,6 +78,9 @@ struct build_range_parameter_index
 
 	typedef typename __Build_range_parameter_index<Start, Start, Stop, Step, parameter_index<>>::__type type;
 };
+
+template<std::size_t Start, std::size_t Stop, std::size_t Step = 1>
+using build_range_parameter_index_t = typename build_range_parameter_index<Start, Stop, Step>::type;
 
 template<typename... Indexes>
 class __parameter_index_cat;
@@ -158,8 +164,14 @@ namespace parameter {
   template<std::size_t Num>
   using build_indexes = build_parameter_index<Num>;
 
+  template<std::size_t Num>
+  using build_indexes_t = typename build_parameter_index<Num>::type;
+
   template<std::size_t Start, std::size_t Stop, std::size_t Step = 1>
   using build_range_index = build_range_parameter_index<Start, Stop, Step>;
+
+  template<std::size_t Start, std::size_t Stop, std::size_t Step = 1>
+  using build_range_index_t = typename build_range_parameter_index<Start, Stop, Step>::type;
 
   template<typename... Indexes>
   using indexes_cat = parameter_index_cat<Indexes...>;

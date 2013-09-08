@@ -4,28 +4,52 @@
 // #include <iostream>
 // #include <falcon/memory/grouping_new.hpp>
 
-#include <falcon/mpl/seq.hpp>
-#include <falcon/mpl/integral.hpp>
-// #include <falcon/mpl/pair.hpp>
+// #include <falcon/mpl/seq.hpp>
+// #include <falcon/mpl/integral.hpp>
+// // #include <falcon/mpl/pair.hpp>
+//
+// using namespace falcon::mpl;
+// using namespace falcon::mpl::placeholders;
+//
+// template< typename N1, typename N2 >
+// struct int_plus
+// : int_<( N1::value + N2::value )>
+// {};
 
-using namespace falcon::mpl;
-using namespace falcon::mpl::placeholders;
+// #include <falcon/functional/dynamic_callback.hpp>
 
-template< typename N1, typename N2 >
-struct int_plus
-: int_<( N1::value + N2::value )>
-{};
+#include <falcon/parameter/parameter_index.hpp>
+#include <falcon/c++1x/unpack.hpp>
 
+#include <initializer_list>
+#include <iostream>
+
+template<int N>
+struct S { void operator()() const { std::cout << N << "\n"; }};
+
+template<typename T>
+void run()
+{ T()(); }
+
+template<typename... Ts>
+void dynamic_callback(std::size_t id)
+{
+  std::size_t n = 0;
+  CPP1X_UNPACK((n == id ? run<Ts>() : void()), ++n);
+}
 
 int main()
 {
-  using sequence = seq<_1,_2,_3>;
-  using first = begin<sequence>::type;
-  using last = end<sequence>::type;
-  using t1 = deref<first>::type;
-  using first2 = next<first>::type;
-  using t2 = deref<first2>::type;
-  return t1::value + t2::value + deref<prior<last>::type>::type::value;
+  /*return */dynamic_callback<S<11>,S<32>,S<23>>(2);
+
+
+//   using sequence = seq<_1,_2,_3>;
+//   using first = begin<sequence>::type;
+//   using last = end<sequence>::type;
+//   using t1 = deref<first>::type;
+//   using first2 = next<first>::type;
+//   using t2 = deref<first2>::type;
+//   return t1::value + t2::value + deref<prior<last>::type>::type::value;
 
 
 

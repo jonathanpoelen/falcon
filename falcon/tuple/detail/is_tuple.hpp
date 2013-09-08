@@ -1,8 +1,10 @@
 #ifndef TUPLE_DETAIL_ISTUPLE_HPP
 #define TUPLE_DETAIL_ISTUPLE_HPP
 
-#include <type_traits>
 #include <falcon/tuple/detail/tuplefwd.hpp>
+#include <falcon/type_traits/remove_cv_reference.hpp>
+
+#include <type_traits>
 
 namespace std
 {
@@ -44,12 +46,12 @@ struct is_tuple_impl<std::pair<T, U>>
 
 template<typename T>
 struct is_tuple
-: ::falcon::detail::is_tuple<typename std::remove_cv<T>::type>
+: ::falcon::detail::is_tuple<typename remove_cv_reference<T>::type>
 {};
 
 template<typename T>
 struct is_tuple_impl
-: ::falcon::detail::is_tuple_impl<typename std::remove_cv<T>::type>
+: ::falcon::detail::is_tuple_impl<typename remove_cv_reference<T>::type>
 {};
 
 }
