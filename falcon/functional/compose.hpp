@@ -127,10 +127,10 @@ public:
 
 	constexpr unary_compose() = default;
 
-	template<typename _T>
+	template<typename T>
 	constexpr typename std::result_of<_Operation1&(
-		typename std::result_of<_Operation2&(_T&)>::type
-	)>::type operator()(_T& __x) const
+		typename std::result_of<_Operation2&(T&)>::type
+	)>::type operator()(T& __x) const
 	{ return _M_fn1(_M_fn2(__x)); }
 };
 
@@ -252,11 +252,11 @@ public:
 
 	constexpr binary_compose() = default;
 
-	template<typename _T>
+	template<typename T>
 	constexpr typename std::result_of<const _Operation1&(
-		const _Operation2&(_T&),
-		const _Operation3&(_T&)
-	)>::type operator()(_T& __x) const
+		const _Operation2&(T&),
+		const _Operation3&(T&)
+	)>::type operator()(T& __x) const
 	{ return _M_fn1(_M_fn2(__x), _M_fn3(__x)); }
 };
 //@}
@@ -369,57 +369,56 @@ public:
 	}
 };
 
-template<class _Operation, class... _Operations>
-struct mulary_compose<_Operation, std::tuple<_Operations...>, false>
+template<class Operation, class... Operations>
+struct mulary_compose<Operation, std::tuple<Operations...>, false>
 {
 protected:
-	_Operation _M_fn;
-	std::tuple<_Operations...> _M_fns;
+	Operation _M_fn;
+	std::tuple<Operations...> _M_fns;
 
 public:
 	constexpr mulary_compose() = default;
 
-	constexpr mulary_compose(_Operation&& __x,
-							 std::tuple<_Operations...>&& __y)
-	: _M_fn(std::forward<_Operation>(__x))
-	, _M_fns(std::forward<std::tuple<_Operations...>>(__y))
+	constexpr mulary_compose(Operation&& x, std::tuple<Operations...>&& y)
+	: _M_fn(std::forward<Operation>(x))
+	, _M_fns(std::forward<std::tuple<Operations...>>(y))
 	{}
 
-	constexpr mulary_compose(_Operation&& __x,
-							 std::tuple<_Operations&&...> __y)
-	: _M_fn(std::forward<_Operation>(__x))
-	, _M_fns(__y)
+	constexpr mulary_compose(Operation&& x, std::tuple<Operations&&...> y)
+	: _M_fn(std::forward<Operation>(x))
+	, _M_fns(y)
 	{}
 
-	constexpr mulary_compose(std::tuple<_Operations&&...> __y)
+	constexpr mulary_compose(std::tuple<Operations&&...> y)
 	: _M_fn()
-	, _M_fns(__y)
+	, _M_fns(y)
 	{}
 
-	constexpr mulary_compose(std::tuple<_Operations...>&& __y)
+	constexpr mulary_compose(std::tuple<Operations...>&& y)
 	: _M_fn()
-	, _M_fns(std::forward<std::tuple<_Operations...>>(__y))
+	, _M_fns(std::forward<std::tuple<Operations...>>(y))
 	{}
 
 	template<typename _Functor, typename... _Functors>
-	constexpr mulary_compose(_Functor&& __x, _Functors&&... __y)
-	: _M_fn(std::forward<_Functor>(__x))
-	, _M_fns(std::forward<_Functors>(__y)...)
+	constexpr mulary_compose(_Functor&& x, _Functors&&... y)
+	: _M_fn(std::forward<_Functor>(x))
+	, _M_fns(std::forward<_Functors>(y)...)
 	{}
 
-	template<typename _T>
-	constexpr typename __tuple_compose_base<
-		0, sizeof...(_Operations), const _Operation,
-		const std::tuple<_Operations...>,
-		const std::tuple<_T&>,
-		parameter_index<0>
-	>::__result_type operator()(_T& __x) const
+	template<typename T>
+	constexpr auto operator()(T&& x) const
+	-> decltype(tuple_compose<const Operation &>(
+      parameter_index<0>(),
+      _M_fn,
+      _M_fns,
+      std::forward_as_tuple(x)
+    ))
 	{
-		return tuple_compose<const _Operation&>(
+		return tuple_compose<const Operation &>(
 			parameter_index<0>(),
 			_M_fn,
 			_M_fns,
-			std::tuple<_T&>(__x)
+            std::forward_as_tuple(x)
 		);
 	}
 };

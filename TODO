@@ -205,6 +205,9 @@ to_cstring/to_const_cstring et des fonctions concat et append qui retourne un cs
 
 Faire un to_string, to_cstring et to_const_cstring qui supporte plusieurs valeurs et les transforme en [c]string. Si prend un paramètre qui est une référence sur leurs types de retour alors le retourne par référence. Changer le nom pour les différencier de to_string (variables_to_string ?).
 
+functional/compose.hpp: simplifier et utilisation de rvalue
+
+functional/call.hpp: enlever __call_result_of
 
 
 
