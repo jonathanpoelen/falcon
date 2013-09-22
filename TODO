@@ -199,6 +199,11 @@ simplifier function/{special_call,compose}.hpp
 
 faire les helper type: `template<...> xxx_t = typename xxx<...>::type` et les macros pour aider à leur construction: FALCON_HELPER_TYPE_2_DEF(name, T, U)
 
+concat supporte de recevoir des nombres est reserve une taille max + utilise to_string.
+
+to_cstring/to_const_cstring et des fonctions concat et append qui retourne un cstring.
+
+Faire un to_string, to_cstring et to_const_cstring qui supporte plusieurs valeurs et les transforme en [c]string. Si prend un paramètre qui est une référence sur leurs types de retour alors le retourne par référence. Changer le nom pour les différencier de to_string (variables_to_string ?).
 
 
 

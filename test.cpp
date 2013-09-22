@@ -20,27 +20,72 @@
 
 #include <falcon/parameter/parameter_index.hpp>
 #include <falcon/c++1x/unpack.hpp>
+#include <falcon/arg/arg.hpp>
+#include <falcon/functional/call.hpp>
+#include <falcon/parameter/keep_parameter_index.hpp>
 
 #include <initializer_list>
 #include <iostream>
+#include <typeinfo>
 
-template<int N>
-struct S { void operator()() const { std::cout << N << "\n"; }};
+using falcon::parameter_index;
+using falcon::build_parameter_index;
+using falcon::build_parameter_index_t;
+using falcon::build_range_parameter_index;
+using falcon::build_range_parameter_index_t;
+using falcon::call;
+using namespace falcon;
 
-template<typename T>
-void run()
-{ T()(); }
 
-template<typename... Ts>
-void dynamic_callback(std::size_t id)
+
+template<std::size_t... Indexes, typename Function, typename... Args>
+void __call(parameter_index<Indexes...>, Function func, Args&&... args)
 {
-  std::size_t n = 0;
-  CPP1X_UNPACK((n == id ? run<Ts>() : void()), ++n);
+  func(arg<Indexes>(std::forward<Args>(args)...)...);
 }
+
+template<std::size_t NumberArg, typename Function, typename... Args,
+  std::size_t... Indexes, std::size_t Index>
+void __call_partial_param_loop(parameter_index<Indexes...>, parameter_index<Index>,
+                               Function func, Args&&... args)
+// -> decltype(call(build_range_parameter_index_t<Index*NumberArg, sizeof...(Args)>(),
+//                  func, std::forward<Args>(args)...))
+{
+//   CPP1X_UNPACK(__call(
+//     build_range_parameter_index_t<Indexes*NumberArg, Indexes*NumberArg + NumberArg>,
+//     func,
+//     std::forward<Args>(args)...
+//   ));
+  /*return*/ call(build_range_parameter_index_t<Index*NumberArg, sizeof...(Args)>(),
+              func, std::forward<Args>(args)...);
+}
+
+template<std::size_t NumberArg, typename Function, typename... Args,
+  typename Indexes = build_parameter_index_t<
+    (sizeof...(Args) / NumberArg + ((sizeof...(Args) % NumberArg) ? 1 : 0))
+  >
+>
+void call_partial_param_loop(Function func, Args&&... args)
+// -> decltype(__call_partial_param_loop<NumberArg>(
+//   build_parameter_index_t<sizeof...(Args) / NumberArg + ((sizeof...(Args) % NumberArg) ? 1 : 0)>(),
+//   func,
+//   std::forward<Args>(args)...
+// ))
+{
+  /*return*/ __call_partial_param_loop<NumberArg>(
+    Indexes(),
+//     keep_parameter_index<last_parameter_index_tag<>>
+    func,
+    std::forward<Args>(args)...
+  );
+}
+
+void f1(int /*n*/)
+{}
 
 int main()
 {
-  /*return */dynamic_callback<S<11>,S<32>,S<23>>(2);
+  call_partial_param_loop<1>(f1, 1,3,4);
 
 
 //   using sequence = seq<_1,_2,_3>;

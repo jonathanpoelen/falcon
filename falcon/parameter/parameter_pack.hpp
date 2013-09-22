@@ -5,7 +5,7 @@ namespace falcon {
 
 template<typename... Args>
 struct parameter_pack
-{};
+{ typedef parameter_pack type; };
 
 namespace parameter {
   template<typename... Args>

@@ -123,6 +123,9 @@ struct keep_parameter_index
 	typedef typename __keep_parameter_index<ParameterIndexTag, NmArg>::__type type;
 };
 
+template<typename ParameterIndexTag, std::size_t NmArg>
+using keep_parameter_index_t = typename keep_parameter_index<ParameterIndexTag, NmArg>::type;
+
 
 template<typename ParameterIndexTag>
 struct parameter_index_or_tag_to_tag
