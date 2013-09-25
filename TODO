@@ -208,7 +208,7 @@ Faire un to_string, to_cstring et to_const_cstring qui supporte plusieurs valeur
 functional/compose.hpp: simplifier et utilisation de rvalue
 
 functional/call.hpp: enlever __call_result_of
-
+functional/parameter_index_adapter.hpp: enlever __call_partial_recursive_param_loop_traits
 
 
 

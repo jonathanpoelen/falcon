@@ -1,10 +1,9 @@
-#ifndef _FALCON_IOSTREAM_PUT_AND_GET_HPP
-#define _FALCON_IOSTREAM_PUT_AND_GET_HPP
+#ifndef FALCON_IOSTREAM_PUT_AND_GET_HPP
+#define FALCON_IOSTREAM_PUT_AND_GET_HPP
+
+#include <falcon/c++1x/unpack.hpp>
 
 #include <iosfwd>
-#include <falcon/functional/call_partial_param_loop.hpp>
-#include <falcon/functional/placeholder_for_argument.hpp>
-#include <falcon/functional/operators.hpp>
 
 namespace falcon {
 
@@ -13,34 +12,16 @@ template<typename CharT, typename Traits, typename... Args>
 std::basic_ostream<CharT, Traits>&
 put(std::basic_ostream<CharT, Traits>& os, const Args&... args)
 {
-  return call_partial_param_loop<1>(
-    placeholder_for_argument<
-      0,
-      left_shift<
-        std::basic_ostream<CharT, Traits>&,
-        late_parameter_t
-      >,
-      std::basic_ostream<CharT, Traits>&
-    >(os),
-    args...
-  );
+  CPP1X_UNPACK(os << args);
+  return os;
 }
 
 template<typename CharT, typename Traits, typename... Args>
 std::basic_istream<CharT, Traits>&
 get(std::basic_istream<CharT, Traits>& is, Args&... args)
 {
-  return call_partial_param_loop<1>(
-    placeholder_for_argument<
-      0,
-      right_shift<
-        std::basic_istream<CharT, Traits>&,
-        late_parameter_t
-      >,
-      std::basic_istream<CharT, Traits>&
-    >(is),
-    args...
-  );
+  CPP1X_UNPACK(is >> args);
+  return is;
 }
 //@}
 
@@ -76,7 +57,7 @@ public:
 
   template<typename... Args>
   ostream_type& operator()(const Args&... args) const
-  { return put<>(*m_os, args...); }
+  { return put(*m_os, args...); }
 
   ostream_type& base() const
   { return *m_os; }
@@ -131,7 +112,7 @@ public:
 
   template<typename... Args>
   istream_type& operator()(Args&... args) const
-  { return get<>(*m_is, args...); }
+  { return get(*m_is, args...); }
 
   istream_type& base() const
   { return *m_is; }
@@ -163,6 +144,7 @@ template<typename CharT, typename Traits>
 void swap(basic_ostream_functor<CharT, Traits>& x,
           basic_ostream_functor<CharT, Traits>& y)
 { x.swap(y); }
+
 }
 
 #endif

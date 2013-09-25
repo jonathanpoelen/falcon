@@ -12,29 +12,29 @@ struct parameter_index
 
 
 template<std::size_t... Indexes>
-struct __Parameter_index
+struct __parameter_index
 {
-	typedef __Parameter_index<Indexes..., sizeof...(Indexes)> __next;
-	typedef parameter_index<Indexes...> __parameter_index;
+	typedef __parameter_index<Indexes..., sizeof...(Indexes)> __next;
+	typedef parameter_index<Indexes...> __indexes;
 };
 
 template<std::size_t Num>
-struct __Build_parameter_index
+struct __build_parameter_index
 {
-	typedef typename __Build_parameter_index<Num-1>::__type::__next __type;
+	typedef typename __build_parameter_index<Num-1>::__type::__next __type;
 };
 
 template<>
-struct __Build_parameter_index<0>
+struct __build_parameter_index<0>
 {
-	typedef __Parameter_index<> __type;
+	typedef __parameter_index<> __type;
 };
 
 /// Builds an parameter_index<0, 1, 2, ..., Num-1>.
 template<std::size_t Num>
 struct build_parameter_index
 {
-	typedef typename __Build_parameter_index<Num>::__type::__parameter_index type;
+    typedef typename __build_parameter_index<Num>::__type::__indexes type;
 };
 
 template<std::size_t Num>
@@ -42,16 +42,16 @@ using build_parameter_index_t = typename build_parameter_index<Num>::type;
 
 
 template<std::size_t Start, std::size_t Current, std::size_t Stop, std::size_t Step, typename Indexes>
-struct __Build_range_parameter_index;
+struct __build_range_parameter_index;
 
 template<
 	std::size_t Start, std::size_t Current, std::size_t Stop,
 	std::size_t Step, std::size_t... Indexes
 >
-struct __Build_range_parameter_index<
+struct __build_range_parameter_index<
 	Start, Current, Stop,
 	Step, parameter_index<Indexes...>
-> : __Build_range_parameter_index<
+> : __build_range_parameter_index<
 	Start,
 	((Current + Step) < Stop ? Current+Step : Stop),
 	Stop,
@@ -61,7 +61,7 @@ struct __Build_range_parameter_index<
 {};
 
 template<std::size_t Start, std::size_t Stop, std::size_t Step, std::size_t... Indexes>
-struct __Build_range_parameter_index<
+struct __build_range_parameter_index<
 	Start, Stop, Stop,
 	Step, parameter_index<Indexes...>
 >
@@ -76,7 +76,7 @@ struct build_range_parameter_index
 	static_assert(Start <= Stop, "Start > Stop");
 	static_assert(Step, "Step is zero");
 
-	typedef typename __Build_range_parameter_index<Start, Start, Stop, Step, parameter_index<>>::__type type;
+	typedef typename __build_range_parameter_index<Start, Start, Stop, Step, parameter_index<>>::__type type;
 };
 
 template<std::size_t Start, std::size_t Stop, std::size_t Step = 1>

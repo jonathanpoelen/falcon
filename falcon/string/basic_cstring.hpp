@@ -78,6 +78,7 @@ private:
   >::value>
   struct __dispath_cons
   {
+    ///TODO no const ?
     CPP_CONSTEXPR static pointer begin(const _String& s)
     { return s.begin(); }
     CPP_CONSTEXPR static pointer end(const _String& s)

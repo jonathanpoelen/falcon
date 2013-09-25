@@ -3,7 +3,7 @@
 // #include <vector>
 // #include <iostream>
 // #include <falcon/memory/grouping_new.hpp>
-
+//
 // #include <falcon/mpl/seq.hpp>
 // #include <falcon/mpl/integral.hpp>
 // // #include <falcon/mpl/pair.hpp>
@@ -15,77 +15,19 @@
 // struct int_plus
 // : int_<( N1::value + N2::value )>
 // {};
+//
 
-// #include <falcon/functional/dynamic_callback.hpp>
-
-#include <falcon/parameter/parameter_index.hpp>
-#include <falcon/c++1x/unpack.hpp>
-#include <falcon/arg/arg.hpp>
-#include <falcon/functional/call.hpp>
-#include <falcon/parameter/keep_parameter_index.hpp>
-
-#include <initializer_list>
+#include <falcon/functional/call_partial_param_loop.hpp>
 #include <iostream>
-#include <typeinfo>
 
-using falcon::parameter_index;
-using falcon::build_parameter_index;
-using falcon::build_parameter_index_t;
-using falcon::build_range_parameter_index;
-using falcon::build_range_parameter_index_t;
-using falcon::call;
-using namespace falcon;
-
-
-
-template<std::size_t... Indexes, typename Function, typename... Args>
-void __call(parameter_index<Indexes...>, Function func, Args&&... args)
-{
-  func(arg<Indexes>(std::forward<Args>(args)...)...);
-}
-
-template<std::size_t NumberArg, typename Function, typename... Args,
-  std::size_t... Indexes, std::size_t Index>
-void __call_partial_param_loop(parameter_index<Indexes...>, parameter_index<Index>,
-                               Function func, Args&&... args)
-// -> decltype(call(build_range_parameter_index_t<Index*NumberArg, sizeof...(Args)>(),
-//                  func, std::forward<Args>(args)...))
-{
-//   CPP1X_UNPACK(__call(
-//     build_range_parameter_index_t<Indexes*NumberArg, Indexes*NumberArg + NumberArg>,
-//     func,
-//     std::forward<Args>(args)...
-//   ));
-  /*return*/ call(build_range_parameter_index_t<Index*NumberArg, sizeof...(Args)>(),
-              func, std::forward<Args>(args)...);
-}
-
-template<std::size_t NumberArg, typename Function, typename... Args,
-  typename Indexes = build_parameter_index_t<
-    (sizeof...(Args) / NumberArg + ((sizeof...(Args) % NumberArg) ? 1 : 0))
-  >
->
-void call_partial_param_loop(Function func, Args&&... args)
-// -> decltype(__call_partial_param_loop<NumberArg>(
-//   build_parameter_index_t<sizeof...(Args) / NumberArg + ((sizeof...(Args) % NumberArg) ? 1 : 0)>(),
-//   func,
-//   std::forward<Args>(args)...
-// ))
-{
-  /*return*/ __call_partial_param_loop<NumberArg>(
-    Indexes(),
-//     keep_parameter_index<last_parameter_index_tag<>>
-    func,
-    std::forward<Args>(args)...
-  );
-}
-
-void f1(int /*n*/)
-{}
+struct F {
+int operator()(int, int n = 33)
+{ return n; }
+};
 
 int main()
 {
-  call_partial_param_loop<1>(f1, 1,3,4);
+  return falcon::call_partial_param_loop<1>(F(), 1,3,4);
 
 
 //   using sequence = seq<_1,_2,_3>;

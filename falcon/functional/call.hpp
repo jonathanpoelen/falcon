@@ -36,15 +36,10 @@ struct __call_result_of
  * \endcode
  */
 template <typename _Function, typename... _Args, std::size_t... _Indexes>
-constexpr typename __call_result_of<
-	_Function,
-	parameter_index<_Indexes...>,
-	_Args...
->::__type call(const parameter_index<_Indexes...>&,
+constexpr auto call(const parameter_index<_Indexes...>&,
 			   _Function func, _Args&&... args)
-{
-	return func(arg<_Indexes>(std::forward<_Args>(args)...)...);
-}
+-> decltype(func(arg<_Indexes>(std::forward<_Args>(args)...)...))
+{    return func(arg<_Indexes>(std::forward<_Args>(args)...)...); }
 //@}
 
 }

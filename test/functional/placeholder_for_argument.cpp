@@ -1,5 +1,6 @@
 #include <functional>
 #include <falcon/functional/placeholder_for_argument.hpp>
+#include <falcon/functional/operators.hpp>
 #include <falcon/iostreams/iostream.hpp>
 #include <test/test.hpp>
 #include "placeholder_for_argument.hpp"

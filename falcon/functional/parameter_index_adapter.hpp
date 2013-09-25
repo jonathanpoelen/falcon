@@ -9,11 +9,11 @@
 namespace falcon {
 
 ///\brief Tag for used @p call_partial_param_loop() with @c parameter_index_adapter
-template<std::size_t _NumberArg>
+template<std::size_t NumArg>
 struct call_partial_param_loop_tag {};
 
 ///\brief Tag for used @p call_partial_recursive_param_loop() with @c parameter_index_adapter
-template<std::size_t _NumberArg>
+template<std::size_t NumArg>
 struct call_partial_recursive_param_loop_tag {};
 
 
@@ -29,17 +29,40 @@ struct parameter_index_adapter
   Functor _M_func;
 
 private:
-  typedef typename parameter_index_or_tag_to_tag<Tag>::type __tag;
+  typedef typename parameter_index_or_tag_to_tag<Tag>::type tag_type;
 
 public:
-  template<typename... _Args, typename _BuildIndexes = typename keep_parameter_index<__tag, sizeof...(_Args)>::type>
-  constexpr typename __call_result_of<
-    const Functor,
-    _BuildIndexes,
-    _Args...
-  >::__type operator()(_Args&&... args) const
+  template<typename... Args, typename BuildIndexes = typename keep_parameter_index<tag_type, sizeof...(Args)>::type>
+  constexpr auto operator()(Args&&... args) const
+  -> decltype(call(BuildIndexes(), _M_func, std::forward<Args>(args)...))
+  { return call(BuildIndexes(), _M_func, std::forward<Args>(args)...); }
+
+  void swap(parameter_index_adapter& other)
   {
-    return call<const Functor&>(_BuildIndexes(), _M_func, std::forward<_Args>(args)...);
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
+
+  template<typename Tag2>
+  void swap(parameter_index_adapter<Functor, Tag2>& other)
+  {
+    using std::swap;
+    swap(_M_func, other._M_func);
+  }
+};
+
+template <typename Functor, std::size_t NumArg>
+struct parameter_index_adapter<Functor, call_partial_param_loop_tag<NumArg>>
+{
+  Functor _M_func;
+
+  template<typename... Args>
+  constexpr auto operator()(Args&&... args) const
+  -> decltype(call_partial_param_loop<NumArg, const Functor&>(
+    _M_func, std::forward<Args>(args)...))
+  {
+    return call_partial_param_loop<NumArg, const Functor&>(
+      _M_func, std::forward<Args>(args)...);
   }
 
   void swap(parameter_index_adapter& other)
@@ -56,42 +79,16 @@ public:
   }
 };
 
-template <typename Functor, std::size_t _NumberArg>
-struct parameter_index_adapter<Functor, call_partial_param_loop_tag<_NumberArg>>
+template <typename Functor, std::size_t NumArg>
+struct parameter_index_adapter<Functor, call_partial_recursive_param_loop_tag<NumArg>>
 {
   Functor _M_func;
 
-  template<typename... _Args>
-  constexpr typename __call_partial_param_loop_traits<_NumberArg, const Functor, _Args...>::__result_type operator()(_Args&&... args) const
+  template<typename... Args>
+  constexpr typename __call_partial_recursive_param_loop_traits<NumArg, const Functor, Args...>::__result_type operator()(Args&&... args) const
   {
-    return call_partial_param_loop<_NumberArg, const Functor&>(
-      _M_func, std::forward<_Args>(args)...);
-  }
-
-  void swap(parameter_index_adapter& other)
-  {
-    using std::swap;
-    swap(_M_func, other._M_func);
-  }
-
-  template<typename Tag2>
-  void swap(parameter_index_adapter<Functor, Tag2>& other)
-  {
-    using std::swap;
-    swap(_M_func, other._M_func);
-  }
-};
-
-template <typename Functor, std::size_t _NumberArg>
-struct parameter_index_adapter<Functor, call_partial_recursive_param_loop_tag<_NumberArg>>
-{
-  Functor _M_func;
-
-  template<typename... _Args>
-  constexpr typename __call_partial_recursive_param_loop_traits<_NumberArg, const Functor, _Args...>::__result_type operator()(_Args&&... args) const
-  {
-    return call_partial_recursive_param_loop<_NumberArg, const Functor&>(
-      _M_func, std::forward<_Args>(args)...);
+    return call_partial_recursive_param_loop<NumArg, const Functor&>(
+      _M_func, std::forward<Args>(args)...);
   }
 
   void swap(parameter_index_adapter& other)
