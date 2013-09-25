@@ -5,14 +5,16 @@
 
 namespace falcon {
 
-template<int _N, typename _Placeholder = typename std::remove_reference<typename std::remove_cv<decltype(std::placeholders::_1)>::type>::type>
+template<int N, typename Placeholder = typename std::remove_reference<
+  typename std::remove_cv<decltype(std::placeholders::_1)>::type
+>::type>
 struct std_placeholder
 {};
 
-template<int _NewN, template<int> class _Placeholder, int _N>
-struct std_placeholder<_NewN, _Placeholder<_N> >
+template<int NewN, template<int> class Placeholder, int N>
+struct std_placeholder<NewN, Placeholder<N> >
 {
-	typedef _Placeholder<_NewN> type;
+	typedef Placeholder<NewN> type;
 };
 
 template<typename>

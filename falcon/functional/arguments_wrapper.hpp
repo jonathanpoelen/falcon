@@ -20,19 +20,19 @@ namespace falcon
  * f(a,b);
  * \endcode
  */
-template <typename... _Elements>
+template <typename... Elements>
 class arguments_wrapper
-: public std::tuple<_Elements...>
+: public std::tuple<Elements...>
 {
-	typedef std::tuple<_Elements...> __base;
+	typedef std::tuple<Elements...> __base;
 
 public:
 	typedef __base tuple_type;
 
 
 public:
-	using std::tuple<_Elements...>::tuple;
-	using std::tuple<_Elements...>::operator=;
+	using std::tuple<Elements...>::tuple;
+	using std::tuple<Elements...>::operator=;
 
 	const tuple_type& tuple() const
 	{ return *this; }
@@ -40,25 +40,15 @@ public:
 	tuple_type& tuple()
 	{ return *this; }
 
-	template<typename _Functor>
-	auto operator()(_Functor func) const
-	-> decltype(tuple_apply<const _Functor&>(func, this->tuple()))
-	{ return tuple_apply<const _Functor&>(func, tuple()); }
+	template<typename Functor>
+	auto operator()(Functor func) const
+	-> decltype(tuple_apply(func, this->tuple()))
+	{    return tuple_apply(func, tuple()); }
 
-	template<typename _Functor>
-	auto operator()(_Functor func)
-	-> decltype(tuple_apply<_Functor&>(func, this->tuple()))
-	{ return tuple_apply<_Functor&>(func, tuple()); }
-
-	template<typename _Functor, std::size_t... _Indexes>
-	auto operator()(const parameter_index<_Indexes...>& indexes, _Functor func) const
-	-> decltype(tuple_apply<const _Functor&>(indexes, func, this->tuple()))
-	{ return tuple_apply<const _Functor&>(indexes, func, tuple()); }
-
-	template<typename _Functor, std::size_t... _Indexes>
-	auto operator()(const parameter_index<_Indexes...>& indexes, _Functor func)
-	-> decltype(tuple_apply<_Functor&>(indexes, func, this->tuple()))
-	{ return tuple_apply<_Functor&>(indexes, func, tuple()); }
+	template<typename Functor, std::size_t... _Indexes>
+	auto operator()(const parameter_index<_Indexes...>& indexes, Functor func) const
+	-> decltype(tuple_apply(indexes, func, this->tuple()))
+	{    return tuple_apply(indexes, func, tuple()); }
 
 	void swap(arguments_wrapper& other)
 	{
@@ -67,35 +57,35 @@ public:
     }
 };
 
-template<typename... _Elements>
-constexpr arguments_wrapper<typename decay_and_strip<_Elements>::type...>
-make_arguments(_Elements&&... __args)
+template<typename... Elements>
+constexpr arguments_wrapper<typename decay_and_strip<Elements>::type...>
+make_arguments(Elements&&... args)
 {
 	return arguments_wrapper<
-		typename decay_and_strip<_Elements>::type...
-	>(std::forward<_Elements>(__args)...);
+		typename decay_and_strip<Elements>::type...
+	>(std::forward<Elements>(args)...);
 }
 
-template<typename... _Elements>
-constexpr arguments_wrapper<_Elements&&...>
-forward_as_arguments(_Elements&&... __args) noexcept
-{ return arguments_wrapper<_Elements&&...>(std::forward<_Elements>(__args)...); }
+template<typename... Elements>
+constexpr arguments_wrapper<Elements&&...>
+forward_as_arguments(Elements&&... args) noexcept
+{ return arguments_wrapper<Elements&&...>(std::forward<Elements>(args)...); }
 
-template<typename... _Elements>
-void swap(arguments_wrapper<_Elements...>& x, arguments_wrapper<_Elements...>& y)
+template<typename... Elements>
+void swap(arguments_wrapper<Elements...>& x, arguments_wrapper<Elements...>& y)
 { x.swap(y); };
 
 }
 
 namespace std
 {
-	template<typename... _Elements>
-	struct tuple_size<falcon::arguments_wrapper<_Elements...>>
-	{ static const int value = sizeof...(_Elements); };
+	template<typename... Elements>
+	struct tuple_size<falcon::arguments_wrapper<Elements...>>
+	{ static const int value = sizeof...(Elements); };
 
-	template<std::size_t _Index, typename... _Elements>
-	struct tuple_element<_Index, falcon::arguments_wrapper<_Elements...>>
-	: tuple_element<_Index, std::tuple<_Elements...>>
+	template<std::size_t _Index, typename... Elements>
+	struct tuple_element<_Index, falcon::arguments_wrapper<Elements...>>
+	: tuple_element<_Index, std::tuple<Elements...>>
 	{};
 }
 

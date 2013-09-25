@@ -1,5 +1,5 @@
-#ifndef _FALCON_MATH_RAD_HPP
-#define _FALCON_MATH_RAD_HPP
+#ifndef FALCON_MATH_RAD_HPP
+#define FALCON_MATH_RAD_HPP
 
 #include <cmath>
 #include <falcon/c++/constexpr.hpp>

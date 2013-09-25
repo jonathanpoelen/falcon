@@ -1,155 +1,176 @@
-#ifndef _FALCON_FUNCTIONAL_STORE_IF_HPP
-#define _FALCON_FUNCTIONAL_STORE_IF_HPP
+#ifndef FALCON_FUNCTIONAL_STORE_IF_HPP
+#define FALCON_FUNCTIONAL_STORE_IF_HPP
 
 #include <falcon/cast/static_caster.hpp>
+#include <falcon/c++/reference.hpp>
+#include <falcon/utility/move.hpp>
 
 namespace falcon {
 
-struct __store_if_accessor
+struct __store_if_set_value
 {
-  template <typename _T>
-  _T* operator()(_T& x) const
-  { return &x; }
+  template <typename T, typename U>
+#if __cplusplus >= 201103L
+  void operator()(const T & x, U && y) const
+  { x = std::forward<U>(y); }
+#else
+  void operator()(const T & x, U & y) const
+  { x = y; }
+#endif
 
-  template <typename _T>
-  const _T* operator()(const _T& x) const
-  { return &x; }
+  template <typename T, typename U>
+  void operator()(T * x, U & y) const
+  { *x = y; }
+
+  template <typename T, typename U>
+  void operator()(T * x, U * y) const
+  { *x = *y; }
 };
 
 template <
-  typename _T,
-  typename _Functor = static_caster<bool>,
-  typename _Access = __store_if_accessor,
-  bool _IsNot = false
+  typename T,
+  typename Functor = static_caster<bool>,
+  typename AssignVal = __store_if_set_value,
+  bool IsNot = false
 >
-struct __store_if
+class __store_if
 {
-  typedef _T value_type;
-  typedef _T* pointer_type;
-  typedef const _T* const_pointer_type;
-  typedef _Functor functor_type;
-  typedef _Access accessor_type;
+public:
+  typedef T type;
+  typedef Functor functor_type;
+  typedef AssignVal accessor_type;
 
 private:
-  _Functor _functor;
-  _Access _access;
-  pointer_type _marchandise;
+  Functor _functor;
+  AssignVal _set_val;
+  T _marchandise;
 
 public:
-  __store_if(_Functor functor, _Access access, pointer_type p = 0)
-  : _functor(functor)
-  , _access(access)
-  , _marchandise(p)
+  __store_if(Functor CPP_RVALUE_OR_CONST_REFERENCE functor,
+             AssignVal CPP_RVALUE_OR_CONST_REFERENCE access,
+             T CPP_RVALUE_OR_CONST_REFERENCE value)
+  : _functor(FALCON_FORWARD(Functor, functor))
+  , _set_val(FALCON_FORWARD(AssignVal, access))
+  , _marchandise(FALCON_FORWARD(T, value))
   {}
 
-  __store_if(_Functor functor, pointer_type p = 0)
-  : _functor(functor)
-  , _access()
-  , _marchandise(p)
+  __store_if(Functor CPP_RVALUE_OR_CONST_REFERENCE functor,
+             AssignVal CPP_RVALUE_OR_CONST_REFERENCE access)
+  : _functor(FALCON_FORWARD(Functor, functor))
+  , _set_val(FALCON_FORWARD(AssignVal, access))
+  , _marchandise()
   {}
 
-  __store_if(pointer_type p = 0)
+  __store_if(Functor CPP_RVALUE_OR_CONST_REFERENCE functor,
+             T CPP_RVALUE_OR_CONST_REFERENCE value)
+  : _functor(FALCON_FORWARD(Functor, functor))
+  , _set_val()
+  , _marchandise(FALCON_FORWARD(T, value))
+  {}
+
+  __store_if(Functor CPP_RVALUE_OR_CONST_REFERENCE functor)
+  : _functor(FALCON_FORWARD(Functor, functor))
+  , _set_val()
+  , _marchandise()
+  {}
+
+  __store_if(T CPP_RVALUE_OR_CONST_REFERENCE value)
   : _functor()
-  , _access()
-  , _marchandise(p)
+  , _set_val()
+  , _marchandise(FALCON_FORWARD(T, value))
   {}
 
-  template<typename _U>
-  bool operator()(_U& value)
-  {
-    if (_IsNot ? !_functor(value) : _functor(value))
-    {
-      _marchandise = _access(value);
-      return true;
-    }
-    return false;
-  }
+  __store_if()
+  : _functor()
+  , _set_val()
+  , _marchandise()
+  {}
 
   template<typename _U>
   bool operator()(_U& value) const
   {
-    if (_IsNot ? !_functor(value) : _functor(value))
+    if (IsNot ? !_functor(value) : _functor(value))
     {
-      _marchandise = _access(value);
+      _set_val(_marchandise, value);
       return true;
     }
     return false;
   }
 
-  pointer_type get()
+  T& get()
   { return _marchandise; }
 
-  const_pointer_type get() const
+  const T& get() const
   { return _marchandise; }
 
-  void set(pointer_type p)
-  { _marchandise = p; }
+  void set(T CPP_RVALUE_OR_CONST_REFERENCE value)
+  { _marchandise = FALCON_FORWARD(T, value); }
 
   void clear()
-  { _marchandise = 0; }
+  { _marchandise = T(); }
 };
 
 #if __cplusplus >= 201103L
 template <
-  typename _T,
-  typename _Functor = static_caster<bool>,
-  typename _Access = __store_if_accessor
+  typename T,
+  typename Functor = static_caster<bool>,
+  typename AssignVal = __store_if_set_value
 >
-using store_if = __store_if<_T, _Functor, _Access>;
+using store_if = __store_if<T, Functor, AssignVal>;
 
 template <
-  typename _T,
-  typename _Functor = static_caster<bool>,
-  typename _Access = __store_if_accessor
+  typename T,
+  typename Functor = static_caster<bool>,
+  typename AssignVal = __store_if_set_value
 >
-using store_if_not = __store_if<_T, _Functor, _Access, true>;
+using store_if_not = __store_if<T, Functor, AssignVal, true>;
 #else
 template <
-  typename _T,
-  typename _Functor = static_caster<bool>,
-  typename _Access = __store_if_accessor
+  typename T,
+  typename Functor = static_caster<bool>,
+  typename AssignVal = __store_if_set_value
 >
 struct store_if
-: __store_if<_T, _Functor, _Access>
+: __store_if<T, Functor, AssignVal>
 {
 private:
-  typedef __store_if<_T, _Functor, _Access> __base;
+  typedef __store_if<T, Functor, AssignVal> __base;
 
 public:
-  store_if(_Functor functor, _Access access, pointer_type p = 0)
+  store_if(Functor functor, AssignVal access, const T & p = T())
   : __base(functor, access, p)
   {}
 
-  store_if(_Functor functor, pointer_type p = 0)
+  store_if(Functor functor, const T & p = T())
   : __base(functor, p)
   {}
 
-  store_if(pointer_type p = 0)
+  store_if(const T & p = T())
   : __base(p)
   {}
 };
 
 template <
-  typename _T,
-  typename _Functor = static_caster<bool>,
-  typename _Access = __store_if_accessor
+  typename T,
+  typename Functor = static_caster<bool>,
+  typename AssignVal = __store_if_set_value
 >
 struct store_if_not
-: __store_if<_T, _Functor, _Access, true>
+: __store_if<T, Functor, AssignVal, true>
 {
 private:
-  typedef __store_if<_T, _Functor, _Access, true> __base;
+  typedef __store_if<T, Functor, AssignVal, true> __base;
 
 public:
-  store_if_not(_Functor functor, _Access access, pointer_type p = 0)
+  store_if_not(Functor functor, AssignVal access, const T & p = T())
   : __base(functor, access, p)
   {}
 
-  store_if_not(_Functor functor, pointer_type p = 0)
+  store_if_not(Functor functor, const T & p = T())
   : __base(functor, p)
   {}
 
-  store_if_not(pointer_type p = 0)
+  store_if_not(const T & p = T())
   : __base(p)
   {}
 };

@@ -1,45 +1,45 @@
-#ifndef _FALCON_LOGICAL_VALUE_CONDITION_HPP
-#define _FALCON_LOGICAL_VALUE_CONDITION_HPP
+#ifndef FALCON_LOGICAL_VALUE_CONDITION_HPP
+#define FALCON_LOGICAL_VALUE_CONDITION_HPP
 
 namespace falcon {
 
 #if __cplusplus >= 201103L
-template<typename _T>
-inline constexpr _T& first_true(_T& a)
+template<typename T>
+inline constexpr T& first_true(T& a)
 {
 	return a;
 }
 
-template<typename _T, typename... _Args>
-inline constexpr _T& first_true(_T& a, _Args&... args)
+template<typename T, typename... Args>
+inline constexpr T& first_true(T& a, Args&... args)
 {
-	return a ? a : first_true<_T>(args...);
+	return a ? a : first_true<T>(args...);
 }
 
 #else
-template<typename _T>
-inline _T& first_true(_T& a, _T& b)
+template<typename T>
+inline T& first_true(T& a, T& b)
 {
 	return a ? a : b;
 }
 #endif
 
 #if __cplusplus >= 201103L
-template<typename _T>
-inline constexpr _T& first_false(_T& a)
+template<typename T>
+inline constexpr T& first_false(T& a)
 {
 	return a;
 }
 
-template<typename _T, typename... _Args>
-inline constexpr _T& first_false(_T& a, _Args&... args)
+template<typename T, typename... Args>
+inline constexpr T& first_false(T& a, Args&... args)
 {
-	return a ? first_false<_T>(args...) : a;
+	return a ? first_false<T>(args...) : a;
 }
 
 #else
-template<typename _T>
-inline _T& first_false(_T& a, _T& b)
+template<typename T>
+inline T& first_false(T& a, T& b)
 {
 	return a ? b : a;
 }

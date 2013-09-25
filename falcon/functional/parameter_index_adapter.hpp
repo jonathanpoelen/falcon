@@ -58,10 +58,10 @@ struct parameter_index_adapter<Functor, call_partial_param_loop_tag<NumArg>>
 
   template<typename... Args>
   constexpr auto operator()(Args&&... args) const
-  -> decltype(call_partial_param_loop<NumArg, const Functor&>(
+  -> decltype(call_partial_param_loop<NumArg>(
     _M_func, std::forward<Args>(args)...))
   {
-    return call_partial_param_loop<NumArg, const Functor&>(
+    return call_partial_param_loop<NumArg>(
       _M_func, std::forward<Args>(args)...);
   }
 

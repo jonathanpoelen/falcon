@@ -4,6 +4,7 @@
 #include <falcon/functional/call.hpp>
 #include <falcon/parameter/manip.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
+#include <falcon/math/min.hpp>
 
 namespace falcon {
 
@@ -20,10 +21,7 @@ struct __call_partial_recursive_param_loop
       parameter_index<0>,
       build_range_parameter_index_t<
         Start,
-        (Start + (NumberArg - 1) < sizeof...(Args) + 1
-          ? Start + (NumberArg - 1)
-          : sizeof...(Args) + 1
-        )
+        min(Start + (NumberArg - 1), sizeof...(Args) + 1)
       >
     >::type(),
     func,
@@ -37,10 +35,7 @@ struct __call_partial_recursive_param_loop
         parameter_index<0>,
         build_range_parameter_index_t<
           Start,
-          (Start + (NumberArg - 1) < sizeof...(Args) + 1
-            ? Start + (NumberArg - 1)
-            : sizeof...(Args) + 1
-          )
+          min(Start + (NumberArg - 1), sizeof...(Args) + 1)
         >
       >::type(),
       func,
@@ -59,17 +54,13 @@ struct __call_partial_recursive_param_loop<NumberArg, 0>
   template<typename Function, typename... Args>
   static constexpr auto impl(Function func, Args&&... args)
   -> decltype(call(
-    build_parameter_index_t<
-      (NumberArg < sizeof...(Args) ? NumberArg : sizeof...(Args))
-    >(),
+    build_parameter_index_t<min(NumberArg, sizeof...(Args))>(),
     func,
     std::forward<Args>(args)...
   ))
   {
     return call(
-      build_parameter_index_t<
-        (NumberArg < sizeof...(Args) ? NumberArg : sizeof...(Args))
-      >(),
+      build_parameter_index_t<min(NumberArg, sizeof...(Args))>(),
       func,
       std::forward<Args>(args)...
     );

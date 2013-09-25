@@ -48,19 +48,19 @@ std::basic_ostream<_CharT, _Traits>& join(std::basic_ostream<_CharT, _Traits>& o
 template<typename _CharT, typename _Traits, typename _Container>
 std::basic_ostream<_CharT, _Traits>& join(std::basic_ostream<_CharT, _Traits>& os, const _Container& container, const _CharT* glue)
 {
-	return join<>(os, begin(container), end(container), glue, static_cast<std::streamsize>(_Traits::length(glue)));
+	return join(os, begin(container), end(container), glue, static_cast<std::streamsize>(_Traits::length(glue)));
 }
 
 template<typename _CharT, typename _Traits, typename _Container>
 std::basic_ostream<_CharT, _Traits>& join(std::basic_ostream<_CharT, _Traits>& os, const _Container& container, const _CharT* glue, std::streamsize size)
 {
-	return join<>(os, begin(container), end(container), glue, size);
+	return join(os, begin(container), end(container), glue, size);
 }
 
 template<typename _CharT, typename _Traits, typename _Container>
 std::basic_ostream<_CharT, _Traits>& join(std::basic_ostream<_CharT, _Traits>& os, const _Container& container, _CharT glue = ',')
 {
-	return join<>(os, begin(container), end(container), &glue, 1);
+	return join(os, begin(container), end(container), &glue, 1);
 }
 
 
@@ -103,13 +103,13 @@ struct join_iterator_wrapper<_CharT, _CharOrStringT, _ForwardIterator, true>
 template<typename _CharT, typename _Traits, typename _CharOrStringT, typename _ForwardIterator>
 std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Traits>& os, join_iterator_wrapper<_CharT, _CharOrStringT, _ForwardIterator, false> wrapper)
 {
-	return join<>(os, wrapper._first, wrapper._last, wrapper._glue);
+	return join(os, wrapper._first, wrapper._last, wrapper._glue);
 }
 
 template<typename _CharT, typename _Traits, typename _CharOrStringT, typename _ForwardIterator>
 std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Traits>& os, join_iterator_wrapper<_CharT, _CharOrStringT, _ForwardIterator, true> wrapper)
 {
-	return join<>(os, wrapper._first, wrapper._last, wrapper._glue, wrapper._size);
+	return join(os, wrapper._first, wrapper._last, wrapper._glue, wrapper._size);
 }
 
 template<typename _CharT, typename _ForwardIterator>
@@ -172,13 +172,13 @@ struct join_wrapper<_CharT, _CharOrStringT, _Container, true>
 template<typename _CharT, typename _Traits, typename _CharOrStringT, typename _Container>
 std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Traits>& os, join_wrapper<_CharT, _CharOrStringT, _Container, false> wrapper)
 {
-	return join<>(os, begin(wrapper._container), end(wrapper._container), wrapper._glue);
+	return join(os, begin(wrapper._container), end(wrapper._container), wrapper._glue);
 }
 
 template<typename _CharT, typename _Traits, typename _CharOrStringT, typename _Container>
 std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Traits>& os, join_wrapper<_CharT, _CharOrStringT, _Container, true> wrapper)
 {
-	return join<>(os, begin(wrapper._container), end(wrapper._container), wrapper._glue, wrapper._size);
+	return join(os, begin(wrapper._container), end(wrapper._container), wrapper._glue, wrapper._size);
 }
 
 template<typename _CharT, typename _Container>

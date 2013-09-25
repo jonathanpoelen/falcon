@@ -1,11 +1,12 @@
-#ifndef _FALCON_FUNCTIONAL_PLACEHOLDER_FOR_ARGUMENT_HPP
-#define _FALCON_FUNCTIONAL_PLACEHOLDER_FOR_ARGUMENT_HPP
+#ifndef FALCON_FUNCTIONAL_PLACEHOLDER_FOR_ARGUMENT_HPP
+#define FALCON_FUNCTIONAL_PLACEHOLDER_FOR_ARGUMENT_HPP
 
-#include <utility>
 #include <falcon/functional/call.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
 #include <falcon/parameter/result_pack_of.hpp>
 #include <falcon/parameter/pack_element.hpp>
+
+#include <utility>
 
 namespace falcon {
 
@@ -34,51 +35,23 @@ public:
   , _M_functor(func)
   {}
 
-  template<typename... _Args>
-  constexpr placeholder_for_argument(const T& __data, _Args&&... args)
+  template<typename... Args>
+  constexpr placeholder_for_argument(const T& __data, Args&&... args)
   : _M_data(__data)
-  , FALCON_PP_NOT_IDE_PARSER(_M_functor{std::forward<_Args>(args)...})
+  , FALCON_PP_NOT_IDE_PARSER(_M_functor{std::forward<Args>(args)...})
   {}
 
-  template<typename... _Args,
-    std::size_t _CutPosition = (sizeof...(_Args) < Position ? sizeof...(_Args) : Position) + 1,
+  template<typename... Args,
+    std::size_t CutPosition = (sizeof...(Args) < Position ? sizeof...(Args) : Position) + 1,
     typename _Indexes = typename parameter_index_cat<
-      typename build_range_parameter_index<1, _CutPosition>::type,
+      build_range_parameter_index_t<1, CutPosition>,
       parameter_index<0>,
-      typename build_range_parameter_index<_CutPosition, sizeof...(_Args)+1>::type
+      build_range_parameter_index_t<CutPosition, sizeof...(Args)+1>
     >::type
   >
-  constexpr typename parameter::result_of<
-    const Functor&,
-    typename parameter::elements<
-      parameter_pack<const T&, _Args&&...>,
-      _Indexes
-    >::type
-  >::type operator()(_Args&&... args) const
-  {
-    return call<const Functor&>(_Indexes(), _M_functor, _M_data,
-                                std::forward<_Args>(args)...);
-  }
-
-  template<typename... _Args,
-    std::size_t _CutPosition = (sizeof...(_Args) < Position ? sizeof...(_Args) : Position) + 1,
-    typename _Indexes = typename parameter_index_cat<
-      typename build_range_parameter_index<1, _CutPosition>::type,
-      parameter_index<0>,
-      typename build_range_parameter_index<_CutPosition, sizeof...(_Args)+1>::type
-    >::type
-  >
-  typename parameter::result_of<
-    Functor&,
-    typename parameter::elements<
-      parameter_pack<T&, _Args&&...>,
-      _Indexes
-    >::type
-  >::type operator()(_Args&&... args)
-  {
-    return call<Functor&>(_Indexes(), _M_functor, _M_data,
-                          std::forward<_Args>(args)...);
-  }
+  constexpr auto operator()(Args&&... args) const
+  -> decltype(call(_Indexes(), _M_functor, _M_data, std::forward<Args>(args)...))
+  {    return call(_Indexes(), _M_functor, _M_data, std::forward<Args>(args)...); }
 
   functor_type& functor()
   { return _M_functor; }
@@ -108,7 +81,7 @@ placeholder_for_argument<Position, Functor, T> bound_argument(Functor&& func, T&
 
 template <int Position, typename Functor, typename T>
 void swap(placeholder_for_argument<Position, Functor, T>& x,
-        placeholder_for_argument<Position, Functor, T>& y)
+          placeholder_for_argument<Position, Functor, T>& y)
 { x.swap(y); }
 
 }

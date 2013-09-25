@@ -112,7 +112,7 @@ node/*.hpp: peuvent fonctionner de façon transparente avec des std::unique_ptr 
 utiliser optimal_tuple dans recursive_iterator
 
 revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
-changer le nom des java_iterator en range_iterator et merger les fonction make_range_iterator et range_iterator
+changer le nom des java_iterator en range_iterator et merger les fonctions make_range_iterator et range_iterator
 Renommer les java_iterator (range_iterator ?)
 
 peut-on supprimer les constructeurs de copie et l'affectation dans les iterateurs sans que cela crée des copies ? il faudra surement faire un move ctor et un move copy
@@ -209,8 +209,10 @@ functional/compose.hpp: simplifier et utilisation de rvalue
 
 refaire une passe de l'ensemble des fichiers de functional/ pour eliminer les foncteurs non constant et alleger le code. (surtout parameter_index_adapter)
 
-functional/call.hpp: enlever __call_result_of
-functional/parameter_index_adapter.hpp: enlever __call_partial_recursive_param_loop_traits
+mettre en noexcept les constructeur qui peuvent l'être
+
+un mutable_val comme cmme mutable_pointer mais pour les valeurs
+
 
 
 

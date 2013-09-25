@@ -6,11 +6,11 @@ void delegate_result_test()
 {
 	{
 		struct S{
-			int operator()(){ return 3; }
-			int operator()(int n){ return n; }
+			int operator()() const { return 3; }
+			int operator()(int n) const { return n; }
 		};
 
-		struct SS{ int operator()(int n){ return n*2; } };
+        struct SS{ int operator()(int n) const { return n*2; } };
 
 		CHECK_EQUAL_VALUE(falcon::delegate(SS(),S())(), 6);
 		CHECK_EQUAL_VALUE(falcon::delegate(SS(),S())(7), 14);
@@ -18,12 +18,12 @@ void delegate_result_test()
 	{
 		struct S{
 			typedef int argument_type;
-			int operator()(int){ return 3; }
+			int operator()(int) const { return 3; }
 		};
 
 		struct SS{
 			typedef int result_type;
-			int operator()(int n){ return n*2; }
+            int operator()(int n) const { return n*2; }
 		};
 
 		CHECK_EQUAL_VALUE(falcon::delegate1(SS(),S())(1), 6);
@@ -33,12 +33,12 @@ void delegate_result_test()
 		struct S{
 			typedef int first_argument_type;
 			typedef int second_argument_type;
-			int operator()(int,int){ return 3; }
+            int operator()(int,int) const { return 3; }
 		};
 
 		struct SS{
 			typedef int result_type;
-			int operator()(int n){ return n*2; }
+            int operator()(int n) const { return n*2; }
 		};
 
 		CHECK_EQUAL_VALUE(falcon::delegate2(SS(),S())(1,1), 6);

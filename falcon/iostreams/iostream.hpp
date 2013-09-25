@@ -10,85 +10,85 @@ namespace falcon {
 template<typename... Args>
 std::istream& scan(Args&... args)
 {
-  return get<>(std::cin, args...);
+  return get(std::cin, args...);
 }
 
 template<typename... Args>
 std::ostream& print(const Args&... args)
 {
-  return put<>(std::cout, args...);
+  return put(std::cout, args...);
 }
 
 template<typename... Args>
 std::ostream& print_err(const Args&... args)
 {
-  return put<>(std::cerr, args...);
+  return put(std::cerr, args...);
 }
 
 template<typename... Args>
 std::ostream& print_log(const Args&... args)
 {
-  return put<>(std::clog, args...);
+  return put(std::clog, args...);
 }
 
 template<typename... Args>
 std::ostream& println(const Args&... args)
 {
-  return print<>(args...) << '\n';
+  return print(args...) << '\n';
 }
 
 template<typename... Args>
 std::ostream& println_err(const Args&... args)
 {
-  return print_err<>(args...) << '\n';
+  return print_err(args...) << '\n';
 }
 
 template<typename... Args>
 std::ostream& println_log(const Args&... args)
 {
-  return print_log<>(args...) << '\n';
+  return print_log(args...) << '\n';
 }
 
 template<typename... Args>
 std::wistream& wscan(Args&... args)
 {
-  return get<>(std::wcin, args...);
+  return get(std::wcin, args...);
 }
 
 template<typename... Args>
 std::wostream& wprint(const Args&... args)
 {
-  return put<>(std::wcout, args...);
+  return put(std::wcout, args...);
 }
 
 template<typename... Args>
 std::wostream& wprint_err(const Args&... args)
 {
-  return put<>(std::wcerr, args...);
+  return put(std::wcerr, args...);
 }
 
 template<typename... Args>
 std::wostream& wprint_log(const Args&... args)
 {
-  return put<>(std::wclog, args...);
+  return put(std::wclog, args...);
 }
 
 template<typename... Args>
 std::wostream& wprintln(const Args&... args)
 {
-  return wprint<>(args...) << '\n';
+  return wprint(args...) << '\n';
 }
 
 template<typename... Args>
 std::wostream& wprintln_err(const Args&... args)
 {
-  return wprint_err<>(args...) << '\n';
+  return wprint_err(args...) << '\n';
 }
 
 template<typename... Args>
 std::wostream& wprintln_log(const Args&... args)
 {
-  return wprint_log<>(args...) << '\n';
+  return wprint_log(args...) << '\n';
 }
 
 inline basic_ostream_functor<char> cout_functor()

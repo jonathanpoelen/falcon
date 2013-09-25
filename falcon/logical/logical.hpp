@@ -1,5 +1,5 @@
-#ifndef _FALCON_LOGICAL_LOGICAL_HPP
-#define _FALCON_LOGICAL_LOGICAL_HPP
+#ifndef FALCON_LOGICAL_LOGICAL_HPP
+#define FALCON_LOGICAL_LOGICAL_HPP
 
 #include <type_traits>
 #include <utility>
@@ -17,199 +17,199 @@ namespace logical {
 * @endcode
 * because values pass to reference
 */
-template<typename _T, typename _U, typename... _Args>
-constexpr bool equal_to_or(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool equal_to_or(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-inline constexpr bool equal_to_and(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+inline constexpr bool equal_to_and(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool not_equal_to_or(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool not_equal_to_or(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool not_equal_to_and(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool not_equal_to_and(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool greater_or(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool greater_or(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool greater_and(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool greater_and(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool less_equal_or(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool less_equal_or(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool less_equal_and(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool less_equal_and(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool greater_or(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool greater_or(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool greater_and(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool greater_and(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool greater_equal_or(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool greater_equal_or(const T& a, const U& b, const Args&... args);
 
-template<typename _T, typename _U, typename... _Args>
-constexpr bool greater_equal_and(const _T& a, const _U& b, const _Args&... args);
+template<typename T, typename U, typename... Args>
+constexpr bool greater_equal_and(const T& a, const U& b, const Args&... args);
 
-template<typename _Predicate, typename _T, typename _U, typename... _Args>
-constexpr bool equal_if_or(_Predicate, const _T& a, const _U& b, const _Args&... args);
+template<typename _Predicate, typename T, typename U, typename... Args>
+constexpr bool equal_if_or(_Predicate, const T& a, const U& b, const Args&... args);
 
-template<typename _Predicate, typename _T, typename _U, typename... _Args>
-constexpr bool equal_if_and(_Predicate, const _T& a, const _U& b, const _Args&... args);
+template<typename _Predicate, typename T, typename U, typename... Args>
+constexpr bool equal_if_and(_Predicate, const T& a, const U& b, const Args&... args);
 
-template<typename _Predicate, typename _T, typename _U, typename... _Args>
-constexpr bool not_equal_if_or(_Predicate, const _T& a, const _U& b, const _Args&... args);
+template<typename _Predicate, typename T, typename U, typename... Args>
+constexpr bool not_equal_if_or(_Predicate, const T& a, const U& b, const Args&... args);
 
-template<typename _Predicate, typename _T, typename _U, typename... _Args>
-constexpr bool not_equal_if_and(_Predicate, const _T& a, const _U& b, const _Args&... args);
-
-
-template<typename _T, typename _U>
-constexpr bool equal_to_or(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool equal_to_and(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool not_equal_to_or(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool not_equal_to_and(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool greater_or(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool greater_and(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool less_equal_or(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool less_equal_and(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool greater_or(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool greater_and(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool greater_equal_or(const _T& a, const _U& b);
-
-template<typename _T, typename _U>
-constexpr bool greater_equal_and(const _T& a, const _U& b);
-
-template<typename _Predicate, typename _T, typename _U>
-constexpr bool equal_if_or(_Predicate, const _T& a, const _U& b);
-
-template<typename _Predicate, typename _T, typename _U>
-constexpr bool equal_if_and(_Predicate, const _T& a, const _U& b);
-
-template<typename _Predicate, typename _T, typename _U>
-constexpr bool not_equal_if_or(_Predicate, const _T& a, const _U& b);
-
-template<typename _Predicate, typename _T, typename _U>
-constexpr bool not_equal_if_and(_Predicate, const _T& a, const _U& b);
+template<typename _Predicate, typename T, typename U, typename... Args>
+constexpr bool not_equal_if_and(_Predicate, const T& a, const U& b, const Args&... args);
 
 
-template <typename _T>
+template<typename T, typename U>
+constexpr bool equal_to_or(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool equal_to_and(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool not_equal_to_or(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool not_equal_to_and(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool greater_or(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool greater_and(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool less_equal_or(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool less_equal_and(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool greater_or(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool greater_and(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool greater_equal_or(const T& a, const U& b);
+
+template<typename T, typename U>
+constexpr bool greater_equal_and(const T& a, const U& b);
+
+template<typename _Predicate, typename T, typename U>
+constexpr bool equal_if_or(_Predicate, const T& a, const U& b);
+
+template<typename _Predicate, typename T, typename U>
+constexpr bool equal_if_and(_Predicate, const T& a, const U& b);
+
+template<typename _Predicate, typename T, typename U>
+constexpr bool not_equal_if_or(_Predicate, const T& a, const U& b);
+
+template<typename _Predicate, typename T, typename U>
+constexpr bool not_equal_if_and(_Predicate, const T& a, const U& b);
+
+
+template <typename T>
 struct equal_to_or_wrapper;
 
-template <typename _T>
+template <typename T>
 struct equal_to_and_wrapper;
 
-template <typename _T>
+template <typename T>
 struct not_equal_to_or_wrapper;
 
-template <typename _T>
+template <typename T>
 struct not_equal_to_and_wrapper;
 
-template <typename _T>
+template <typename T>
 struct greater_or_wrapper;
 
-template <typename _T>
+template <typename T>
 struct greater_and_wrapper;
 
-template <typename _T>
+template <typename T>
 struct less_equal_or_wrapper;
 
-template <typename _T>
+template <typename T>
 struct less_equal_and_wrapper;
 
-template <typename _T>
+template <typename T>
 struct greater_or_wrapper;
 
-template <typename _T>
+template <typename T>
 struct greater_and_wrapper;
 
-template <typename _T>
+template <typename T>
 struct greater_equal_or_wrapper;
 
-template <typename _T>
+template <typename T>
 struct greater_equal_and_wrapper;
 
-template <typename _Predicate, typename _T>
+template <typename _Predicate, typename T>
 struct equal_if_or_wrapper;
 
-template <typename _Predicate, typename _T>
+template <typename _Predicate, typename T>
 struct equal_if_and_wrapper;
 
-template <typename _Predicate, typename _T>
+template <typename _Predicate, typename T>
 struct not_equal_if_or_wrapper;
 
-template <typename _Predicate, typename _T>
+template <typename _Predicate, typename T>
 struct not_equal_if_and_wrapper;
 //@}
 
 
-template <typename _Predicate, typename _T>
-equal_if_or_wrapper<_Predicate, _T> make_equal_if_or(_Predicate, _T&&);
+template <typename _Predicate, typename T>
+equal_if_or_wrapper<_Predicate, T> make_equal_if_or(_Predicate, T&&);
 
-template <typename _Predicate, typename _T>
-equal_if_or_wrapper<_Predicate, _T> make_equal_if_or(_T&&);
+template <typename _Predicate, typename T>
+equal_if_or_wrapper<_Predicate, T> make_equal_if_or(T&&);
 
-template <typename _Predicate, typename _T>
-equal_if_and_wrapper<_Predicate, _T> make_equal_if_and(_Predicate, _T&&);
+template <typename _Predicate, typename T>
+equal_if_and_wrapper<_Predicate, T> make_equal_if_and(_Predicate, T&&);
 
-template <typename _Predicate, typename _T>
-equal_if_and_wrapper<_Predicate, _T> make_equal_if_and(_T&&);
+template <typename _Predicate, typename T>
+equal_if_and_wrapper<_Predicate, T> make_equal_if_and(T&&);
 
-template <typename _Predicate, typename _T>
-not_equal_if_or_wrapper<_Predicate, _T> make_not_equal_if_or(_Predicate, _T&&);
+template <typename _Predicate, typename T>
+not_equal_if_or_wrapper<_Predicate, T> make_not_equal_if_or(_Predicate, T&&);
 
-template <typename _Predicate, typename _T>
-not_equal_if_or_wrapper<_Predicate, _T> make_not_equal_if_or(_T&&);
+template <typename _Predicate, typename T>
+not_equal_if_or_wrapper<_Predicate, T> make_not_equal_if_or(T&&);
 
-template <typename _Predicate, typename _T>
-not_equal_if_and_wrapper<_Predicate, _T> make_not_equal_if_and(_Predicate, _T&&);
+template <typename _Predicate, typename T>
+not_equal_if_and_wrapper<_Predicate, T> make_not_equal_if_and(_Predicate, T&&);
 
-template <typename _Predicate, typename _T>
-not_equal_if_and_wrapper<_Predicate, _T> make_not_equal_if_and(_T&&);
+template <typename _Predicate, typename T>
+not_equal_if_and_wrapper<_Predicate, T> make_not_equal_if_and(T&&);
 
 
 #define __FALCON_MAKE_LOGICAL_FUNC(name, op, op_name)\
-	template<typename _T, typename _U>\
-	inline constexpr bool name##_##op_name(const _T& a, const _U& b)\
+	template<typename T, typename U>\
+	inline constexpr bool name##_##op_name(const T& a, const U& b)\
 	{ return a == b; }\
 	\
-	template<typename _T, typename _U, typename... _Args>\
-	constexpr bool name##_##op_name(const _T& a, const _U& b, const _Args&... args)\
+	template<typename T, typename U, typename... Args>\
+	constexpr bool name##_##op_name(const T& a, const U& b, const Args&... args)\
 	{ return a == b op_name name##_##op_name(a, args...); }\
 	\
-	template <typename _T>\
+	template <typename T>\
 	struct name##_##op_name##_wrapper\
 	{\
-		_T _value;\
+		T _value;\
 		\
 		constexpr bool operator()() const\
 		{ return false; }\
 		\
-		template <typename... _Args>\
-		constexpr bool operator()(const _Args&... args) const\
-		{ return name##_##op_name<_Args...>(_value, args...); }\
+		template <typename... Args>\
+		constexpr bool operator()(const Args&... args) const\
+		{ return name##_##op_name<Args...>(_value, args...); }\
 	};
 
 #define __FALCON_MAKE2_LOGICAL_FUNC(name, op)\
@@ -228,45 +228,45 @@ __FALCON_MAKE2_LOGICAL_FUNC(greater_equal, >=)
 
 #define __FALCON_LOGICAL_NAME(x) x
 #define __FALCON_MAKE_LOGICAL_FUNC(op, prefix_op, _)\
-template<typename _Predicate, typename _T, typename _U>\
-	inline constexpr bool __##prefix_op##_##equal_if_##op(_Predicate & pred, const _T& a, const _U& b)\
+template<typename _Predicate, typename T, typename U>\
+	inline constexpr bool __##prefix_op##_##equal_if_##op(_Predicate & pred, const T& a, const U& b)\
 	{ return prefix_op pred(a,b); }\
 	\
-	template<typename _Predicate, typename _T, typename _U, typename... _Args>\
-	constexpr bool __##prefix_op##_##equal_if_##op(_Predicate & pred, const _T& a, const _U& b, const _Args&... args)\
+	template<typename _Predicate, typename T, typename U, typename... Args>\
+	constexpr bool __##prefix_op##_##equal_if_##op(_Predicate & pred, const T& a, const U& b, const Args&... args)\
 	{ return (prefix_op pred(a,b)) op __##prefix_op##_##equal_if_##op(a, args...); }\
 	\
-	template<typename _Predicate, typename _T, typename _U>\
-	inline constexpr bool name##_##op(_Predicate pred, const _T& a, const _U& b)\
+	template<typename _Predicate, typename T, typename U>\
+	inline constexpr bool name##_##op(_Predicate pred, const T& a, const U& b)\
 	{ return pred(a,b); }\
 	\
-	template<typename _Predicate, typename _T, typename _U, typename... _Args>\
-	constexpr bool name##_##op(_Predicate pred, const _T& a, const _U& b, const _Args&... args)\
+	template<typename _Predicate, typename T, typename U, typename... Args>\
+	constexpr bool name##_##op(_Predicate pred, const T& a, const U& b, const Args&... args)\
 	{ return pred(a,b) op __##prefix_op##_##equal_if_##op(a, args...); }\
 	\
-	template <typename _Predicate, typename _T>\
+	template <typename _Predicate, typename T>\
 	struct __FALCON_LOGICAL_NAME(prefix_op##_##equal_if_##op##_wrapper)\
 	{\
 		_Predicate _pred;\
-		_T _value;\
+		T _value;\
 	\
 		constexpr bool operator()() const\
 		{ return false; }\
 	\
-		template <typename... _Args>\
-		constexpr bool operator()(const _Args&... args) const\
-		{ return __##prefix_op##_##equal_if_##op<_Args...>(_pred, _value, args...); }\
+		template <typename... Args>\
+		constexpr bool operator()(const Args&... args) const\
+		{ return __##prefix_op##_##equal_if_##op<Args...>(_pred, _value, args...); }\
 	};\
 	\
-	template <typename _Predicate, typename _T>\
-	prefix_op##_##equal_if_##op##_wrapper<_Predicate, _T>\
-	make_##prefix_op##_##equal_if_##op(_Predicate pred, _T&& v)\
-	{ return {pred, std::forward<_T>(v)}; }\
+	template <typename _Predicate, typename T>\
+	prefix_op##_##equal_if_##op##_wrapper<_Predicate, T>\
+	make_##prefix_op##_##equal_if_##op(_Predicate pred, T&& v)\
+	{ return {pred, std::forward<T>(v)}; }\
 	\
-	template <typename _Predicate, typename _T>\
-	prefix_op##_##equal_if_##op##_wrapper<_Predicate, _T>\
-	make_##prefix_op##_##equal_if_##op(_T&& v)\
-	{ return {_Predicate(), std::forward<_T>(v)}; }
+	template <typename _Predicate, typename T>\
+	prefix_op##_##equal_if_##op##_wrapper<_Predicate, T>\
+	make_##prefix_op##_##equal_if_##op(T&& v)\
+	{ return {_Predicate(), std::forward<T>(v)}; }
 
 __FALCON_MAKE_LOGICAL_FUNC(or,,)
 __FALCON_MAKE_LOGICAL_FUNC(and,,)
