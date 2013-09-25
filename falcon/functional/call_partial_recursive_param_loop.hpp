@@ -7,182 +7,75 @@
 
 namespace falcon {
 
-template <bool, typename _PackIndexes, std::size_t _NumberArg, std::size_t _Current, std::size_t _End, typename _CurrentResult, typename _Function, typename... _Args>
-struct __call_partial_recursive_param_loop_traits_impl;
-
-template <std::size_t... _Indexes, std::size_t _NumberArg, std::size_t _Current, std::size_t _End, typename _CurrentResult, typename _Function, typename... _Args>
-struct __call_partial_recursive_param_loop_traits_impl<
-	true,
-	parameter_index<_Indexes...>,
-	_NumberArg,
-	_Current,
-	_End,
-	_CurrentResult,
-	_Function,
-	_Args...
->
+template<std::size_t NumberArg, std::size_t N>
+struct __call_partial_recursive_param_loop
 {
-	static const std::size_t __stop = (_Current + _NumberArg - 1 < _End ? _Current + _NumberArg - 1 : _End);
-	typedef typename build_range_parameter_index<
-		_Current,
-		__stop
-	>::type __impl_indexes;
-	typedef typename parameter::result_of<
-		_Function,
-		typename parameter::cat<
-			parameter_pack<_CurrentResult&&>,
-			typename parameter::elements<
-				parameter_pack<_Args&&...>,
-				__impl_indexes
-			>::type
-		>::type
-	>::type __impl_result_type;
-	typedef __call_partial_recursive_param_loop_traits_impl<
-		true,
-		__impl_indexes,
-		_NumberArg,
-		__stop,
-		_End,
-		__impl_result_type,
-		_Function,
-		_Args...
-	> __impl;
-	typedef typename __impl::__result_type __result_type;
+  static_assert(NumberArg > 1, "NumberArg < 2");
 
-	constexpr static __result_type __call(_Function& func, _CurrentResult&& v, _Args&&... args)
-	{
-		return __impl
-		::__call(func,
-				 func(std::forward<_CurrentResult>(v),
-					  arg<_Indexes>(std::forward<_Args>(args)...)...),
-				 std::forward<_Args>(args)...);
-	}
+  template<typename Function, typename... Args,
+    std::size_t Start = (N - 1) * (NumberArg - 1) + NumberArg + 1>
+  static constexpr auto impl(Function func, Args&&... args)
+  -> decltype(call(
+    typename parameter_index_cat<
+      parameter_index<0>,
+      build_range_parameter_index_t<
+        Start,
+        (Start + (NumberArg - 1) < sizeof...(Args) + 1
+          ? Start + (NumberArg - 1)
+          : sizeof...(Args) + 1
+        )
+      >
+    >::type(),
+    func,
+    __call_partial_recursive_param_loop<NumberArg, N-1>
+    ::impl(func, std::forward<Args>(args)...),
+    std::forward<Args>(args)...
+  ))
+  {
+    return call(
+      typename parameter_index_cat<
+        parameter_index<0>,
+        build_range_parameter_index_t<
+          Start,
+          (Start + (NumberArg - 1) < sizeof...(Args) + 1
+            ? Start + (NumberArg - 1)
+            : sizeof...(Args) + 1
+          )
+        >
+      >::type(),
+      func,
+      __call_partial_recursive_param_loop<NumberArg, N-1>
+      ::impl(func, std::forward<Args>(args)...),
+      std::forward<Args>(args)...
+    );
+  }
 };
 
-template <std::size_t... _Indexes, std::size_t _NumberArg, std::size_t _End, typename _Function, typename _CurrentResult, typename... _Args>
-struct __call_partial_recursive_param_loop_traits_impl<true, parameter_index<_Indexes...>, _NumberArg, _End, _End, _CurrentResult, _Function, _Args...>
+template<std::size_t NumberArg>
+struct __call_partial_recursive_param_loop<NumberArg, 0>
 {
-	typedef parameter_index<_Indexes...> __indexes;
-	typedef typename parameter::result_of<
-		_Function,
-		typename parameter::cat<
-			parameter_pack<_CurrentResult&&>,
-			typename parameter::elements<
-				parameter_pack<_Args&&...>,
-				__indexes
-			>::type
-		>::type
-	>::type __result_type;
+  static_assert(NumberArg > 1, "NumberArg < 2");
 
-	typedef __call_partial_recursive_param_loop_traits_impl __impl;
-
-	constexpr static __result_type __call(_Function& func, _CurrentResult&& v, _Args&&... args)
-	{
-		return func(std::forward<_CurrentResult>(v),
-					arg<_Indexes>(std::forward<_Args>(args)...)...);
-	}
+  template<typename Function, typename... Args>
+  static constexpr auto impl(Function func, Args&&... args)
+  -> decltype(call(
+    build_parameter_index_t<
+      (NumberArg < sizeof...(Args) ? NumberArg : sizeof...(Args))
+    >(),
+    func,
+    std::forward<Args>(args)...
+  ))
+  {
+    return call(
+      build_parameter_index_t<
+        (NumberArg < sizeof...(Args) ? NumberArg : sizeof...(Args))
+      >(),
+      func,
+      std::forward<Args>(args)...
+    );
+  }
 };
 
-struct __call_partial_recursive_param_loop_first_call;
-
-template <std::size_t... _Indexes, std::size_t _NumberArg, typename _Function, typename... _Args>
-struct __call_partial_recursive_param_loop_traits_impl<false, parameter_index<_Indexes...>, _NumberArg, 0, 0, _Function, __call_partial_recursive_param_loop_first_call, _Args...>
-{
-	typedef void __result_type;
-
-	constexpr static __result_type __call(_Function&, _Args&&... FALCON_PP_NOT_IDE_PARSER())
-	{}
-};
-
-template <std::size_t _NumberArg, std::size_t _End, typename _Function, typename... _Args>
-struct __call_partial_recursive_param_loop_traits_impl<
-	false,
-	parameter_index<>,
-	_NumberArg,
-	0,
-	_End,
-	__call_partial_recursive_param_loop_first_call,
-	_Function,
-	_Args...
->
-{
-	static_assert(_NumberArg != 0 && !(_NumberArg == 1 && _End > 1), "_NumberArg != 0 && !(_NumberArg == 1 && _End > 1)");
-	static const std::size_t __stop = (_NumberArg < _End ? _NumberArg : _End);
-	typedef typename build_parameter_index<__stop>::type __impl_indexes;
-	typedef typename __call_result_of<
-		_Function,
-		__impl_indexes,
-		_Args...
-	>::__type __result_type;
-
-	constexpr static __result_type __call(_Function& func, _Args&&... args)
-	{
-		return call<_Function&>(__impl_indexes(),
-								func, std::forward<_Args>(args)...);
-	}
-};
-
-template <std::size_t _NumberArg, std::size_t _End, typename _Function, typename... _Args>
-struct __call_partial_recursive_param_loop_traits_impl<
-	true,
-	parameter_index<>,
-	_NumberArg,
-	0,
-	_End,
-	__call_partial_recursive_param_loop_first_call,
-	_Function,
-	_Args...
->
-{
-	typedef __call_partial_recursive_param_loop_traits_impl<
-		false,
-		parameter_index<>,
-		_NumberArg,
-		0,
-		_End,
-		__call_partial_recursive_param_loop_first_call,
-		_Function,
-		_Args...
-	> __basic_type;
-	typedef typename __basic_type::__impl_indexes __impl_indexes;
-	typedef typename __basic_type::__result_type __impl_result_type;
-	typedef __call_partial_recursive_param_loop_traits_impl<
-		true,
-		__impl_indexes,
-		_NumberArg,
-		__basic_type::__stop,
-		_End,
-		__impl_result_type,
-		_Function,
-		_Args...
-	> __next_impl;
-	typedef typename __next_impl::__result_type __result_type;
-
-	constexpr static __result_type __call(_Function& func, _Args&&... args)
-	{
-		return __next_impl::__impl
-		::__call(func,
-				 call<_Function&>(__impl_indexes(),
-								  func, std::forward<_Args>(args)...),
-				 std::forward<_Args>(args)...);
-	}
-};
-
-template<std::size_t _NumberArg, typename _Function, typename... _Args>
-struct __call_partial_recursive_param_loop_traits
-{
-	typedef __call_partial_recursive_param_loop_traits_impl<
-		(sizeof...(_Args) > _NumberArg),
-		parameter_index<>,
-		_NumberArg,
-		0,
-		sizeof...(_Args),
-		__call_partial_recursive_param_loop_first_call,
-		_Function,
-		_Args...
-	> __impl;
-	typedef typename __impl::__result_type __result_type;
-};
 
 /**
  * \brief Call \c func with \c _NumberArg arguments. The return of \c func is the first argument of next call.
@@ -199,10 +92,14 @@ struct __call_partial_recursive_param_loop_traits
  *
  * \ingroup call-arguments
  */
-template<std::size_t _NumberArg, typename _Function, typename... _Args, typename _Traits = __call_partial_recursive_param_loop_traits<_NumberArg, _Function, _Args...>>
-constexpr typename _Traits::__result_type call_partial_recursive_param_loop(_Function func, _Args&&... args)
+template<std::size_t NumberArg, typename Function, typename... Args,
+  std::size_t N = (sizeof...(Args) - 2) / (NumberArg - 1)>
+constexpr auto call_partial_recursive_param_loop(Function func, Args&&... args)
+-> decltype(__call_partial_recursive_param_loop<NumberArg, N>
+            ::impl(func, std::forward<Args>(args)...))
 {
-	return _Traits::__impl::__call(func, std::forward<_Args>(args)...);
+  return __call_partial_recursive_param_loop<NumberArg, N>
+  ::impl(func, std::forward<Args>(args)...);
 }
 
 }

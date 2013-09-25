@@ -17,17 +17,21 @@
 // {};
 //
 
-#include <falcon/functional/call_partial_param_loop.hpp>
+#include <falcon/functional/call_partial_recursive_param_loop.hpp>
+#include <falcon/parameter/parameter_index.hpp>
 #include <iostream>
 
 struct F {
-int operator()(int, int n = 33)
-{ return n; }
+int operator()(int a, int b, int c = 0)
+{
+  std::cout << (a) << ' ' << b << ' ' << c << std::endl;
+  return a+b+c;
+}
 };
 
 int main()
 {
-  return falcon::call_partial_param_loop<1>(F(), 1,3,4);
+  return falcon::call_partial_recursive_param_loop<3>(F(), 1,2,3,4,5,6);
 
 
 //   using sequence = seq<_1,_2,_3>;

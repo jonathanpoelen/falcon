@@ -4,6 +4,8 @@
 #include <utility>
 #include <falcon/functional/call.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
+#include <falcon/parameter/result_pack_of.hpp>
+#include <falcon/parameter/pack_element.hpp>
 
 namespace falcon {
 

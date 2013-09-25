@@ -85,7 +85,9 @@ struct parameter_index_adapter<Functor, call_partial_recursive_param_loop_tag<Nu
   Functor _M_func;
 
   template<typename... Args>
-  constexpr typename __call_partial_recursive_param_loop_traits<NumArg, const Functor, Args...>::__result_type operator()(Args&&... args) const
+  constexpr auto operator()(Args&&... args) const
+  -> decltype(call_partial_recursive_param_loop<NumArg, const Functor&>(
+    _M_func, std::forward<Args>(args)...))
   {
     return call_partial_recursive_param_loop<NumArg, const Functor&>(
       _M_func, std::forward<Args>(args)...);

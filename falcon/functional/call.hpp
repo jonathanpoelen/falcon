@@ -1,24 +1,12 @@
-#ifndef _FALCON_FUNCTIONAL_CALL_HPP
-#define _FALCON_FUNCTIONAL_CALL_HPP
+#ifndef FALCON_FUNCTIONAL_CALL_HPP
+#define FALCON_FUNCTIONAL_CALL_HPP
 
-#include <utility>
-#include <falcon/parameter/result_pack_of.hpp>
-#include <falcon/parameter/pack_element.hpp>
+#include <falcon/parameter/parameter_index.hpp>
 #include <falcon/arg/arg.hpp>
 
-namespace falcon {
+#include <utility>
 
-template <typename _Function, typename _Indexes, typename... _Args>
-struct __call_result_of
-{
-	typedef typename parameter::result_of<
-		_Function,
-		typename parameter::elements<
-			parameter_pack<_Args&&...>,
-			_Indexes
-		>::type
-	>::type __type;
-};
+namespace falcon {
 
 /**
  * \addtogroup call-arguments
@@ -37,7 +25,7 @@ struct __call_result_of
  */
 template <typename _Function, typename... _Args, std::size_t... _Indexes>
 constexpr auto call(const parameter_index<_Indexes...>&,
-			   _Function func, _Args&&... args)
+                    _Function func, _Args&&... args)
 -> decltype(func(arg<_Indexes>(std::forward<_Args>(args)...)...))
 {    return func(arg<_Indexes>(std::forward<_Args>(args)...)...); }
 //@}

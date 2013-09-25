@@ -1,5 +1,5 @@
-#ifndef _FALCON_FUNCTIONAL_SPECIAL_CALL_HPP
-#define _FALCON_FUNCTIONAL_SPECIAL_CALL_HPP
+#ifndef FALCON_FUNCTIONAL_SPECIAL_CALL_HPP
+#define FALCON_FUNCTIONAL_SPECIAL_CALL_HPP
 
 #include <falcon/functional/call.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
@@ -14,55 +14,56 @@ namespace falcon {
  * \brief Specification of \p call()
  * @{
  */
-template<std::size_t _Keep = 1, typename _Function, typename... _Args,
-typename _Indexes = typename keep_parameter_index<
-	first_parameter_index_tag<_Keep>, sizeof...(_Args)
->::type>
-constexpr typename __call_result_of<_Function, _Indexes, _Args...>::__type
-call_first_param(_Function func, _Args&&... args)
-{
-	return call<_Function&>(_Indexes(), func, std::forward<_Args>(args)...);
-}
+template<std::size_t Keep = 1, typename Function, typename... Args,
+  typename _Indexes = typename keep_parameter_index<
+      first_parameter_index_tag<Keep>, sizeof...(Args)
+  >::type
+>
+constexpr auto call_first_param(Function func, Args&&... args)
+-> decltype(call(_Indexes(), func, std::forward<Args>(args)...))
+{    return call(_Indexes(), func, std::forward<Args>(args)...); }
 
-template<std::size_t _Keep = 1, typename _Function, typename... _Args,
-typename _Indexes = typename keep_parameter_index<
-	last_parameter_index_tag<_Keep>, sizeof...(_Args)
->::type>
-constexpr typename __call_result_of<_Function, _Indexes, _Args...>::__type
-call_last_param(_Function func, _Args&&... args)
-{
-	return call<_Function&>(_Indexes(), func, std::forward<_Args>(args)...);
-}
 
-template<std::size_t _Start, std::size_t _Len, typename _Function, typename... _Args,
-typename _Indexes = typename keep_parameter_index<
-	range_parameter_index_tag<_Start, _Len>, sizeof...(_Args)
->::type>
-constexpr typename __call_result_of<_Function, _Indexes, _Args...>::__type
-call_range_param(_Function func, _Args&&... args)
-{
-	return call<_Function&>(_Indexes(), func, std::forward<_Args>(args)...);
-}
+template<std::size_t Keep = 1, typename Function, typename... Args,
+  typename _Indexes = typename keep_parameter_index<
+      last_parameter_index_tag<Keep>, sizeof...(Args)
+  >::type
+>
+constexpr auto call_last_param(Function func, Args&&... args)
+-> decltype(call(_Indexes(), func, std::forward<Args>(args)...))
+{    return call(_Indexes(), func, std::forward<Args>(args)...); }
 
-template<std::size_t _Pos, std::size_t _Ignore = 1, typename _Function, typename... _Args,
-typename _Indexes = typename keep_parameter_index<
-	ignore_parameter_index_tag<_Pos, _Ignore>, sizeof...(_Args)
->::type>
-constexpr typename __call_result_of<_Function, _Indexes, _Args...>::__type
-call_ignore_param(_Function func, _Args&&... args)
-{
-	return call<_Function&>(_Indexes(), func, std::forward<_Args>(args)...);
-}
 
-template<std::size_t _Start = 0, std::size_t _Len = -1, typename _Function, typename... _Args,
-typename _Indexes = typename keep_parameter_index<
-	reverse_parameter_index_tag<_Start, _Len>, sizeof...(_Args)
->::type>
-constexpr typename __call_result_of<_Function, _Indexes, _Args...>::__type
-call_reverse_param(_Function func, _Args&&... args)
-{
-	return call<_Function&>(_Indexes(), func, std::forward<_Args>(args)...);
-}
+template<std::size_t Start, std::size_t Len, typename Function, typename... Args,
+  typename _Indexes = typename keep_parameter_index<
+      range_parameter_index_tag<Start, Len>, sizeof...(Args)
+  >::type
+>
+constexpr auto call_range_param(Function func, Args&&... args)
+-> decltype(call(_Indexes(), func, std::forward<Args>(args)...))
+{    return call(_Indexes(), func, std::forward<Args>(args)...); }
+
+
+template<std::size_t Pos, std::size_t Ignore = 1, typename Function,
+  typename... Args,
+  typename _Indexes = typename keep_parameter_index<
+      ignore_parameter_index_tag<Pos, Ignore>, sizeof...(Args)
+  >::type
+>
+constexpr auto call_ignore_param(Function func, Args&&... args)
+-> decltype(call(_Indexes(), func, std::forward<Args>(args)...))
+{    return call(_Indexes(), func, std::forward<Args>(args)...); }
+
+
+template<std::size_t Start = 0, std::size_t Len = -1, typename Function,
+  typename... Args,
+  typename _Indexes = typename keep_parameter_index<
+      reverse_parameter_index_tag<Start, Len>, sizeof...(Args)
+  >::type
+>
+constexpr auto call_reverse_param(Function func, Args&&... args)
+-> decltype(call(_Indexes(), func, std::forward<Args>(args)...))
+{    return call(_Indexes(), func, std::forward<Args>(args)...); }
 //@}
 //@}
 
