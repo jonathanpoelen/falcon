@@ -80,7 +80,7 @@ public:
 };
 
 template <typename _T>
-pseudo_iterator<_T> make_proxy_iterator(_T CPP_RVALUE_OR_CONST_REFERENCE value) {
+pseudo_iterator<_T> make_pseudo_iterator(_T CPP_RVALUE_OR_CONST_REFERENCE value) {
 	return pseudo_iterator<_T>(FALCON_FORWARD(_T, value));
 }
 

@@ -9,16 +9,16 @@ namespace falcon {
 
 template <typename Function, typename Tuple, std::size_t... Indexes>
 constexpr auto tuple_apply(const parameter_index<Indexes...>&,
-                           Function&& func, Tuple&& t)
+                           Function func, Tuple&& t)
 -> decltype(func(std::get<Indexes>(std::forward<Tuple>(t))...))
 { return func(std::get<Indexes>(std::forward<Tuple>(t))...); }
 
 template <typename Function, typename Tuple,
 	typename Indexes = build_tuple_index_t<typename std::decay<Tuple>::type>
 >
-constexpr auto tuple_apply(Function&& func, Tuple&& t)
--> decltype(tuple_apply(Indexes(), std::forward<Function>(func), std::forward<Tuple>(t)))
-{ return tuple_apply(Indexes(), std::forward<Function>(func), std::forward<Tuple>(t)); }
+constexpr auto tuple_apply(Function func, Tuple&& t)
+-> decltype(tuple_apply(Indexes(), func, std::forward<Tuple>(t)))
+{ return tuple_apply(Indexes(), func, std::forward<Tuple>(t)); }
 
 }
 

@@ -1,89 +1,75 @@
-#ifndef _FALCON_TUPLE_OSTREAM_HPP
-#define _FALCON_TUPLE_OSTREAM_HPP
+#ifndef FALCON_TUPLE_OSTREAM_HPP
+#define FALCON_TUPLE_OSTREAM_HPP
 
+#include <falcon/c++1x/unpack.hpp>
+#include <falcon/tuple/parameter_index.hpp>
+#include <falcon/tuple/detail/septuple.hpp>
+#include <falcon/string/is_character.hpp>
+#include <falcon/string/basic_cstring.hpp>
+
+#include <type_traits>
 #include <iosfwd>
 #include <tuple>
 
 namespace falcon {
+
+template<typename CharT, typename Traits, typename Tuple, typename Sep>
+void __ostream_tuple(parameter_index<>,
+                     std::basic_ostream<CharT, Traits>&,
+                     const Tuple&,
+                     const Sep&)
+{}
+
+template<typename CharT, typename Traits, typename Tuple, typename Sep,
+         std::size_t ... Indexes>
+void __ostream_tuple(parameter_index<0, Indexes...>,
+                     std::basic_ostream<CharT, Traits>& os,
+                     Tuple& t,
+                     const Sep& sep)
+{
+  os << std::get<0>(t);
+  using Remove = typename std::remove_cv<Sep>::type;
+  using RemovePointer = typename std::remove_pointer<Remove>::type;
+  using OptimizeSep = typename std::conditional<
+    (sizeof...(Indexes)
+    && std::is_pointer<Remove>::value
+    && is_character<RemovePointer>::value),
+    const basic_cstring<const CharT>,
+    const Sep&
+  >::type;
+  OptimizeSep osep = sep;
+  CPP1X_UNPACK(os << osep << std::get<Indexes>(t));
+}
+
+template<typename CharT, typename Traits, typename Tuple, typename Sep = const char *>
+std::basic_ostream<CharT, Traits>&
+put_tuple(std::basic_ostream<CharT, Traits>& os, const Tuple& t, const Sep& sep = " ")
+{
+  __ostream_tuple(build_tuple_index_t<Tuple>(), os, t, sep);
+  return os;
+}
+
 namespace tuple {
+
+using ::falcon::put_tuple;
+
 namespace ostream {
 
-template<std::size_t _I, std::size_t _N>
-struct __ostream_tuple_impl
+template<typename CharT, typename Traits, typename Tuple>
+std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& os, const Tuple& t)
 {
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>&
-	impl(std::basic_ostream<_CharT, _Traits>& os,
-			 const std::tuple<_Args...>& t,
-			 const _CharT *sep = ",")
-	{
-		return __ostream_tuple_impl<_I + 1, _N>
-		::impl(os << sep << std::get<_I>(t), t, sep);
-	}
-};
+	return ::falcon::put_tuple(os, t);
+}
 
-template<>
-struct __ostream_tuple_impl<0, 0>
+template<typename CharT, typename Traits, typename Tuple, typename Sep>
+std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& is, ::falcon::__iotuple<Tuple,Sep> t)
 {
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>&
-	impl(std::basic_ostream<_CharT, _Traits>& os,
-			 const std::tuple<_Args...>&,
-			 const _CharT * = ",")
-	{
-		return os;
-	}
-};
-
-template<>
-struct __ostream_tuple_impl<0, 1>
-{
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>&
-	impl(std::basic_ostream<_CharT, _Traits>& os,
-			 const std::tuple<_Args...>& t,
-			 const _CharT * = ",")
-	{
-		return os << std::get<0>(t);
-	}
-};
-
-template<std::size_t _N>
-struct __ostream_tuple_impl<0, _N>
-{
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_ostream<_CharT, _Traits>&
-	impl(std::basic_ostream<_CharT, _Traits>& os,
-			 const std::tuple<_Args...>& t,
-			 const _CharT * sep = ",")
-	{
-		return __ostream_tuple_impl<1, _N>::impl(os << std::get<0>(t), t, sep);
-	}
-};
-
-template<std::size_t _N>
-struct __ostream_tuple_impl<_N, _N>
-: __ostream_tuple_impl<0,0>
-{};
-
-template<typename _CharT, typename _Traits, typename... _Args>
-std::basic_ostream<_CharT, _Traits>&
-operator<<(std::basic_ostream<_CharT, _Traits>& os,
-					 const std::tuple<_Args...>& t)
-{
-	return __ostream_tuple_impl<0, sizeof...(_Args)>::impl(os, t);
+  return ::falcon::put_tuple(is, t.__t, t.__s);
 }
 
 }
-}
-
-template<typename _CharT, typename _Traits, typename... _Args>
-std::basic_ostream<_CharT, _Traits>&
-put_tuple(std::basic_ostream<_CharT, _Traits>& os,
-					const std::tuple<_Args...>& t,
-					const _CharT * sep = ",")
-{
-	return tuple::ostream::__ostream_tuple_impl<0, sizeof...(_Args)>::impl(os, t, sep);
 }
 
 }

@@ -1,7 +1,7 @@
 #ifndef _FALCON_OSTREAM_INSERT_HPP
 #define _FALCON_OSTREAM_INSERT_HPP
 
-#include <iosfwd>
+#include <ios>
 #include <falcon/string/cstringfwd.hpp>
 
 namespace falcon {

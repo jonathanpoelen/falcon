@@ -1,7 +1,7 @@
 #ifndef _FALCON_FLAG_ISTREAM_HPP
 #define _FALCON_FLAG_ISTREAM_HPP
 
-#include <iosfwd>
+#include <ios>
 #include <falcon/flag/flag.hpp>
 
 namespace falcon {

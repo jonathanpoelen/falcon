@@ -7,10 +7,6 @@
 
 namespace std {
   template<size_t I, typename T>
-  T& get(initializer_list<T>& l) noexcept
-  { return l.begin()[I]; }
-
-  template<size_t I, typename T>
   constexpr const T& get(const initializer_list<T>& l) noexcept
   { return l.begin()[I]; }
 

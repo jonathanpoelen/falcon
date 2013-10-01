@@ -1,6 +1,7 @@
 #ifndef FALCON_IOSTREAMULTIBUF_HPP
 #define FALCON_IOSTREAMULTIBUF_HPP
 
+#include <ios>
 #include <streambuf>
 #include <vector>
 

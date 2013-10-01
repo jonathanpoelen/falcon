@@ -1,18 +1,10 @@
 #ifndef TUPLE_DETAIL_ISTUPLE_HPP
 #define TUPLE_DETAIL_ISTUPLE_HPP
 
-#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/type_traits/remove_cv_reference.hpp>
 
 #include <type_traits>
-
-namespace std
-{
-  template<typename, std::size_t>
-  class array;
-  template<typename, typename>
-  class pair;
-}
+#include <tuple>
 
 namespace falcon {
 

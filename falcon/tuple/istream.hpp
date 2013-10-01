@@ -1,91 +1,88 @@
-#ifndef _FALCON_TUPLE_ISTREAM_HPP
-#define _FALCON_TUPLE_ISTREAM_HPP
+#ifndef FALCON_TUPLE_ISTREAM_HPP
+#define FALCON_TUPLE_ISTREAM_HPP
 
+#include <falcon/c++1x/unpack.hpp>
+#include <falcon/istream/ignore.hpp>
+#include <falcon/tuple/parameter_index.hpp>
+#include <falcon/tuple/detail/septuple.hpp>
+
+#include <type_traits>
 #include <iosfwd>
 #include <tuple>
-#include <falcon/istream/ignore.hpp>
 
 namespace falcon {
+
+template<typename CharT, typename Traits, typename Tuple, typename Sep = const CharT*>
+void __istream_tuple(parameter_index<>,
+                     std::basic_istream<CharT, Traits>&,
+                     const Tuple&,
+                     const Sep& = Sep())
+{}
+
+template<typename CharT, typename Traits, typename Tuple, typename Sep>
+void __istream_tuple(parameter_index<0>,
+                     std::basic_istream<CharT, Traits>& is,
+                     Tuple& t,
+                     const Sep&)
+{ is >> std::get<0>(t); }
+
+template<typename CharT, typename Traits, typename Tuple, std::size_t... Indexes>
+void __istream_tuple(parameter_index<Indexes...>,
+                     std::basic_istream<CharT, Traits>& is,
+                     Tuple& t)
+{
+  CPP1X_UNPACK(is >> std::get<Indexes>(t));
+}
+
+template<typename CharT, typename Traits, typename Tuple, typename Sep,
+         std::size_t... Indexes>
+void __istream_tuple(parameter_index<0, Indexes...>,
+                     std::basic_istream<CharT, Traits>& is,
+                     Tuple& t,
+                     const Sep& sep)
+{
+  is >> std::get<0>(t);
+  CPP1X_UNPACK(::falcon::istream::ignore(is, sep) >> std::get<Indexes>(t));
+}
+
+template<typename CharT, typename Traits, typename Tuple>
+std::basic_istream<CharT, Traits>&
+get_tuple(std::basic_istream<CharT, Traits>& is, Tuple&& t)
+{
+  __istream_tuple(build_tuple_index_t<Tuple>(), is, t);
+  return is;
+}
+
+template<typename CharT, typename Traits, typename Tuple, typename Sep>
+std::basic_istream<CharT, Traits>&
+get_tuple(std::basic_istream<CharT, Traits>& is, Tuple&& t, const Sep& sep)
+{
+  __istream_tuple(build_tuple_index_t<Tuple>(), is, t, sep);
+  return is;
+}
+
 namespace tuple {
+
+using ::falcon::get_tuple;
+
 namespace istream {
 
-template<std::size_t _I, std::size_t _N>
-struct __istream_tuple_impl
+template<typename CharT, typename Traits, typename Tuple>
+std::basic_istream<CharT, Traits>&
+operator>>(std::basic_istream<CharT, Traits>& is, Tuple&& t)
 {
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_istream<_CharT, _Traits>&
-	impl(std::basic_istream<_CharT, _Traits>& is,
-			 std::tuple<_Args...>& t, const _CharT *sep = ",")
-	{
-		return __istream_tuple_impl<_I + 1, _N>
-		::impl(ignore(is, sep) >> std::get<_I>(t), t, sep);
-	}
-};
+  return ::falcon::get_tuple(is, t);
+}
 
-template<>
-struct __istream_tuple_impl<0, 0>
+template<typename CharT, typename Traits, typename Tuple, typename Sep>
+std::basic_istream<CharT, Traits>&
+operator>>(std::basic_istream<CharT, Traits>& is, ::falcon::__iotuple<Tuple,Sep> t)
 {
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_istream<_CharT, _Traits>&
-	impl(std::basic_istream<_CharT, _Traits>& is,
-			 std::tuple<_Args...>&,
-			 const _CharT * = ",")
-	{
-		return is;
-	}
-};
-
-template<>
-struct __istream_tuple_impl<0, 1>
-{
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_istream<_CharT, _Traits>&
-	impl(std::basic_istream<_CharT, _Traits>& is,
-			 std::tuple<_Args...>& t,
-			 const _CharT * = ",")
-	{
-		return is >> std::get<0>(t);
-	}
-};
-
-template<std::size_t _N>
-struct __istream_tuple_impl<0, _N>
-{
-	template<typename _CharT, typename _Traits, typename... _Args>
-	static std::basic_istream<_CharT, _Traits>&
-	impl(std::basic_istream<_CharT, _Traits>& is,
-			 std::tuple<_Args...>& t,
-			 const _CharT * sep = ",")
-	{
-		return __istream_tuple_impl<1, _N>::impl(is >> std::get<0>(t), t, sep);
-	}
-};
-
-template<std::size_t _N>
-struct __istream_tuple_impl<_N, _N>
-: __istream_tuple_impl<0,0>
-{};
-
-template<typename _CharT, typename _Traits, typename... _Args>
-std::basic_istream<_CharT, _Traits>&
-operator>>(std::basic_istream<_CharT, _Traits>& is,
-					 std::tuple<_Args...>& t)
-{
-	return __istream_tuple_impl<0, sizeof...(_Args)>::impl(is, t);
+  return ::falcon::get_tuple(is, t.__t, t.__s);
 }
 
 }
 }
-
-template<typename _CharT, typename _Traits, typename... _Args>
-std::basic_istream<_CharT, _Traits>&
-get_tuple(std::basic_istream<_CharT, _Traits>& is,
-					std::tuple<_Args...>& t,
-					const _CharT * sep = ",")
-{
-	return tuple::istream::__istream_tuple_impl<0, sizeof...(_Args)>::impl(is, t, sep);
-}
-
 }
 
 #endif
