@@ -74,7 +74,7 @@ struct __optimal_index_pack<
   >::__value;
   typedef parameter_pack<Elements...> __pack;
   typedef typename __optimal_index_pack<
-    typename parameter::pack_element<
+    typename pack_element<
       __pack,
       typename keep_parameter_index<
         ignore_parameter_index_tag<__max_element>,

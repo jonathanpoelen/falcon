@@ -17,21 +17,25 @@
 // {};
 //
 
-#include <falcon/functional/call_partial_recursive_param_loop.hpp>
-#include <falcon/parameter/parameter_index.hpp>
+#include <falcon/tuple/optimal_tuple.hpp>
+#include <falcon/tuple/ostream.hpp>
 #include <iostream>
 
-struct F {
-int operator()(int a, int b, int c = 0)
-{
-  std::cout << (a) << ' ' << b << ' ' << c << std::endl;
-  return a+b+c;
-}
-};
-
+using namespace falcon::tuple::ostream;
 int main()
 {
-  return falcon::call_partial_recursive_param_loop<3>(F(), 1,2,3,4,5,6);
+  using normal_tuple = std::tuple<int, long, int>;
+  using optimal_tuple = falcon::optimal_tuple<normal_tuple>;
+  std::cout
+  << (sizeof(normal_tuple)) << "\n"
+  << (sizeof(optimal_tuple)) << "\n";
+  normal_tuple t1(1,2,3);
+  optimal_tuple t2 = t1;
+  falcon::put_tuple(std::cout, t2) << "\n";
+  optimal_tuple t3(1,2,3);
+  falcon::put_tuple(std::cout, t3) << "\n";
+  std::cout << t2;
+
 
 
 //   using sequence = seq<_1,_2,_3>;

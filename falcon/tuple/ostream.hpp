@@ -6,6 +6,7 @@
 #include <falcon/tuple/detail/septuple.hpp>
 #include <falcon/string/is_character.hpp>
 #include <falcon/string/basic_cstring.hpp>
+#include <falcon/type_traits/is_tuple.hpp>
 
 #include <type_traits>
 #include <iosfwd>
@@ -56,7 +57,8 @@ using ::falcon::put_tuple;
 namespace ostream {
 
 template<typename CharT, typename Traits, typename Tuple>
-std::basic_ostream<CharT, Traits>&
+typename std::enable_if<::falcon::is_tuple_impl<Tuple>::value
+, std::basic_ostream<CharT, Traits>&>::type
 operator<<(std::basic_ostream<CharT, Traits>& os, const Tuple& t)
 {
 	return ::falcon::put_tuple(os, t);

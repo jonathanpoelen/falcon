@@ -148,7 +148,7 @@ classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib
 
 basic_string_reference<String>(String&, start, size)
 string_reference=basic_string_reference<std::string>
-cstring fonctionnant sur pile (alloue un tableau de char). Hérite de cstring (private/protected). Implémenter à travers cstring par un CharT = char_type<N, CharT = char> ? (changer le nom de char_type)
+cstring fonctionnant sur pile (alloue un tableau de char (fixed_string?)). Hérite de cstring (private/protected). Implémenter à travers cstring par un CharT = char_type<N, CharT = char> ? (changer le nom de char_type)
 
 local_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau (la copie partage le même storage)
 global_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau static
@@ -233,17 +233,19 @@ le basic_stringbuf avec cstring peut être fait sous forme d'un basic_stringbuf 
 
 remove tuple/detail/tuplefwd.hpp
 
-optimal_tuple -> optimal_tuple_traits. optimal_tuple devient une classe qui utilise une tuple (n'en hérite pas)
-
 pas de rvalue pour les foncteurs dans les fonctions de tuple/
 
 ne pas inclure tuple pour {array,list_initializer}_compatibility.hpp
 
-un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avce la local et autre paramètre)
+un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avec la local et autre paramètre)
 
 les fonction de flux entrant doivent pouvoir recevoir des modifiers
 
-ignore() avec cstring
+simplifier ignore() et faire en sorte que la fonction supporte n'importe quel type
+
+optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le cas (voir put_tuple et intrusive stream)
+
+
 
 
 

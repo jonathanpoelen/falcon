@@ -8,7 +8,6 @@
 
 namespace falcon {
 
-
 /**
  * \brief Call functors on tuple
  *
@@ -36,19 +35,15 @@ template <typename Function, typename Operations, typename ArgElements,
 std::size_t... Indexes, std::size_t... IndexesOperation>
 constexpr auto tuple_compose(const parameter_index<Indexes...>&,
                              const parameter_index<IndexesOperation...>&,
-                             Function&& func, Operations&& t, ArgElements&& targs)
+                             Function func, Operations t, ArgElements&& targs)
 -> decltype(func(
-  std::get<IndexesOperation>(
-    std::forward<Operations>(t)
-  )(std::get<Indexes>(
+  std::get<IndexesOperation>(t)(std::get<Indexes>(
     std::forward<ArgElements>(targs)
   )...)...
 ))
 {
   return func(
-    std::get<IndexesOperation>(
-      std::forward<Operations>(t)
-    )(std::get<Indexes>(
+    std::get<IndexesOperation>(t)(std::get<Indexes>(
       std::forward<ArgElements>(targs)
     )...)...
   );
@@ -59,7 +54,7 @@ template <typename Function, typename Operations,
 	typename ArgElements, std::size_t... Indexes>
 constexpr auto
 tuple_compose(const parameter_index<Indexes...>& indexes,
-              Function&& func, Operations&& t, ArgElements&& targs)
+              Function func, Operations t, ArgElements&& targs)
 -> decltype(tuple_compose(indexes,
                           build_tuple_index_t<Operations>(),
                           std::forward<Function>(func),
@@ -76,7 +71,7 @@ tuple_compose(const parameter_index<Indexes...>& indexes,
 
 template <typename Function, typename Operations, typename ArgElements>
 constexpr auto
-tuple_compose(Function&& func, Operations&& t, ArgElements&& targs)
+tuple_compose(Function func, Operations t, ArgElements&& targs)
 -> decltype(tuple_compose(build_tuple_index_t<ArgElements>(),
                           build_tuple_index_t<Operations>(),
                           std::forward<Function>(func),
@@ -93,7 +88,7 @@ tuple_compose(Function&& func, Operations&& t, ArgElements&& targs)
 
 template <typename Function, typename Operations>
 constexpr auto
-tuple_compose(Function&& func, Operations&& t)
+tuple_compose(Function func, Operations t)
 -> decltype(tuple_compose(parameter_index<>(),
                           build_tuple_index_t<Operations>(),
                           std::forward<Function>(func),

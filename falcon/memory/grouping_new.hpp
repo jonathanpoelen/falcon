@@ -1,11 +1,11 @@
 #ifndef FALCON_MEMORY_GROUPING_NEW_HPP
 #define FALCON_MEMORY_GROUPING_NEW_HPP
 
+#include <falcon/parameter/optimal_index_pack.hpp>
 #include <falcon/parameter/parameter_pack.hpp>
-#include <falcon/tuple/optimal_tuple.hpp>
 #include <falcon/memory/construct.hpp>
-#include <falcon/arg/arg.hpp>
 #include <falcon/utility/maker.hpp>
+#include <falcon/arg/arg.hpp>
 
 #include <array>
 #include <tuple>

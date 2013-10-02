@@ -33,24 +33,25 @@ typename ResultTuple = std::tuple<decltype(
     std::declval<FunctionOrFunctions>()
   )
 )...>>
-constexpr ResultTuple tuple_transform(Tuple&& t, FunctionOrFunctions&& funcs, const parameter_index<Indexes...>&)
+constexpr ResultTuple tuple_transform(parameter_index<Indexes...>,
+                                      Tuple&& t, FunctionOrFunctions funcs)
 {
   return ResultTuple(__tuple_transform_get<Indexes>(
     typename is_tuple_impl<FunctionOrFunctions>::type(),
     std::forward<Tuple>(t),
-    std::forward<FunctionOrFunctions>(funcs)
+    funcs
   )...);
 }
 
 template<typename Tuple, typename FunctionOrFunctions>
-constexpr auto tuple_transform(Tuple&& t, FunctionOrFunctions && funcs)
--> decltype(tuple_transform(std::forward<Tuple>(t),
-                            std::forward<FunctionOrFunctions>(funcs),
-                            build_tuple_index_t<Tuple>()))
+constexpr auto tuple_transform(Tuple&& t, FunctionOrFunctions funcs)
+-> decltype(tuple_transform(build_tuple_index_t<Tuple>(),
+                            std::forward<Tuple>(t),
+                            funcs))
 {
-  return tuple_transform(std::forward<Tuple>(t),
-                         std::forward<FunctionOrFunctions>(funcs),
-                         build_tuple_index_t<Tuple>());
+  return tuple_transform(build_tuple_index_t<Tuple>(),
+                         std::forward<Tuple>(t),
+                         funcs);
 }
 
 }

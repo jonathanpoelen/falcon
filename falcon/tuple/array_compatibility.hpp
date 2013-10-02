@@ -31,8 +31,8 @@ struct tuple_element<I, T[N]>
 
 namespace falcon {
 
-template<typename _T, std::size_t _N>
-struct is_tuple_impl<_T[_N]>
+template<typename T, std::size_t N>
+struct is_tuple_impl<T[N]>
 : std::true_type
 {};
 

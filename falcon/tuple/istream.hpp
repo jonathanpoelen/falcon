@@ -5,6 +5,7 @@
 #include <falcon/istream/ignore.hpp>
 #include <falcon/tuple/parameter_index.hpp>
 #include <falcon/tuple/detail/septuple.hpp>
+#include <falcon/type_traits/is_tuple.hpp>
 
 #include <type_traits>
 #include <iosfwd>
@@ -68,7 +69,8 @@ using ::falcon::get_tuple;
 namespace istream {
 
 template<typename CharT, typename Traits, typename Tuple>
-std::basic_istream<CharT, Traits>&
+typename std::enable_if<::falcon::is_tuple_impl<Tuple>::value
+, std::basic_istream<CharT, Traits>&>::type
 operator>>(std::basic_istream<CharT, Traits>& is, Tuple&& t)
 {
   return ::falcon::get_tuple(is, t);

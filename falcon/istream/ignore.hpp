@@ -1,5 +1,5 @@
-#ifndef FALCONISTREAMIGNOREHPP
-#define FALCONISTREAMIGNOREHPP
+#ifndef FALCON_ISTREAM_IGNORE_HPP
+#define FALCON_ISTREAM_IGNORE_HPP
 
 #include <falcon/string/cstringfwd.hpp>
 
