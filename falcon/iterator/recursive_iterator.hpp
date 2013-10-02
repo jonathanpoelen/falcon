@@ -1,7 +1,6 @@
-#ifndef _FALCON_ITERATOR_RECURSIVE_ITERATOR_HPP
-#define _FALCON_ITERATOR_RECURSIVE_ITERATOR_HPP
+#ifndef FALCON_ITERATOR_RECURSIVE_ITERATOR_HPP
+#define FALCON_ITERATOR_RECURSIVE_ITERATOR_HPP
 
-#include <tuple>
 #include <falcon/iterator/iterator_handler.hpp>
 #include <falcon/iterator/subrange_access_iterator.hpp>
 #include <falcon/container/range_access_traits.hpp>
@@ -14,46 +13,48 @@
 #include <falcon/type_traits/dimension.hpp>
 #include <falcon/utility/maker.hpp>
 
+#include <tuple>
+
 namespace falcon {
 namespace iterator {
 
-template <typename _Iterators, typename _ComparisonParameterTag = last_parameter_index_tag<1>>
+template <typename Iterators, typename ComparisonParameterTag = last_parameter_index_tag<1>>
 class basic_recursive_iterator;
 
-template<typename _Iterator, typename _AccessTrait = range_access_traits<typename std::iterator_traits<_Iterator>::value_type>>
+template<typename Iterator, typename AccessTrait = range_access_traits<typename std::iterator_traits<Iterator>::value_type>>
 struct recursive_iterator_access_adapter
 {
-	typedef _Iterator iterator;
-	typedef std::pair<_Iterator, _Iterator> type;
-	typedef _AccessTrait access_traits;
+	typedef Iterator iterator;
+	typedef std::pair<Iterator, Iterator> type;
+	typedef AccessTrait access_traits;
 };
 
-template<typename _Iterator>
+template<typename Iterator>
 struct iterator_to_recursive_iterator_access_adapter
-{ typedef recursive_iterator_access_adapter<_Iterator> type; };
+{ typedef recursive_iterator_access_adapter<Iterator> type; };
 
-template<typename _Iterator, typename _AccessTrait>
+template<typename Iterator, typename AccessTrait>
 struct iterator_to_recursive_iterator_access_adapter
-<recursive_iterator_access_adapter<_Iterator, _AccessTrait>>
-{ typedef recursive_iterator_access_adapter<_Iterator, _AccessTrait> type; };
+<recursive_iterator_access_adapter<Iterator, AccessTrait>>
+{ typedef recursive_iterator_access_adapter<Iterator, AccessTrait> type; };
 
 namespace detail {
 
-	template <typename _ComparisonParameterTag, typename... _Iterators>
+	template <typename ComparisonParameterTag, typename... Iterators>
 	struct recursive_iterator_base
 	{
-		typedef parameter_pack<_Iterators...> __parameter;
+		typedef parameter_pack<Iterators...> __parameter;
 
 		typedef typename parameter::modifier<
 			iterator_to_recursive_iterator_access_adapter,
 			typename parameter::elements<
 				__parameter,
-				typename build_parameter_index<sizeof...(_Iterators) - 1>::type
+				typename build_parameter_index<sizeof...(Iterators) - 1>::type
 			>::type
 		>::type __parameter_adapter;
 
 		typedef typename parameter_element<
-			sizeof...(_Iterators) - 1,
+			sizeof...(Iterators) - 1,
 			__parameter
 		>::type __last_iterator;
 
@@ -72,7 +73,7 @@ namespace detail {
 		typedef typename std::iterator_traits<__last_iterator> __traits;
 
 		typedef typename iterator_handler_types<
-			basic_recursive_iterator<__parameter, _ComparisonParameterTag>,
+			basic_recursive_iterator<__parameter, ComparisonParameterTag>,
 			__tuple,
 			std::forward_iterator_tag,
 			typename __traits::value_type,
@@ -85,88 +86,88 @@ namespace detail {
 }
 
 
-template<typename _Tuple, typename _ParameterAdapter, std::size_t _Idx>
+template<typename Tuple, typename ParameterAdapter, std::size_t Idx>
 struct __recursive_iterator_move
 {
-	static void __update(_Tuple& t)
+	static void __update(Tuple& t)
 	{
-		typedef typename parameter_element<_Idx-1, _ParameterAdapter>::type::access_traits __access;
-		if (std::get<0>(t)) {
-			std::get<_Idx+1>(t).first = __access::begin(*std::get<_Idx>(t).first);
-			std::get<_Idx+1>(t).second = __access::end(*std::get<_Idx>(t).first);
+		typedef typename parameter_element<Idx-1, ParameterAdapter>::type::access_traits __access;
+		if (get<0>(t)) {
+			get<Idx+1>(t).first = __access::begin(*get<Idx>(t).first);
+			get<Idx+1>(t).second = __access::end(*get<Idx>(t).first);
 		}
 	}
 
-	static void __inc(_Tuple& t)
+	static void __inc(Tuple& t)
 	{
-		if (++std::get<_Idx+1>(t).first == std::get<_Idx+1>(t).second)
+		if (++get<Idx+1>(t).first == get<Idx+1>(t).second)
 		{
-			__recursive_iterator_move<_Tuple, _ParameterAdapter, _Idx - 1>::__inc(t);
+			__recursive_iterator_move<Tuple, ParameterAdapter, Idx - 1>::__inc(t);
 			__update(t);
 		}
 	}
 
 	template<typename difference_type>
-	static void __inc(_Tuple& t, difference_type n)
+	static void __inc(Tuple& t, difference_type n)
 	{
-		difference_type diff = std::get<_Idx+1>(t).second - std::get<_Idx+1>(t).first;
+		difference_type diff = get<Idx+1>(t).second - get<Idx+1>(t).first;
 		if (diff < n)
 		{
-			__recursive_iterator_move<_Tuple, _ParameterAdapter, _Idx - 1>::__inc(t, n-diff);
+			__recursive_iterator_move<Tuple, ParameterAdapter, Idx - 1>::__inc(t, n-diff);
 			__update(t);
 		}
 		else
-			std::get<_Idx+1>(t).first += n;
+			get<Idx+1>(t).first += n;
 	}
 };
 
-template<typename _Tuple, typename _ParameterAdapter>
-struct __recursive_iterator_move<_Tuple, _ParameterAdapter, 0>
+template<typename Tuple, typename ParameterAdapter>
+struct __recursive_iterator_move<Tuple, ParameterAdapter, 0>
 {
-	static void __inc(_Tuple& t)
-	{ std::get<0>(t) = ++std::get<1>(t).first != std::get<1>(t).second; }
+	static void __inc(Tuple& t)
+	{ get<0>(t) = ++get<1>(t).first != get<1>(t).second; }
 
 	template<typename difference_type>
-	static void __inc(_Tuple& t, difference_type n)
-	{ std::get<0>(t) = (std::get<1>(t).first += n) < std::get<1>(t).second; }
+	static void __inc(Tuple& t, difference_type n)
+	{ get<0>(t) = (get<1>(t).first += n) < get<1>(t).second; }
 };
 
-template<typename _Result, typename _NullElements>
+template<typename Result, typename NullElements>
 struct __make_imcomplet_tuple_in_recursive_iterator;
 
-template<typename _Result, std::size_t... _Indexes>
+template<typename Result, std::size_t... Indexes>
 struct __make_imcomplet_tuple_in_recursive_iterator<
-	_Result,
-	parameter_index<_Indexes...>
+	Result,
+	parameter_index<Indexes...>
 >
 {
-	template<typename... _Iterators>
-	static _Result __make(_Iterators... elems)
+	template<typename... Iterators>
+	static Result __make(Iterators... elems)
 	{
-		return _Result(
-			false, elems..., typename std::tuple_element<_Indexes, _Result>::type()...
+		return Result(
+			false, elems..., typename std::tuple_element<Indexes, Result>::type()...
 		);
 	}
 };
 
-template<typename _Result, typename _ParameterAdapter, std::size_t _Idx, std::size_t _N>
+template<typename Result, typename ParameterAdapter, std::size_t Idx, std::size_t N>
 struct __make_tuple_in_recursive_iterator
 {
-	template<typename... _Iterators>
-	static _Result __make(_Iterators... elems)
+	template<typename... Iterators>
+	static Result __make(Iterators... elems)
 	{
-		auto& p = arg<sizeof...(_Iterators)-1>(elems...);
+		auto& p = arg<sizeof...(Iterators)-1>(elems...);
 		if (p.first == p.second) {
 			return __make_imcomplet_tuple_in_recursive_iterator<
-				_Result,
+				Result,
 				typename build_range_parameter_index<
 					sizeof...(elems)+1,
-					std::tuple_size<_Result>::value
+					std::tuple_size<Result>::value
 				>::type
 			>::__make(elems...);
 		}
-		typedef typename parameter_element<_Idx, _ParameterAdapter>::type::access_traits __access;
-		return __make_tuple_in_recursive_iterator<_Result, _ParameterAdapter, _Idx+1, _N>
+		typedef typename parameter_element<Idx, ParameterAdapter>::type::access_traits __access;
+		return __make_tuple_in_recursive_iterator<Result, ParameterAdapter, Idx+1, N>
 		::__make(elems..., std::make_pair<>(
 			__access::begin(*p.first),
 			__access::end(*p.first)
@@ -174,40 +175,40 @@ struct __make_tuple_in_recursive_iterator
 	}
 };
 
-template<typename _Result, typename _ParameterAdapter, std::size_t _N>
-struct __make_tuple_in_recursive_iterator<_Result, _ParameterAdapter, _N, _N>
+template<typename Result, typename ParameterAdapter, std::size_t N>
+struct __make_tuple_in_recursive_iterator<Result, ParameterAdapter, N, N>
 {
-	template<typename... _Iterators>
-	static _Result __make(_Iterators... elems)
+	template<typename... Iterators>
+	static Result __make(Iterators... elems)
 	{
-		auto& p = arg<sizeof...(_Iterators)-1>(elems...);
-		return _Result(p.first != p.second, elems...);
+		auto& p = arg<sizeof...(Iterators)-1>(elems...);
+		return Result(p.first != p.second, elems...);
 	}
 };
 
-template<typename _Left>
+template<typename Left>
 struct __make_last_iterator_in_recursive_iterator;
 
-template<typename... _Left>
-struct __make_last_iterator_in_recursive_iterator<parameter_pack<_Left...>>
+template<typename... Left>
+struct __make_last_iterator_in_recursive_iterator<parameter_pack<Left...>>
 {
-	template<typename _Last>
-	static std::tuple<bool, _Left..., std::pair<_Last, _Last>>
-	__make(bool __is_valid, _Last __x)
+	template<typename Last>
+	static std::tuple<bool, Left..., std::pair<Last, Last>>
+	__make(bool __is_valid, Last __x)
 	{
-		return std::tuple<bool, _Left..., std::pair<_Last, _Last>>(
-			__is_valid, _Left()..., std::pair<_Last, _Last>(__x, _Last())
+		return std::tuple<bool, Left..., std::pair<Last, Last>>(
+			__is_valid, Left()..., std::pair<Last, Last>(__x, Last())
 		);
 	}
 };
 
 
-template<typename _Pair>
+template<typename Pair>
 struct __recursive_iterator_last_element_for_compare
 {
-	const _Pair& _p;
+	const Pair& _p;
 
-	__recursive_iterator_last_element_for_compare(const _Pair& x)
+	__recursive_iterator_last_element_for_compare(const Pair& x)
 	: _p(x)
 	{}
 
@@ -215,42 +216,42 @@ struct __recursive_iterator_last_element_for_compare
 	{ return _p.first == x._p.first; }
 };
 
-template<typename _Indexes, typename _Elements, typename _Iterators>
+template<typename Indexes, typename Elements, typename Iterators>
 struct __recursive_iterator_to_tuple_const_reference_type;
 
-template<std::size_t _Index, std::size_t... _Indexes,
-	typename... _Elements, typename _Iterators>
+template<std::size_t Index, std::size_t... Indexes,
+	typename... Elements, typename Iterators>
 struct __recursive_iterator_to_tuple_const_reference_type<
-	parameter_index<_Index, _Indexes...>,
-	parameter_pack<_Elements...>,
-	_Iterators
+	parameter_index<Index, Indexes...>,
+	parameter_pack<Elements...>,
+	Iterators
 >
 : __recursive_iterator_to_tuple_const_reference_type<
-	parameter_index<_Indexes...>,
+	parameter_index<Indexes...>,
 	parameter_pack<
-		_Elements...,
+		Elements...,
 		__recursive_iterator_last_element_for_compare<
-			typename parameter_element<_Index, _Iterators>::type
+			typename parameter_element<Index, Iterators>::type
 		>
 	>,
-	_Iterators>
+	Iterators>
 {};
 
-template<typename... _Elements, typename _Iterators>
+template<typename... Elements, typename Iterators>
 struct __recursive_iterator_to_tuple_const_reference_type<
 	parameter_index<>,
-	parameter_pack<_Elements...>,
-	_Iterators
+	parameter_pack<Elements...>,
+	Iterators
 >
-{ typedef std::tuple<_Elements...> __type; };
+{ typedef std::tuple<Elements...> __type; };
 
-template <typename... _Iterators, typename _ComparisonParameterTag>
-class basic_recursive_iterator<parameter_pack<_Iterators...>, _ComparisonParameterTag>
-: public detail::recursive_iterator_base<_ComparisonParameterTag, _Iterators...>::base
+template <typename... Iterators, typename ComparisonParameterTag>
+class basic_recursive_iterator<parameter_pack<Iterators...>, ComparisonParameterTag>
+: public detail::recursive_iterator_base<ComparisonParameterTag, Iterators...>::base
 {
 	friend class iterator_core_access;
 
-	typedef detail::recursive_iterator_base<_ComparisonParameterTag, _Iterators...> __detail;
+	typedef detail::recursive_iterator_base<ComparisonParameterTag, Iterators...> __detail;
 	typedef typename __detail::__last_iterator __last_iterator;
 	typedef typename __detail::__parameter_adapter __parameter_adapter;
 	typedef typename __detail::__parameter_tuple __parameter_tuple;
@@ -269,7 +270,7 @@ public:
 	basic_recursive_iterator()
 	: __base(__make_imcomplet_tuple_in_recursive_iterator<
 		iterator_type,
-		typename build_range_parameter_index<1, sizeof...(_Iterators)+1>::type
+		typename build_range_parameter_index<1, sizeof...(Iterators)+1>::type
 	>::__make())
 	{}
 
@@ -285,21 +286,21 @@ public:
 	: __base(__make_last_iterator_in_recursive_iterator<
 		typename parameter::elements<
 			__parameter_pair_iterator,
-			typename build_parameter_index<sizeof...(_Iterators)-1>::type
+			typename build_parameter_index<sizeof...(Iterators)-1>::type
 		>::type
 	>::__make(__is_valid, __x))
 	{}
 
 private:
 	typedef __make_tuple_in_recursive_iterator<
-		iterator_type, __parameter_adapter, 0, sizeof...(_Iterators)-1
+		iterator_type, __parameter_adapter, 0, sizeof...(Iterators)-1
 	> __maker_tuple;
 	typedef typename std::tuple_element<0, iterator_type>::type __first_iterator;
 	typedef std::pair<__first_iterator, __first_iterator> __first_pair;
 
 public:
-	template<typename _Container>
-	explicit basic_recursive_iterator(_Container& __cont, int = 1)
+	template<typename Container>
+	explicit basic_recursive_iterator(Container& __cont, int = 1)
 	: __base(__maker_tuple::__make(std::make_pair(begin(__cont), end(__cont))))
 	{}
 
@@ -316,13 +317,13 @@ public:
 	{ return this->base_reference(); }
 
 	bool valid() const
-	{ return std::get<0>(tuple_impl()); }
+	{ return get<0>(tuple_impl()); }
 
 private:
-	static const std::size_t __last_idx = sizeof...(_Iterators);
+	static const std::size_t __last_idx = sizeof...(Iterators);
 
 	const __last_iterator& get_last_iterator() const
-	{ return std::get<__last_idx>(this->base_reference()).first; }
+	{ return get<__last_idx>(this->base_reference()).first; }
 
 	reference dereference() const
 	{ return *get_last_iterator(); }
@@ -341,8 +342,8 @@ private:
 public:
 	typedef typename parameter_index_increment<
 		typename keep_parameter_index<
-			typename parameter_index_or_tag_to_tag<_ComparisonParameterTag>::type,
-			sizeof...(_Iterators)
+			typename parameter_index_or_tag_to_tag<ComparisonParameterTag>::type,
+			sizeof...(Iterators)
 		>::type
 	>::type __tuple_index;
 	typedef typename __recursive_iterator_to_tuple_const_reference_type<
@@ -397,24 +398,24 @@ public:
 };
 
 
-template<std::size_t _Dimension, typename _Iterator, typename _ComparisonParameterTag>
+template<std::size_t Dimension, typename Iterator, typename ComparisonParameterTag>
 struct __recursive_iterator_info
 {
-	template<std::size_t _N, typename _T, typename... _Elements>
+	template<std::size_t N, typename _T, typename... Elements>
 	struct __recursive_iterator_info_impl
-	: __recursive_iterator_info_impl<_N-1, typename subrange_access_iterator<_T>::type, _T, _Elements...>
+	: __recursive_iterator_info_impl<N-1, typename subrange_access_iterator<_T>::type, _T, Elements...>
 	{};
 
-	template<typename _T, typename... _Elements>
-	struct __recursive_iterator_info_impl<0, _T, _Elements...>
+	template<typename _T, typename... Elements>
+	struct __recursive_iterator_info_impl<0, _T, Elements...>
 	{
 		typedef basic_recursive_iterator<
-			typename parameter::reverse<parameter_pack<_T, _Elements...>>::type,
-			_ComparisonParameterTag
+			typename parameter::reverse<parameter_pack<_T, Elements...>>::type,
+			ComparisonParameterTag
 		> type;
 	};
 
-	typedef typename __recursive_iterator_info_impl<_Dimension-1, _Iterator>::type type;
+	typedef typename __recursive_iterator_info_impl<Dimension-1, Iterator>::type type;
 };
 
 
@@ -422,67 +423,67 @@ struct __recursive_iterator_info
  * \brief create begin recursive iterator. End iterator is end first iterator. Use safe_recursive_iterator if iterator can be empty.
  * @{
  */
-template<std::size_t _Dimension, typename _Container,
-	typename _ComparisonParameterTag = last_parameter_index_tag<1>>
+template<std::size_t Dimension, typename Container,
+	typename ComparisonParameterTag = last_parameter_index_tag<1>>
 typename __recursive_iterator_info<
-	_Dimension,
-	typename range_access_iterator<_Container>::type,
-	_ComparisonParameterTag
+	Dimension,
+	typename range_access_iterator<Container>::type,
+	ComparisonParameterTag
 >::type
-recursive_iterator(_Container& container,
-									 _ComparisonParameterTag = _ComparisonParameterTag())
+recursive_iterator(Container& container,
+									 ComparisonParameterTag = ComparisonParameterTag())
 {
 	return typename __recursive_iterator_info<
-		_Dimension,
-		typename range_access_iterator<_Container>::type,
-		_ComparisonParameterTag
+		Dimension,
+		typename range_access_iterator<Container>::type,
+		ComparisonParameterTag
 	>::type(container, 1);
 }
 
-template<typename _Container,
-	typename _ComparisonParameterTag = last_parameter_index_tag<1>>
+template<typename Container,
+	typename ComparisonParameterTag = last_parameter_index_tag<1>>
 typename __recursive_iterator_info<
-	dimension<_Container>::value,
-	typename range_access_iterator<_Container>::type,
-	_ComparisonParameterTag
+	dimension<Container>::value,
+	typename range_access_iterator<Container>::type,
+	ComparisonParameterTag
 >::type
-recursive_iterator(_Container& container,
-									 _ComparisonParameterTag = _ComparisonParameterTag())
+recursive_iterator(Container& container,
+									 ComparisonParameterTag = ComparisonParameterTag())
 {
 	return typename __recursive_iterator_info<
-		dimension<_Container>::value,
-		typename range_access_iterator<_Container>::type,
-		_ComparisonParameterTag
+		dimension<Container>::value,
+		typename range_access_iterator<Container>::type,
+		ComparisonParameterTag
 	>::type(container, 1);
 }
 
-template<std::size_t _Dimension, typename _Iterator,
-	typename _ComparisonParameterTag = last_parameter_index_tag<1>>
-typename __recursive_iterator_info<_Dimension, _Iterator, _ComparisonParameterTag>::type
-recursive_iterator(_Iterator first, _Iterator get_last,
-									 _ComparisonParameterTag = _ComparisonParameterTag())
+template<std::size_t Dimension, typename Iterator,
+	typename ComparisonParameterTag = last_parameter_index_tag<1>>
+typename __recursive_iterator_info<Dimension, Iterator, ComparisonParameterTag>::type
+recursive_iterator(Iterator first, Iterator get_last,
+									 ComparisonParameterTag = ComparisonParameterTag())
 {
 	return typename __recursive_iterator_info<
-		_Dimension,
-		_Iterator,
-		_ComparisonParameterTag
+		Dimension,
+		Iterator,
+		ComparisonParameterTag
 	>::type(first, get_last);
 }
 
-template<typename _Iterator,
-	typename _ComparisonParameterTag = last_parameter_index_tag<1>>
+template<typename Iterator,
+	typename ComparisonParameterTag = last_parameter_index_tag<1>>
 typename __recursive_iterator_info<
-	dimension<_Iterator>::value,
-	_Iterator,
-	_ComparisonParameterTag
+	dimension<Iterator>::value,
+	Iterator,
+	ComparisonParameterTag
 >::type
-recursive_iterator(_Iterator first, _Iterator get_last,
-									 _ComparisonParameterTag = _ComparisonParameterTag())
+recursive_iterator(Iterator first, Iterator get_last,
+									 ComparisonParameterTag = ComparisonParameterTag())
 {
 	return typename __recursive_iterator_info<
-		dimension<_Iterator>::value,
-		_Iterator,
-		_ComparisonParameterTag
+		dimension<Iterator>::value,
+		Iterator,
+		ComparisonParameterTag
 	>::type(first, get_last);
 }
 //@}

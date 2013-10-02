@@ -42,9 +42,9 @@ struct __initialize_optimal_grouping_allocae_tuple
   template<typename Tuple, typename Sizes>
   static void init(Tuple& t, const Sizes& szs)
   {
-    std::get<I+1>(t) = reinterpret_cast<
+    get<I+1>(t) = reinterpret_cast<
       typename std::tuple_element<I+1, Tuple>::type
-    >(static_cast<char*>(std::get<0>(t)) + szs[Idx]);
+    >(static_cast<char*>(get<0>(t)) + szs[Idx]);
     __initialize_optimal_grouping_allocae_tuple<I+1,N,Indexes...>::init(t, szs);
   }
 };
@@ -84,7 +84,7 @@ __optimal_grouping_allocate(parameter_index<Indexes...>, parameter_pack<Elements
     }
   }
 
-  std::get<0>(ret) = allocate(-1u - sz);
+  get<0>(ret) = allocate(-1u - sz);
   __initialize_optimal_grouping_allocae_tuple<0, sizeof...(Elements), Indexes..., 0>
   ::init(ret, szs);
 
@@ -126,9 +126,9 @@ struct __initialize_grouping_allocae_tuple
   template<typename Tuple, typename Sizes>
   static void init(Tuple& t, const Sizes& szs)
   {
-    std::get<I>(t) = reinterpret_cast<
+    get<I>(t) = reinterpret_cast<
       typename std::tuple_element<I, Tuple>::type
-    >(static_cast<char*>(std::get<0>(t)) + szs[I]);
+    >(static_cast<char*>(get<0>(t)) + szs[I]);
     __initialize_grouping_allocae_tuple<I+1,N>::init(t, szs);
   }
 };
@@ -166,7 +166,7 @@ grouping_allocate(Allocate allocate, S... sizes)
     }
   }
 
-  std::get<0>(ret) = allocate(-1u - sz);
+  get<0>(ret) = allocate(-1u - sz);
   __initialize_grouping_allocae_tuple<1, sizeof...(Elements)>::init(ret, szs);
 
   return ret;

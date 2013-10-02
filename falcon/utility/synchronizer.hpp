@@ -1,21 +1,21 @@
 #ifndef FALCON_UTILITY_SYNCHRONIZER_HPP
 #define FALCON_UTILITY_SYNCHRONIZER_HPP
 
-#include <tuple>
-#include <type_traits>
 #include <falcon/c++1x/syntax.hpp>
 #include <falcon/utility/maker.hpp>
-#include <falcon/functional/operators.hpp>
 #include <falcon/functional/placeholder_for_argument.hpp>
-#include <falcon/functional/arguments_wrapper.hpp>
-#include <falcon/tuple/tuple_for_each.hpp>
-#include <falcon/tuple/tuple_compose.hpp>
-#include <falcon/tuple/parameter_pack.hpp>
+#include <falcon/functional/operators.hpp>
 #include <falcon/tuple/to_tuple_reference.hpp>
+#include <falcon/tuple/tuple_for_each.hpp>
+#include <falcon/tuple/parameter_pack.hpp>
+#include <falcon/tuple/tuple_compose.hpp>
 #include <falcon/templates/template_left_accumulator.hpp>
 #include <falcon/parameter/manip.hpp>
 #include <falcon/type_traits/decay_and_strip.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
+
+#include <tuple>
+#include <type_traits>
 
 namespace falcon
 {
@@ -264,6 +264,23 @@ make_synchronizer(_Elements&&... __args)
 		typename decay_and_strip<_Elements>::type...
 	>(std::forward<_Elements>(__args)...);
 }
+
+
+template<std::size_t I, typename... Elements>
+auto get(synchronizer<Elements...>& t) noexcept
+-> decltype(std::get<I>(t))
+{ return std::get<I>(t); }
+
+template<std::size_t I, typename... Elements>
+auto get(const synchronizer<Elements...>& t) noexcept
+-> decltype(std::get<I>(t))
+{ return std::get<I>(t); }
+
+template<std::size_t I, typename... Elements>
+auto get(synchronizer<Elements...>&& t) noexcept
+-> decltype(std::get<I>(std::forward<synchronizer<Elements...>>(t)))
+{ return std::get<I>(std::forward<synchronizer<Elements...>>(t)); }
+
 
 ///Creates a @c synchronizer of lvalue references
 template<typename... _Elements>

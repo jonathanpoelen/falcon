@@ -1,7 +1,6 @@
 #ifndef _FALCON_TUPLE_HPP
 #define _FALCON_TUPLE_HPP
 
-#include <tuple>
 #include <falcon/tuple/iostream.hpp>
 #include <falcon/tuple/optimal_tuple.hpp>
 #include <falcon/tuple/to_tuple_pointer.hpp>

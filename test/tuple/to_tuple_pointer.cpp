@@ -17,9 +17,11 @@ void to_tuple_pointer_test()
 	CHECK_NOTYPENAME_TYPE(tuple_pointer_type, decltype(t2));
 	CHECK_NOTYPENAME_TYPE(tuple_pointer_type, std::tuple<int*, int*>);
 
-	CHECK_EQUAL_VALUE(1, *std::get<0>(t2));
-	CHECK_EQUAL_VALUE(2, *std::get<1>(t2));
-	CHECK_EQUAL_VALUE(1, *std::get<0>(t3));
-	CHECK_EQUAL_VALUE(2, *std::get<1>(t3));
+    using std::get;
+    
+	CHECK_EQUAL_VALUE(1, *get<0>(t2));
+	CHECK_EQUAL_VALUE(2, *get<1>(t2));
+	CHECK_EQUAL_VALUE(1, *get<0>(t3));
+	CHECK_EQUAL_VALUE(2, *get<1>(t3));
 }
 FALCON_TEST_TO_MAIN(to_tuple_pointer_test)

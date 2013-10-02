@@ -17,8 +17,8 @@
 // {};
 //
 
-#include <falcon/tuple/optimal_tuple.hpp>
 #include <falcon/tuple/ostream.hpp>
+#include <falcon/tuple/optimal_tuple.hpp>
 #include <iostream>
 
 using namespace falcon::tuple::ostream;
@@ -59,19 +59,19 @@ int main()
 
 //   auto t = falcon::optimal_grouping_allocate<char, int>(falcon::allocate_wrapper<char>(),
 //                                                         size_t(12), size_t(32));
-//   std::get<1>(t) = const_cast<char*>("plop");
+//   get<1>(t) = const_cast<char*>("plop");
 //   std::cout
-//   << (std::get<0>(t)) << "\n"
-//   << (std::get<1>(t)) << "\n"
-//   << (std::get<2>(t)) << "\n"
+//   << (get<0>(t)) << "\n"
+//   << (get<1>(t)) << "\n"
+//   << (get<2>(t)) << "\n"
 //   ;
 //
 //   auto t2 = falcon::grouping_allocate<char, int>(falcon::allocate_wrapper<char>(),
 //                                                  size_t(12), size_t(32));
-//   std::get<0>(t2) = const_cast<char*>("plop");
+//   get<0>(t2) = const_cast<char*>("plop");
 //   std::cout
-//   << (std::get<0>(t2)) << "\n"
-//   << (std::get<1>(t2)) << "\n"
+//   << (get<0>(t2)) << "\n"
+//   << (get<1>(t2)) << "\n"
 //   ;
 
 //   falcon::grouping_new<int, char>(2, 4);

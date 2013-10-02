@@ -3,9 +3,9 @@
 
 #include <falcon/tuple/parameter_index.hpp>
 #include <falcon/tuple/build_tuple_pointer.hpp>
+#include <falcon/tuple/detail/tuplefwd.hpp>
 
 #include <utility>
-#include <tuple>
 
 namespace falcon {
 
@@ -18,7 +18,7 @@ to_tuple_pointer(parameter_index<Indexes...>, const T & t)
 {
   return build_tuple_const_pointer_t<
     T, parameter_index<Indexes...>
-  >(&std::get<Indexes>(t)...);
+  >(&get<Indexes>(t)...);
 }
 
 /// Pointer tuple element
@@ -30,7 +30,7 @@ to_tuple_pointer(parameter_index<Indexes...>, T& t)
 {
   return build_tuple_pointer_t<
     T, parameter_index<Indexes...>
-  >(&std::get<Indexes>(t)...);
+  >(&get<Indexes>(t)...);
 }
 
 

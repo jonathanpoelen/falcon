@@ -1,9 +1,10 @@
 #ifndef FALCON_FUNCTIONAL_ARGUMENTS_WRAPPER_HPP
 #define FALCON_FUNCTIONAL_ARGUMENTS_WRAPPER_HPP
 
-#include <tuple>
 #include <falcon/tuple/tuple_apply.hpp>
 #include <falcon/type_traits/decay_and_strip.hpp>
+
+#include <tuple>
 
 namespace falcon
 {
@@ -65,6 +66,23 @@ make_arguments(Elements&&... args)
 		typename decay_and_strip<Elements>::type...
 	>(std::forward<Elements>(args)...);
 }
+
+
+template<std::size_t I, typename... Elements>
+auto get(arguments_wrapper<Elements...>& t) noexcept
+-> decltype(std::get<I>(t))
+{ return std::get<I>(t); }
+
+template<std::size_t I, typename... Elements>
+auto get(const arguments_wrapper<Elements...>& t) noexcept
+-> decltype(std::get<I>(t))
+{ return std::get<I>(t); }
+
+template<std::size_t I, typename... Elements>
+auto get(arguments_wrapper<Elements...>&& t) noexcept
+-> decltype(std::get<I>(std::forward<arguments_wrapper<Elements...>>(t)))
+{ return std::get<I>(std::forward<arguments_wrapper<Elements...>>(t)); }
+
 
 template<typename... Elements>
 constexpr arguments_wrapper<Elements&&...>

@@ -5,11 +5,11 @@
 #include <falcon/istream/ignore.hpp>
 #include <falcon/tuple/parameter_index.hpp>
 #include <falcon/tuple/detail/septuple.hpp>
+#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/type_traits/is_tuple.hpp>
 
 #include <type_traits>
 #include <iosfwd>
-#include <tuple>
 
 namespace falcon {
 
@@ -25,14 +25,14 @@ void __istream_tuple(parameter_index<0>,
                      std::basic_istream<CharT, Traits>& is,
                      Tuple& t,
                      const Sep&)
-{ is >> std::get<0>(t); }
+{ is >> get<0>(t); }
 
 template<typename CharT, typename Traits, typename Tuple, std::size_t... Indexes>
 void __istream_tuple(parameter_index<Indexes...>,
                      std::basic_istream<CharT, Traits>& is,
                      Tuple& t)
 {
-  CPP1X_UNPACK(is >> std::get<Indexes>(t));
+  CPP1X_UNPACK(is >> get<Indexes>(t));
 }
 
 template<typename CharT, typename Traits, typename Tuple, typename Sep,
@@ -42,8 +42,8 @@ void __istream_tuple(parameter_index<0, Indexes...>,
                      Tuple& t,
                      const Sep& sep)
 {
-  is >> std::get<0>(t);
-  CPP1X_UNPACK(::falcon::istream::ignore(is, sep) >> std::get<Indexes>(t));
+  is >> get<0>(t);
+  CPP1X_UNPACK(::falcon::istream::ignore(is, sep) >> get<Indexes>(t));
 }
 
 template<typename CharT, typename Traits, typename Tuple>

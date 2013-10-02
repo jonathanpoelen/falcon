@@ -9,8 +9,9 @@ void arguments_wrapper_test()
 	arguments([](int &x, int& y){ x += ++y; });
 	CHECK(a == 3);
 	CHECK(b == 3);
-	CHECK(std::get<0>(arguments) == 3);
-	CHECK(std::get<1>(arguments) == 3);
+    using std::get;
+	CHECK(get<0>(arguments) == 3);
+	CHECK(get<1>(arguments) == 3);
 }
 
 FALCON_TEST_TO_MAIN(arguments_wrapper_test)

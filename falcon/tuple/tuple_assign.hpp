@@ -15,8 +15,8 @@ void __tuple_assign(std::false_type, parameter_index<Indexes...>,
                     Tuple1& t1, Tuple2 && t2, Functor && func)
 {
   CPP1X_UNPACK(
-    std::get<Indexes>(t1)
-    = func(std::get<Indexes>(std::forward<Tuple2>(t2))));
+    get<Indexes>(t1)
+    = func(get<Indexes>(std::forward<Tuple2>(t2))));
 }
 
 template<typename Tuple1, typename Tuple2, typename Functors, std::size_t... Indexes>
@@ -24,9 +24,9 @@ void __tuple_assign(std::true_type, parameter_index<Indexes...>,
                     Tuple1& t1, Tuple2 && t2, Functors && t_func)
 {
   CPP1X_UNPACK(
-    std::get<Indexes>(t1)
-    = std::get<Indexes>(std::forward<Functors>(t_func))
-    (std::get<Indexes>(std::forward<Tuple2>(t2))));
+    get<Indexes>(t1)
+    = get<Indexes>(std::forward<Functors>(t_func))
+    (get<Indexes>(std::forward<Tuple2>(t2))));
 }
 
 

@@ -1,8 +1,9 @@
-#ifndef _FALCONUTILITY_MAKER_HPP
-#define _FALCONUTILITY_MAKER_HPP
+#ifndef FALCONUTILITY_MAKER_HPP
+#define FALCONUTILITY_MAKER_HPP
 
 #if __cplusplus >= 201103L
 # include <falcon/memory/construct_category.hpp>
+# include <falcon/tuple/detail/tuplefwd.hpp>
 # include <utility>
 #endif
 #include <falcon/parameter/parameter_index.hpp>
@@ -47,7 +48,7 @@ struct __delegate_maker<T, dispatch_index_tag>
 {
 	template<std::size_t... Indexes>
 	constexpr static T __dispatch_impl(T&& val, falcon::parameter_index<Indexes...>)
-	{ return T{std::get<Indexes>(std::forward<T>(val))...}; }
+	{ return T{get<Indexes>(std::forward<T>(val))...}; }
 
 	constexpr static T __impl(T&& val)
 	{
@@ -59,7 +60,7 @@ struct __delegate_maker<T, dispatch_index_tag>
 
 	template<std::size_t... Indexes>
 	constexpr static T __dispatch_impl(const T& val, falcon::parameter_index<Indexes...>)
-	{ return T{std::get<Indexes>(std::forward<T>(val))...}; }
+	{ return T{get<Indexes>(std::forward<T>(val))...}; }
 
 	constexpr static T __impl(const T& val)
 	{

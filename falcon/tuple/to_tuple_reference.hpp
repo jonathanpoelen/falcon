@@ -1,11 +1,12 @@
+
 #ifndef FALCON_TUPLE_TO_TUPLE_REFERENCE_HPP
 #define FALCON_TUPLE_TO_TUPLE_REFERENCE_HPP
 
 #include <falcon/tuple/parameter_index.hpp>
 #include <falcon/tuple/build_tuple_reference.hpp>
+#include <falcon/tuple/detail/tuplefwd.hpp>
 
 #include <utility>
-#include <tuple>
 
 namespace falcon {
 
@@ -18,7 +19,7 @@ to_tuple_reference(parameter_index<Indexes...>, const T & t)
 {
   return build_tuple_const_reference_t<
     T, parameter_index<Indexes...>
-  >(std::get<Indexes>(t)...);
+  >(get<Indexes>(t)...);
 }
 
 /// Reference tuple element
@@ -30,7 +31,7 @@ to_tuple_reference(parameter_index<Indexes...>, T& t)
 {
   return build_tuple_reference_t<
     T, parameter_index<Indexes...>
-  >(std::get<Indexes>(t)...);
+  >(get<Indexes>(t)...);
 }
 
 

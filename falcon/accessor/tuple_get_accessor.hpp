@@ -1,26 +1,26 @@
-#ifndef _FALCON_ACCESSOR_TUPLE_GET_ACCESSOR_HPP
-#define _FALCON_ACCESSOR_TUPLE_GET_ACCESSOR_HPP
+#ifndef FALCON_ACCESSOR_TUPLE_GET_ACCESSOR_HPP
+#define FALCON_ACCESSOR_TUPLE_GET_ACCESSOR_HPP
 
-#include <tuple>
+#include <falcon/tuple/detail/tuplefwd.hpp>
 
 namespace falcon {
 
-template <typename _Tuple, std::size_t _N>
+template <typename Tuple, std::size_t N>
 struct tuple_get_accessor
 {
-	typedef typename std::tuple_element<_N, _Tuple>::type& result_type;
-	typedef _Tuple argument_type;
+	typedef typename std::tuple_element<N, Tuple>::type result_type;
+	typedef Tuple argument_type;
 
-	static constexpr std::size_t index = _N;
+	static constexpr std::size_t index = N;
 
-	result_type operator()(_Tuple &t) const
+	result_type& operator()(Tuple &t) const
 	{
-		return std::get<_N>(t);
+		return get<N>(t);
 	}
 
-	constexpr const result_type operator()(const _Tuple &t) const
+	constexpr const result_type& operator()(const Tuple &t) const
 	{
-		return std::get<_N>(t);
+		return get<N>(t);
 	}
 };
 

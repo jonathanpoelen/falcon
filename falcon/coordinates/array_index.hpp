@@ -1,63 +1,67 @@
-#ifndef _FALCON_COORDINATES_ARRAY_INDEX_HPP
-#define _FALCON_COORDINATES_ARRAY_INDEX_HPP
+#ifndef FALCON_COORDINATES_ARRAY_INDEX_HPP
+#define FALCON_COORDINATES_ARRAY_INDEX_HPP
+
+#include <falcon/tuple/detail/tuplefwd.hpp>
+
+#include <array>
 
 namespace falcon {
 namespace coordinates {
 
-template<std::size_t i, std::size_t n, typename _TupleSize, typename _TupleCoord, typename _IndexType>
+template<std::size_t i, std::size_t n, typename TupleSize, typename TupleCoord, typename IndexType>
 struct __tuple_index
 {
-	template<typename _Coef>
-	constexpr static _IndexType __call(const _TupleSize& sizes,
-									   const _TupleCoord& coord,
-									   const _Coef& coef,
-									   _IndexType index)
+	template<typename Coef>
+	constexpr static IndexType __call(const TupleSize& sizes,
+									   const TupleCoord& coord,
+									   const Coef& coef,
+									   IndexType index)
 	{
-		return __tuple_index<i+1, n, _TupleSize, _TupleCoord, _IndexType>
-		::__call(sizes, coord, coef * std::get<i-1>(sizes), index + std::get<i-1>(coord) * coef);
+		return __tuple_index<i+1, n, TupleSize, TupleCoord, IndexType>
+		::__call(sizes, coord, coef * get<i-1>(sizes), index + get<i-1>(coord) * coef);
 	}
 };
 
-template<std::size_t n, typename _TupleSize, typename _TupleCoord, typename _IndexType>
-struct __tuple_index<n, n, _TupleSize, _TupleCoord, _IndexType>
+template<std::size_t n, typename TupleSize, typename TupleCoord, typename IndexType>
+struct __tuple_index<n, n, TupleSize, TupleCoord, IndexType>
 {
-	template<typename _Coef>
-	constexpr static _IndexType __call(const _TupleSize& ,
-									   const _TupleCoord& coord,
-									   const _Coef& coef,
-									   _IndexType index)
-	{ return index + std::get<n-1>(coord) * coef; }
+	template<typename Coef>
+	constexpr static IndexType __call(const TupleSize& ,
+									   const TupleCoord& coord,
+									   const Coef& coef,
+									   IndexType index)
+	{ return index + get<n-1>(coord) * coef; }
 };
 
-template<std::size_t n, typename _TupleSize, typename _TupleCoord, typename _IndexType>
-struct __tuple_index<0, n, _TupleSize, _TupleCoord, _IndexType>
+template<std::size_t n, typename TupleSize, typename TupleCoord, typename IndexType>
+struct __tuple_index<0, n, TupleSize, TupleCoord, IndexType>
 {
-	constexpr static _IndexType __call(const _TupleSize& sizes,
-									   const _TupleCoord& coord)
+	constexpr static IndexType __call(const TupleSize& sizes,
+									   const TupleCoord& coord)
 	{
-		return __tuple_index<2, n, _TupleSize, _TupleCoord, _IndexType>
-		::__call(sizes, coord, std::get<0>(sizes), std::get<0>(coord));
+		return __tuple_index<2, n, TupleSize, TupleCoord, IndexType>
+		::__call(sizes, coord, get<0>(sizes), get<0>(coord));
 	}
 };
 
-template<typename _TupleSize, typename _TupleCoord, typename _IndexType>
-struct __tuple_index<0,1, _TupleSize, _TupleCoord, _IndexType>
+template<typename TupleSize, typename TupleCoord, typename IndexType>
+struct __tuple_index<0,1, TupleSize, TupleCoord, IndexType>
 {
-	constexpr static _IndexType __call(const _TupleSize&,
-									   const _TupleCoord& coord)
-	{ return std::get<0>(coord); }
+	constexpr static IndexType __call(const TupleSize&,
+									   const TupleCoord& coord)
+	{ return get<0>(coord); }
 };
 
-template<typename _TupleSize, typename _TupleCoord, typename _IndexType>
-struct __tuple_index<0,0, _TupleSize, _TupleCoord, _IndexType>
+template<typename TupleSize, typename TupleCoord, typename IndexType>
+struct __tuple_index<0,0, TupleSize, TupleCoord, IndexType>
 {
-	constexpr static _IndexType __call(const _TupleSize&,
-									   const _TupleCoord&)
-	{ return static_cast<_IndexType>(0); }
+	constexpr static IndexType __call(const TupleSize&,
+									   const TupleCoord&)
+	{ return static_cast<IndexType>(0); }
 };
 
-template <typename _T, std::size_t _N, typename _T2, std::size_t _N2, typename _Index = _T>
-constexpr inline _Index array_index(
+template <typename _T, std::size_t _N, typename _T2, std::size_t _N2, typename Index = _T>
+constexpr inline Index array_index(
 	const std::array<_T, _N>& sizes,
 	const std::array<_T2, _N2>& coord)
 {
@@ -66,7 +70,7 @@ constexpr inline _Index array_index(
 		_N2,
 		std::array<_T, _N>,
 		std::array<_T2, _N2>,
-		_Index
+		Index
 	>::__call(sizes, coord);
 }
 

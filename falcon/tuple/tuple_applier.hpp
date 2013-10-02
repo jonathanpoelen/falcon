@@ -24,8 +24,8 @@ public:
 
   template<typename T, typename BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<T>::value>::type>
   auto operator()(T&& t) const
-  -> decltype(tuple_apply<const Functor&>(BuildIndexes(), _M_func, std::forward<T>(t)))
-  { return tuple_apply<const Functor&>(BuildIndexes(), _M_func, std::forward<T>(t)); }
+  -> decltype(tuple_apply(BuildIndexes(), std::declval<const Functor&>(), std::forward<T>(t)))
+  { return tuple_apply(BuildIndexes(), _M_func, std::forward<T>(t)); }
 
   void swap(tuple_applier& other)
   {

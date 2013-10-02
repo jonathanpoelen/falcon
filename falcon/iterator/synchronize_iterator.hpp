@@ -195,7 +195,7 @@ private:
 
 	CPP1X_DELEGATE_FUNCTION(
 		__cmp_iterator(std::false_type) const,
-		to_tuple_reference<>(this->iterators(), typename __detail::__cmp_parameter_index())
+		to_tuple_reference(typename __detail::__cmp_parameter_index(), this->iterators())
 	)
 
 	typedef std::integral_constant<bool, __detail::__cmp_iterators_is_full> __cmp_type;

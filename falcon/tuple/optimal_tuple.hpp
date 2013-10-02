@@ -15,16 +15,19 @@
 namespace falcon {
 
 template<typename Tuple>
-struct optimal_tuple_traits
+struct optimal_tuple_traits;
+
+template<typename... Params>
+struct optimal_tuple_traits<std::tuple<Params...>>
 {
+  typedef std::tuple<Params...> tuple_base;
+
 private:
-  typedef typename tuple_to_parameter_pack<Tuple>::type parameter_pack;
+  typedef typename tuple_to_parameter_pack<tuple_base>::type parameter_pack;
 
   typedef typename optimal_index_pack<parameter_pack>::type indexes;
 
 public:
-  typedef Tuple tuple_base;
-
   typedef typename parameter_pack_to_tuple<
     typename pack_element<parameter_pack, indexes>::type
   >::type tuple;
@@ -36,25 +39,25 @@ public:
 
   template<std::size_t I>
   struct tuple_element
-  { typedef typename std::tuple_element<idx<I>::value, Tuple>::type type; };
+  { typedef typename std::tuple_element<idx<I>::value, tuple_base>::type type; };
 
   struct tuple_size
-  { static const std::size_t value = std::tuple_size<Tuple>::value; };
+  { static const std::size_t value = std::tuple_size<tuple_base>::value; };
 
   constexpr static std::size_t size()
   { return tuple_size::value; }
 
   template<std::size_t I>
-  static typename tuple_element<I>::type& get(Tuple& t)
+  static typename tuple_element<I>::type& get(tuple_base& t)
   { return std::get<idx<I>::value>(t); }
 
   template<std::size_t I>
-  static const typename tuple_element<I>::type& get(const Tuple& t)
+  static const typename tuple_element<I>::type& get(const tuple_base& t)
   { return std::get<idx<I>::value>(t); }
 
   template<std::size_t I>
-  static typename tuple_element<I>::type&& get(Tuple&& t)
-  { return std::get<idx<I>::value>(std::forward<Tuple>(t)); }
+  static typename tuple_element<I>::type&& get(tuple_base&& t)
+  { return std::get<idx<I>::value>(std::forward<tuple_base>(t)); }
 };
 
 
@@ -93,7 +96,7 @@ private:
     void assign(parameter_index<Indexes...>, Tuple2&& t)
     {
       CPP1X_UNPACK(tuple_traits::get<Indexes>(tuple)
-      = std::get<Indexes>(std::forward<Tuple2>(t)));
+      = get<Indexes>(std::forward<Tuple2>(t)));
     }
 
     typename tuple_traits::tuple tuple;
@@ -142,28 +145,28 @@ struct is_tuple_impl<optimal_tuple<Tuple>>
 : std::true_type
 {};
 
-}
-
-namespace std {
-
 template<std::size_t I, typename Tuple>
-auto get(::falcon::optimal_tuple<Tuple>&& t)
--> decltype(::falcon::optimal_tuple_traits<Tuple>::
+auto get(optimal_tuple<Tuple>&& t)
+-> decltype(optimal_tuple_traits<Tuple>::
   template get<I>(std::forward<Tuple>(t._M_impl.tuple)))
 {
-  return ::falcon::optimal_tuple_traits<Tuple>::
+  return optimal_tuple_traits<Tuple>::
   template get<I>(std::forward<Tuple>(t._M_impl.tuple));
 }
 
 template<std::size_t I, typename Tuple>
-auto get(const ::falcon::optimal_tuple<Tuple>& t)
--> decltype(::falcon::optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple))
-{ return ::falcon::optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple); }
+auto get(const optimal_tuple<Tuple>& t)
+-> decltype(optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple))
+{ return optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple); }
 
 template<std::size_t I, typename Tuple>
-auto get(::falcon::optimal_tuple<Tuple>& t)
--> decltype(::falcon::optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple))
-{ return ::falcon::optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple); }
+auto get(optimal_tuple<Tuple>& t)
+-> decltype(optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple))
+{ return optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple); }
+
+}
+
+namespace std {
 
 template<typename Tuple>
 struct tuple_size<::falcon::optimal_tuple<Tuple>>

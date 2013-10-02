@@ -7,10 +7,10 @@
 #include <falcon/string/is_character.hpp>
 #include <falcon/string/basic_cstring.hpp>
 #include <falcon/type_traits/is_tuple.hpp>
+#include <falcon/tuple/detail/tuplefwd.hpp>
 
 #include <type_traits>
 #include <iosfwd>
-#include <tuple>
 
 namespace falcon {
 
@@ -28,7 +28,7 @@ void __ostream_tuple(parameter_index<0, Indexes...>,
                      Tuple& t,
                      const Sep& sep)
 {
-  os << std::get<0>(t);
+  os << get<0>(t);
   using Remove = typename std::remove_cv<Sep>::type;
   using RemovePointer = typename std::remove_pointer<Remove>::type;
   using OptimizeSep = typename std::conditional<
@@ -39,7 +39,7 @@ void __ostream_tuple(parameter_index<0, Indexes...>,
     const Sep&
   >::type;
   OptimizeSep osep = sep;
-  CPP1X_UNPACK(os << osep << std::get<Indexes>(t));
+  CPP1X_UNPACK(os << osep << get<Indexes>(t));
 }
 
 template<typename CharT, typename Traits, typename Tuple, typename Sep = const char *>

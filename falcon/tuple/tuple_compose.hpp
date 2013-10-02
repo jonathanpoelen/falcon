@@ -37,13 +37,13 @@ constexpr auto tuple_compose(const parameter_index<Indexes...>&,
                              const parameter_index<IndexesOperation...>&,
                              Function func, Operations t, ArgElements&& targs)
 -> decltype(func(
-  std::get<IndexesOperation>(t)(std::get<Indexes>(
+  get<IndexesOperation>(t)(get<Indexes>(
     std::forward<ArgElements>(targs)
   )...)...
 ))
 {
   return func(
-    std::get<IndexesOperation>(t)(std::get<Indexes>(
+    get<IndexesOperation>(t)(get<Indexes>(
       std::forward<ArgElements>(targs)
     )...)...
   );

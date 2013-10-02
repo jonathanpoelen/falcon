@@ -1,11 +1,11 @@
 #ifndef FALCON_FUNCTIONAL_DYNAMIC_CALLBACK_HPP
 #define FALCON_FUNCTIONAL_DYNAMIC_CALLBACK_HPP
 
-#include <tuple> //std::get
-#include <utility>
-
 #include <falcon/c++1x/unpack.hpp>
+#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/parameter/parameter_index.hpp>
+
+#include <utility>
 
 namespace falcon {
 
@@ -16,7 +16,7 @@ bool dynamic_callback(parameter_index<Indexes...>, Callbacks callbacks,
   bool test = false;
   CPP1X_UNPACK((
     Indexes == id
-    ? void((test = true, std::get<Indexes>(callbacks)(std::forward<Args>(args)...)))
+    ? void((test = true, get<Indexes>(callbacks)(std::forward<Args>(args)...)))
     : void()
   ));
   return test;
