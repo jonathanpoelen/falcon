@@ -66,7 +66,7 @@ class optimal_tuple
 {
   using indexes = build_parameter_index_t<std::tuple_size<Tuple>::value>;
 public:
-  using tuple_traits = optimal_tuple_traits<Tuple>;
+  using traits_type = optimal_tuple_traits<Tuple>;
 
 private:
   struct spa{};
@@ -77,14 +77,14 @@ private:
 
     template<std::size_t... Indexes, typename... Args>
     opti_impl(spa, parameter_index<Indexes...>, Args&&... args)
-    : tuple(arg<
-      tuple_traits::template idx<Indexes>::value
-    >(std::forward<Args>(args)...)...)
+    : tuple(arg<traits_type::template idx<Indexes>::value>(
+      std::forward<Args>(args)...)...
+    )
     {}
 
     template<std::size_t... Indexes, typename Tuple2>
     opti_impl(spt, parameter_index<Indexes...>, Tuple2&& t)
-    : tuple(tuple_traits::template get<Indexes>(std::forward<Tuple2>(t))...)
+    : tuple(traits_type::template get<Indexes>(std::forward<Tuple2>(t))...)
     {}
 
     template<typename Tuple2>
@@ -95,11 +95,11 @@ private:
     template<typename Tuple2, std::size_t... Indexes>
     void assign(parameter_index<Indexes...>, Tuple2&& t)
     {
-      CPP1X_UNPACK(tuple_traits::get<Indexes>(tuple)
+      CPP1X_UNPACK(traits_type::get<Indexes>(tuple)
       = get<Indexes>(std::forward<Tuple2>(t)));
     }
 
-    typename tuple_traits::tuple tuple;
+    typename traits_type::tuple tuple;
   };
 
 public:
@@ -107,7 +107,7 @@ public:
 
   template<typename Tuple2>
   optimal_tuple(Tuple2&& t)
-  : _M_impl(typename std::conditional<tuple_traits::size() != 1, spt, spa>::type(),
+  : _M_impl(typename std::conditional<traits_type::size() != 1, spt, spa>::type(),
             indexes(), std::forward<Tuple2>(t))
   {}
 

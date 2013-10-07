@@ -2,8 +2,8 @@
 #define FALCON_STRING_CSTRINGFW_HPP
 
 namespace std {
-	template<typename>
-	class char_traits;
+  template<typename>
+  class char_traits;
 }
 
 namespace falcon {
@@ -14,7 +14,7 @@ namespace falcon {
  * @{
  */
 
-template <typename _CharT, typename _Traits = std::char_traits<_CharT> >
+template <typename CharT, typename Traits = std::char_traits<CharT> >
 class basic_cstring;
 
 /// A cstring of @c char

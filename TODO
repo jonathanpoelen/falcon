@@ -231,12 +231,6 @@ un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basi
 le basic_stringbuf qui ne copie pas de string peut être remplacer par un range (sous forme de cstring) recuperer via les intrusive data stream (mieux)
 le basic_stringbuf avec cstring peut être fait sous forme d'un basic_stringbuf avec un allocator spécial pour que std::string soit en réaliter un cstring (ajoute cette spécification dans basic_cstring.hpp)
 
-remove tuple/detail/tuplefwd.hpp
-
-pas de rvalue pour les foncteurs dans les fonctions de tuple/
-
-ne pas inclure tuple pour {array,list_initializer}_compatibility.hpp
-
 un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avec la local et autre paramètre)
 
 les fonction de flux entrant doivent pouvoir recevoir des modifiers
@@ -245,6 +239,13 @@ simplifier ignore() et faire en sorte que la fonction supporte n'importe quel ty
 
 optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le cas (voir put_tuple et intrusive stream)
 
+remove type_traits/is_same.hpp
+
+normal_iterator (wrapper sur un pointeur). Pareil que celui de gcc ? L'utiliser dans cstring
+
+le namespace detail et publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
+
+unordered_vector
 
 
 

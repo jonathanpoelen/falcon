@@ -17,24 +17,13 @@
 // {};
 //
 
-#include <falcon/tuple/ostream.hpp>
-#include <falcon/tuple/optimal_tuple.hpp>
-#include <iostream>
+#include <falcon/string/basic_cstring.hpp>
 
-using namespace falcon::tuple::ostream;
 int main()
 {
-  using normal_tuple = std::tuple<int, long, int>;
-  using optimal_tuple = falcon::optimal_tuple<normal_tuple>;
-  std::cout
-  << (sizeof(normal_tuple)) << "\n"
-  << (sizeof(optimal_tuple)) << "\n";
-  normal_tuple t1(1,2,3);
-  optimal_tuple t2 = t1;
-  falcon::put_tuple(std::cout, t2) << "\n";
-  optimal_tuple t3(1,2,3);
-  falcon::put_tuple(std::cout, t3) << "\n";
-  std::cout << t2;
+  char s[]{'p','l','o','p', 0};
+  falcon::cstring p(s);
+  return "plop" == p;
 
 
 

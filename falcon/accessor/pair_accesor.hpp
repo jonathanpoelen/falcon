@@ -10,14 +10,14 @@ struct first_accessor
 {
 	typedef _PairT pair_type;
 	typedef pair_type argument_type;
-	typedef typename pair_type::first_type& result_type;
+	typedef typename pair_type::first_type result_type;
 
-	result_type operator()(pair_type& pair) const
+	result_type& operator()(pair_type& pair) const
 	{
 		return pair.first;
 	}
 
-	CPP_CONSTEXPR_OR_CONST result_type operator()(const pair_type& pair) const
+	const result_type& operator()(const pair_type& pair) const
 	{
 		return pair.first;
 	}
@@ -28,14 +28,14 @@ struct second_accessor
 {
 	typedef _PairT pair_type;
 	typedef pair_type argument_type;
-	typedef typename pair_type::second_type& result_type;
+	typedef typename pair_type::second_type result_type;
 
-	result_type operator()(pair_type& pair) const
+	result_type& operator()(pair_type& pair) const
 	{
 		return pair.second;
 	}
 
-	CPP_CONSTEXPR_OR_CONST result_type operator()(const pair_type& pair) const
+	const result_type& operator()(const pair_type& pair) const
 	{
 		return pair.second;
 	}
