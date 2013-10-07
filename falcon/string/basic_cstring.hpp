@@ -1,35 +1,61 @@
 #ifndef FALCON_STRING_BASIC_CSTRING_HPP
 #define FALCON_STRING_BASIC_CSTRING_HPP
 
+#include <falcon/config.hpp>
+#include <falcon/c++/noexcept.hpp>
+#include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/boost_or_std.hpp>
+#include <falcon/string/cstringfwd.hpp>
+#include <falcon/type_traits/if.hpp>
+#include <falcon/type_traits/enable_if.hpp>
+#include <falcon/container/range_access.hpp>
+#include <falcon/detail/string_convertion.hpp>
+#include <falcon/iterator/normal_iterator.hpp>
+#include <falcon/ostream/insert.hpp>
+
 #include <iosfwd>
 #include <limits>
-#include <iterator>
-#include <stdexcept>
 #include <utility>
+#include <iterator>
 #include <algorithm>
+#include <stdexcept>
 #if __cplusplus < 201103L
-# include <boost/type_traits/remove_reference.hpp>
-# include <boost/type_traits/remove_const.hpp>
-# include <boost/type_traits/is_integral.hpp>
-# include <boost/type_traits/is_pointer.hpp>
-# include <boost/type_traits/is_array.hpp>
-# include <boost/type_traits/is_const.hpp>
 # include <boost/type_traits/is_same.hpp>
+# include <boost/type_traits/is_const.hpp>
+# include <boost/type_traits/is_array.hpp>
+# include <boost/type_traits/is_pointer.hpp>
+# include <boost/type_traits/is_integral.hpp>
+# include <boost/type_traits/remove_const.hpp>
+# include <boost/type_traits/remove_reference.hpp>
+#else
+# include <type_traits>
 #endif
-#include <falcon/config.hpp>
-#include <falcon/string/cstringfwd.hpp>
-#include <falcon/c++/boost_or_std.hpp>
-#include <falcon/c++/constexpr.hpp>
-#include <falcon/c++/noexcept.hpp>
-#include <falcon/type_traits/integral_constant.hpp>
-#include <falcon/type_traits/enable_if.hpp>
-#include <falcon/type_traits/if.hpp>
-#include <falcon/ostream/insert.hpp> //TODO unless ?
-#include <falcon/detail/string_convertion.hpp>
-#include <falcon/container/range_access.hpp>
-#include <falcon/iterator/normal_iterator.hpp>
 
 namespace falcon {
+
+template<typename CharT, typename Traits, typename String,
+  bool is_pointer_or_array = FALCON_BOOST_OR_STD_NAMESPACE::is_pointer<
+    typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<String>::type
+  >::value || FALCON_BOOST_OR_STD_NAMESPACE::is_array<
+    typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<String>::type
+  >::value
+>
+struct __dispath_cs_cons
+{
+  CPP_CONSTEXPR static CharT * begin(String & s)
+  { return &*::falcon::begin(s); }
+  CPP_CONSTEXPR static size_t size(String & s)
+  { return ::falcon::end(s) - ::falcon::begin(s); }
+};
+
+template<typename CharT, typename Traits, typename String>
+struct __dispath_cs_cons<CharT, Traits, String, true>
+{
+  static CharT * begin(String s)
+  { return s; }
+  static size_t size(String s)
+  { return Traits::length(s); }
+};
 
 struct cstring_constexpr{};
 
@@ -49,10 +75,10 @@ public:
 
   typedef CharT             value_type;
 
-  typedef CharT*            pointer;
-  typedef const value_type* const_pointer;
-  typedef CharT&            reference;
-  typedef const value_type& const_reference;
+  typedef CharT *           pointer;
+  typedef const CharT *     const_pointer;
+  typedef CharT &           reference;
+  typedef const CharT &     const_reference;
   typedef std::size_t       size_type;
   typedef std::ptrdiff_t    difference_type;
 
@@ -64,9 +90,6 @@ public:
 
 public:
   static const size_type npos = static_cast<size_type>(-1ul);
-
-private:
-  static const CharT _S_terminal = CharT();
 
 private:
   pointer m_begin;
@@ -88,42 +111,24 @@ public:
   {}
 #endif
 
-private:
-  template<typename String,
-    bool is_pointer = FALCON_BOOST_OR_STD_NAMESPACE::is_pointer<
-      typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<String>::type
-    >::value
-  >
-  struct __dispath_cons
-  {
-    static pointer begin(String & s)
-    { return &*::falcon::begin(s); }
-    static size_type size(String & s)
-    { return ::falcon::end(s) - ::falcon::begin(s); }
-  };
-
-  template<typename String>
-  struct __dispath_cons<String, false>
-  {
-    static pointer begin(String s)
-    { return s; }
-    static size_type size(String s)
-    { return traits_type::length(s); }
-  };
-
-public:
   template<typename String>
   basic_cstring(String & s) CPP_NOEXCEPT
-  : m_begin(__dispath_cons<String>::begin(s))
-  , m_size(__dispath_cons<String>::size(s))
+  : m_begin(__dispath_cs_cons<CharT, Traits, String>::begin(s))
+  , m_size(__dispath_cs_cons<CharT, Traits, String>::size(s))
   , m_capacity(m_size)
   {}
 
   template<typename String>
   basic_cstring(const String & s) CPP_NOEXCEPT
-  : m_begin(__dispath_cons<const String>::begin(s))
-  , m_size(__dispath_cons<const String>::size(s))
+  : m_begin(__dispath_cs_cons<CharT, Traits, const String>::begin(s))
+  , m_size(__dispath_cs_cons<CharT, Traits, const String>::size(s))
   , m_capacity(m_size)
+  {}
+
+  basic_cstring(pointer s, size_type __size, size_type __capacity) CPP_NOEXCEPT
+  : m_begin(s)
+  , m_size(__size)
+  , m_capacity(__capacity)
   {}
 
   basic_cstring(pointer s, size_type __size) CPP_NOEXCEPT
@@ -138,17 +143,17 @@ public:
   , m_capacity(m_size)
   {}
 
-  basic_cstring(const basic_cstring& str) CPP_NOEXCEPT
-  : m_begin(str.m_begin)
-  , m_size(str.m_size)
-  , m_capacity(str.m_capacity)
+  basic_cstring(const basic_cstring& __str) CPP_NOEXCEPT
+  : m_begin(__str.m_begin)
+  , m_size(__str.m_size)
+  , m_capacity(__str.m_capacity)
   {}
 
-  basic_cstring& operator=(const basic_cstring& str) CPP_NOEXCEPT
+  basic_cstring& operator=(const basic_cstring& __str) CPP_NOEXCEPT
   {
-    m_begin = str.m_begin;
-    m_size = str.m_size;
-    m_capacity = str.m_capacity;
+    m_begin = __str.m_begin;
+    m_size = __str.m_size;
+    m_capacity = __str.m_capacity;
     return *this;
   }
 
@@ -162,6 +167,34 @@ public:
     return *this;
   }
 #endif
+
+  void str(const basic_cstring& __str)
+  {
+    m_begin = __str.m_begin;
+    m_size = __str.m_size;
+    m_capacity = __str.m_capacity;
+  }
+
+  void str(pointer p)
+  {
+    m_begin = p;
+    m_size = traits_type::length(p);
+    m_capacity = m_size;
+  }
+
+  void str(pointer p, size_type __size)
+  {
+    m_begin = p;
+    m_size = __size;
+    m_capacity = __size;
+  }
+
+  void str(pointer p, size_type __size, size_type __capacity)
+  {
+    m_begin = p;
+    m_size = __size;
+    m_capacity = __capacity;
+  }
 
   reference operator[](size_type index) CPP_NOEXCEPT
   { return m_begin[index]; }
@@ -259,19 +292,19 @@ public:
   // Modifiers:
   /**
    *  @brief  Append a string to this string.
-   *  @param str  The string to append.
+   *  @param __str  The string to append.
    *  @return  Reference to this string.
    */
-  basic_cstring& operator+=(const basic_cstring& str)
-  { return this->append(str); }
+  basic_cstring& operator+=(const basic_cstring& __str)
+  { return this->append(__str); }
 
   /**
    *  @brief  Append a string to this string.
-   *  @param str  The string to append.
+   *  @param __str  The string to append.
    *  @return  Reference to this string.
    */
-  basic_cstring& operator+=(const const_cstring& str)
-  { return this->append(str); }
+  basic_cstring& operator+=(const const_cstring& __str)
+  { return this->append(__str); }
 
   /**
    *  @brief  Append a C string.
@@ -304,66 +337,66 @@ public:
 
   /**
    *  @brief  Append a string to this string.
-   *  @param str  The string to append.
+   *  @param __str  The string to append.
    *  @return  Reference to this string.
    *  @throw  std::length_error if new length exceeds @a capacity().
    */
-  basic_cstring& append(const const_cstring& str)
+  basic_cstring& append(const const_cstring& __str)
   {
-    if (this->capacity() < str.size() + this->size()) {
+    if (this->capacity() < __str.size() + this->size()) {
       throw std::length_error("basic_cstring::append");
     }
-    _M_assign(_M_iend(), str.data(), str.size());
-    _M_set_length(str.size());
+    _M_assign(_M_iend(), __str.data(), __str.size());
+    _M_set_length(__str.size());
     return *this;
   }
 
-  basic_cstring& append(const basic_cstring& str)
-  { return append(str._M_const_cstring()); }
+  basic_cstring& append(const basic_cstring& __str)
+  { return append(__str._M_const_cstring()); }
 
   /**
    *  @brief  Append a substring.
-   *  @param str  The string to append.
-   *  @param pos  Index of the first character of str to append.
+   *  @param __str  The string to append.
+   *  @param pos  Index of the first character of __str to append.
    *  @param n  The number of characters to append.
    *  @return  Reference to this string.
    *  @throw  std::out_of_range if @a pos is not a valid index.
-   *  @throw  std::length_error if final size > capacity().
+   *  @throw  std::length_error if final size is not < capacity().
    *
-   *  This function appends @a n characters from @a str
+   *  This function appends @a n characters from @a __str
    *  starting at @a pos to this string.  If @a n is is larger
-   *  than the number of available characters in @a str, the
-   *  remainder of @a str is appended.
+   *  than the number of available characters in @a __str, the
+   *  remainder of @a __str is appended.
    */
-  basic_cstring& append(const const_cstring& str, size_type pos, size_type n)
+  basic_cstring& append(const const_cstring& __str, size_type pos, size_type n)
   {
-    if (pos < str.size()) {
+    if (pos < __str.size()) {
       throw std::out_of_range("basic_cstring::append");
     }
-    n = str._M_limit(pos, n);
+    n = __str._M_limit(pos, n);
     const size_type __len = n + this->size();
-    if (__len > this->capacity())
+    if (__len >= this->capacity())
       throw std::length_error("basic_cstring::append");
-    _M_copy(_M_iend(), str.data() + pos, n);
+    _M_copy(_M_iend(), __str.data() + pos, n);
     _M_set_length(__len);
     return *this;
   }
 
-  basic_cstring& append(const basic_cstring& str, size_type pos, size_type n)
-  { return append(str._M_const_cstring(), pos, n); }
+  basic_cstring& append(const basic_cstring& __str, size_type pos, size_type n)
+  { return append(__str._M_const_cstring(), pos, n); }
 
   /**
    *  @brief  Append a C substring.
    *  @param s  The C string to append.
    *  @param n  The number of characters to append.
    *  @return  Reference to this string.
-   *  @throw  std::length_error if final size > capacity().
+   *  @throw  std::length_error if final size is not < capacity().
    */
   basic_cstring& append(const CharT * s, size_type n)
   {
     const size_type __len = n + this->size();
-    if (__len > this->capacity())
-      throw std::out_of_range("basic_cstring::append");
+    if (__len >= this->capacity())
+      throw std::length_error("basic_cstring::append");
     _M_copy(_M_iend(), s, n);
     _M_set_length(__len);
     return *this;
@@ -382,14 +415,14 @@ public:
    *  @param n  The number of characters to append.
    *  @param c  The character to use.
    *  @return  Reference to this string.
-   *  @throw  std::length_error if final size > capacity().
+   *  @throw  std::length_error if final size is not < capacity().
    *
    *  Appends n copies of c to this string.
    */
   basic_cstring& append(size_type n, CharT c)
   {
     const size_type __len = n + this->size();
-    if (__len > this->capacity())
+    if (__len >= this->capacity())
       throw std::length_error("basic_cstring::append");
     _M_assign(_M_iend(), n, c);
     _M_set_length(__len);
@@ -425,7 +458,7 @@ public:
   void push_back(CharT c)
   {
     const size_type __len = 1 + this->size();
-    if (__len > this->capacity())
+    if (__len >= this->capacity())
       throw std::length_error("basic_cstring::append");
     traits_type::assign(_M_iend(), c);
     _M_set_length(__len);
@@ -433,22 +466,22 @@ public:
 
   /**
    *  @brief  Set value to contents of another string.
-   *  @param  str  Source string to use.
+   *  @param  __str  Source string to use.
    *  @return  Reference to this string.
-   *  @throw  std::length_error if str.size() > capacity().
+   *  @throw  std::length_error if !(__str.size() < capacity()).
    */
-  basic_cstring& assign(const const_cstring& str)
-  { return assign(str._M_data(), str.size()); }
+  basic_cstring& assign(const const_cstring& __str)
+  { return assign(__str._M_data(), __str.size()); }
 
-  basic_cstring & assign(const basic_cstring& str) CPP_NOEXCEPT
-  { return assign(str._M_data(), str.size()); }
+  basic_cstring & assign(const basic_cstring& __str) CPP_NOEXCEPT
+  { return assign(__str._M_data(), __str.size()); }
 
   basic_cstring&  assign(pointer first, pointer last) CPP_NOEXCEPT
   { return assign(first, last - first); }
 
   basic_cstring& assign(pointer s, size_type len) CPP_NOEXCEPT
   {
-    if (len > this->capacity())
+    if (len >= this->capacity())
       throw std::length_error("basic_cstring::append");
     _M_assign(m_begin, s, len);
     _M_set_length(len);
@@ -457,30 +490,30 @@ public:
 
   /**
    *  @brief  Set value to a substring of a string.
-   *  @param str  The string to use.
-   *  @param pos  Index of the first character of str.
+   *  @param __str  The string to use.
+   *  @param pos  Index of the first character of __str.
    *  @param n  Number of characters to use.
    *  @return  Reference to this string.
    *  @throw  std::out_of_range if @a pos is not a valid index.
-   *  @throw  std::length_error if final size > capacity().
+   *  @throw  std::length_error if final size is not < capacity().
    *
-   *  This function sets this string to the substring of @a str
+   *  This function sets this string to the substring of @a __str
    *  consisting of @a n characters at @a pos.  If @a n is
    *  is larger than the number of available characters in @a
-   *  str, the remainder of @a str is used.
+   *  __str, the remainder of @a __str is used.
    */
-  basic_cstring& assign(const const_cstring& str, size_type pos,
+  basic_cstring& assign(const const_cstring& __str, size_type pos,
                         size_type n) CPP_NOEXCEPT
   {
-    const size_type __len = str.size();
+    const size_type __len = __str.size();
     if (__len < pos)
-      throw std::length_error("basic_cstring::append");
-    return assign(str._M_data(), str._M_limit(pos, n));
+      throw std::out_of_range("basic_cstring::append");
+    return assign(__str._M_data(), __str._M_limit(pos, n));
   }
 
-  basic_cstring& assign(const basic_cstring& str, size_type pos,
+  basic_cstring& assign(const basic_cstring& __str, size_type pos,
                         size_type n) CPP_NOEXCEPT
-  { return assign(str._M_const_cstring(), pos, n); }
+  { return assign(__str._M_const_cstring(), pos, n); }
 
   basic_cstring& assign(const value_type * s) CPP_NOEXCEPT
   { return assign(s, s + traits_type::length(s)); }
@@ -490,18 +523,18 @@ public:
    *  @param n  Length of the resulting string.
    *  @param c  The character to use.
    *  @return  Reference to this string.
-   *  @throw  std::length_error if n > capacity().
+   *  @throw  std::length_error if n >= this->capacity().
    *
    *  This function sets the value of this string to @a n copies of
    *  character @a c.
    */
   basic_cstring& assign(size_type n, CharT c)
   {
-    if (capacity() < n) {
+    if (n >= this->capacity()) {
       throw std::length_error("basic_cstring::assign");
     }
     _M_assign(_M_data(), n, c);
-    traits_type::assign(*_M_iend(), _S_terminal);
+    traits_type::assign(*_M_iend(), CharT());
     return *this;
   }
 
@@ -573,50 +606,50 @@ public:
   /**
    *  @brief  Insert value of a string.
    *  @param pos1  Iterator referencing location in string to insert at.
-   *  @param str  The string to insert.
+   *  @param __str  The string to insert.
    *  @return  Reference to this string.
    *  @throw  std::length_error  If new length exceeds @c max_size().
    *
-   *  Inserts value of @a str starting at @a pos1.  If adding
+   *  Inserts value of @a __str starting at @a pos1.  If adding
    *  characters causes the length to exceed max_size(),
    *  length_error is thrown.  The value of the string doesn't
    *  change if an error is thrown.
    */
-  basic_cstring& insert(size_type pos1, const basic_cstring& str)
-  { return this->insert(pos1, str, size_type(0), str.size()); }
+  basic_cstring& insert(size_type pos1, const basic_cstring& __str)
+  { return this->insert(pos1, __str, size_type(0), __str.size()); }
 
-  basic_cstring& insert(size_type pos1, const const_cstring& str)
-  { return this->insert(pos1, str, size_type(0), str.size()); }
+  basic_cstring& insert(size_type pos1, const const_cstring& __str)
+  { return this->insert(pos1, __str, size_type(0), __str.size()); }
 
   /**
    *  @brief  Insert a substring.
    *  @param pos1  Iterator referencing location in string to insert at.
-   *  @param str  The string to insert.
-   *  @param pos2  Start of characters in str to insert.
+   *  @param __str  The string to insert.
+   *  @param pos2  Start of characters in __str to insert.
    *  @param n  Number of characters to insert.
    *  @return  Reference to this string.
    *  @throw  std::length_error  If new length exceeds @c max_size().
    *  @throw  std::out_of_range  If @a pos1 > size() or
-   *  @a pos2 > @a str.size().
+   *  @a pos2 > @a __str.size().
    *
-   *  Starting at @a pos1, insert @a n character of @a str
+   *  Starting at @a pos1, insert @a n character of @a __str
    *  beginning with @a pos2.  If adding characters causes the
    *  length to exceed max_size(), length_error is thrown.  If @a
    *  pos1 is beyond the end of this string or @a pos2 is
-   *  beyond the end of @a str, out_of_range is thrown.  The
+   *  beyond the end of @a __str, out_of_range is thrown.  The
    *  value of the string doesn't change if an error is thrown.
    */
-  basic_cstring& insert(size_type pos1, const const_cstring& str,
+  basic_cstring& insert(size_type pos1, const const_cstring& __str,
                         size_type pos2, size_type n)
   {
-    if (pos2 > str.size())
+    if (pos2 > __str.size())
       throw std::out_of_range("basic_cstring::insert");
-    return this->insert(pos1, str._M_data() + pos2, str._M_limit(pos2, n));
+    return this->insert(pos1, __str._M_data() + pos2, __str._M_limit(pos2, n));
   }
 
-  basic_cstring& insert(size_type pos1, const basic_cstring& str,
+  basic_cstring& insert(size_type pos1, const basic_cstring& __str,
                         size_type pos2, size_type n)
-  { return this->insert(pos1, str._M_const_cstring(), pos2, n); }
+  { return this->insert(pos1, __str._M_const_cstring(), pos2, n); }
 
   /**
    *  @brief  Insert a C substring.
@@ -638,7 +671,7 @@ public:
   {
     if (pos > size())
       throw std::out_of_range("basic_cstring::insert");
-    if (size() + n > capacity())
+    if (size() + n >= this->capacity())
       throw std::length_error("basic_cstring::insert");
     ///TODO
     if (_M_disjunct(s))
@@ -808,59 +841,59 @@ public:
    *  @brief  Replace characters with value from another string.
    *  @param pos  Index of first character to replace.
    *  @param n  Number of characters to be replaced.
-   *  @param str  String to insert.
+   *  @param __str  String to insert.
    *  @return  Reference to this string.
    *  @throw  std::out_of_range  If @a pos is beyond the end of this
    *  string.
    *  @throw  std::length_error  If new length exceeds @c max_size().
    *
    *  Removes the characters in the range [pos,pos+n) from
-   *  this string.  In place, the value of @a str is inserted.
+   *  this string.  In place, the value of @a __str is inserted.
    *  If @a pos is beyond end of string, out_of_range is thrown.
    *  If the length of the result exceeds max_size(), length_error
    *  is thrown.  The value of the string doesn't change if an
    *  error is thrown.
    */
-  basic_cstring& replace(size_type pos, size_type n, const basic_cstring& str)
-  { return this->replace(pos, n, str._M_data(), str.size()); }
+  basic_cstring& replace(size_type pos, size_type n, const basic_cstring& __str)
+  { return this->replace(pos, n, __str._M_data(), __str.size()); }
 
-  basic_cstring& replace(size_type pos, size_type n, const const_cstring& str)
-  { return this->replace(pos, n, str._M_data(), str.size()); }
+  basic_cstring& replace(size_type pos, size_type n, const const_cstring& __str)
+  { return this->replace(pos, n, __str._M_data(), __str.size()); }
 
   /**
    *  @brief  Replace characters with value from another string.
    *  @param pos1  Index of first character to replace.
    *  @param n1  Number of characters to be replaced.
-   *  @param str  String to insert.
-   *  @param pos2  Index of first character of str to use.
-   *  @param n2  Number of characters from str to use.
+   *  @param __str  String to insert.
+   *  @param pos2  Index of first character of __str to use.
+   *  @param n2  Number of characters from __str to use.
    *  @return  Reference to this string.
    *  @throw  std::out_of_range  If @a pos1 > size() or @a pos2 >
-   *  str.size().
+   *  __str.size().
    *  @throw  std::length_error  If new length exceeds @c max_size().
    *
    *  Removes the characters in the range [pos1,pos1 + n) from this
-   *  string.  In place, the value of @a str is inserted.  If @a pos is
+   *  string.  In place, the value of @a __str is inserted.  If @a pos is
    *  beyond end of string, out_of_range is thrown.  If the length of the
    *  result exceeds max_size(), length_error is thrown.  The value of the
    *  string doesn't change if an error is thrown.
    */
-  basic_cstring& replace(size_type pos1, size_type n1, const basic_cstring& str,
+  basic_cstring& replace(size_type pos1, size_type n1, const basic_cstring& __str,
                          size_type pos2, size_type n2)
   {
-    if (pos2 > str.size()) {
+    if (pos2 > __str.size()) {
       throw std::out_of_range("basic_cstring::replace");
     }
-    return this->replace(pos1, n1, str._M_data() + pos2, str._M_limit(pos2, n2));
+    return this->replace(pos1, n1, __str._M_data() + pos2, __str._M_limit(pos2, n2));
   }
 
-  basic_cstring& replace(size_type pos1, size_type n1, const const_cstring& str,
+  basic_cstring& replace(size_type pos1, size_type n1, const const_cstring& __str,
                          size_type pos2, size_type n2)
   {
-    if (pos2 > str.size()) {
+    if (pos2 > __str.size()) {
       throw std::out_of_range("basic_cstring::replace");
     }
-    return this->replace(pos1, n1, str._M_data() + pos2, str._M_limit(pos2, n2));
+    return this->replace(pos1, n1, __str._M_data() + pos2, __str._M_limit(pos2, n2));
   }
 
   /**
@@ -887,7 +920,7 @@ public:
       throw std::out_of_range("basic_cstring::replace");
     }
     n1 = _M_limit(pos, n1);
-    if (n1 + n2 > capacity()) {
+    if (n1 + n2  >= this->capacity()) {
       throw std::length_error("basic_cstring::replace");
     }
     //TODO
@@ -960,20 +993,20 @@ public:
    *  @brief  Replace range of characters with string.
    *  @param first  Iterator referencing start of range to replace.
    *  @param last  Iterator referencing end of range to replace.
-   *  @param str  String value to insert.
+   *  @param __str  String value to insert.
    *  @return  Reference to this string.
    *  @throw  std::length_error  If new length exceeds @c max_size().
    *
    *  Removes the characters in the range [first,last).  In place,
-   *  the value of @a str is inserted.  If the length of result
+   *  the value of @a __str is inserted.  If the length of result
    *  exceeds max_size(), length_error is thrown.  The value of
    *  the string doesn't change if an error is thrown.
    */
-  basic_cstring& replace(iterator first, iterator last, const basic_cstring& str)
-  { return this->replace(first, last, str._M_data(), str.size()); }
+  basic_cstring& replace(iterator first, iterator last, const basic_cstring& __str)
+  { return this->replace(first, last, __str._M_data(), __str.size()); }
 
-  basic_cstring& replace(iterator first, iterator last, const const_cstring& str)
-  { return this->replace(first, last, str._M_data(), str.size()); }
+  basic_cstring& replace(iterator first, iterator last, const const_cstring& __str)
+  { return this->replace(first, last, __str._M_data(), __str.size()); }
 
   /**
    *  @brief  Replace range of characters with C substring.
@@ -1112,7 +1145,7 @@ public:
    *  This is a handle to internal data.  Do not modify or dire things may
    *  happen.
    */
-  const_pointer c_str() const CPP_NOEXCEPT
+  const_pointer c___str() const CPP_NOEXCEPT
   { return m_begin; }
 
   /**
@@ -1124,11 +1157,11 @@ public:
   const_pointer data() const CPP_NOEXCEPT
   { return m_begin; }
 
-  void swap(basic_cstring& str) CPP_NOEXCEPT
+  void swap(basic_cstring& __str) CPP_NOEXCEPT
   {
     using std::swap;
-    swap(m_begin, str.m_begin);
-    swap(m_size, str.m_size);
+    swap(m_begin, __str.m_begin);
+    swap(m_size, __str.m_size);
   }
 
   iterator begin() CPP_NOEXCEPT
@@ -1199,19 +1232,19 @@ public:
 
   /**
    *  @brief  Find position of a string.
-   *  @param str  String to locate.
+   *  @param __str  String to locate.
    *  @param pos  Index of character to search from (default 0).
    *  @return  Index of start of first occurrence.
    *
-   *  Starting from @a pos, searches forward for value of @a str within
+   *  Starting from @a pos, searches forward for value of @a __str within
    *  this string.  If found, returns the index where it begins.  If not
    *  found, returns npos.
    */
-  size_type find(const basic_cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return _M_const_cstring().find(str, pos); }
+  size_type find(const basic_cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return _M_const_cstring().find(__str, pos); }
 
-  size_type find(const const_cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return _M_const_cstring().find(str, pos); }
+  size_type find(const const_cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return _M_const_cstring().find(__str, pos); }
 
   /**
    *  @brief  Find position of a C string.
@@ -1255,19 +1288,19 @@ public:
 
   /**
    *  @brief  Find last position of a string.
-   *  @param str  String to locate.
+   *  @param __str  String to locate.
    *  @param pos  Index of character to search back from (default end).
    *  @return  Index of start of last occurrence.
    *
-   *  Starting from @a pos, searches backward for value of @a str within
+   *  Starting from @a pos, searches backward for value of @a __str within
    *  this string.  If found, returns the index where it begins.  If not
    *  found, returns npos.
    */
-  size_type rfind(const basic_cstring& str, size_type pos = npos) const CPP_NOEXCEPT
-  { return _M_const_cstring().rfind(str, pos); }
+  size_type rfind(const basic_cstring& __str, size_type pos = npos) const CPP_NOEXCEPT
+  { return _M_const_cstring().rfind(__str, pos); }
 
-  size_type rfind(const const_cstring& str, size_type pos = npos) const CPP_NOEXCEPT
-  { return _M_const_cstring().rfind(str, pos); }
+  size_type rfind(const const_cstring& __str, size_type pos = npos) const CPP_NOEXCEPT
+  { return _M_const_cstring().rfind(__str, pos); }
 
   /**
    *  @brief  Find last position of a C string.
@@ -1311,19 +1344,19 @@ public:
 
   /**
    *  @brief  Find position of a character of string.
-   *  @param str  String containing characters to locate.
+   *  @param __str  String containing characters to locate.
    *  @param pos  Index of character to search from (default 0).
    *  @return  Index of first occurrence.
    *
    *  Starting from @a pos, searches forward for one of the characters of
-   *  @a str within this string.  If found, returns the index where it was
+   *  @a __str within this string.  If found, returns the index where it was
    *  found.  If not found, returns npos.
    */
-  size_type find_first_of(const basic_cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_first_of(str, pos); }
+  size_type find_first_of(const basic_cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return _M_const_cstring().find_first_of(__str, pos); }
 
-  size_type find_first_of(const const_cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_first_of(str, pos); }
+  size_type find_first_of(const const_cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return _M_const_cstring().find_first_of(__str, pos); }
 
   /**
    *  @brief  Find position of a character of C string.
@@ -1355,21 +1388,21 @@ public:
 
   /**
    *  @brief  Find last position of a character of string.
-   *  @param str  String containing characters to locate.
+   *  @param __str  String containing characters to locate.
    *  @param pos  Index of character to search back from (default end).
    *  @return  Index of last occurrence.
    *
    *  Starting from @a pos, searches backward for one of the characters of
-   *  @a str within this string.  If found, returns the index where it was
+   *  @a __str within this string.  If found, returns the index where it was
    *  found.  If not found, returns npos.
    */
-  size_type find_last_of(const basic_cstring& str,
+  size_type find_last_of(const basic_cstring& __str,
                          size_type pos = npos) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_last_of(str, pos); }
+  { return _M_const_cstring().find_last_of(__str, pos); }
 
-  size_type find_last_of(const const_cstring& str,
+  size_type find_last_of(const const_cstring& __str,
                          size_type pos = npos) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_last_of(str, pos); }
+  { return _M_const_cstring().find_last_of(__str, pos); }
 
   /**
    *  @brief  Find last position of a character of C substring.
@@ -1415,21 +1448,21 @@ public:
 
   /**
    *  @brief  Find position of a character not in string.
-   *  @param str  String containing characters to avoid.
+   *  @param __str  String containing characters to avoid.
    *  @param pos  Index of character to search from (default 0).
    *  @return  Index of first occurrence.
    *
    *  Starting from @a pos, searches forward for a character not contained
-   *  in @a str within this string.  If found, returns the index where it
+   *  in @a __str within this string.  If found, returns the index where it
    *  was found.  If not found, returns npos.
    */
-  size_type find_first_not_of(const basic_cstring& str,
+  size_type find_first_not_of(const basic_cstring& __str,
                               size_type pos = 0) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_first_not_of(str, pos); }
+  { return _M_const_cstring().find_first_not_of(__str, pos); }
 
-  size_type find_first_not_of(const const_cstring& str,
+  size_type find_first_not_of(const const_cstring& __str,
                               size_type pos = 0) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_first_not_of(str, pos); }
+  { return _M_const_cstring().find_first_not_of(__str, pos); }
 
   /**
    *  @brief  Find position of a character not in C substring.
@@ -1473,21 +1506,21 @@ public:
 
   /**
    *  @brief  Find last position of a character not in string.
-   *  @param str  String containing characters to avoid.
+   *  @param __str  String containing characters to avoid.
    *  @param pos  Index of character to search back from (default end).
    *  @return  Index of last occurrence.
    *
    *  Starting from @a pos, searches backward for a character not
-   *  contained in @a str within this string.  If found, returns the index
+   *  contained in @a __str within this string.  If found, returns the index
    *  where it was found.  If not found, returns npos.
    */
-  size_type find_last_not_of(const basic_cstring& str,
+  size_type find_last_not_of(const basic_cstring& __str,
                              size_type pos = npos) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_last_not_of(str, pos); }
+  { return _M_const_cstring().find_last_not_of(__str, pos); }
 
-  size_type find_last_not_of(const const_cstring& str,
+  size_type find_last_not_of(const const_cstring& __str,
                              size_type pos = npos) const CPP_NOEXCEPT
-  { return _M_const_cstring().find_last_not_of(str, pos); }
+  { return _M_const_cstring().find_last_not_of(__str, pos); }
 
   /**
    *  @brief  Find last position of a character not in C substring.
@@ -1551,74 +1584,74 @@ public:
 
   /**
    *  @brief  Compare to a string.
-   *  @param str  String to compare against.
+   *  @param __str  String to compare against.
    *  @return  Integer < 0, 0, or > 0.
    *
-   *  Returns an integer < 0 if this string is ordered before @a str, 0 if
+   *  Returns an integer < 0 if this string is ordered before @a __str, 0 if
    *  their values are equivalent, or > 0 if this string is ordered after
-   *  @a str.  Determines the effective length rlen of the strings to
-   *  compare as the smallest of size() and str.size().  The function
+   *  @a __str.  Determines the effective length rlen of the strings to
+   *  compare as the smallest of size() and __str.size().  The function
    *  then compares the two strings by calling traits::compare(data(),
-   *  str.data(),rlen).  If the result of the comparison is nonzero returns
+   *  __str.data(),rlen).  If the result of the comparison is nonzero returns
    *  it, otherwise the shorter one is ordered first.
    */
-  int compare(const basic_cstring& str) const CPP_NOEXCEPT
-  { return _M_const_cstring().compare(str); }
+  int compare(const basic_cstring& __str) const CPP_NOEXCEPT
+  { return _M_const_cstring().compare(__str); }
 
-  int compare(const const_cstring& str) const CPP_NOEXCEPT
-  { return _M_const_cstring().compare(str); }
+  int compare(const const_cstring& __str) const CPP_NOEXCEPT
+  { return _M_const_cstring().compare(__str); }
 
   /**
    *  @brief  Compare substring to a string.
    *  @param pos  Index of first character of substring.
    *  @param n  Number of characters in substring.
-   *  @param str  String to compare against.
+   *  @param __str  String to compare against.
    *  @return  Integer < 0, 0, or > 0.
    *
    *  Form the substring of this string from the @a n characters starting
    *  at @a pos.  Returns an integer < 0 if the substring is ordered
-   *  before @a str, 0 if their values are equivalent, or > 0 if the
-   *  substring is ordered after @a str.  Determines the effective length
+   *  before @a __str, 0 if their values are equivalent, or > 0 if the
+   *  substring is ordered after @a __str.  Determines the effective length
    *  rlen of the strings to compare as the smallest of the length of the
-   *  substring and @a str.size().  The function then compares the two
-   *  strings by calling traits::compare(substring.data(),str.data(),rlen).
+   *  substring and @a __str.size().  The function then compares the two
+   *  strings by calling traits::compare(substring.data(),__str.data(),rlen).
    *  If the result of the comparison is nonzero returns it, otherwise the
    *  shorter one is ordered first.
    */
-  int compare(size_type pos, size_type n, const basic_cstring& str) const
-  { return _M_const_cstring().compare(pos, n, str); }
+  int compare(size_type pos, size_type n, const basic_cstring& __str) const
+  { return _M_const_cstring().compare(pos, n, __str); }
 
-  int compare(size_type pos, size_type n, const const_cstring& str) const
-  { return _M_const_cstring().compare(pos, n, str); }
+  int compare(size_type pos, size_type n, const const_cstring& __str) const
+  { return _M_const_cstring().compare(pos, n, __str); }
 
   /**
    *  @brief  Compare substring to a substring.
    *  @param pos1  Index of first character of substring.
    *  @param n1  Number of characters in substring.
-   *  @param str  String to compare against.
-   *  @param pos2  Index of first character of substring of str.
-   *  @param n2  Number of characters in substring of str.
+   *  @param __str  String to compare against.
+   *  @param pos2  Index of first character of substring of __str.
+   *  @param n2  Number of characters in substring of __str.
    *  @return  Integer < 0, 0, or > 0.
    *
    *  Form the substring of this string from the @a n1 characters starting
-   *  at @a pos1.  Form the substring of @a str from the @a n2 characters
+   *  at @a pos1.  Form the substring of @a __str from the @a n2 characters
    *  starting at @a pos2.  Returns an integer < 0 if this substring is
-   *  ordered before the substring of @a str, 0 if their values are
+   *  ordered before the substring of @a __str, 0 if their values are
    *  equivalent, or > 0 if this substring is ordered after the substring
-   *  of @a str.  Determines the effective length rlen of the strings
+   *  of @a __str.  Determines the effective length rlen of the strings
    *  to compare as the smallest of the lengths of the substrings.  The
    *  function then compares the two strings by calling
-   *  traits::compare(substring.data(),str.substr(pos2,n2).data(),rlen).
+   *  traits::compare(substring.data(),__str.substr(pos2,n2).data(),rlen).
    *  If the result of the comparison is nonzero returns it, otherwise the
    *  shorter one is ordered first.
    */
-  int compare(size_type pos1, size_type n1, const basic_cstring& str,
+  int compare(size_type pos1, size_type n1, const basic_cstring& __str,
               size_type pos2, size_type n2) const
-  { return _M_const_cstring().compare(pos1, n1, str, pos2, n2); }
+  { return _M_const_cstring().compare(pos1, n1, __str, pos2, n2); }
 
-  int compare(size_type pos1, size_type n1, const const_cstring& str,
+  int compare(size_type pos1, size_type n1, const const_cstring& __str,
               size_type pos2, size_type n2) const
-  { return _M_const_cstring().compare(pos1, n1, str, pos2, n2); }
+  { return _M_const_cstring().compare(pos1, n1, __str, pos2, n2); }
 
   /**
    *  @brief  Compare to a C string.
@@ -1706,7 +1739,7 @@ private:
   void _M_set_length(size_type len)
   {
     m_size = len;
-    traits_type::assign(_M_iend(), _S_terminal);
+    traits_type::assign(*_M_iend(), CharT());
   }
 
   static void _M_assign(CharT* d, size_type n, CharT c)
@@ -1727,11 +1760,18 @@ private:
   }
 
   bool _M_disjunct(const CharT * s)
-  { return false; } //TODO
+  {
+    return (std::less<const CharT*>()(s, _M_data())
+    || std::less<const CharT*>()(_M_data() + this->size(), s));
+  }
 
-  basic_cstring& _M_replace_safe(size_type pos1, size_type pos2,
-                                 const CharT * s, size_type n)
-  { return *this; } //TODO
+  basic_cstring& _M_replace_safe(size_type pos1, size_type n1,
+                                 const CharT * s, size_type n2)
+  {
+    (void)n1;//_M_mutate(pos1, n1, n2); //TODO
+    _M_copy(_M_data() + pos1, s, n2);
+    return *this;
+  }
 
   // When __n = 1 way faster than the general multichar
   // traits_type::copy/move/assign.
@@ -1843,58 +1883,16 @@ public:
   , m_size(N - 1)
   {}
 
-private:
-  template<typename String,
-    bool is_pointer = FALCON_BOOST_OR_STD_NAMESPACE::is_pointer<
-      typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<String>::type
-    >::value
-  >
-  struct __dispath_cons
-  {
-    CPP_CONSTEXPR static pointer begin(String & s)
-    { return &*::falcon::begin(s); }
-    CPP_CONSTEXPR static size_type size(String & s)
-    { return ::falcon::end(s) - ::falcon::begin(s); }
-  };
-
-  template<typename String>
-  struct __dispath_cons<String, true>
-  {
-    static pointer begin(String s)
-    { return s; }
-    static size_type size(String s)
-    { return traits_type::length(s); }
-  };
-
-//   template<typename CharT2>
-//   struct __dispath_cons<basic_cstring<CharT2>, false>
-//   {
-//     static pointer begin(basic_cstring<CharT2, Traits>& s)
-//     { return &s[0]; }
-//     static pointer end(basic_cstring<CharT2, Traits>& s)
-//     { return &s[0] + s.size(); }
-//   };
-//
-//   template<typename CharT2>
-//   struct __dispath_cons<const basic_cstring<CharT2>, false>
-//   {
-//     static pointer begin(const basic_cstring<CharT2, Traits>& s)
-//     { return &s[0]; }
-//     static pointer end(const basic_cstring<CharT2, Traits>& s)
-//     { return &s[0] + s.size(); }
-//   };
-
-public:
   template<typename String>
   CPP_CONSTEXPR basic_cstring(String & s) CPP_NOEXCEPT
-  : m_begin(__dispath_cons<String>::begin(s))
-  , m_size(__dispath_cons<String>::size(s))
+  : m_begin(__dispath_cs_cons<const CharT, Traits, String>::begin(s))
+  , m_size(__dispath_cs_cons<const CharT, Traits, String>::size(s))
   {}
 
   template<typename String>
   CPP_CONSTEXPR basic_cstring(const String & s) CPP_NOEXCEPT
-  : m_begin(__dispath_cons<const String>::begin(s))
-  , m_size(__dispath_cons<const String>::size(s))
+  : m_begin(__dispath_cs_cons<const CharT, Traits, const String>::begin(s))
+  , m_size(__dispath_cs_cons<const CharT, Traits, const String>::size(s))
   {}
 
   CPP_CONSTEXPR basic_cstring(pointer s, size_type __size) CPP_NOEXCEPT
@@ -1907,21 +1905,21 @@ public:
   , m_size(last - begin)
   {}
 
-  CPP_CONSTEXPR basic_cstring(const basic_cstring& str) CPP_NOEXCEPT
-  : m_begin(str.m_begin)
-  , m_size(str.m_size)
+  CPP_CONSTEXPR basic_cstring(const basic_cstring& __str) CPP_NOEXCEPT
+  : m_begin(__str.m_begin)
+  , m_size(__str.m_size)
   {}
 
-  CPP_CONSTEXPR basic_cstring(const cstring& str) CPP_NOEXCEPT
-  : m_begin(str.data())
-  , m_size(str.size())
+  CPP_CONSTEXPR basic_cstring(const cstring& __str) CPP_NOEXCEPT
+  : m_begin(__str.data())
+  , m_size(__str.size())
   {}
 
-  basic_cstring& operator=(const basic_cstring& str) CPP_NOEXCEPT
-  { return assign(str); }
+  basic_cstring& operator=(const basic_cstring& __str) CPP_NOEXCEPT
+  { return assign(__str); }
 
-  basic_cstring& operator=(const cstring& str) CPP_NOEXCEPT
-  { return assign(str); }
+  basic_cstring& operator=(const cstring& __str) CPP_NOEXCEPT
+  { return assign(__str); }
 
   basic_cstring& operator=(pointer s) CPP_NOEXCEPT
   { return assign(s); }
@@ -1933,6 +1931,24 @@ public:
     return *this;
   }
 #endif
+
+  void str(const basic_cstring& __str)
+  {
+    m_begin = __str.m_begin;
+    m_size = __str.m_size;
+  }
+
+  void str(pointer p)
+  {
+    m_begin = p;
+    m_size = traits_type::length(p);
+  }
+
+  void str(pointer p, size_type __size)
+  {
+    m_begin = p;
+    m_size = __size;
+  }
 
   CPP_CONSTEXPR const_reference operator[](size_type index) const CPP_NOEXCEPT
   { return m_begin[index]; }
@@ -1972,11 +1988,11 @@ public:
   void clear() CPP_NOEXCEPT
   { m_size = 0; }
 
-  basic_cstring& assign(const basic_cstring& str) CPP_NOEXCEPT
-  { return assign(str.m_begin, str.m_size); }
+  basic_cstring& assign(const basic_cstring& __str) CPP_NOEXCEPT
+  { return assign(__str.m_begin, __str.m_size); }
 
-  basic_cstring & assign(const cstring& str) CPP_NOEXCEPT
-  { return assign(str.data(), str.size()); }
+  basic_cstring & assign(const cstring& __str) CPP_NOEXCEPT
+  { return assign(__str.data(), __str.size()); }
 
   basic_cstring&  assign(pointer first, pointer last) CPP_NOEXCEPT
   {
@@ -1988,12 +2004,12 @@ public:
   basic_cstring& assign(pointer s, size_type len) CPP_NOEXCEPT
   { return assign(s, s + len); }
 
-  basic_cstring& assign(const basic_cstring& str, size_type pos,
+  basic_cstring& assign(const basic_cstring& __str, size_type pos,
                         size_type len) CPP_NOEXCEPT
-  { return assign(str + pos, len); }
+  { return assign(__str + pos, len); }
 
-  basic_cstring& assign(const cstring& str, size_type pos, size_type len) CPP_NOEXCEPT
-  { return assign(str.data() + pos, len); }
+  basic_cstring& assign(const cstring& __str, size_type pos, size_type len) CPP_NOEXCEPT
+  { return assign(__str.data() + pos, len); }
 
   basic_cstring& assign(pointer s) CPP_NOEXCEPT
   { assign(s, s + traits_type::length(s)); }
@@ -2025,7 +2041,7 @@ public:
    *  This is a handle to internal data.  Do not modify or dire things may
    *  happen.
    */
-  CPP_CONSTEXPR const_pointer c_str() const CPP_NOEXCEPT
+  CPP_CONSTEXPR const_pointer c___str() const CPP_NOEXCEPT
   { return m_begin; }
 
   /**
@@ -2037,11 +2053,11 @@ public:
   CPP_CONSTEXPR const_pointer data() const CPP_NOEXCEPT
   { return m_begin; }
 
-  void swap(basic_cstring& str) CPP_NOEXCEPT
+  void swap(basic_cstring& __str) CPP_NOEXCEPT
   {
     using std::swap;
-    swap(m_begin, str.m_begin);
-    swap(m_size, str.m_size);
+    swap(m_begin, __str.m_begin);
+    swap(m_size, __str.m_size);
   }
 
   CPP_CONSTEXPR const_iterator begin() const CPP_NOEXCEPT
@@ -2120,19 +2136,19 @@ public:
 
   /**
    *  @brief  Find position of a string.
-   *  @param str  String to locate.
+   *  @param __str  String to locate.
    *  @param pos  Index of character to search from (default 0).
    *  @return  Index of start of first occurrence.
    *
-   *  Starting from @a pos, searches forward for value of @a str within
+   *  Starting from @a pos, searches forward for value of @a __str within
    *  this string.  If found, returns the index where it begins.  If not
    *  found, returns npos.
    */
-  size_type find(const basic_cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return this->find(str.data(), pos, str.size()); }
+  size_type find(const basic_cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return this->find(__str.data(), pos, __str.size()); }
 
-  size_type find(const cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return this->find(str.data(), pos, str.size()); }
+  size_type find(const cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return this->find(__str.data(), pos, __str.size()); }
 
   /**
    *  @brief  Find position of a C string.
@@ -2202,19 +2218,19 @@ public:
 
   /**
    *  @brief  Find last position of a string.
-   *  @param str  String to locate.
+   *  @param __str  String to locate.
    *  @param pos  Index of character to search back from (default end).
    *  @return  Index of start of last occurrence.
    *
-   *  Starting from @a pos, searches backward for value of @a str within
+   *  Starting from @a pos, searches backward for value of @a __str within
    *  this string.  If found, returns the index where it begins.  If not
    *  found, returns npos.
    */
-  size_type rfind(const basic_cstring& str, size_type pos = npos) const CPP_NOEXCEPT
-  { return this->rfind(str.data(), pos, str.size()); }
+  size_type rfind(const basic_cstring& __str, size_type pos = npos) const CPP_NOEXCEPT
+  { return this->rfind(__str.data(), pos, __str.size()); }
 
-  size_type rfind(const cstring& str, size_type pos = npos) const CPP_NOEXCEPT
-  { return this->rfind(str.data(), pos, str.size()); }
+  size_type rfind(const cstring& __str, size_type pos = npos) const CPP_NOEXCEPT
+  { return this->rfind(__str.data(), pos, __str.size()); }
 
   /**
    *  @brief  Find last position of a C string.
@@ -2277,19 +2293,19 @@ public:
 
   /**
    *  @brief  Find position of a character of string.
-   *  @param str  String containing characters to locate.
+   *  @param __str  String containing characters to locate.
    *  @param pos  Index of character to search from (default 0).
    *  @return  Index of first occurrence.
    *
    *  Starting from @a pos, searches forward for one of the characters of
-   *  @a str within this string.  If found, returns the index where it was
+   *  @a __str within this string.  If found, returns the index where it was
    *  found.  If not found, returns npos.
    */
-  size_type find_first_of(const basic_cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return this->find_first_of(str.data(), pos, str.size()); }
+  size_type find_first_of(const basic_cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return this->find_first_of(__str.data(), pos, __str.size()); }
 
-  size_type find_first_of(const cstring& str, size_type pos = 0) const CPP_NOEXCEPT
-  { return this->find_first_of(str.data(), pos, str.size()); }
+  size_type find_first_of(const cstring& __str, size_type pos = 0) const CPP_NOEXCEPT
+  { return this->find_first_of(__str.data(), pos, __str.size()); }
 
   /**
    *  @brief  Find position of a character of C string.
@@ -2321,21 +2337,21 @@ public:
 
   /**
    *  @brief  Find last position of a character of string.
-   *  @param str  String containing characters to locate.
+   *  @param __str  String containing characters to locate.
    *  @param pos  Index of character to search back from (default end).
    *  @return  Index of last occurrence.
    *
    *  Starting from @a pos, searches backward for one of the characters of
-   *  @a str within this string.  If found, returns the index where it was
+   *  @a __str within this string.  If found, returns the index where it was
    *  found.  If not found, returns npos.
    */
-  size_type find_last_of(const basic_cstring& str,
+  size_type find_last_of(const basic_cstring& __str,
                          size_type pos = npos) const CPP_NOEXCEPT
-  { return this->find_last_of(str.data(), pos, str.size()); }
+  { return this->find_last_of(__str.data(), pos, __str.size()); }
 
-  size_type find_last_of(const cstring& str,
+  size_type find_last_of(const cstring& __str,
                          size_type pos = npos) const CPP_NOEXCEPT
-  { return this->find_last_of(str.data(), pos, str.size()); }
+  { return this->find_last_of(__str.data(), pos, __str.size()); }
 
   /**
    *  @brief  Find last position of a character of C substring.
@@ -2395,21 +2411,21 @@ public:
 
   /**
    *  @brief  Find position of a character not in string.
-   *  @param str  String containing characters to avoid.
+   *  @param __str  String containing characters to avoid.
    *  @param pos  Index of character to search from (default 0).
    *  @return  Index of first occurrence.
    *
    *  Starting from @a pos, searches forward for a character not contained
-   *  in @a str within this string.  If found, returns the index where it
+   *  in @a __str within this string.  If found, returns the index where it
    *  was found.  If not found, returns npos.
    */
-  size_type find_first_not_of(const basic_cstring& str,
+  size_type find_first_not_of(const basic_cstring& __str,
                               size_type pos = 0) const CPP_NOEXCEPT
-  { return this->find_first_not_of(str.data(), pos, str.size()); }
+  { return this->find_first_not_of(__str.data(), pos, __str.size()); }
 
-  size_type find_first_not_of(const cstring& str,
+  size_type find_first_not_of(const cstring& __str,
                               size_type pos = 0) const CPP_NOEXCEPT
-  { return this->find_first_not_of(str.data(), pos, str.size()); }
+  { return this->find_first_not_of(__str.data(), pos, __str.size()); }
 
   /**
    *  @brief  Find position of a character not in C substring.
@@ -2465,21 +2481,21 @@ public:
 
   /**
    *  @brief  Find last position of a character not in string.
-   *  @param str  String containing characters to avoid.
+   *  @param __str  String containing characters to avoid.
    *  @param pos  Index of character to search back from (default end).
    *  @return  Index of last occurrence.
    *
    *  Starting from @a pos, searches backward for a character not
-   *  contained in @a str within this string.  If found, returns the index
+   *  contained in @a __str within this string.  If found, returns the index
    *  where it was found.  If not found, returns npos.
    */
-  size_type find_last_not_of(const basic_cstring& str,
+  size_type find_last_not_of(const basic_cstring& __str,
                              size_type pos = npos) const CPP_NOEXCEPT
-  { return this->find_last_not_of(str.data(), pos, str.size()); }
+  { return this->find_last_not_of(__str.data(), pos, __str.size()); }
 
-  size_type find_last_not_of(const cstring& str,
+  size_type find_last_not_of(const cstring& __str,
                              size_type pos = npos) const CPP_NOEXCEPT
-  { return this->find_last_not_of(str.data(), pos, str.size()); }
+  { return this->find_last_not_of(__str.data(), pos, __str.size()); }
 
   /**
    *  @brief  Find last position of a character not in C substring.
@@ -2571,103 +2587,103 @@ public:
 
   /**
    *  @brief  Compare to a string.
-   *  @param str  String to compare against.
+   *  @param __str  String to compare against.
    *  @return  Integer < 0, 0, or > 0.
    *
-   *  Returns an integer < 0 if this string is ordered before @a str, 0 if
+   *  Returns an integer < 0 if this string is ordered before @a __str, 0 if
    *  their values are equivalent, or > 0 if this string is ordered after
-   *  @a str.  Determines the effective length rlen of the strings to
-   *  compare as the smallest of size() and str.size().  The function
+   *  @a __str.  Determines the effective length rlen of the strings to
+   *  compare as the smallest of size() and __str.size().  The function
    *  then compares the two strings by calling traits::compare(data(),
-   *  str.data(),rlen).  If the result of the comparison is nonzero returns
+   *  __str.data(),rlen).  If the result of the comparison is nonzero returns
    *  it, otherwise the shorter one is ordered first.
    */
-  int compare(const basic_cstring& str) const CPP_NOEXCEPT
+  int compare(const basic_cstring& __str) const CPP_NOEXCEPT
   {
     const size_type __size = this->size();
-    const size_type __osize = str.size();
+    const size_type __osize = __str.size();
     const size_type __len = std::min(__size, __osize);
 
-    int __r = traits_type::compare(data(), str.data(), __len);
+    int __r = traits_type::compare(data(), __str.data(), __len);
     if (!__r)
       __r = _S_compare(__size, __osize);
     return __r;
   }
 
-  int compare(const cstring& str) const CPP_NOEXCEPT
-  { return compare(_M_const_cstring(str)); }
+  int compare(const cstring& __str) const CPP_NOEXCEPT
+  { return compare(_M_const_cstring(__str)); }
 
   /**
    *  @brief  Compare substring to a string.
    *  @param pos  Index of first character of substring.
    *  @param n  Number of characters in substring.
-   *  @param str  String to compare against.
+   *  @param __str  String to compare against.
    *  @return  Integer < 0, 0, or > 0.
    *
    *  Form the substring of this string from the @a n characters starting
    *  at @a pos.  Returns an integer < 0 if the substring is ordered
-   *  before @a str, 0 if their values are equivalent, or > 0 if the
-   *  substring is ordered after @a str.  Determines the effective length
+   *  before @a __str, 0 if their values are equivalent, or > 0 if the
+   *  substring is ordered after @a __str.  Determines the effective length
    *  rlen of the strings to compare as the smallest of the length of the
-   *  substring and @a str.size().  The function then compares the two
-   *  strings by calling traits::compare(substring.data(),str.data(),rlen).
+   *  substring and @a __str.size().  The function then compares the two
+   *  strings by calling traits::compare(substring.data(),__str.data(),rlen).
    *  If the result of the comparison is nonzero returns it, otherwise the
    *  shorter one is ordered first.
    */
-  int compare(size_type pos, size_type n, const basic_cstring& str) const
+  int compare(size_type pos, size_type n, const basic_cstring& __str) const
   {
     if (size() < pos)
       throw std::out_of_range("basic_cstring::compare");
     n = _M_limit(pos, n);
-    const size_type __osize = str.size();
+    const size_type __osize = __str.size();
     const size_type __len = std::min(n, __osize);
-    int __r = traits_type::compare(data() + pos, str.data(), __len);
+    int __r = traits_type::compare(data() + pos, __str.data(), __len);
     if (!__r)
       __r = _S_compare(n, __osize);
     return __r;
   }
 
-  int compare(size_type pos, size_type n, const cstring& str) const
-  { return compare(pos, n, basic_cstring(str.begin(), str.end())); }
+  int compare(size_type pos, size_type n, const cstring& __str) const
+  { return compare(pos, n, basic_cstring(__str.begin(), __str.end())); }
 
   /**
    *  @brief  Compare substring to a substring.
    *  @param pos1  Index of first character of substring.
    *  @param n1  Number of characters in substring.
-   *  @param str  String to compare against.
-   *  @param pos2  Index of first character of substring of str.
-   *  @param n2  Number of characters in substring of str.
+   *  @param __str  String to compare against.
+   *  @param pos2  Index of first character of substring of __str.
+   *  @param n2  Number of characters in substring of __str.
    *  @return  Integer < 0, 0, or > 0.
    *
    *  Form the substring of this string from the @a n1 characters starting
-   *  at @a pos1.  Form the substring of @a str from the @a n2 characters
+   *  at @a pos1.  Form the substring of @a __str from the @a n2 characters
    *  starting at @a pos2.  Returns an integer < 0 if this substring is
-   *  ordered before the substring of @a str, 0 if their values are
+   *  ordered before the substring of @a __str, 0 if their values are
    *  equivalent, or > 0 if this substring is ordered after the substring
-   *  of @a str.  Determines the effective length rlen of the strings
+   *  of @a __str.  Determines the effective length rlen of the strings
    *  to compare as the smallest of the lengths of the substrings.  The
    *  function then compares the two strings by calling
-   *  traits::compare(substring.data(),str.substr(pos2,n2).data(),rlen).
+   *  traits::compare(substring.data(),__str.substr(pos2,n2).data(),rlen).
    *  If the result of the comparison is nonzero returns it, otherwise the
    *  shorter one is ordered first.
    */
-  int compare(size_type pos1, size_type n1, const basic_cstring& str,
+  int compare(size_type pos1, size_type n1, const basic_cstring& __str,
               size_type pos2, size_type n2) const
   {
-    if (size() < pos1 || str.size() < pos2)
+    if (size() < pos1 || __str.size() < pos2)
       throw std::out_of_range("basic_cstring::compare");
     n1 = _M_limit(pos1, n1);
-    n2 = str._M_limit(pos2, n2);
+    n2 = __str._M_limit(pos2, n2);
     const size_type __len = std::min(n1, n2);
-    int __r = traits_type::compare(data() + pos1, str.data() + pos2, __len);
+    int __r = traits_type::compare(data() + pos1, __str.data() + pos2, __len);
     if (!__r)
       __r = _S_compare(n1, n2);
     return __r;
   }
 
-  int compare(size_type pos1, size_type n1, const cstring& str,
+  int compare(size_type pos1, size_type n1, const cstring& __str,
               size_type pos2, size_type n2) const
-  { return compare(pos1, n1, basic_cstring(str.begin(), str.end()), pos2, n2); }
+  { return compare(pos1, n1, basic_cstring(__str.begin(), __str.end()), pos2, n2); }
 
   /**
    *  @brief  Compare to a C string.
@@ -2775,8 +2791,8 @@ private:
       traits_type::copy(__d, s, n);
   }
 
-  basic_cstring _M_const_cstring(const cstring& str) const
-  { return basic_cstring(str.data(), str.size()); }
+  basic_cstring _M_const_cstring(const cstring& __str) const
+  { return basic_cstring(__str.data(), __str.size()); }
 
   static int _S_compare(size_type n1, size_type n2) CPP_NOEXCEPT
   {
@@ -2876,7 +2892,7 @@ inline bool operator==(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator==(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) == 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) == 0; }
 
 /**
  *  @brief  Test equivalence of cstring and string.
@@ -2988,7 +3004,7 @@ inline bool operator<(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<(const basic_cstring<CharT, Traits>& __lhs,
                       const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) < 0; }
 
 /**
  *  @brief  Test if string precedes cstring.
@@ -2999,7 +3015,7 @@ inline bool operator<(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                       const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) > 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) > 0; }
 
 // operator >
 /**
@@ -3044,7 +3060,7 @@ inline bool operator>(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
                       const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) < 0; }
 
 /**
  *  @brief  Test if string follows cstring.
@@ -3055,7 +3071,7 @@ inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                       const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) > 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) > 0; }
 
 // operator <=
 /**
@@ -3100,7 +3116,7 @@ inline bool operator<=(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
                        const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) <= 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) <= 0; }
 
 /**
  *  @brief  Test if string doesn't follow cstring.
@@ -3111,7 +3127,7 @@ inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<=(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) >= 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) >= 0; }
 
 // operator >=
 /**
@@ -3156,7 +3172,7 @@ inline bool operator>=(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
                        const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) <= 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) <= 0; }
 
 /**
  *  @brief  Test if C string doesn't precede cstring.
@@ -3167,7 +3183,7 @@ inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>=(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) >= 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) >= 0; }
 
 
 /**
@@ -3202,7 +3218,7 @@ operator+(const std::basic_string<CharT, Traits, Alloc>& __lhs,
 	std::basic_string<typename Traits::char_type, Traits, Alloc> s;
 	s.reserve(__lhs.size() + __rhs.size());
 	s.append(__lhs);
-	s.append(__rhs.c_str(), __rhs.size());
+	s.append(__rhs.c___str(), __rhs.size());
 	return s;
 }
 
@@ -3219,7 +3235,7 @@ operator+(const basic_cstring<CharT, Traits>& __lhs,
 {
 	std::basic_string<typename Traits::char_type, Traits, Alloc> s;
 	s.reserve(__lhs.size() + __rhs.size());
-	s.append(__lhs.c_str(), __lhs.size());
+	s.append(__lhs.c___str(), __lhs.size());
 	s.append(__rhs);
 	return s;
 }
@@ -3234,7 +3250,7 @@ template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline std::basic_string<typename Traits::char_type, Traits, Alloc>&
 operator+=(std::basic_string<CharT, Traits, Alloc>& __lhs,
            const basic_cstring<CharT2, Traits>& __rhs)
-{ return __lhs.append(__rhs.c_str(), __rhs.size()); }
+{ return __lhs.append(__rhs.c___str(), __rhs.size()); }
 
 /**
  *  @brief  Append a cstring to string.
@@ -3246,16 +3262,16 @@ template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline std::basic_string<typename Traits::char_type, Traits, Alloc>&
 operator+=(std::basic_string<typename Traits::char_type, Traits, Alloc>& __lhs,
            const basic_cstring<const CharT, Traits>& __rhs)
-{ return __lhs.append(__rhs.c_str(), __rhs.size()); }
+{ return __lhs.append(__rhs.c___str(), __rhs.size()); }
 
 
 /**
- *  @brief  Write string to a stream.
- *  @param os  Output stream.
- *  @param str  String to write out.
- *  @return  Reference to the output stream.
+ *  @brief  Write string to a __stream.
+ *  @param os  Output __stream.
+ *  @param __str  String to write out.
+ *  @return  Reference to the output __stream.
  *
- *  Output characters of @a str into os following the same rules as for
+ *  Output characters of @a __str into os following the same rules as for
  *  writing a C string.
  */
 template<typename CharT, typename Traits, typename StringCharT, typename StringTraits>
@@ -3279,9 +3295,10 @@ inline void swap(basic_cstring<CharT, Traits>& __lhs,
 
 
 #define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
-	inline result_type fname(const cstring_type& s, std::size_t* __idx = 0, int __base = 10)\
+	inline result_type \
+	fname(const cstring_type& s, std::size_t* __idx = 0, int __base = 10)\
 	{ return ::falcon::detail::stoa<result_type>\
-	(&std_fname, #fname, s.c_str(), __idx, __base); }
+	(&std_fname, #fname, s.c___str(), __idx, __base); }
 
 #define __FALCON_BASIC_CSTRING_TO(result_type, fname, type)\
 	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, cstring)\
@@ -3302,7 +3319,7 @@ __FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 #define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type fname(const cstring_type& s, std::size_t* __idx = 0)\
 	{ return ::falcon::detail::stoa<result_type>\
-	(&std_fname, #fname, s.c_str(), __idx); }
+	(&std_fname, #fname, s.c___str(), __idx); }
 
 __FALCON_BASIC_CSTRING_TO(float, stof, f)
 __FALCON_BASIC_CSTRING_TO(double, stod, d)
@@ -3313,22 +3330,22 @@ __FALCON_BASIC_CSTRING_TO(double long, stold, ld)
 #undef __FALCON_BASIC_CSTRING_TO
 #undef __FALCON_BASIC_CSTRING_TO_IMPL
 
-inline std::string to_string(const cstring& str)
-{ return std::string(str.data(), str.size()); }
+inline std::string to_string(const cstring& __str)
+{ return std::string(__str.data(), __str.size()); }
 
-inline std::string to_string(const const_cstring& str)
-{ return std::string(str.data(), str.size()); }
+inline std::string to_string(const const_cstring& __str)
+{ return std::string(__str.data(), __str.size()); }
 
-inline std::wstring to_wstring(const cwstring& str)
-{ return std::wstring(str.data(), str.size()); }
+inline std::wstring to_wstring(const cwstring& __str)
+{ return std::wstring(__str.data(), __str.size()); }
 
-inline std::wstring to_wstring(const const_cwstring& str)
-{ return std::wstring(str.data(), str.size()); }
+inline std::wstring to_wstring(const const_cwstring& __str)
+{ return std::wstring(__str.data(), __str.size()); }
 
 template<typename CharT, typename Traits>
 inline std::basic_string<CharT, Traits>
-to_string(const basic_cstring<CharT, Traits>& str)
-{ return std::basic_string<CharT, Traits>(str.data(), str.size()); }
+to_string(const basic_cstring<CharT, Traits>& __str)
+{ return std::basic_string<CharT, Traits>(__str.data(), __str.size()); }
 
 }
 

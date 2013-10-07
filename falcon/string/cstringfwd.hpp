@@ -8,14 +8,29 @@ namespace std {
 
 namespace falcon {
 
+template<typename T>
+struct __cs_remove_const
+{ typedef T type; };
+
+template<typename T>
+struct __cs_remove_const<const T>
+{ typedef T type; };
+
 /**
  * @defgroup strings Strings
  *
  * @{
  */
 
-template <typename CharT, typename Traits = std::char_traits<CharT> >
+template < typename CharT
+         , typename Traits = std::char_traits<typename __cs_remove_const<CharT>::type> >
 class basic_cstring;
+
+#if __cplusplus >= 201103L
+template< typename CharT
+        , typename Traits = std::char_traits<typename __cs_remove_const<CharT>::type> >
+using basic_const_cstring = basic_cstring<const CharT, Traits>;
+#endif
 
 /// A cstring of @c char
 typedef basic_cstring<char> cstring;
@@ -23,9 +38,9 @@ typedef basic_cstring<char> cstring;
 typedef basic_cstring<wchar_t> cwstring;
 
 /// A cstring of @c const_char
-typedef basic_cstring<const char, std::char_traits<char> > const_cstring;
+typedef basic_cstring<const char> const_cstring;
 /// A cstring of @c const_wchar_t
-typedef basic_cstring<const wchar_t, std::char_traits<wchar_t> > const_cwstring;
+typedef basic_cstring<const wchar_t> const_cwstring;
 
 #if __cplusplus >= 201103L
 /// A cstring of @c char16_t
@@ -34,9 +49,9 @@ typedef basic_cstring<char16_t> u16cstring;
 typedef basic_cstring<char32_t> u32cstring;
 
 /// A cstring of @c const_char16_t
-typedef basic_cstring<const char16_t, std::char_traits<char16_t> > const_u16cstring;
+typedef basic_cstring<const char16_t> const_u16cstring;
 /// A cstring of @c const_char32_t
-typedef basic_cstring<const char32_t, std::char_traits<char32_t> > const_u32cstring;
+typedef basic_cstring<const char32_t> const_u32cstring;
 #endif
 
 /** @} */

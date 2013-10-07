@@ -19,11 +19,14 @@
 
 #include <falcon/string/basic_cstring.hpp>
 
+#include <iostream>
+
 int main()
 {
-  char s[]{'p','l','o','p', 0};
-  falcon::cstring p(s);
-  return "plop" == p;
+  char s[10]{'p','l','o','p', 0};
+  falcon::cstring p(s, 4, sizeof(s));
+  p.insert(0, s, 1);
+  std::cout << (p) << "'\n";
 
 
 
