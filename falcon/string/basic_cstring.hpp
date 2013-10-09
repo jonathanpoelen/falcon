@@ -6,8 +6,6 @@
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/string/cstringfwd.hpp>
-#include <falcon/type_traits/if.hpp>
-#include <falcon/type_traits/enable_if.hpp>
 #include <falcon/container/range_access.hpp>
 #include <falcon/detail/string_convertion.hpp>
 #include <falcon/iterator/normal_iterator.hpp>
@@ -29,6 +27,7 @@
 # include <boost/type_traits/remove_reference.hpp>
 #else
 # include <type_traits>
+# include <initializer_list>
 #endif
 
 namespace falcon {
@@ -57,10 +56,12 @@ struct __dispath_cs_cons<CharT, Traits, String, true>
   { return Traits::length(s); }
 };
 
-struct cstring_constexpr{};
+struct cstring_array_size{};
+struct cstring_array_capacity{};
 
-//BUG zero finally
-//BUG disjonction when copy
+//TODO adding cstring_array_size and cstring_array_capacity maker (cstring_array() ?)
+//TODO _M_set_terminal inutile sauf pour c_str()
+//TODO don't c_str(), use data()
 
 /**
  * @brief Managing sequences of constants characters and constant character-like objects.
@@ -97,7 +98,7 @@ private:
   size_type m_capacity;
 
 public:
-  basic_cstring() CPP_NOEXCEPT
+  constexpr basic_cstring() CPP_NOEXCEPT
   : m_begin(0)
   , m_size(0)
   , m_capacity(0)
@@ -129,6 +130,27 @@ public:
   : m_begin(s)
   , m_size(__size)
   , m_capacity(__capacity)
+  {}
+
+  template<std::size_t N>
+  basic_cstring(CharT * (&s)[N], cstring_array_size) CPP_NOEXCEPT
+  : m_begin(s)
+  , m_size(N)
+  , m_capacity(N)
+  {}
+
+  template<std::size_t N>
+  basic_cstring(CharT * (&s)[N], cstring_array_capacity) CPP_NOEXCEPT
+  : m_begin(s)
+  , m_size(traits_type::length(s))
+  , m_capacity(N)
+  {}
+
+  template<std::size_t N>
+  basic_cstring(CharT * (&s)[N], size_type __size, cstring_array_capacity) CPP_NOEXCEPT
+  : m_begin(s)
+  , m_size(__size)
+  , m_capacity(N)
   {}
 
   basic_cstring(pointer s, size_type __size) CPP_NOEXCEPT
@@ -449,7 +471,7 @@ public:
    */
   template<class InputIterator>
   basic_cstring& append(InputIterator first, InputIterator last)
-  { return this->replace(_M_iend(), _M_iend(), first, last); } //TODO
+  { return this->replace(_M_iend(), _M_iend(), first, last); }
 
   /**
    *  @brief  Append a single character.
@@ -534,7 +556,7 @@ public:
       throw std::length_error("basic_cstring::assign");
     }
     _M_assign(_M_data(), n, c);
-    traits_type::assign(*_M_iend(), CharT());
+    _M_set_terminal();
     return *this;
   }
 
@@ -548,7 +570,7 @@ public:
    */
   template<class InputIterator>
   basic_cstring& assign(InputIterator first, InputIterator last)
-  { return this->replace(_M_ibegin(), _M_iend(), first, last); } //TODO
+  { return this->replace(begin(), end(), first, last); }
 
 #if __cplusplus >= 201103L
   /**
@@ -574,7 +596,7 @@ public:
    *  change if an error is thrown.
    */
   void insert(iterator p, size_type n, CharT c)
-  { this->replace(p, p, n, c);  } //TODO
+  { _M_replace_aux(p.base() - _M_data(), 0, n, c);  }
 
   /**
    *  @brief  Insert a range of characters.
@@ -590,7 +612,7 @@ public:
    */
   template<class InputIterator>
   void insert(iterator p, InputIterator first, InputIterator last)
-  { this->replace(p, p, first, last); } //TODO
+  { this->replace(p, p, first, last); }
 
 #if __cplusplus >= 201103L
   /**
@@ -642,7 +664,7 @@ public:
   basic_cstring& insert(size_type pos1, const const_cstring& __str,
                         size_type pos2, size_type n)
   {
-    if (pos2 > __str.size())
+    if (pos2 >= __str.size())
       throw std::out_of_range("basic_cstring::insert");
     return this->insert(pos1, __str._M_data() + pos2, __str._M_limit(pos2, n));
   }
@@ -669,31 +691,11 @@ public:
    */
   basic_cstring& insert(size_type pos, const CharT * s, size_type n)
   {
-    if (pos > size())
+    if (pos >= size())
       throw std::out_of_range("basic_cstring::insert");
     if (size() + n >= this->capacity())
       throw std::length_error("basic_cstring::insert");
-    ///TODO
-    if (_M_disjunct(s))
-      return _M_replace_safe(pos, size_type(0), s, n);
-    else
-    {
-      // Work in-place.
-      const size_type __off = s - _M_data();
-      s = _M_data() + __off;
-      CharT * __p = _M_data() + pos;
-      if (s  + n <= __p)
-        _M_copy(__p, s, n);
-      else if (s >= __p)
-        _M_copy(__p, s + n, n);
-      else
-      {
-        const size_type __nleft = __p - s;
-        _M_copy(__p, s, __nleft);
-        _M_copy(__p + __nleft, __p + n, n - __nleft);
-      }
-      return *this;
-    }
+    return _M_insert_safe(pos, s, n);
   }
 
   /**
@@ -721,7 +723,7 @@ public:
    *  @param c  The character to insert.
    *  @return  Reference to this string.
    *  @throw  std::length_error  If new length exceeds @c max_size().
-   *  @throw  std::out_of_range  If @a pos is beyond the end of this
+   *  @throw  std::out_of_range  If @a pos is beyond the end of this.
    *  string.
    *
    *  Inserts @a n copies of character @a c starting at index
@@ -732,10 +734,17 @@ public:
    */
   basic_cstring& insert(size_type pos, size_type n, CharT c)
   {
-    if (pos < size()) {
+    if (pos >= size())
       throw std::out_of_range("basic_cstring::insert");
-    }
-    return _M_replace_aux(pos, size_type(0), n, c); //TODO
+    if (size() + 1 >= this->capacity())
+      throw std::length_error("basic_cstring::insert");
+
+    CharT * p = _M_data() + pos;
+    _M_move(p + n, p, size() - pos);
+    _M_assign(p, n, c);
+    m_size += n;
+    _M_set_terminal();
+    return *this;
   }
 
   /**
@@ -743,7 +752,7 @@ public:
    *  @param p  Iterator referencing position in string to insert at.
    *  @param c  The character to insert.
    *  @return  Iterator referencing newly inserted char.
-   *  @throw  std::length_error  If new length exceeds @c max_size().
+   *  @throw  std::length_error  If new length exceeds @c capacity().
    *
    *  Inserts character @a c at position referenced by @a p.
    *  If adding character causes the length to exceed max_size(),
@@ -753,9 +762,14 @@ public:
    */
   iterator insert(iterator p, CharT c)
   {
-    const size_type pos = p - _M_ibegin();
-    _M_replace_aux(pos, size_type(0), size_type(1), c); //TODO
-    return iterator(_M_data() + pos);
+    if (size() + 1 >= this->capacity())
+      throw std::length_error("basic_cstring::insert");
+    CharT * const __p = p.base();
+    _M_move(__p + 1, __p, _M_iend() - __p);
+    traits_type::assign(*__p, c);
+    ++m_size;
+    _M_set_terminal();
+    return p;
   }
 
   /**
@@ -775,7 +789,7 @@ public:
    */
   basic_cstring& erase(size_type pos = 0, size_type n = npos)
   {
-    if (pos < size()) {
+    if (pos >= size()) {
       throw std::out_of_range("basic_cstring::erase");
     }
     n = _M_limit(pos, n);
@@ -794,11 +808,10 @@ public:
    */
   iterator erase(iterator position)
   {
-    const size_type pos = position - _M_ibegin();
-    const size_type n = this->size() - pos;
-    _M_move(_M_data() + pos, _M_data() + pos + 1, n);
+    CharT * p = position.base();
+    _M_move(p, p + 1, _M_iend() - p);
     --m_size;
-    return iterator(_M_data() + pos);
+    return position;
   }
 
   /**
@@ -813,15 +826,10 @@ public:
   iterator erase(iterator first, iterator last)
   {
     const size_type __size = last - first;
-    if (__size)
-    {
-      const size_type pos = first - _M_ibegin();
-      _M_move(_M_data() + pos, _M_data() + pos + __size, this->size() - (pos + __size));
-      m_size -= __size;
-      return iterator(_M_data() + pos);
-    }
-    else
-      return first;
+    CharT * p = first.base();
+    _M_move(p, p + __size, _M_iend() - last.base());
+    m_size -= __size;
+    return first;
   }
 
 #if __cplusplus >= 201103L
@@ -916,33 +924,14 @@ public:
    */
   basic_cstring& replace(size_type pos, size_type n1, const CharT* s, size_type n2)
   {
-    if (pos > size()) {
+    if (pos > this->size()) {
       throw std::out_of_range("basic_cstring::replace");
     }
     n1 = _M_limit(pos, n1);
-    if (n1 + n2  >= this->capacity()) {
+    if (n2 - n1 + this->size() >= this->capacity()) {
       throw std::length_error("basic_cstring::replace");
     }
-    //TODO
-    bool __left;
-    if (_M_disjunct(s))
-      return _M_replace_safe(pos, n1, s, n2);
-    else if ((__left = s + n2 <= _M_data() + pos)
-      || _M_data() + pos + n1 <= s)
-    {
-      // Work in-place: non-overlapping case.
-      size_type __off = s - _M_data();
-      if (__left)
-        __off += n2 - n1;
-      _M_copy(_M_data() + pos, _M_data() + __off, n2);
-      return *this;
-    }
-    else
-    {
-      // Todo: overlapping case.
-      const basic_cstring __tmp(s, n2);
-      return _M_replace_safe(pos, n1, s, n2);
-    }
+    return _M_replace_safe(pos, n1, s, n2);
   }
 
   /**
@@ -986,7 +975,7 @@ public:
     if (pos > size()) {
       throw std::out_of_range("basic_cstring::replace");
     }
-    return _M_replace_aux(pos, _M_limit(pos, n1), n2, c); //TODO
+    return _M_replace_aux(pos, _M_limit(pos, n1), n2, c);
   }
 
   /**
@@ -1057,7 +1046,7 @@ public:
    *  value of the string doesn't change if an error is thrown.
    */
   basic_cstring& replace(iterator first, iterator last, size_type n, CharT c)
-  { return _M_replace_aux(first - _M_ibegin(), last - first, n, c); }
+  { return _M_replace_aux(first.base() - _M_data(), last - first, n, c); }
 
   /**
    *  @brief  Replace range of characters with range.
@@ -1130,14 +1119,7 @@ public:
    *  s.  If @a pos is %greater than size(), out_of_range is thrown.
    */
   size_type copy(CharT * s, size_type n, size_type pos = 0) const
-  {
-    if (pos > size())
-      throw std::out_of_range("basic_cstring::copy");
-    n = _M_limit(pos, n);
-    if (n)
-      _S_copy(s, data() + pos, n);
-    return n;
-  }
+  { return _M_const_cstring().copy(s, n, pos); }
 
   /**
    *  @brief Returns const pointer to the beginning of string (equivalent to begin())
@@ -1145,7 +1127,7 @@ public:
    *  This is a handle to internal data.  Do not modify or dire things may
    *  happen.
    */
-  const_pointer c___str() const CPP_NOEXCEPT
+  const_pointer c_str() const CPP_NOEXCEPT
   { return m_begin; }
 
   /**
@@ -1720,62 +1702,9 @@ private:
   size_type _M_limit(size_type pos, size_type off) const CPP_NOEXCEPT
   { return std::min(off, this->size() - pos); }
 
-#ifdef IN_IDE_PARSER
-  basic_cstring<>
-#else
-  const_cstring
-#endif
-  CPP_CONSTEXPR _M_const_cstring() const
-  { return const_cstring(m_begin, m_size); }
-
-  pointer _M_ibegin()
-  { return m_begin; }
-  pointer _M_data()
-  { return m_begin; }
-
-  pointer _M_iend()
-  { return m_begin + m_size; }
-
-  void _M_set_length(size_type len)
-  {
-    m_size = len;
-    traits_type::assign(*_M_iend(), CharT());
-  }
-
-  static void _M_assign(CharT* d, size_type n, CharT c)
-  {
-    if (n == 1)
-      traits_type::assign(*d, c);
-    else
-      traits_type::assign(d, n, c);
-  }
-
-  basic_cstring& _M_replace_aux(size_type pos1, size_type n, CharT c)
-  {
-    if (capacity() < pos1 + n) {
-      throw std::length_error("basic_cstring::_M_replace_aux");
-    }
-    _M_assign(_M_data() + pos1, n, c);
-    return *this;
-  }
-
-  bool _M_disjunct(const CharT * s)
-  {
-    return (std::less<const CharT*>()(s, _M_data())
-    || std::less<const CharT*>()(_M_data() + this->size(), s));
-  }
-
-  basic_cstring& _M_replace_safe(size_type pos1, size_type n1,
-                                 const CharT * s, size_type n2)
-  {
-    (void)n1;//_M_mutate(pos1, n1, n2); //TODO
-    _M_copy(_M_data() + pos1, s, n2);
-    return *this;
-  }
-
   // When __n = 1 way faster than the general multichar
   // traits_type::copy/move/assign.
-  static void _M_copy(CharT* d, const CharT* s, size_type n)
+  static void _M_copy(CharT* d, const CharT* s, size_type n) CPP_NOEXCEPT
   {
     if (n == 1)
       traits_type::assign(*d, *s);
@@ -1783,7 +1712,7 @@ private:
       traits_type::copy(d, s, n);
   }
 
-  static void _M_move(CharT* d, const CharT * s, size_type n)
+  static void _M_move(CharT* d, const CharT * s, size_type n) CPP_NOEXCEPT
   {
     if (n == 1)
       traits_type::assign(*d, *s);
@@ -1791,47 +1720,147 @@ private:
       traits_type::move(d, s, n);
   }
 
+  static void _M_assign(CharT* d, size_type n, CharT c) CPP_NOEXCEPT
+  {
+    if (n == 1)
+      traits_type::assign(*d, c);
+    else
+      traits_type::assign(d, n, c);
+  }
+
+  CPP_CONSTEXPR
+#ifdef IN_IDE_PARSER
+  basic_cstring&
+#else
+  const_cstring
+#endif
+  _M_const_cstring() const CPP_NOEXCEPT
+  { return const_cstring(m_begin, m_size); }
+
+  pointer _M_ibegin() const CPP_NOEXCEPT
+  { return m_begin; }
+  pointer _M_data() const CPP_NOEXCEPT
+  { return m_begin; }
+
+  pointer _M_iend() const CPP_NOEXCEPT
+  { return m_begin + m_size; }
+
+  void _M_set_length(size_type len) CPP_NOEXCEPT
+  {
+    m_size = len;
+    _M_set_terminal();
+  }
+
+  void _M_set_terminal() CPP_NOEXCEPT
+  { traits_type::assign(m_begin[m_size], CharT()); }
+
+  /**
+   *  @brief  Replace characters with multiple characters.
+   *  @param pos  Index of first character to replace. Should be a valid position.
+   *  @param n1  Number of characters to be replaced.
+   *  @param n2  Number of characters to insert.
+   *  @param c  Character to insert.
+   */
+  basic_cstring& _M_replace_aux(size_type pos, size_type n1, size_type n2, CharT c)
+  {
+    if (n2 - n1 + this->size() >= this->capacity()) {
+      throw std::length_error("basic_cstring::_M_replace_aux");
+    }
+
+    CharT * p = _M_data() + pos;
+    if (n1 != n2) {
+      const size_type len = size() - (pos + n1);
+      _M_move(p + n2, p + n1, len);
+    }
+    _M_assign(p, n2, c);
+
+    return *this;
+  }
+
+  basic_cstring& _M_replace_safe(size_type pos, size_type n1,
+                                 const CharT * s, size_type n2) CPP_NOEXCEPT
+  {
+    CharT * p = _M_data() + pos;
+    const size_type n = std::min(n1, n2);
+    if (s >= p + n || s + n <= p) {
+      _M_copy(p, s, n);
+    }
+    else if (s < p) {
+      const size_type nleft = p - s;
+      const size_type nright = n - nleft;
+      _M_copy(p + nleft, p, nright);
+      _M_copy(p, s, nleft);
+    }
+    else if (s < p + n) {
+      const size_type nright = s - p;
+      const size_type nleft = n - nright;
+      _M_copy(p, s, nleft);
+      _M_copy(p + nleft, p + n, nright);
+    }
+
+    if (n < n1) {
+      _M_move(p + n, p + n1, n1 - n);
+    }
+    else if (n < n2) {
+      _M_insert_safe(pos + n, s, n2 - n);
+    }
+
+    m_size += n2 - n1;
+
+    return *this;
+  }
+
+  basic_cstring& _M_insert_safe(size_type pos, const CharT * s,
+                                size_type n) CPP_NOEXCEPT
+  {
+    CharT * p = _M_data() + pos;
+    if (s > p && s + n > _M_iend()) {
+      const size_type nleft = s - p;
+      for (size_type i = 0; i < nleft; ++i) {
+        CharT * pp = p + i;
+        CharT * plast = pp + (n - (n - i) % nleft);
+        const CharT c = *pp;
+        for (; pp < plast; pp += nleft) {
+          traits_type::assign(*pp, *(pp + nleft));
+        }
+        traits_type::assign(*pp, c);
+      }
+      traits_type::assign(m_begin[m_size + n], CharT());
+      _M_copy(p + n + nleft, p, size() - pos - nleft);
+    }
+    else if (s + n <= p || s >= _M_iend() + n) {
+      _M_copy(p + n, p, size() - pos);
+      _M_copy(p, s, n);
+    }
+    else if (s < p) {
+      _M_copy(p + n, p, size() - pos);
+      const size_type nleft = p - s;
+      const size_type nright = n - nleft;
+      _M_move(p + nleft, p, nright);
+      _M_copy(p, s, nleft);
+    }
+    else {
+      _M_move(p + n, p, size() - pos);
+      _M_copy(p, s + n, n);
+    }
+    m_size += n;
+    return *this;
+  }
+
   template<typename InputIterator>
-  basic_cstring& _M_replace_dispatch(iterator first, iterator last, InputIterator k1,
-                                     InputIterator k2,
+  basic_cstring& _M_replace_dispatch(iterator first, iterator last,
+                                     InputIterator k1, InputIterator k2,
                                      FALCON_BOOST_OR_STD_NAMESPACE::false_type)
   {
-    const basic_cstring __s(k1, k2);
-    const size_type __n1 = last - first;
-    if (first - _M_ibegin() + __n1 > capacity()) {
-      throw std::length_error("basic_cstring::_M_replace_dispatch");
-    }
-    return _M_replace_safe(first - _M_ibegin(), __n1, __s._M_data(),
-                           __s.size());
+    return _M_replace_aux(first.base() - _M_data(), last - first,
+                          _M_data() + (k1.base() - _M_data()), k2 - k1);
   }
 
   template<class Integer>
-  basic_cstring& _M_replace_dispatch(iterator __i1, iterator __i2, Integer __n,
-                                     Integer __val,
+  basic_cstring& _M_replace_dispatch(iterator __i1, iterator __i2,
+                                     Integer __n, Integer __val,
                                      FALCON_BOOST_OR_STD_NAMESPACE::true_type)
-  { return _M_replace_aux(__i1 - _M_ibegin(), __i2 - __i1, __n, __val); }
-
-  // When n = 1 way faster than the general multichar
-  // traits_type::copy/move/assign.
-  static void _S_copy(CharT* __d, pointer s, size_type n) CPP_NOEXCEPT
-  {
-    if (n == 1)
-      traits_type::assign(*__d, *s);
-    else
-      traits_type::copy(__d, s, n);
-  }
-
-  static int _S_compare(size_type n1, size_type n2) CPP_NOEXCEPT
-  {
-    const difference_type __d = difference_type(n1 - n2);
-
-    if (__d > std::numeric_limits<int>::max())
-      return std::numeric_limits<int>::max();
-    else if (__d < std::numeric_limits<int>::min())
-      return std::numeric_limits<int>::min();
-    else
-      return int(__d);
-  }
+  { return _M_replace_aux(__i1.base() - _M_data(), __i2 - __i1, __n, __val); }
 };
 
 template<typename CharT, typename Traits>
@@ -1878,7 +1907,7 @@ public:
 #endif
 
   template<std::size_t N>
-  CPP_CONSTEXPR basic_cstring(CharT (*a)[N], cstring_constexpr) CPP_NOEXCEPT
+  CPP_CONSTEXPR basic_cstring(CharT (*a)[N], cstring_array_size) CPP_NOEXCEPT
   : m_begin(a)
   , m_size(N - 1)
   {}
@@ -2030,8 +2059,7 @@ public:
     if (pos > size())
       throw std::out_of_range("basic_cstring::copy");
     n = _M_limit(pos, n);
-    if (n)
-      _S_copy(s, data() + pos, n);
+    traits_type::copy(s, data() + pos, n);
     return n;
   }
 
@@ -2041,7 +2069,7 @@ public:
    *  This is a handle to internal data.  Do not modify or dire things may
    *  happen.
    */
-  CPP_CONSTEXPR const_pointer c___str() const CPP_NOEXCEPT
+  CPP_CONSTEXPR const_pointer c_str() const CPP_NOEXCEPT
   { return m_begin; }
 
   /**
@@ -2606,7 +2634,7 @@ public:
 
     int __r = traits_type::compare(data(), __str.data(), __len);
     if (!__r)
-      __r = _S_compare(__size, __osize);
+      __r = _M_compare(__size, __osize);
     return __r;
   }
 
@@ -2639,7 +2667,7 @@ public:
     const size_type __len = std::min(n, __osize);
     int __r = traits_type::compare(data() + pos, __str.data(), __len);
     if (!__r)
-      __r = _S_compare(n, __osize);
+      __r = _M_compare(n, __osize);
     return __r;
   }
 
@@ -2677,7 +2705,7 @@ public:
     const size_type __len = std::min(n1, n2);
     int __r = traits_type::compare(data() + pos1, __str.data() + pos2, __len);
     if (!__r)
-      __r = _S_compare(n1, n2);
+      __r = _M_compare(n1, n2);
     return __r;
   }
 
@@ -2706,7 +2734,7 @@ public:
     const size_type __len = std::min(__size, __osize);
     int __r = traits_type::compare(data(), s, __len);
     if (!__r)
-      __r = _S_compare(__size, __osize);
+      __r = _M_compare(__size, __osize);
     return __r;
   }
 
@@ -2737,7 +2765,7 @@ public:
     const size_type __len = std::min(n1, __osize);
     int __r = traits_type::compare(data() + pos, s, __len);
     if (!__r)
-      __r = _S_compare(n1, __osize);
+      __r = _M_compare(n1, __osize);
     return __r;
   }
 
@@ -2771,7 +2799,7 @@ public:
     const size_type __len = std::min(n1, n2);
     int __r = traits_type::compare(data() + pos, s, __len);
     if (!__r)
-      __r = _S_compare(n1, n2);
+      __r = _M_compare(n1, n2);
     return __r;
   }
 
@@ -2781,20 +2809,10 @@ private:
   size_type _M_limit(size_type pos, size_type off) const CPP_NOEXCEPT
   { return std::min(off, this->size() - pos); }
 
-  // When n = 1 way faster than the general multichar
-  // traits_type::copy/move/assign.
-  static void _S_copy(CharT* __d, pointer s, size_type n) CPP_NOEXCEPT
-  {
-    if (n == 1)
-      traits_type::assign(*__d, *s);
-    else
-      traits_type::copy(__d, s, n);
-  }
-
   basic_cstring _M_const_cstring(const cstring& __str) const
   { return basic_cstring(__str.data(), __str.size()); }
 
-  static int _S_compare(size_type n1, size_type n2) CPP_NOEXCEPT
+  static int _M_compare(size_type n1, size_type n2) CPP_NOEXCEPT
   {
     const difference_type __d = difference_type(n1 - n2);
 
@@ -2810,7 +2828,7 @@ private:
 
 template <typename CharT, std::size_t N>
 CPP_CONSTEXPR basic_cstring<CharT>
-make_cstring(CharT (&s)[N], cstring_constexpr) CPP_NOEXCEPT
+make_cstring(CharT (&s)[N], cstring_array_size) CPP_NOEXCEPT
 { return basic_cstring<CharT>(s, s + N - 1); }
 
 template <typename CharT>
@@ -2830,7 +2848,7 @@ basic_cstring<CharT> make_cstring(CharT * s) CPP_NOEXCEPT
 
 template <typename CharT, std::size_t N>
 CPP_CONSTEXPR basic_cstring<const CharT, std::char_traits<CharT> >
-make_cstring(const CharT (&s)[N], cstring_constexpr) CPP_NOEXCEPT
+make_cstring(const CharT (&s)[N], cstring_array_size) CPP_NOEXCEPT
 { return basic_cstring<const CharT, std::char_traits<CharT> >(s, s + N - 1); }
 
 template <typename CharT>
@@ -2892,7 +2910,7 @@ inline bool operator==(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator==(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) == 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) == 0; }
 
 /**
  *  @brief  Test equivalence of cstring and string.
@@ -3004,7 +3022,7 @@ inline bool operator<(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<(const basic_cstring<CharT, Traits>& __lhs,
                       const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) < 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
 
 /**
  *  @brief  Test if string precedes cstring.
@@ -3015,7 +3033,7 @@ inline bool operator<(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                       const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) > 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) > 0; }
 
 // operator >
 /**
@@ -3060,7 +3078,7 @@ inline bool operator>(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
                       const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) < 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
 
 /**
  *  @brief  Test if string follows cstring.
@@ -3071,7 +3089,7 @@ inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                       const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) > 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) > 0; }
 
 // operator <=
 /**
@@ -3116,7 +3134,7 @@ inline bool operator<=(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
                        const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) <= 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) <= 0; }
 
 /**
  *  @brief  Test if string doesn't follow cstring.
@@ -3127,7 +3145,7 @@ inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<=(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) >= 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) >= 0; }
 
 // operator >=
 /**
@@ -3172,7 +3190,7 @@ inline bool operator>=(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
                        const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c___str()) <= 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) <= 0; }
 
 /**
  *  @brief  Test if C string doesn't precede cstring.
@@ -3183,7 +3201,7 @@ inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>=(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c___str()) >= 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) >= 0; }
 
 
 /**
@@ -3218,7 +3236,7 @@ operator+(const std::basic_string<CharT, Traits, Alloc>& __lhs,
 	std::basic_string<typename Traits::char_type, Traits, Alloc> s;
 	s.reserve(__lhs.size() + __rhs.size());
 	s.append(__lhs);
-	s.append(__rhs.c___str(), __rhs.size());
+	s.append(__rhs.c_str(), __rhs.size());
 	return s;
 }
 
@@ -3235,7 +3253,7 @@ operator+(const basic_cstring<CharT, Traits>& __lhs,
 {
 	std::basic_string<typename Traits::char_type, Traits, Alloc> s;
 	s.reserve(__lhs.size() + __rhs.size());
-	s.append(__lhs.c___str(), __lhs.size());
+	s.append(__lhs.c_str(), __lhs.size());
 	s.append(__rhs);
 	return s;
 }
@@ -3250,7 +3268,7 @@ template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline std::basic_string<typename Traits::char_type, Traits, Alloc>&
 operator+=(std::basic_string<CharT, Traits, Alloc>& __lhs,
            const basic_cstring<CharT2, Traits>& __rhs)
-{ return __lhs.append(__rhs.c___str(), __rhs.size()); }
+{ return __lhs.append(__rhs.c_str(), __rhs.size()); }
 
 /**
  *  @brief  Append a cstring to string.
@@ -3262,7 +3280,7 @@ template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline std::basic_string<typename Traits::char_type, Traits, Alloc>&
 operator+=(std::basic_string<typename Traits::char_type, Traits, Alloc>& __lhs,
            const basic_cstring<const CharT, Traits>& __rhs)
-{ return __lhs.append(__rhs.c___str(), __rhs.size()); }
+{ return __lhs.append(__rhs.c_str(), __rhs.size()); }
 
 
 /**
@@ -3298,7 +3316,7 @@ inline void swap(basic_cstring<CharT, Traits>& __lhs,
 	inline result_type \
 	fname(const cstring_type& s, std::size_t* __idx = 0, int __base = 10)\
 	{ return ::falcon::detail::stoa<result_type>\
-	(&std_fname, #fname, s.c___str(), __idx, __base); }
+	(&std_fname, #fname, s.c_str(), __idx, __base); }
 
 #define __FALCON_BASIC_CSTRING_TO(result_type, fname, type)\
 	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, cstring)\
@@ -3319,7 +3337,7 @@ __FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 #define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type fname(const cstring_type& s, std::size_t* __idx = 0)\
 	{ return ::falcon::detail::stoa<result_type>\
-	(&std_fname, #fname, s.c___str(), __idx); }
+	(&std_fname, #fname, s.c_str(), __idx); }
 
 __FALCON_BASIC_CSTRING_TO(float, stof, f)
 __FALCON_BASIC_CSTRING_TO(double, stod, d)
