@@ -1,28 +1,13 @@
-#ifndef _FALCON_TYPE_TRAITS_INTEGRAL_CONSTANT_HPP
-#define _FALCON_TYPE_TRAITS_INTEGRAL_CONSTANT_HPP
+#ifndef FALCON_TYPE_TRAITS_INTEGRAL_CONSTANT_HPP
+#define FALCON_TYPE_TRAITS_INTEGRAL_CONSTANT_HPP
 
-#if __cplusplus >= 201103L
-# include <type_traits>
+#include <falcon/c++/boost_or_std.hpp>
+#include FALCON_BOOST_OR_STD_TRAITS(integral_constant)
+
 namespace falcon {
-using std::integral_constant;
-using std::true_type;
-using std::false_type;
+  using FALCON_BOOST_OR_STD_NAMESPACE::integral_constant;
+  using FALCON_BOOST_OR_STD_NAMESPACE::true_type;
+  using FALCON_BOOST_OR_STD_NAMESPACE::false_type;
 }
-#else
-namespace falcon {
-
-template<typename _Tp, _Tp __v>
-struct integral_constant
-{
-	static const _Tp                      value = __v;
-	typedef _Tp                           value_type;
-	typedef integral_constant<_Tp, __v>   type;
-};
-
-typedef integral_constant<bool, true> true_type;
-typedef integral_constant<bool, false> false_type;
-
-}
-#endif
 
 #endif

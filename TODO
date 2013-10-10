@@ -69,7 +69,7 @@ unary_compose et binary_compose doivent pouvoir deviné le type des fonctions
 faire en sorte que mulary_compose passe par héritage au lieu de tuple. Le bool passé en template ne doit pas existé autrement qu'en interne. renommer en *_base et passer par un alias ?
 mulary_compose doit hériter et compose retourner unary_compose ou binary_compose quand cela est possible.
 
-unary_compose, binary_compose et mulary_compose supporte falcon::ignore quand on les construits
+unary_compose, binary_compose et mulary_compose doivent supporter falcon::ignore quand on les construits
 
 faire un function_compose<...> (+ fonction composef()) comme mulary_compose mais prend un nombre de paramètre allant de 0 à infinit.
 
@@ -142,7 +142,7 @@ fonction pour simplifier les operations sur buffer (renvoit false si eof):
 	ios/streambuf.hpp
 intrusive data stream (eback, gptr, egptr, pbase, pptrm epptr). Retourne les valeurs interne de ces pointeurs (mettre dans ios/)
 
-tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui ce comporte comme un tuple
+tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui se comporte comme un tuple
 
 classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.h). (header different pour vs++ ?). Voir boost.simd
 
@@ -222,7 +222,7 @@ http://code.google.com/p/nicola-bonelli-repo/source/browse/trunk/codes.cpp0x/pri
 
 au niveau des construct() faire un cast à la port pour transformer les tableau[x][y] en tableau [x*y] (et plud de dimension évidement)
 
-un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basic_stringbuf qui fonctionne avec des cstring (et donc non sûr car ne fait de copie) et basic_stringbuf avec une taille limiter (utilise cstring mais fait une copie quaand str() est utilisé). Ces 3 streambuf peuvent avoir une base commune. Le basic_stringbuf avec une taille limitée peut être implémenter un constructeur qui utilise setp avec une donnée fournit par l'extrieur: struct basic_limitbuf: public std::streambuf{
+un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basic_stringbuf qui fonctionne avec des cstring (et donc non sûr car ne fait de copie) et basic_stringbuf avec une taille limiter (utilise cstring mais fait une copie quand str() est utilisé). Ces 3 streambuf peuvent avoir une base commune. Le basic_stringbuf avec une taille limitée peut être implémenté un constructeur qui utilise setp avec une donnée fournit par l'extrieur: struct basic_limitbuf: public std::streambuf{
   basic_limitbuf(char *buffer, size_t size)
   { this->setp(buffer,buffer+size); }
   char *end()
@@ -241,11 +241,12 @@ optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le ca
 
 remove type_traits/is_same.hpp
 
-normal_iterator (wrapper sur un pointeur). Pareil que celui de gcc ? L'utiliser dans cstring
-
 le namespace detail et publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
 
-unordered_vector
+unordered_vector. Pas de push_back et co, juste des insert(). Les méthodes de supression existe aussi. Container interne en protected et nommé 'c' (comme pour queue et priority_queue).
+
+sequence_queue, sequence_priority_queue et sequence_unordered_vector (permet de récupérer le container interne)
+
 
 
 

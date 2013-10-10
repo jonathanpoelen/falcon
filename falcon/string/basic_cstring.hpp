@@ -9,6 +9,7 @@
 #include <falcon/container/range_access.hpp>
 #include <falcon/detail/string_convertion.hpp>
 #include <falcon/iterator/normal_iterator.hpp>
+#include <falcon/type_traits/remove_cv_reference.hpp>
 #include <falcon/ostream/insert.hpp>
 
 #include <iosfwd>
@@ -17,26 +18,22 @@
 #include <iterator>
 #include <algorithm>
 #include <stdexcept>
-#if __cplusplus < 201103L
-# include <boost/type_traits/is_same.hpp>
-# include <boost/type_traits/is_const.hpp>
+#if __cplusplus >= 201103L
+# include <type_traits>
+# include <initializer_list>
+#else
 # include <boost/type_traits/is_array.hpp>
 # include <boost/type_traits/is_pointer.hpp>
 # include <boost/type_traits/is_integral.hpp>
-# include <boost/type_traits/remove_const.hpp>
-# include <boost/type_traits/remove_reference.hpp>
-#else
-# include <type_traits>
-# include <initializer_list>
 #endif
 
 namespace falcon {
 
 template<typename CharT, typename Traits, typename String,
   bool is_pointer_or_array = FALCON_BOOST_OR_STD_NAMESPACE::is_pointer<
-    typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<String>::type
+    typename remove_cv_reference<String>::type
   >::value || FALCON_BOOST_OR_STD_NAMESPACE::is_array<
-    typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<String>::type
+    typename remove_cv_reference<String>::type
   >::value
 >
 struct __dispath_cs_cons
