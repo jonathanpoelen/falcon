@@ -1,5 +1,8 @@
-#ifndef _FALCON_ITERATOR_RANGE_ACCESS_HPP
-#define _FALCON_ITERATOR_RANGE_ACCESS_HPP
+#ifndef FALCON_ITERATOR_RANGE_ACCESS_HPP
+#define FALCON_ITERATOR_RANGE_ACCESS_HPP
+
+#include <falcon/c++/noexcept.hpp>
+#include <falcon/c++/constexpr.hpp>
 
 #if __cplusplus >= 201103L
 # include <utility>
@@ -16,50 +19,75 @@
 namespace falcon {
 
 #if __cplusplus >= 201103L
-  using std::begin;
-  using std::end;
-#if __cplusplus > 201103L
-  using std::rbegin;
-  using std::rend;
-#else
   template<class Container>
-  inline auto rbegin(Container& cont)
+  auto begin(Container& cont)
+  noexcept(noexcept(cont.begin()))
+  -> decltype(cont.begin())
+  { return cont.begin(); }
+
+  template<class Container>
+  auto begin(const Container& cont)
+  noexcept(noexcept(cont.begin()))
+  -> decltype(cont.begin())
+  { return cont.begin(); }
+
+  template<class Container>
+  auto end(Container& cont)
+  noexcept(noexcept(cont.end()))
+  -> decltype(cont.end())
+  { return cont.end(); }
+
+  template<class Container>
+  auto end(const Container& cont)
+  noexcept(noexcept(cont.end()))
+  -> decltype(cont.end())
+  { return cont.end(); }
+
+  template<class Container>
+  auto rbegin(Container& cont)
+  noexcept(noexcept(cont.rbegin()))
   -> decltype(cont.rbegin())
   { return cont.rbegin(); }
 
   template<class Container>
-  inline auto rbegin(const Container& cont)
+  auto rbegin(const Container& cont)
+  noexcept(noexcept(cont.rbegin()))
   -> decltype(cont.rbegin())
   { return cont.rbegin(); }
 
   template<class Container>
-  inline auto rend(Container& cont)
+  auto rend(Container& cont)
+  noexcept(noexcept(cont.rend()))
   -> decltype(cont.rend())
   { return cont.rend(); }
 
   template<class Container>
-  inline auto rend(const Container& cont)
+  auto rend(const Container& cont)
+  noexcept(noexcept(cont.rend()))
   -> decltype(cont.rend())
   { return cont.rend(); }
-#endif
 
   template<class Container>
-  inline auto cbegin(const Container& cont)
+  auto cbegin(const Container& cont)
+  noexcept(noexcept(cont.cbegin()))
   -> decltype(begin(cont))
   { return begin(cont); }
 
   template<class Container>
-  inline auto cend(const Container& cont)
+  auto cend(const Container& cont)
+  noexcept(noexcept(cont.cend()))
   -> decltype(end(cont))
   { return end(cont); }
 
   template<class Container>
-  inline auto crbegin(const Container& cont)
+  auto crbegin(const Container& cont)
+  noexcept(noexcept(cont.crbegin()))
   -> decltype(rbegin(cont))
   { return rbegin(cont); }
 
   template<class Container>
-  inline auto crend(const Container& cont)
+  auto crend(const Container& cont)
+  noexcept(noexcept(cont.crend()))
   -> decltype(rend(cont))
   { return rend(cont); }
 
@@ -105,14 +133,6 @@ namespace falcon {
   inline typename range_access_iterator<Container>::type end(Container& cont)
   { return cont.end(); }
 
-  template<class T, size_t N>
-  inline T* begin(T (&arr)[N])
-  { return arr; }
-
-  template<class T, size_t N>
-  inline T* end(T (&arr)[N])
-  { return arr + N; }
-
   template<typename Container>
   inline typename range_access_reverse_iterator<Container>::type rbegin(Container& cont)
   { return cont.rbegin(); }
@@ -139,32 +159,65 @@ namespace falcon {
 
 #endif
 
-#if !(__cplusplus > 201103L)
-  template<class T, size_t N>
-  inline std::reverse_iterator<T*> rbegin(T (&arr)[N])
-  { return std::reverse_iterator<T*>(begin(arr)); }
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR T *
+  begin(T (&arr)[N]) CPP_NOEXCEPT
+  { return arr; }
 
-  template<class T, size_t N>
-  inline std::reverse_iterator<T*> rend(T (&arr)[N])
-  { return std::reverse_iterator<T*>(end(arr)); }
-#endif
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR const T *
+  begin(const T (&arr)[N]) CPP_NOEXCEPT
+  { return arr; }
 
-  template<class T, size_t N>
-  inline const T* cbegin(const T (&arr)[N])
-  { return begin(arr); }
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR T *
+  end(T (&arr)[N]) CPP_NOEXCEPT
+  { return arr + N; }
 
-  template<class T, size_t N>
-  inline const T* cend(const T (&arr)[N])
-  { return begin(arr); }
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR const  T *
+  end(const T (&arr)[N]) CPP_NOEXCEPT
+  { return arr + N; }
 
-  template<class T, size_t N>
-  inline std::reverse_iterator<const T*> crbegin(const T (&arr)[N])
+  template<class T, std::size_t N>
+  std::reverse_iterator<T*>
+  rbegin(T (&arr)[N]) CPP_NOEXCEPT
+  { return std::reverse_iterator<T*>(arr+N); }
+
+  template<class T, std::size_t N>
+  std::reverse_iterator<const T*>
+  rbegin(const T (&arr)[N]) CPP_NOEXCEPT
+  { return std::reverse_iterator<const T*>(arr+N); }
+
+  template<class T, std::size_t N>
+  std::reverse_iterator<T*>
+  rend(T (&arr)[N]) CPP_NOEXCEPT
+  { return std::reverse_iterator<T*>(arr); }
+
+  template<class T, std::size_t N>
+  std::reverse_iterator<const T*>
+  rend(const T (&arr)[N]) CPP_NOEXCEPT
+  { return std::reverse_iterator<const T*>(arr); }
+
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR T const *
+  cbegin(const T (&arr)[N])
+  { return arr; }
+
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR const T *
+  cend(const T (&arr)[N])
+  { return arr + N; }
+
+  template<class T, std::size_t N>
+  std::reverse_iterator<const T*>
+  crbegin(const T (&arr)[N])
   { return rbegin(arr); }
 
-  template<class T, size_t N>
-  inline std::reverse_iterator<const T*> crend(const T (&arr)[N])
+  template<class T, std::size_t N>
+  std::reverse_iterator<const T*>
+  crend(const T (&arr)[N])
   { return rbegin(arr); }
-
 
 #if __cplusplus >= 201103L
   template <typename Container>

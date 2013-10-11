@@ -5,7 +5,7 @@
 void basic_cstring_test()
 {
   {
-    falcon::const_cstring cstr = "plop";
+    constexpr falcon::const_cstring cstr = falcon::constexpr_cstring("plop");
     CHECK(cstr == "plop");
     CHECK(cstr <= "plop");
     CHECK(cstr >= "plop");
@@ -42,6 +42,33 @@ void basic_cstring_test()
     CHECK(cstr >= cstr2);
     CHECK(cstr2 <= cstr);
     CHECK(!(cstr2 >= cstr));
+  }
+  {
+    char s[10] = {'p','l','o','p','\0'};
+    falcon::cstring cstr = falcon::cstring_array(s, 4);
+    CHECK_EQUAL_VALUE(cstr.size(), 4u);
+    CHECK(cstr.capacity() == sizeof(s));
+    CHECK(cstr == "plop");
+    cstr.push_back('e');
+    CHECK_EQUAL_VALUE(cstr.size(), 5u);
+    CHECK(cstr == "plope");
+    cstr.insert(0, 2, 'r');
+    CHECK_EQUAL_VALUE(cstr.size(), 7u);
+    CHECK(cstr >= "rrplope");
+    cstr.replace(1, 4, "abc");
+    CHECK_EQUAL_VALUE(cstr.size(), 6u);
+    CHECK("rabcpe" == cstr);
+    cstr.append("fe");
+    CHECK_EQUAL_VALUE(cstr.size(), 8u);
+    CHECK("rabcpefe" == cstr);
+    try {
+      cstr.append("yy");
+      CHECK(false);
+    } catch (std::length_error &)
+    {}
+    cstr.erase(3, 4);
+    CHECK_EQUAL_VALUE(cstr.size(), 4u);
+    CHECK("rabe" == cstr);
   }
 }
 
