@@ -1927,7 +1927,12 @@ public:
   {}
 #endif
 
-  ///TODO cstring_array_size is unless
+  template<std::size_t N>
+  CPP_CONSTEXPR basic_cstring(const CharT (&s)[N]) CPP_NOEXCEPT
+  : m_begin(s)
+  , m_size(N - 1)
+  {}
+
   template<std::size_t N>
   CPP_CONSTEXPR basic_cstring(const CharT (&s)[N], cstring_array_size) CPP_NOEXCEPT
   : m_begin(s)
@@ -1961,7 +1966,7 @@ public:
   , m_size(__str.m_size)
   {}
 
-  CPP_CONSTEXPR basic_cstring(const cstring& __str) CPP_NOEXCEPT
+  basic_cstring(const cstring& __str) CPP_NOEXCEPT
   : m_begin(__str.data())
   , m_size(__str.size())
   {}

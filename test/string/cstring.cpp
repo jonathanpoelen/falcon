@@ -5,7 +5,7 @@
 void basic_cstring_test()
 {
   {
-    constexpr falcon::const_cstring cstr = falcon::constexpr_cstring("plop");
+    constexpr falcon::const_cstring cstr("plop");
     CHECK(cstr == "plop");
     CHECK(cstr <= "plop");
     CHECK(cstr >= "plop");
