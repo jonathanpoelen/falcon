@@ -56,10 +56,6 @@ struct __dispath_cs_cons<CharT, Traits, String, true>
 struct cstring_array_size{};
 struct cstring_array_capacity{};
 
-//TODO adding cstring_array_size and cstring_array_capacity maker (cstring_array() ?)
-//TODO _M_set_terminal inutile sauf pour c_str()
-//TODO don't c_str(), use data()
-
 /**
  * @brief Managing sequences of constants characters and constant character-like objects.
  */
@@ -132,7 +128,7 @@ public:
   template<std::size_t N>
   basic_cstring(CharT * (&s)[N], cstring_array_size) CPP_NOEXCEPT
   : m_begin(s)
-  , m_size(N)
+  , m_size(N-1)
   , m_capacity(N)
   {}
 
@@ -553,7 +549,6 @@ public:
       throw std::length_error("basic_cstring::assign");
     }
     _M_assign(_M_data(), n, c);
-    _M_set_terminal();
     return *this;
   }
 
@@ -740,7 +735,6 @@ public:
     _M_move(p + n, p, size() - pos);
     _M_assign(p, n, c);
     m_size += n;
-    _M_set_terminal();
     return *this;
   }
 
@@ -765,7 +759,6 @@ public:
     _M_move(__p + 1, __p, _M_iend() - __p);
     traits_type::assign(*__p, c);
     ++m_size;
-    _M_set_terminal();
     return p;
   }
 
@@ -1125,7 +1118,10 @@ public:
    *  happen.
    */
   const_pointer c_str() const CPP_NOEXCEPT
-  { return m_begin; }
+  {
+    _M_set_terminal();
+    return m_begin;
+  }
 
   /**
    *  @brief  Return const pointer to contents.
@@ -1745,11 +1741,14 @@ private:
   void _M_set_length(size_type len) CPP_NOEXCEPT
   {
     m_size = len;
-    _M_set_terminal();
   }
 
-  void _M_set_terminal() CPP_NOEXCEPT
-  { traits_type::assign(m_begin[m_size], CharT()); }
+  void _M_set_terminal() const CPP_NOEXCEPT
+  {
+    if (m_capacity) {
+      traits_type::assign(m_begin[m_size], CharT());
+    }
+  }
 
   /**
    *  @brief  Replace characters with multiple characters.
@@ -2824,17 +2823,38 @@ private:
 
 
 template <typename CharT, std::size_t N>
-CPP_CONSTEXPR basic_cstring<CharT>
+basic_cstring<CharT>
+cstring_array(CharT (&s)[N]) CPP_NOEXCEPT
+{ return basic_cstring<CharT>(s, cstring_array_size()); }
+
+template <typename CharT, std::size_t N>
+CPP_CONSTEXPR basic_cstring<const CharT>
+cstring_array(const CharT (&s)[N]) CPP_NOEXCEPT
+{ return basic_cstring<const CharT>(s, cstring_array_size()); }
+
+
+template <typename CharT, std::size_t N>
+basic_cstring<CharT>
 make_cstring(CharT (&s)[N], cstring_array_size) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s, s + N - 1); }
+{ return basic_cstring<CharT>(s, cstring_array_size()); }
+
+template <typename CharT, std::size_t N>
+basic_cstring<CharT>
+make_cstring(CharT (&s)[N], cstring_array_capacity) CPP_NOEXCEPT
+{ return basic_cstring<CharT>(s, cstring_array_capacity()); }
+
+template <typename CharT, std::size_t N>
+basic_cstring<CharT>
+make_cstring(CharT (&s)[N], std::size_t size, cstring_array_size) CPP_NOEXCEPT
+{ return basic_cstring<CharT>(s, size, cstring_array_size()); }
 
 template <typename CharT>
-CPP_CONSTEXPR basic_cstring<CharT>
+basic_cstring<CharT>
 make_cstring(CharT * s, std::size_t n) CPP_NOEXCEPT
 { return basic_cstring<CharT>(s, n); }
 
 template <typename CharT>
-CPP_CONSTEXPR basic_cstring<CharT>
+basic_cstring<CharT>
 make_cstring(CharT * first, CharT * last) CPP_NOEXCEPT
 { return basic_cstring<CharT>(first, last); }
 
@@ -2907,7 +2927,7 @@ inline bool operator==(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator==(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) == 0; }
+{ return __lhs.compare(0, __rhs.size(), __rhs.data(), __rhs.size()) == 0; }
 
 /**
  *  @brief  Test equivalence of cstring and string.
@@ -3019,7 +3039,7 @@ inline bool operator<(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<(const basic_cstring<CharT, Traits>& __lhs,
                       const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.data(), __lhs.size()) < 0; }
 
 /**
  *  @brief  Test if string precedes cstring.
@@ -3030,7 +3050,7 @@ inline bool operator<(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                       const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) > 0; }
+{ return __rhs.compare(0, __lhs.size(), __lhs.data(), __lhs.size()) > 0; }
 
 // operator >
 /**
@@ -3042,7 +3062,7 @@ inline bool operator<(const std::basic_string<CharT, Traits, Alloc>& __lhs,
 template<typename CharT, typename CharT2, typename Traits>
 inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
                       const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(__rhs) > 0; }
+{ return __rhs < __lhs; }
 
 /**
  *  @brief  Test if cstring follows C string.
@@ -3053,7 +3073,7 @@ inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename Traits, typename CharT2>
 inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
                       CharT2 * __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(__rhs) > 0; }
+{ return __rhs < __lhs; }
 
 /**
  *  @brief  Test if C string follows cstring.
@@ -3064,7 +3084,7 @@ inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename Traits, typename CharT2>
 inline bool operator>(CharT2 * __lhs,
                       const basic_cstring<CharT, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(__lhs) < 0; }
+{ return __rhs < __lhs; }
 
 /**
  *  @brief  Test if cstring follows string.
@@ -3075,7 +3095,7 @@ inline bool operator>(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
                       const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) < 0; }
+{ return __rhs < __lhs; }
 
 /**
  *  @brief  Test if string follows cstring.
@@ -3086,7 +3106,7 @@ inline bool operator>(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                       const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) > 0; }
+{ return __rhs < __lhs; }
 
 // operator <=
 /**
@@ -3098,7 +3118,7 @@ inline bool operator>(const std::basic_string<CharT, Traits, Alloc>& __lhs,
 template<typename CharT, typename CharT2, typename Traits>
 inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(__rhs) <= 0; }
+{ return !(__rhs < __lhs); }
 
 /**
  *  @brief  Test if cstring doesn't follow C string.
@@ -3109,7 +3129,7 @@ inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename Traits, typename CharT2>
 inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
                        CharT2 * __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(__rhs) <= 0; }
+{ return !(__rhs < __lhs); }
 
 /**
  *  @brief  Test if C string doesn't follow cstring.
@@ -3120,7 +3140,7 @@ inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename Traits, typename CharT2>
 inline bool operator<=(CharT2 * __lhs,
                        const basic_cstring<CharT, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(__lhs) >= 0; }
+{ return !(__rhs < __lhs); }
 
 /**
  *  @brief  Test if cstring doesn't follow string.
@@ -3131,7 +3151,7 @@ inline bool operator<=(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
                        const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) <= 0; }
+{ return !(__rhs < __lhs); }
 
 /**
  *  @brief  Test if string doesn't follow cstring.
@@ -3142,7 +3162,7 @@ inline bool operator<=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator<=(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) >= 0; }
+{ return !(__rhs < __lhs); }
 
 // operator >=
 /**
@@ -3154,7 +3174,7 @@ inline bool operator<=(const std::basic_string<CharT, Traits, Alloc>& __lhs,
 template<typename CharT, typename CharT2, typename Traits>
 inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(__rhs) >= 0; }
+{ return !(__lhs < __rhs); }
 
 /**
  *  @brief  Test if cstring doesn't precede C string.
@@ -3165,7 +3185,7 @@ inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename Traits, typename CharT2>
 inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
                        CharT2 * __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(__rhs) >= 0; }
+{ return !(__lhs < __rhs); }
 
 /**
  *  @brief  Test if C string doesn't precede cstring.
@@ -3176,7 +3196,7 @@ inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename Traits, typename CharT2>
 inline bool operator>=(CharT2 * __lhs,
                        const basic_cstring<CharT, Traits>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(__lhs) <= 0; }
+{ return !(__lhs < __rhs); }
 
 /**
  *  @brief  Test if cstring doesn't precede string.
@@ -3187,7 +3207,7 @@ inline bool operator>=(CharT2 * __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
                        const std::basic_string<CharT2, Traits, Alloc>& __rhs) CPP_NOEXCEPT
-{ return __rhs.compare(0, __lhs.size(), __lhs.c_str()) <= 0; }
+{ return !(__lhs < __rhs); }
 
 /**
  *  @brief  Test if C string doesn't precede cstring.
@@ -3198,7 +3218,7 @@ inline bool operator>=(const basic_cstring<CharT, Traits>& __lhs,
 template<typename CharT, typename CharT2, typename Traits, typename Alloc>
 inline bool operator>=(const std::basic_string<CharT, Traits, Alloc>& __lhs,
                        const basic_cstring<CharT2, Traits>& __rhs) CPP_NOEXCEPT
-{ return __lhs.compare(0, __rhs.size(), __rhs.c_str()) >= 0; }
+{ return !(__lhs < __rhs); }
 
 
 /**
@@ -3273,11 +3293,23 @@ operator+=(std::basic_string<CharT, Traits, Alloc>& __lhs,
  *  @param __rhs  The cstring to append.
  *  @return  Reference to __lhs.
  */
-template<typename CharT, typename CharT2, typename Traits, typename Alloc>
+template<typename CharT, typename Traits, typename Alloc>
 inline std::basic_string<typename Traits::char_type, Traits, Alloc>&
 operator+=(std::basic_string<typename Traits::char_type, Traits, Alloc>& __lhs,
-           const basic_cstring<const CharT, Traits>& __rhs)
+           const basic_cstring<CharT, Traits>& __rhs)
 { return __lhs.append(__rhs.c_str(), __rhs.size()); }
+
+/**
+ *  @brief  Append a cstring to string.
+ *  @param __lhs  string.
+ *  @param __rhs  The cstring to append.
+ *  @return  Reference to __lhs.
+ */
+template<typename CharT, typename CharT2, typename Traits, typename Alloc>
+inline std::basic_string<typename Traits::char_type, Traits, Alloc>&
+operator+=(basic_cstring<CharT, Traits>& __lhs,
+           const basic_cstring<CharT2, Traits>& __rhs)
+{ return __lhs.append(__rhs); }
 
 
 /**
@@ -3308,42 +3340,41 @@ inline void swap(basic_cstring<CharT, Traits>& __lhs,
                  basic_cstring<CharT, Traits>& __rhs) CPP_NOEXCEPT
 { __lhs.swap(__rhs); }
 
-
-#define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
+#define FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type \
 	fname(const cstring_type& s, std::size_t* __idx = 0, int __base = 10)\
 	{ return ::falcon::detail::stoa<result_type>\
 	(&std_fname, #fname, s.c_str(), __idx, __base); }
 
-#define __FALCON_BASIC_CSTRING_TO(result_type, fname, type)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, cstring)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, const_cstring)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, cwstring)\
-	__FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, const_cwstring)
+#define FALCON_BASIC_CSTRING_TO(result_type, fname, type)\
+	FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, cstring)\
+	FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, strto##type, const_cstring)\
+	FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, cwstring)\
+	FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, wcsto##type, const_cwstring)
 
-__FALCON_BASIC_CSTRING_TO(int, stoi, l)
-__FALCON_BASIC_CSTRING_TO(long, stol, l)
-__FALCON_BASIC_CSTRING_TO(unsigned long, stoul, ul)
+FALCON_BASIC_CSTRING_TO(int, stoi, l)
+FALCON_BASIC_CSTRING_TO(long, stol, l)
+FALCON_BASIC_CSTRING_TO(unsigned long, stoul, ul)
 #if __cplusplus >= 201103L
-__FALCON_BASIC_CSTRING_TO(long long, stoll, ull)
-__FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
+FALCON_BASIC_CSTRING_TO(long long, stoll, ull)
+FALCON_BASIC_CSTRING_TO(unsigned long long, stoull, ull)
 #endif
 
-#undef __FALCON_BASIC_CSTRING_TO_IMPL
+#undef FALCON_BASIC_CSTRING_TO_IMPL
 
-#define __FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
+#define FALCON_BASIC_CSTRING_TO_IMPL(result_type, fname, std_fname, cstring_type)\
 	inline result_type fname(const cstring_type& s, std::size_t* __idx = 0)\
 	{ return ::falcon::detail::stoa<result_type>\
 	(&std_fname, #fname, s.c_str(), __idx); }
 
-__FALCON_BASIC_CSTRING_TO(float, stof, f)
-__FALCON_BASIC_CSTRING_TO(double, stod, d)
+FALCON_BASIC_CSTRING_TO(float, stof, f)
+FALCON_BASIC_CSTRING_TO(double, stod, d)
 #if __cplusplus >= 201103L
-__FALCON_BASIC_CSTRING_TO(double long, stold, ld)
+FALCON_BASIC_CSTRING_TO(double long, stold, ld)
 #endif
 
-#undef __FALCON_BASIC_CSTRING_TO
-#undef __FALCON_BASIC_CSTRING_TO_IMPL
+#undef FALCON_BASIC_CSTRING_TO
+#undef FALCON_BASIC_CSTRING_TO_IMPL
 
 inline std::string to_string(const cstring& __str)
 { return std::string(__str.data(), __str.size()); }
