@@ -7,7 +7,7 @@
 #include FALCON_BOOST_OR_STD_TRAITS(is_class)
 
 #define FALCON_CREATE_HAS_MEMBER_FUNCTION(_Name, _FuncName)\
-	template <typename _Falcon_T,  bool = ::FALCON_BOOST_OR_STD_NAMESPACE::is_class<_Falcon_T>::value>\
+	template <typename _Falcon_T,  bool = FALCON_BOOST_OR_STD_NAMESPACE::is_class<_Falcon_T>::value>\
 	class _Name\
 	{\
 		struct base { void _FuncName(); };\
@@ -30,7 +30,7 @@
 
 
 #define FALCON_CREATE_HAS_MEMBER_VAR(_Name, _VarName)\
-	template <typename _Falcon_T,  bool = ::FALCON_BOOST_OR_STD_NAMESPACE::is_class<_Falcon_T>::value>\
+	template <typename _Falcon_T,  bool = FALCON_BOOST_OR_STD_NAMESPACE::is_class<_Falcon_T>::value>\
 	class _Name\
 	{\
 		template <typename U, typename V = decltype(U::_VarName)>\

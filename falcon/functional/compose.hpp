@@ -1,7 +1,6 @@
-#ifndef _FALCON_FUNCTIONAL_COMPOSE_HPP
-#define _FALCON_FUNCTIONAL_COMPOSE_HPP
+#ifndef FALCON_FUNCTIONAL_COMPOSE_HPP
+#define FALCON_FUNCTIONAL_COMPOSE_HPP
 
-#include <functional>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/reference.hpp>
 #include <falcon/utility/move.hpp>
@@ -9,24 +8,13 @@
 # include <falcon/arg/arg.hpp>
 # include <falcon/tuple/tuple_compose.hpp>
 # include <falcon/type_traits/has.hpp>
+# include <falcon/tuple/detail/is_tuple.hpp>
+# include <tuple>
 #endif
+
+#include <functional>
 
 namespace falcon {
-
-#if __cplusplus >= 201103L
-template <class _WrapArgument, class _WrapResult>
-struct __compose_check_type
-{
-	static const bool value = (
-		has_argument_type<
-			typename std::remove_reference<_WrapArgument>::type
-		>::value
-		&& has_result_type<
-			typename std::remove_reference<_WrapResult>::type
-		>::value
-	);
-};
-#endif
 
 /**
  * @defgroup functors Function Objects
@@ -41,21 +29,21 @@ struct __compose_check_type
  * @{
  */
 #if __cplusplus < 201103L
-template <class _Operation1, class _Operation2>
+template <class Operation1, class Operation2>
 struct unary_compose
 : public std::unary_function<
-	typename _Operation2::argument_type,
-	typename _Operation1::result_type
+	typename Operation2::argument_type,
+	typename Operation1::result_type
 >
 {
 protected:
-	_Operation1 _M_fn1;
-	_Operation2 _M_fn2;
+	Operation1 _M_fn1;
+	Operation2 _M_fn2;
 
 public:
-	unary_compose(const _Operation1& __x, const _Operation2& __y)
-	: _M_fn1(__x)
-	, _M_fn2(__y)
+	unary_compose(const Operation1& x, const Operation2& y)
+	: _M_fn1(x)
+	, _M_fn2(y)
 	{}
 
 	unary_compose()
@@ -63,87 +51,91 @@ public:
 	, _M_fn2()
 	{}
 
-	typename _Operation1::result_type
-	operator()(typename _Operation2::argument_type& __x) const
-	{ return _M_fn1(_M_fn2(__x)); }
+	typename Operation1::result_type
+	operator()(typename Operation2::argument_type& x) const
+	{ return _M_fn1(_M_fn2(x)); }
 };
 
 #else
 
-template <class _Operation1, class _Operation2,
-bool = __compose_check_type<_Operation2, _Operation1>::value>
-struct unary_compose
-: public std::unary_function<
-	typename _Operation2::argument_type,
-	typename _Operation1::result_type
->
+struct __compose_empty_base {};
+
+
+template <class WrapArgument, class WrapResult>
+struct __unary_compose_check_type
 {
-	typedef typename _Operation2::argument_type argument_type;
-	typedef typename _Operation1::result_type result_type;
-
-protected:
-	_Operation1 _M_fn1;
-	_Operation2 _M_fn2;
-
-public:
-	constexpr unary_compose(const _Operation1& __x, const _Operation2& __y)
-	: _M_fn1(__x)
-	, _M_fn2(__y)
-	{}
-
-	constexpr unary_compose() = default;
-
-	constexpr unary_compose(_Operation1&& __x, const _Operation2& __y)
-	: _M_fn1(std::forward<_Operation1>(__x))
-	, _M_fn2(__y)
-	{}
-
-	constexpr unary_compose(const _Operation1& __x, _Operation2&& __y)
-	: _M_fn1(__x)
-	, _M_fn2(std::forward<_Operation2>(__y))
-	{}
-
-	constexpr unary_compose(_Operation1&& __x, _Operation2&& __y)
-	: _M_fn1(std::forward<_Operation1>(__x))
-	, _M_fn2(std::forward<_Operation2>(__y))
-	{}
-
-	result_type operator()(argument_type& __x) const
-	{ return _M_fn1(_M_fn2(__x)); }
+  static const bool value = (
+    has_argument_type<
+    typename std::remove_reference<WrapArgument>::type
+    >::value
+    && has_result_type<
+    typename std::remove_reference<WrapResult>::type
+    >::value
+  );
 };
 
-template <class _Operation1, class _Operation2>
-struct unary_compose<_Operation1, _Operation2, false>
+template <class Operation1, class Operation2>
+struct __unary_compose_base
+: public std::unary_function<
+  typename Operation2::argument_type,
+  typename Operation1::result_type
+>
+{};
+
+template <typename Operation1, typename Operation2>
+class unary_compose
+: public std::conditional<
+  __unary_compose_check_type<Operation2, Operation1>::value,
+  __unary_compose_base<Operation2, Operation1>,
+  __compose_empty_base
+>::type
 {
-protected:
-	_Operation1 _M_fn1;
-	_Operation2 _M_fn2;
+  Operation1 fn1;
+  Operation2 fn2;
 
 public:
-	constexpr unary_compose(const _Operation1& __x, const _Operation2& __y)
-	: _M_fn1(__x)
-	, _M_fn2(__y)
+  constexpr unary_compose() = default;
+  constexpr unary_compose(const unary_compose&) = default;
+  constexpr unary_compose(unary_compose&&) = default;
+  unary_compose& operator=(const unary_compose&) = default;
+  unary_compose& operator=(unary_compose&&) = default;
+
+  constexpr unary_compose(Operation1&& x)
+  : fn1(std::forward<Operation1>(x))
+  , fn2()
+  {}
+
+  constexpr unary_compose(typename std::enable_if<
+    !std::is_same<Operation1,Operation2>::value,
+    Operation2
+  >::type&& y)
+	: fn1()
+  , fn2(std::forward<Operation2>(y))
 	{}
 
-	constexpr unary_compose() = default;
+	template<typename OperationT, typename OperationU>
+	constexpr unary_compose(OperationT&& x, OperationU&& y)
+	: fn1(std::forward<OperationT>(x))
+	, fn2(std::forward<OperationU>(y))
+	{}
 
 	template<typename T>
-	constexpr typename std::result_of<_Operation1&(
-		typename std::result_of<_Operation2&(T&)>::type
-	)>::type operator()(T& __x) const
-	{ return _M_fn1(_M_fn2(__x)); }
+	auto operator()(T&& x) const
+	-> decltype(this->fn1(this->fn2(std::forward<T>(x))))
+  { return fn1(fn2(std::forward<T>(x))); }
+
 };
 
 #endif
 
-template <class _Operation1, class _Operation2>
-inline unary_compose<_Operation1, _Operation2>
-compose1(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
-         _Operation2 CPP_RVALUE_OR_CONST_REFERENCE __fn2)
+template <class Operation1, class Operation2>
+unary_compose<Operation1, Operation2>
+compose1(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
+         Operation2 CPP_RVALUE_OR_CONST_REFERENCE fn2)
 {
-	return unary_compose<_Operation1,_Operation2>(
-		FALCON_FORWARD(_Operation1, __fn1),
-		FALCON_FORWARD(_Operation2, __fn2)
+	return unary_compose<Operation1,Operation2>(
+		FALCON_FORWARD(Operation1, fn1),
+		FALCON_FORWARD(Operation2, fn2)
 	);
 }
 //@}
@@ -166,23 +158,23 @@ compose1(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
  * @{
  */
 #if __cplusplus < 201103L
-template <class _Operation1, class _Operation2, class _Operation3 = _Operation2>
+template <class Operation1, class Operation2, class Operation3 = Operation2>
 struct binary_compose
 : public std::unary_function<
-	typename _Operation2::argument_type,
-	typename _Operation1::result_type
+	typename Operation2::argument_type,
+	typename Operation1::result_type
 > {
 protected:
-	_Operation1 _M_fn1;
-	_Operation2 _M_fn2;
-	_Operation3 _M_fn3;
+	Operation1 _M_fn1;
+	Operation2 _M_fn2;
+	Operation3 _M_fn3;
 
 public:
-	binary_compose(const _Operation1& __x, const _Operation2& __y,
-				   const _Operation3& __z)
-	: _M_fn1(__x)
-	, _M_fn2(__y)
-	, _M_fn3(__z)
+	binary_compose(const Operation1& x, const Operation2& y,
+				   const Operation3& z)
+	: _M_fn1(x)
+	, _M_fn2(y)
+	, _M_fn3(z)
 	{}
 
 	binary_compose()
@@ -191,99 +183,77 @@ public:
 	, _M_fn3()
 	{}
 
-	typename _Operation1::result_type
-	operator()(typename _Operation2::argument_type& __x) const
-	{ return _M_fn1(_M_fn2(__x), _M_fn3(__x)); }
+	typename Operation1::result_type
+	operator()(typename Operation2::argument_type& x) const
+	{ return _M_fn1(_M_fn2(x), _M_fn3(x)); }
 };
 
 #else
 
-template <class _Operation1, class _Operation2, class _Operation3 = _Operation2,
-bool = __compose_check_type<_Operation2, _Operation1>::value>
-struct binary_compose
-: public std::unary_function<
-	typename _Operation2::argument_type,
-	typename _Operation1::result_type
-> {
-protected:
-	_Operation1 _M_fn1;
-	_Operation2 _M_fn2;
-	_Operation3 _M_fn3;
-
-public:
-	constexpr binary_compose(const _Operation1& __x,
-							 const _Operation2& __y,
-							 const _Operation3& __z)
-	: _M_fn1(__x)
-	, _M_fn2(__y)
-	, _M_fn3(__z)
-	{}
-
-	constexpr binary_compose() = default;
-
-	constexpr binary_compose(_Operation1&& __x, _Operation2&& __y,
-							 _Operation3&& __z)
-	: _M_fn1(std::forward<_Operation1>(__x))
-	, _M_fn2(std::forward<_Operation2>(__y))
-	, _M_fn3(std::forward<_Operation2>(__z))
-	{}
-
-	typename _Operation1::result_type
-	operator()(typename _Operation2::argument_type& __x) const
-	{ return _M_fn1(_M_fn2(__x), _M_fn3(__x)); }
-};
-
-template <class _Operation1, class _Operation2, class _Operation3>
-struct binary_compose<_Operation1, _Operation2, _Operation3, false>
+template <class Operation1, class Operation2, class Operation3 = Operation2,
+bool = __unary_compose_check_type<Operation2, Operation1>::value>
+class binary_compose
+: public std::conditional<
+  __unary_compose_check_type<Operation2, Operation1>::value,
+  __unary_compose_base<Operation2, Operation1>,
+  __compose_empty_base
+>::type
 {
-protected:
-	_Operation1 _M_fn1;
-	_Operation2 _M_fn2;
-	_Operation3 _M_fn3;
+  Operation1 fn1;
+  Operation2 fn2;
+  Operation3 fn3;
 
 public:
-	constexpr binary_compose(const _Operation1& __x,
-							 const _Operation2& __y,
-							 const _Operation3& __z)
-	: _M_fn1(__x)
-	, _M_fn2(__y)
-	, _M_fn3(__z)
-	{}
+  constexpr binary_compose() = default;
+  constexpr binary_compose(const binary_compose&) = default;
+  constexpr binary_compose(binary_compose&&) = default;
+  binary_compose& operator=(const binary_compose&) = default;
+  binary_compose& operator=(binary_compose&&) = default;
 
-	constexpr binary_compose() = default;
+  template<typename OperationT, typename OperationU, typename OperationZ>
+  constexpr binary_compose(OperationT&& x, OperationU&& y, OperationZ&& z)
+	: fn1(std::forward<OperationT>(x))
+	, fn2(std::forward<OperationU>(y))
+	, fn3(std::forward<OperationZ>(z))
+  {}
 
-	template<typename T>
-	constexpr typename std::result_of<const _Operation1&(
-		const _Operation2&(T&),
-		const _Operation3&(T&)
-	)>::type operator()(T& __x) const
-	{ return _M_fn1(_M_fn2(__x), _M_fn3(__x)); }
+  template<typename OperationResult>
+  constexpr binary_compose(OperationResult&& x)
+  : fn1(std::forward<OperationResult>(x))
+  , fn2()
+  , fn3()
+  {}
+
+  template<typename T>
+  auto operator()(T&& x) const
+  -> decltype(this->fn1(this->fn2(std::forward<T>(x)), this->fn3(std::forward<T>(x))))
+  { return fn1(fn2(std::forward<T>(x)), fn3(std::forward<T>(x))); }
 };
 //@}
 
 #endif
 
-template <class _Operation1, class _Operation2, class _Operation3 = _Operation2>
-inline binary_compose<_Operation1, _Operation2, _Operation3>
-compose2(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
-		 _Operation2 CPP_RVALUE_OR_CONST_REFERENCE __fn2,
-         _Operation3 CPP_RVALUE_OR_CONST_REFERENCE __fn3)
+template <class Operation1, class Operation2, class Operation3>
+binary_compose<Operation1, Operation2, Operation3>
+compose2(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
+         Operation2 CPP_RVALUE_OR_CONST_REFERENCE fn2,
+         Operation3 CPP_RVALUE_OR_CONST_REFERENCE fn3)
 {
-	return binary_compose<_Operation1,_Operation2,_Operation3>(
-		FALCON_FORWARD(_Operation1, __fn1),
-		FALCON_FORWARD(_Operation2, __fn2),
-		FALCON_FORWARD(_Operation3, __fn3)
+	return binary_compose<Operation1,Operation2,Operation3>(
+		FALCON_FORWARD(Operation1, fn1),
+		FALCON_FORWARD(Operation2, fn2),
+		FALCON_FORWARD(Operation3, fn3)
 	);
 }
 
-template <class _Operation1, class _Operation2>
-inline binary_compose<_Operation1, _Operation2, _Operation2>
-compose2(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
-         _Operation2 CPP_RVALUE_OR_CONST_REFERENCE __fn2)
+template <class Operation1, class Operation2>
+binary_compose<Operation1, Operation2, Operation2>
+compose2(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
+         Operation2 CPP_RVALUE_OR_CONST_REFERENCE fn2)
 {
-	return binary_compose<_Operation1, _Operation2, _Operation2>(
-		FALCON_FORWARD(_Operation1, __fn1),
-		FALCON_FORWARD(_Operation2, __fn2)
+	return binary_compose<Operation1, Operation2, Operation2>(
+		FALCON_FORWARD(Operation1, fn1),
+		FALCON_FORWARD(Operation2, fn2)
 	);
 }
 
@@ -295,7 +265,7 @@ compose2(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
  * The function  @c compose takes f, t and constructs the @c mulary_compose
  * instance for you.  For example, if @c f returns an int, then
  * \code
- * int answer = (compose2(f,g1,g2,g3))(x);
+ * int answer = (composex(f,g1,g2,g3))(x);
  * \endcode
  * is equivalent to
  * \code
@@ -306,150 +276,88 @@ compose2(_Operation1 CPP_RVALUE_OR_CONST_REFERENCE __fn1,
  * \endcode
  * @{
  */
-template<class _Operation, class _Operations,
-bool = __compose_check_type<
-	typename std::tuple_element<0, _Operations>::type,
-	_Operation
->::value>
-struct mulary_compose;
-
-template<class _Operation, class... _Operations>
-struct mulary_compose<_Operation, std::tuple<_Operations...>, true>
-: public std::unary_function<
-	typename arg_element<0, _Operations...>::type::argument_type,
-	typename _Operation::result_type
-> {
-protected:
-	_Operation _M_fn;
-	std::tuple<_Operations...> _M_fns;
-
-public:
-	constexpr mulary_compose() = default;
-
-	constexpr mulary_compose(_Operation&& __x,
-							 std::tuple<_Operations...>&& __y)
-	: _M_fn(std::forward<_Operation>(__x))
-	, _M_fns(std::forward<std::tuple<_Operations...>>(__y))
-	{}
-
-	constexpr mulary_compose(_Operation&& __x,
-							 std::tuple<_Operations&&...> __y)
-	: _M_fn(std::forward<_Operation>(__x))
-	, _M_fns(__y)
-	{}
-
-	constexpr mulary_compose(std::tuple<_Operations&&...> __y)
-	: _M_fn()
-	, _M_fns(__y)
-	{}
-
-	constexpr mulary_compose(std::tuple<_Operations...>&& __y)
-	: _M_fn()
-	, _M_fns(std::forward<std::tuple<_Operations...>>(__y))
-	{}
-
-	template<typename _Functor, typename... _Functors>
-	constexpr mulary_compose(_Functor&& __x, _Functors&&... __y)
-	: _M_fn(std::forward<_Functors>(__x)...)
-	, _M_fns(std::forward<_Functors>(__y)...)
-	{}
-
-	constexpr typename _Operation::result_type
-	operator()(const typename arg_element<0, _Operations...>::type::argument_type& __x) const
-	{
-		return tuple_compose<_Operation&>(
-			parameter_index<0>(),
-			_M_fn,
-			_M_fns,
-			std::tuple<const typename arg_element<
-				0,
-				_Operations...
-			>::type::argument_type&>(__x)
-		);
-	}
-};
-
-template<class Operation, class... Operations>
-struct mulary_compose<Operation, std::tuple<Operations...>, false>
+template<class Operation, class Operations>
+class mulary_compose
+: public std::conditional<
+  __unary_compose_check_type<
+    typename std::tuple_element<0, Operations>::type,
+    Operation
+  >::value,
+  __unary_compose_base<typename std::tuple_element<0, Operations>::type, Operation>,
+  __compose_empty_base
+>
 {
-protected:
-	Operation _M_fn;
-	std::tuple<Operations...> _M_fns;
+	Operation fn;
+	Operations fns;
 
 public:
-	constexpr mulary_compose() = default;
+  constexpr mulary_compose() = default;
+  constexpr mulary_compose(const mulary_compose&) = default;
+  constexpr mulary_compose(mulary_compose&&) = default;
+  mulary_compose& operator=(const mulary_compose&) = default;
+  mulary_compose& operator=(mulary_compose&&) = default;
 
-	constexpr mulary_compose(Operation&& x, std::tuple<Operations...>&& y)
-	: _M_fn(std::forward<Operation>(x))
-	, _M_fns(std::forward<std::tuple<Operations...>>(y))
+  template<typename Op, typename Ops>
+	constexpr mulary_compose(Op&& x, Ops&& y)
+	: fn(std::forward<Op>(x))
+	, fns(std::forward<Ops>(y))
 	{}
 
-	constexpr mulary_compose(Operation&& x, std::tuple<Operations&&...> y)
-	: _M_fn(std::forward<Operation>(x))
-	, _M_fns(y)
+  template<typename Op>
+  constexpr mulary_compose(Op&& x)
+  : fn(std::forward<Op>(x))
+  , fns()
+  {}
+
+	constexpr mulary_compose(Operations&& y)
+	: fn()
+  , fns(std::forward<Operations>(y))
 	{}
 
-	constexpr mulary_compose(std::tuple<Operations&&...> y)
-	: _M_fn()
-	, _M_fns(y)
-	{}
-
-	constexpr mulary_compose(std::tuple<Operations...>&& y)
-	: _M_fn()
-	, _M_fns(std::forward<std::tuple<Operations...>>(y))
-	{}
-
-	template<typename _Functor, typename... _Functors>
-	constexpr mulary_compose(_Functor&& x, _Functors&&... y)
-	: _M_fn(std::forward<_Functor>(x))
-	, _M_fns(std::forward<_Functors>(y)...)
-	{}
-
-	template<typename T>
-	constexpr auto operator()(T&& x) const
-	-> decltype(tuple_compose<const Operation &>(
+  template<typename T>
+  constexpr auto operator()(T&& x) const
+  -> decltype(tuple_compose<const Operation &>(
       parameter_index<0>(),
-      _M_fn,
-      _M_fns,
+      fn,
+      fns,
       std::forward_as_tuple(x)
     ))
-	{
-		return tuple_compose<const Operation &>(
-			parameter_index<0>(),
-			_M_fn,
-			_M_fns,
-            std::forward_as_tuple(x)
-		);
-	}
+  {
+    return tuple_compose<const Operation &>(
+      parameter_index<0>(),
+      fn,
+      fns,
+      std::forward_as_tuple(x)
+    );
+  }
 };
 
-template<class _Operation, class... _Operations>
-constexpr inline mulary_compose<_Operation, std::tuple<_Operations...>>
-composex(_Operation&& __fn1, _Operations&&... __fns)
+template<typename Operation, typename Operations>
+constexpr mulary_compose<Operation,
+  typename std::conditional<
+    is_tuple_impl<Operations>::value,
+    Operations,
+    std::tuple<Operation>
+  >::type
+>
+composex(Operation&& fn1, Operations&& fns)
 {
-	return {
-		std::forward<_Operation>(__fn1),
-		std::forward<_Operations>(__fns)...
-	};
+  return {
+    std::forward<Operation>(fn1),
+    std::forward<Operations>(fns)
+  };
 }
 
-template<class _Operation, class... _Operations>
-constexpr inline mulary_compose<_Operation, std::tuple<_Operations...>>
-composex(_Operation&& __fn1, std::tuple<_Operations...>&& __fns)
+template<typename Operation, typename OperationT, typename... Operations>
+constexpr mulary_compose<Operation, std::tuple<OperationT, Operations...>>
+composex(Operation&& fn1, OperationT && fn2, Operations&&... fns)
 {
 	return {
-		std::forward<_Operation>(__fn1),
-		std::forward<_Operations>(__fns)...
-	};
-}
-
-template<class _Operation, class... _Operations>
-constexpr inline mulary_compose<_Operation, std::tuple<_Operations...>>
-composex(_Operation&& __fn1, std::tuple<_Operations&&...> __fns)
-{
-	return {
-		std::forward<_Operation>(__fn1),
-		__fns
+		std::forward<Operation>(fn1),
+    std::tuple<OperationT, Operations...>(
+      std::forward<OperationT>(fn2),
+      std::forward<Operations>(fns)...
+    )
 	};
 }
 //@}

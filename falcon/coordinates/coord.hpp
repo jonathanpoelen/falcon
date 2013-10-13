@@ -37,8 +37,8 @@ CPP_CONSTEXPR inline _Coord coord(const _T& width, const _T& index) {
 	_Coord
 #endif
 	(
-		coord_x<>(width, index),
-		coord_y<>(width, index)
+		coord_x(width, index),
+		coord_y(width, index)
 	);
 }
 
@@ -52,9 +52,9 @@ CPP_CONSTEXPR inline _Coord coord(const _T& width, const _T& height,
 	_Coord
 #endif
 	(
-		coord_x<>(width, height, index),
-		coord_y<>(width, height, index),
-		coord_z<>(width, height, index)
+		coord_x(width, height, index),
+		coord_y(width, height, index),
+		coord_z(width, height, index)
 	);
 }
 

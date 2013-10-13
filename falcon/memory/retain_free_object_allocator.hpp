@@ -40,7 +40,7 @@ struct __retain_free_object_allocator_traits {
         }
       };
       typedef typename container_t::iterator iterator;
-      iterator it = dichotomic_lower_bound<>(cont.begin(), cont.end(), &n, EUpper());
+      iterator it = dichotomic_lower_bound(cont.begin(), cont.end(), &n, EUpper());
       if (it != cont.end()) {
         pointer ret = ptr(*it);
         cont.erase(it);
@@ -71,7 +71,7 @@ struct __retain_free_object_allocator_traits {
         }
       };
       size_type * pf = reinterpret_cast<size_type*>(byte_cast(p) - _S_heap);
-      cont.insert(dichotomic_lower_bound<>(cont.begin(), cont.end(), pf, Upper()), pf);
+      cont.insert(dichotomic_lower_bound(cont.begin(), cont.end(), pf, Upper()), pf);
     }
     else {
       cont.push_back(reinterpret_cast<size_type*>(byte_cast(p) - _S_heap));

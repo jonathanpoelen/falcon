@@ -27,7 +27,7 @@ struct __uninitialized_emplace
 		}
 		catch(...)
 		{
-			destroy<>(__first, __cur);
+			destroy(__first, __cur);
 			throw;
 		}
 	}
@@ -43,7 +43,7 @@ struct __uninitialized_emplace
 		}
 		catch(...)
 		{
-			destroy<>(__first, __cur);
+			destroy(__first, __cur);
 			throw;
 		}
 	}

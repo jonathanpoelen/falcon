@@ -172,7 +172,7 @@ struct default_delete_wrapper
 
 	void operator()(_Tp* ptr) const
 	{
-		default_delete<>(ptr);
+		default_delete(ptr);
 	}
 };
 
@@ -207,13 +207,13 @@ struct destroy_wrapper
 	template<typename _ForwardIterator>
 	void operator()(_ForwardIterator __first, _ForwardIterator __last) const
 	{
-		destroy<>(__first, __last);
+		destroy(__first, __last);
 	}
 
 	template<typename _ForwardIterator, typename _Allocator>
 	void operator()(_ForwardIterator __first, _ForwardIterator __last, _Allocator& __alloc) const
 	{
-		destroy<>(__first, __last, __alloc);
+		destroy(__first, __last, __alloc);
 	}
 
 	void operator()(_Tp* p) const
@@ -253,7 +253,7 @@ struct deallocate_then_zero_wrapper
 
 	void operator()(_Tp*& ptr, std::size_t = 1) const
 	{
-		deallocate_then_zero<>(ptr);
+		deallocate_then_zero(ptr);
 	}
 };
 

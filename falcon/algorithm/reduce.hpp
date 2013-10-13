@@ -22,7 +22,7 @@ _Result reduce(_ForwardIterator first, _ForwardIterator last, _Reducer reducer)
 template<typename _Container, typename _Reducer, typename _Result = typename FALCON_BOOST_OR_STD_NAMESPACE::remove_reference<typename range_access_subtype<_Container>::type>::type>
 inline _Result reduce(const _Container& container, _Reducer reducer)
 {
-	return reduce<>(begin(container), end(container), reducer);
+	return reduce(begin(container), end(container), reducer);
 }
 
 template<typename _ForwardIterator, typename _Reducer, typename _Result>
@@ -36,7 +36,7 @@ _Result reduce(_ForwardIterator first, _ForwardIterator last, _Reducer reducer, 
 template<typename _Container, typename _Reducer, typename _Result>
 inline _Result reduce(const _Container& container, _Reducer reducer, _Result r = _Result())
 {
-	return reduce<>(begin(container), end(container), reducer, r);
+	return reduce(begin(container), end(container), reducer, r);
 }
 
 }

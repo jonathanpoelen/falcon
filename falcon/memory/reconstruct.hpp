@@ -78,7 +78,7 @@ template<typename _T, typename... _Args>
 inline void emplace_new(_T*& p, _Args&&... args)
 {
 	if (p)
-		reconstruct<>(p, std::forward<_Args>(args)...);
+		reconstruct(p, std::forward<_Args>(args)...);
 	else
 		p = default_new<_T>(std::forward<_Args>(args)...);
 }
@@ -87,7 +87,7 @@ template<typename _T, typename... _Args>
 inline void nothrow_emplace_new(_T*& p, _Args&&... args)
 {
 	if (p)
-		reconstruct<>(p, std::forward<_Args>(args)...);
+		reconstruct(p, std::forward<_Args>(args)...);
 	else
 		p = nothrow_default_new<_T>(std::forward<_Args>(args)...);
 }
@@ -96,7 +96,7 @@ template<typename _T>
 inline void emplace_new(_T*& p)
 {
 	if (p)
-		reconstruct<>(p);
+		reconstruct(p);
 	else
 		p = default_new<_T>();
 }
@@ -104,7 +104,7 @@ template<typename _T, typename _U>
 inline void emplace_new(_T*& p, const _U& value)
 {
 	if (p)
-		reconstruct<>(p, value);
+		reconstruct(p, value);
 	else
 		p = default_new<_T>(value);
 }
@@ -113,7 +113,7 @@ template<typename _T>
 inline void nothrow_emplace_new(_T*& p)
 {
 	if (p)
-		reconstruct<>(p);
+		reconstruct(p);
 	else
 		p = nothrow_default_new<_T>();
 }
@@ -121,7 +121,7 @@ template<typename _T, typename _U>
 inline void nothrow_emplace_new(_T*& p, const _U& value)
 {
 	if (p)
-		reconstruct<>(p, value);
+		reconstruct(p, value);
 	else
 		p = nothrow_default_new<_T>(value);
 }
@@ -141,19 +141,19 @@ struct reconstruct_wrapper
 
 	void operator()(_Tp* ptr) const
 	{
-		reconstruct<>(ptr);
+		reconstruct(ptr);
 	}
 
 	void operator()(_Tp* ptr, const _Tp& v) const
 	{
-		reconstruct<>(ptr, v);
+		reconstruct(ptr, v);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... _Args>
 	void operator()(_Tp* ptr, _Args&&... args) const
 	{
-		reconstruct<>(ptr, std::forward<_Args>(args)...);
+		reconstruct(ptr, std::forward<_Args>(args)...);
 	}
 #endif
 };
@@ -172,37 +172,37 @@ struct renew_wrapper
 
 	_Tp* operator()(_Tp*& ptr) const
 	{
-		return renew<>(ptr);
+		return renew(ptr);
 	}
 
 	_Tp* operator()(_Tp*& ptr, const _Tp& v) const
 	{
-		return renew<>(ptr, v);
+		return renew(ptr, v);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... _Args>
 	_Tp* operator()(_Tp*& ptr, _Args&&... args) const
 	{
-		return renew<>(ptr, std::forward<_Args>(args)...);
+		return renew(ptr, std::forward<_Args>(args)...);
 	}
 #endif
 
 	_Tp* operator()(_Tp*& ptr, const std::nothrow_t& nothrow) const
 	{
-		return nothrow_renew<>(ptr);
+		return nothrow_renew(ptr);
 	}
 
 	_Tp* operator()(_Tp*& ptr, const std::nothrow_t& nothrow, const _Tp& v) const
 	{
-		return nothrow_renew<>(ptr, v);
+		return nothrow_renew(ptr, v);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... _Args>
 	_Tp* operator()(_Tp*& ptr, const std::nothrow_t& nothrow, _Args&&... args) const
 	{
-		return nothrow_renew<>(ptr, std::forward<_Args>(args)...);
+		return nothrow_renew(ptr, std::forward<_Args>(args)...);
 	}
 #endif
 };
@@ -219,19 +219,19 @@ struct nothrow_renew_wrapper
 
 	_Tp* operator()(_Tp*& ptr) const
 	{
-		return nothrow_renew<>(ptr);
+		return nothrow_renew(ptr);
 	}
 
 	_Tp* operator()(_Tp*& ptr, const _Tp& v) const
 	{
-		return nothrow_renew<>(ptr, v);
+		return nothrow_renew(ptr, v);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... _Args>
 	_Tp* operator()(_Tp*& ptr, _Args&&... args) const
 	{
-		return nothrow_renew<>(ptr, std::forward<_Args>(args)...);
+		return nothrow_renew(ptr, std::forward<_Args>(args)...);
 	}
 #endif
 };
@@ -249,37 +249,37 @@ struct emplace_new_wrapper
 
 	void operator()(_Tp*& ptr) const
 	{
-		emplace_new<>(ptr);
+		emplace_new(ptr);
 	}
 
 	void operator()(_Tp*& ptr, const _Tp& v) const
 	{
-		emplace_new<>(ptr, v);
+		emplace_new(ptr, v);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... _Args>
 	void operator()(_Tp*& ptr, _Args&&... args) const
 	{
-		emplace_new<>(ptr, std::forward<_Args>(args)...);
+		emplace_new(ptr, std::forward<_Args>(args)...);
 	}
 #endif
 
 	void operator()(_Tp*& ptr, const std::nothrow_t& nothrow) const
 	{
-		nothrow_emplace_new<>(ptr);
+		nothrow_emplace_new(ptr);
 	}
 
 	void operator()(_Tp*& ptr, const std::nothrow_t& nothrow, const _Tp& v) const
 	{
-		nothrow_emplace_new<>(ptr, v);
+		nothrow_emplace_new(ptr, v);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... _Args>
 	void operator()(_Tp*& ptr, const std::nothrow_t& nothrow, _Args&&... args) const
 	{
-		nothrow_emplace_new<>(ptr, std::forward<_Args>(args)...);
+		nothrow_emplace_new(ptr, std::forward<_Args>(args)...);
 	}
 #endif
 };
@@ -296,19 +296,19 @@ struct nothrow_emplace_new_wrapper
 
 	void operator()(_Tp*& ptr) const
 	{
-		nothrow_emplace_new<>(ptr);
+		nothrow_emplace_new(ptr);
 	}
 
 	void operator()(_Tp*& ptr, const _Tp& v) const
 	{
-		nothrow_emplace_new<>(ptr, v);
+		nothrow_emplace_new(ptr, v);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... _Args>
 	void operator()(_Tp*& ptr, _Args&&... args) const
 	{
-		nothrow_emplace_new<>(ptr, std::forward<_Args>(args)...);
+		nothrow_emplace_new(ptr, std::forward<_Args>(args)...);
 	}
 #endif
 };

@@ -232,7 +232,7 @@ __ignore(std::basic_istream<CharT, Traits>& is, StringOrRange s)
 
 		std::ios_base::iostate __err = std::ios_base::goodbit;
 
-		while (*s && !Traits::eq_int_type(__c, __eof) && Traits::eq(Traits::to_char_type(__c), __ignore_get_char<>(s)))
+		while (*s && !Traits::eq_int_type(__c, __eof) && Traits::eq(Traits::to_char_type(__c), __ignore_get_char(s)))
 		{
 			__c = __sb->snextc();
 			++s;

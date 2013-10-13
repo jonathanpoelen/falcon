@@ -36,7 +36,7 @@ template <typename _Container, typename _Iterator, typename _Functor>
 typename enable_if_c<is_iterator<_Iterator>, _Functor>::type
 for_each2(_Container& cont, _Iterator first, _Functor func)
 {
-	return for_each2<>(begin(cont), end(cont), first, func);
+	return for_each2(begin(cont), end(cont), first, func);
 }
 
 template <typename _Container, typename _Container2, typename _Functor>
@@ -45,13 +45,13 @@ typename disable_if_c<is_iterator<
 >, _Functor>::type
 for_each2(_Container& cont, _Container2& cont2, _Functor func)
 {
-	return for_each2<>(begin(cont), end(cont), begin(cont2), end(cont2), func);
+	return for_each2(begin(cont), end(cont), begin(cont2), end(cont2), func);
 }
 
 template <typename _Container, typename _T, std::size_t _N, typename _Functor>
 _Functor for_each2(_Container& cont, _T(&cont2)[_N], _Functor func)
 {
-	return for_each2<>(begin(cont), end(cont), &cont2[0], &cont2[_N], func);
+	return for_each2(begin(cont), end(cont), &cont2[0], &cont2[_N], func);
 }
 
 template <typename _ForwardIterator, typename _Container, typename _Functor>
@@ -61,21 +61,21 @@ typename disable_if_c<is_iterator<
 for_each2(_ForwardIterator first, _ForwardIterator last,
 					_Container& cont, _Functor func)
 {
-	return for_each2<>(first, last, begin(cont), end(cont), func);
+	return for_each2(first, last, begin(cont), end(cont), func);
 }
 
 template <typename _ForwardIterator, typename _T, std::size_t _N, typename _Functor>
 _Functor for_each2(_ForwardIterator first, _ForwardIterator last,
 									 _T(&cont)[_N], _Functor func)
 {
-	return for_each2<>(first, last, &cont[0], &cont[_N], func);
+	return for_each2(first, last, &cont[0], &cont[_N], func);
 }
 
 template <typename _Container, typename _ForwardIterator, typename _Functor>
 _Functor for_each2(_Container& cont,
 									 _ForwardIterator first, _ForwardIterator last, _Functor func)
 {
-	return for_each2<>(begin(cont), end(cont), first, last, func);
+	return for_each2(begin(cont), end(cont), first, last, func);
 }
 
 }

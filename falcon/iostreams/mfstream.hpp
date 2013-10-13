@@ -59,7 +59,7 @@ public:
 
 #if __cplusplus >= 201103L
   void push(std::string&& filename)
-  { vector.emplace_back<>(std::move(filename)); }
+  { vector.emplace_back(std::move(filename)); }
 #endif
 
   template<typename InputIterator>

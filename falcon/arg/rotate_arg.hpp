@@ -51,7 +51,7 @@ struct __rotate_arg
   {
     typedef typename __build_index<_N / number_swap, _Index, parameter_index<>>::__type _BuildIndex;
     auto tmp = std::move(arg<_Index>(args...));
-    __rotate_impl<>(_BuildIndex(), tmp, args...);
+    __rotate_impl(_BuildIndex(), tmp, args...);
     __rotate<number_swap>(parameter_index<_Indexes...>(), args...);
   }
 
@@ -62,7 +62,7 @@ struct __rotate_arg
   template<typename _T, typename... _Args, std::size_t... _Indexes>
   static void __rotate_impl(const parameter_index<_Indexes...>&, _T& tmp, _Args&... args)
   {
-    __rotate_impl<>(tmp, arg<_Indexes>(args...)...);
+    __rotate_impl(tmp, arg<_Indexes>(args...)...);
   }
 
   template<typename _T, typename _U, typename _V, typename... _Args>

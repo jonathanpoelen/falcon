@@ -39,7 +39,7 @@ public:
 
 	template<typename U, typename... Args>
 	void construct(U* p, Args&&... args) noexcept
-	{ ::falcon::construct<>(p, std::forward<Args>(args)...); }
+	{ ::falcon::construct(p, std::forward<Args>(args)...); }
 
 	template<typename U>
 	void destroy(U* p)

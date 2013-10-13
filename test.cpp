@@ -17,18 +17,8 @@
 // {};
 //
 
-#include <iostream>
-#include <falcon/string/basic_cstring.hpp>
-
-
 int main()
 {
-  char s[10]{'a','b','c','d','e'};
-  falcon::cstring p(s, 4, sizeof(s));
-  p.insert(1, s+2, 3);
-  std::cout << (p) << "'\n";
-
-
 
 //   using sequence = seq<_1,_2,_3>;
 //   using first = begin<sequence>::type;

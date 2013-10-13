@@ -8,58 +8,51 @@ function(create_exec_test name)
 endfunction(create_exec_test)
 
 add_definitions(
-	-Wnon-virtual-dtor
-	-Wno-long-long
-	-Wundef
-	-Wcast-align
-	-Wchar-subscripts
-	-Wall
-	-Wextra
-	-Wpointer-arith
-	-Wformat-security
-# 	-fno-exceptions
-# 	-fno-check-new
-# 	-fno-common
-# 	-Werror=return-type
-	-Woverloaded-virtual
-# 	-fno-threadsafe-statics
-# 	-fvisibility=hidden
-# 	-fvisibility-inlines-hidden
-	-Wold-style-cast
-	-Wunreachable-code
-	-Wformat
-	-Wformat=2
-	-Werror-implicit-function-declaration
-	-Wmain
-	-Wparentheses
-	-Wsequence-point
-	-Wreturn-type
-	-Wunused
-	-Wfloat-equal
-	-Wshadow
-	-Wpointer-arith
-	-Wconversion
-	-Wsign-compare
-	-Wno-missing-declarations
-	-Wmissing-noreturn
-	-Wmissing-format-attribute
-	-Wpacked
-	-Wredundant-decls
-	-Winline
-	-Wdouble-promotion
-	-Winit-self
-	-Wcast-qual
+    -Wall
+    -Wextra
+    -Wcast-align
+    -Wchar-subscripts
+    -Wformat-security
+    -Wunreachable-code
+    -Wformat
+    -Wformat=2
+    -Werror-implicit-function-declaration
+    -Wsequence-point
+    -Wfloat-equal
+#     -Wshadow
+    -Wpointer-arith
+    -Wconversion
+    -Wno-missing-declarations
+    -Wmissing-noreturn
+    -Wmissing-format-attribute
+    -Wpacked
+    -Wredundant-decls
+    -Winline
+    -Wdouble-promotion
+    -Winit-self
+    -Wcast-qual
 
-	-Wtrampolines
-	-fstrict-overflow
-	-Wstrict-overflow=5
-	-Wno-overflow
+    -Wnon-virtual-dtor
+    -Wno-long-long
+#   -fno-exceptions
+#   -fno-check-new
+#   -fno-common
+    -Woverloaded-virtual
+#   -fno-threadsafe-statics
+#   -fvisibility=hidden
+#   -fvisibility-inlines-hidden
+    -Wold-style-cast
+    -Wmain
+    -Wparentheses
+    -Wtrampolines
+    -fstrict-overflow
+    -Wstrict-overflow=5
+#   -Wno-overflow
+#   -Wno-unused-function
 
-#	-Wno-unused-function
+    -Werror
 
-	-Werror
+    -std=c++11
 
-	-std=c++11
-
-# 	-Wfatal-errors
+#   -Wfatal-errors
 )

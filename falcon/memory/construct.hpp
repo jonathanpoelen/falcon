@@ -177,20 +177,20 @@ struct construct_wrapper
 
 	void operator()(Tp* ptr) const
 	{
-		construct<>(ptr);
+		construct(ptr);
 	}
 
 #if __cplusplus >= 201103L
 	template<typename... Args>
 	void operator()(Tp* ptr, Args&&... args) const
 	{
-		construct<>(ptr, std::forward<Args>(args)...);
+		construct(ptr, std::forward<Args>(args)...);
 	}
 #else
 	template<typename U>
 	void operator()(Tp* ptr, const U& v) const
 	{
-		construct<>(ptr, v);
+		construct(ptr, v);
 	}
 #endif
 };

@@ -249,19 +249,19 @@ struct range
 
 	CPP_CONSTEXPR bool between(const _T v) const
 	{
-		return falcon::between<>(left, v, right);
+		return falcon::between(left, v, right);
 	}
 	CPP_CONSTEXPR bool inner(const _T v) const
 	{
-		return falcon::inner<>(left, v, right);
+		return falcon::inner(left, v, right);
 	}
 	CPP_CONSTEXPR bool outside(const _T v) const
 	{
-		return falcon::outside<>(left, v, right);
+		return falcon::outside(left, v, right);
 	}
 	CPP_CONSTEXPR bool inner_out(const _T v) const
 	{
-		return falcon::inner_out<>(left, v, right);
+		return falcon::inner_out(left, v, right);
 	}
 
 	CPP_CONSTEXPR difference_type difference() const

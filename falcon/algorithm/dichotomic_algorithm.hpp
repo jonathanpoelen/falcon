@@ -5,17 +5,19 @@
 
 namespace falcon {
 
-template<typename _RandomAccessIterator, typename _T, typename _Compare>
-void __dichotomic_lower_bound_advance(_RandomAccessIterator& first, _RandomAccessIterator& last, const _T& val, _Compare& comp)
+template<typename RandomAccessIterator, typename T, typename Compare>
+void __dichotomic_lower_bound_advance(RandomAccessIterator& first,
+                                      RandomAccessIterator& last,
+                                      const T& val, Compare comp)
 {
-	typedef typename std::iterator_traits<_RandomAccessIterator>::difference_type
-	_DistanceType;
-	_DistanceType len = std::distance(first, last);
+	typedef typename std::iterator_traits<RandomAccessIterator>::difference_type
+	DistanceType;
+	DistanceType len = std::distance(first, last);
 
 	if (len < 7 || !comp(*first, val))
 		return ;
 
-	_DistanceType patt = len/2;
+	DistanceType patt = len/2;
 	first += --patt;
 	bool b = true;
 
@@ -32,20 +34,13 @@ void __dichotomic_lower_bound_advance(_RandomAccessIterator& first, _RandomAcces
 		first -= patt * 2;
 }
 
-template<typename _T>
+template<typename T>
 struct __algo_less
 {
 	template<typename _U>
-	bool operator()(const _U& a, const _T& b) const
+	bool operator()(const _U& a, const T& b) const
 	{ return a < b; }
 };
-
-template<typename _RandomAccessIterator, typename _T>
-void __dichotomic_lower_bound_advance(_RandomAccessIterator& first, _RandomAccessIterator& last, const _T& val)
-{
-	__algo_less<_T> comp;
-	__dichotomic_lower_bound_advance(first, last, val, comp);
-}
 
 
 /**
@@ -57,11 +52,12 @@ void __dichotomic_lower_bound_advance(_RandomAccessIterator& first, _RandomAcces
  *  @return The first iterator @c i in the range @p [first,last)
  *  such that @c *i == @p val, or @p last if no such iterator exists.
  */
-template<typename _RandomAccessIterator, typename _T>
-_RandomAccessIterator dichotomic_find(_RandomAccessIterator first, _RandomAccessIterator last, const _T& val)
+template<typename RandomAccessIterator, typename T>
+RandomAccessIterator dichotomic_find(RandomAccessIterator first,
+                                     RandomAccessIterator last, const T& val)
 {
-	__dichotomic_lower_bound_advance<>(first, last, val);
-	return std::find<>(first, last, val);
+  __dichotomic_lower_bound_advance(first, last, val, __algo_less<T>());
+	return std::find(first, last, val);
 }
 
 /**
@@ -70,15 +66,17 @@ _RandomAccessIterator dichotomic_find(_RandomAccessIterator first, _RandomAccess
  *  @param first An input iterator.
  *  @param last An input iterator.
  *  @param pred A predicate.
- *  @param comp A functor to use for comparisons with @p dichotomic_lower_bound().
+ *  @param lower_comp A functor to use for comparisons with @p dichotomic_lower_bound().
  *  @return The first iterator @c i in the range @p [first,last)
  *  such that @p pred(*i) is true, or @p last if no such iterator exists.
  */
-template<typename _RandomAccessIterator, typename _T, typename _LowerCompare>
-_RandomAccessIterator dichotomic_find(_RandomAccessIterator first, _RandomAccessIterator last, const _T& val, _LowerCompare lower_comp)
+template<typename RandomAccessIterator, typename T, typename LowerCompare>
+RandomAccessIterator dichotomic_find(RandomAccessIterator first,
+                                     RandomAccessIterator last, const T& val,
+                                     LowerCompare lower_comp)
 {
-	__dichotomic_lower_bound_advance<>(first, last, val, lower_comp);
-	return std::find<>(first, last, val);
+	__dichotomic_lower_bound_advance(first, last, val, lower_comp);
+	return std::find(first, last, val);
 }
 
 /**
@@ -87,15 +85,17 @@ _RandomAccessIterator dichotomic_find(_RandomAccessIterator first, _RandomAccess
  *  @param first An input iterator.
  *  @param last An input iterator.
  *  @param pred A predicate.
- *  @param comp A functor to use for comparisons with @p dichotomic_lower_bound().
+ *  @param lower_comp A functor to use for comparisons with @p dichotomic_lower_bound().
  *  @return The first iterator @c i in the range @p [first,last)
  *  such that @p pred(*i) is true, or @p last if no such iterator exists.
  */
-template<typename _RandomAccessIterator, typename _T, typename _LowerCompare, typename _Predicate>
-_RandomAccessIterator dichotomic_find_if(_RandomAccessIterator first, _RandomAccessIterator last, const _T& val, _LowerCompare lower_comp, _Predicate pred)
+template<typename RandomAccessIterator, typename T, typename LowerCompare, typename Predicate>
+RandomAccessIterator dichotomic_find_if(RandomAccessIterator first,
+                                        RandomAccessIterator last, const T& val,
+                                        LowerCompare lower_comp, Predicate pred)
 {
-	__dichotomic_lower_bound_advance<>(first, last, val, lower_comp);
-	return std::find_if<>(first, last, pred);
+	__dichotomic_lower_bound_advance(first, last, val, lower_comp);
+	return std::find_if(first, last, pred);
 }
 
 
@@ -112,11 +112,12 @@ _RandomAccessIterator dichotomic_find_if(_RandomAccessIterator first, _RandomAcc
  *  The comparison function should have the same effects on ordering as
  *  the function used for the initial sort.
  */
-template<typename _RandomAccessIterator, typename _T>
-_RandomAccessIterator dichotomic_lower_bound(_RandomAccessIterator first, _RandomAccessIterator last, const _T& val)
+template<typename RandomAccessIterator, typename T>
+RandomAccessIterator dichotomic_lower_bound(RandomAccessIterator first,
+                                            RandomAccessIterator last, const T& val)
 {
-	__dichotomic_lower_bound_advance<>(first, last, val);
-	return std::lower_bound<>(first, last, val);
+  __dichotomic_lower_bound_advance(first, last, val, __algo_less<T>());
+	return std::lower_bound(first, last, val);
 }
 
 /**
@@ -133,11 +134,13 @@ _RandomAccessIterator dichotomic_lower_bound(_RandomAccessIterator first, _Rando
  *  The comparison function should have the same effects on ordering as
  *  the function used for the initial sort.
  */
-template<typename _RandomAccessIterator, typename _T, typename _Compare>
-_RandomAccessIterator dichotomic_lower_bound(_RandomAccessIterator first, _RandomAccessIterator last, const _T& val, _Compare comp)
+template<typename RandomAccessIterator, typename T, typename Compare>
+RandomAccessIterator dichotomic_lower_bound(RandomAccessIterator first,
+                                            RandomAccessIterator last,
+                                            const T& val, Compare comp)
 {
-	__dichotomic_lower_bound_advance<>(first, last, val, comp);
-	return std::lower_bound<>(first, last, val, comp);
+	__dichotomic_lower_bound_advance(first, last, val, comp);
+	return std::lower_bound(first, last, val, comp);
 }
 
 }

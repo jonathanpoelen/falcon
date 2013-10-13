@@ -52,7 +52,7 @@ namespace falcon {
 	struct __bit_swap
 	{
 		inline static void __impl(_T& bits)
-		{ bit_swap(falcon::unreliable_pointer_cast<char>(falcon::detail::addressof<>(bits)), sizeof(_T)); }
+		{ bit_swap(falcon::unreliable_pointer_cast<char>(falcon::detail::addressof(bits)), sizeof(_T)); }
 	};
 
 #define __FALCON_CREATE_BIT_SWAP(S)\

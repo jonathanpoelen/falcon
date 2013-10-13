@@ -46,7 +46,7 @@ struct range_modifier
 	template<typename _T>
 	range_modifier& operator=(const _T& v)
 	{
-		assign<>(v);
+		assign(v);
 		return *this;
 	}
 

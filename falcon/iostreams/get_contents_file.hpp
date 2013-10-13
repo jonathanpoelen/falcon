@@ -38,7 +38,7 @@ String
 __get_contents_file(const char * name, std::ios_base::iostate * err = 0)
 {
   String s;
-  __get_contents_file<>(s, name, err);
+  __get_contents_file(s, name, err);
   return s;
 }
 
@@ -48,7 +48,7 @@ String&
 get_contents_file(String& s, const char * name, std::ios_base::iostate * err = 0)
 {
   s.clear();
-  __get_contents_file<>(s, name, err);
+  __get_contents_file(s, name, err);
   return s;
 }
 #endif

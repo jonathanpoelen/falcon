@@ -87,7 +87,7 @@ private:
 		template<typename _TupleParameter>
 		CPP1X_DELEGATE_FUNCTION(
 			static __impl(_Tuple& t, _TupleParameter parameters),
-			tuple_compose<>(_Maker(), __tuple(to_tuple_reference(t)), parameters)
+			tuple_compose(_Maker(), __tuple(to_tuple_reference(t)), parameters)
 		)
 	};
 
@@ -197,11 +197,11 @@ public:
 
 	template<typename... _Args>
 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),
-	tuple_compose<>(late_tupe(), this->tuple(), std::forward_as_tuple(args...)))
+	tuple_compose(late_tupe(), this->tuple(), std::forward_as_tuple(args...)))
 
 	template<typename... _Args>
 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args) const,
-	tuple_compose<>(late_tupe(), this->tuple(), std::forward_as_tuple(args...)))
+	tuple_compose(late_tupe(), this->tuple(), std::forward_as_tuple(args...)))
 
 	synchronizer& operator++()
 	{

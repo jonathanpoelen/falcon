@@ -247,6 +247,14 @@ unordered_vector. Pas de push_back et co, juste des insert(). Les méthodes de s
 
 sequence_queue, sequence_priority_queue et sequence_unordered_vector (permet de récupérer le container interne)
 
+dichotomic_find et dichotomic_find_if recherche jusqu'à la fin lorsque std::find est utilisé. Faire un dichotomic_upper
+
+flat_map et flat_multimap avec strategie pour la réorganisation des elements (deplacement de tous ou juste des dernier element). Idem pour flat_set et flat_multiset
+
+bit_not pour l'operateur ~
+
+
+
 
 
 

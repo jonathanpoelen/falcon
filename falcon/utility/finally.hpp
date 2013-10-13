@@ -11,7 +11,7 @@ namespace falcon {
  * @code
  * {
  *   T * v = new T;
- *   auto finally = falcon::make_finally<>([v](){ delete v; });
+ *   auto finally = falcon::make_finally([v](){ delete v; });
  *   //...
  *   if (condition)
  *     throw std::runtime_error("...");

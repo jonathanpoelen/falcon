@@ -13,7 +13,7 @@ void compose_test()
 	int * p = &i;
 
 	CHECK_EQUAL_VALUE(unary1()(p), 6);
-	CHECK_EQUAL_VALUE(falcon::compose1<>(increment(), pointer())(p), 7);
+	CHECK_EQUAL_VALUE(falcon::compose1(increment(), pointer())(p), 7);
 }
 
 FALCON_TEST_TO_MAIN(compose_test)

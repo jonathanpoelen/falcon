@@ -26,7 +26,7 @@ get(std::basic_istream<CharT, Traits>& is, Args&... args)
 //@}
 
 /**
- * \brief Functor for @p falcon::put<>()
+ * \brief Functor for @p falcon::put()
  */
 template<typename CharT, typename Traits = std::char_traits<CharT>>
 class basic_ostream_functor
@@ -81,7 +81,7 @@ make_ostream_functor(std::basic_ostream<CharT, Traits>& os)
 { return basic_ostream_functor<CharT, Traits>(os); }
 
 /**
- * \brief Functor for @p falcon::get<>()
+ * \brief Functor for @p falcon::get()
  */
 template<typename CharT, typename Traits = std::char_traits<CharT>>
 class basic_istream_functor

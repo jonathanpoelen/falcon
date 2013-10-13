@@ -126,7 +126,7 @@ protected:
 	}
 
 	void recoil()
-	{ std::advance<>(this->base_reference(), -_step); }
+	{ std::advance(this->base_reference(), -_step); }
 };
 
 

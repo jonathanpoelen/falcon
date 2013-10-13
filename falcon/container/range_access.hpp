@@ -19,30 +19,10 @@
 namespace falcon {
 
 #if __cplusplus >= 201103L
-  template<class Container>
-  auto begin(Container& cont)
-  noexcept(noexcept(cont.begin()))
-  -> decltype(cont.begin())
-  { return cont.begin(); }
+  using std::begin;
+  using std::end;
 
-  template<class Container>
-  auto begin(const Container& cont)
-  noexcept(noexcept(cont.begin()))
-  -> decltype(cont.begin())
-  { return cont.begin(); }
-
-  template<class Container>
-  auto end(Container& cont)
-  noexcept(noexcept(cont.end()))
-  -> decltype(cont.end())
-  { return cont.end(); }
-
-  template<class Container>
-  auto end(const Container& cont)
-  noexcept(noexcept(cont.end()))
-  -> decltype(cont.end())
-  { return cont.end(); }
-
+#if __cplusplus < 201403L
   template<class Container>
   auto rbegin(Container& cont)
   noexcept(noexcept(cont.rbegin()))
@@ -66,6 +46,7 @@ namespace falcon {
   noexcept(noexcept(cont.rend()))
   -> decltype(cont.rend())
   { return cont.rend(); }
+#endif
 
   template<class Container>
   auto cbegin(const Container& cont)
@@ -159,26 +140,7 @@ namespace falcon {
 
 #endif
 
-  template<class T, std::size_t N>
-  CPP_CONSTEXPR T *
-  begin(T (&arr)[N]) CPP_NOEXCEPT
-  { return arr; }
-
-  template<class T, std::size_t N>
-  CPP_CONSTEXPR const T *
-  begin(const T (&arr)[N]) CPP_NOEXCEPT
-  { return arr; }
-
-  template<class T, std::size_t N>
-  CPP_CONSTEXPR T *
-  end(T (&arr)[N]) CPP_NOEXCEPT
-  { return arr + N; }
-
-  template<class T, std::size_t N>
-  CPP_CONSTEXPR const  T *
-  end(const T (&arr)[N]) CPP_NOEXCEPT
-  { return arr + N; }
-
+#if __cplusplus < 201403L
   template<class T, std::size_t N>
   std::reverse_iterator<T*>
   rbegin(T (&arr)[N]) CPP_NOEXCEPT
@@ -198,25 +160,26 @@ namespace falcon {
   std::reverse_iterator<const T*>
   rend(const T (&arr)[N]) CPP_NOEXCEPT
   { return std::reverse_iterator<const T*>(arr); }
+#endif
 
   template<class T, std::size_t N>
   CPP_CONSTEXPR T const *
-  cbegin(const T (&arr)[N])
+  cbegin(const T (&arr)[N]) CPP_NOEXCEPT
   { return arr; }
 
   template<class T, std::size_t N>
   CPP_CONSTEXPR const T *
-  cend(const T (&arr)[N])
+  cend(const T (&arr)[N]) CPP_NOEXCEPT
   { return arr + N; }
 
   template<class T, std::size_t N>
   std::reverse_iterator<const T*>
-  crbegin(const T (&arr)[N])
+  crbegin(const T (&arr)[N]) CPP_NOEXCEPT
   { return rbegin(arr); }
 
   template<class T, std::size_t N>
   std::reverse_iterator<const T*>
-  crend(const T (&arr)[N])
+  crend(const T (&arr)[N]) CPP_NOEXCEPT
   { return rbegin(arr); }
 
 #if __cplusplus >= 201103L

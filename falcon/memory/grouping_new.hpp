@@ -110,7 +110,7 @@ optimal_grouping_allocate(Allocate allocate, S... sizes)
   typedef __grouping_allocate_result<Elements...> __result_handler;
   typedef parameter_pack<Elements...> elements;
   typedef typename __result_handler::indexes indexes;
-  return __optimal_grouping_allocate<>(indexes(), elements(), allocate, sizes...);
+  return __optimal_grouping_allocate(indexes(), elements(), allocate, sizes...);
 }
 
 //TODO

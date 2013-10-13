@@ -65,8 +65,8 @@ public:
 
 	template<typename _Container>
 	java_iterator(_Container& cont)
-	: __base(falcon::begin<>(cont))
-	, _end(falcon::end<>(cont))
+	: __base(falcon::begin(cont))
+	, _end(falcon::end(cont))
 	{}
 
 	java_iterator(const java_iterator& other)
