@@ -153,7 +153,7 @@ template<typename T, typename U = T>
 struct right_shift_equal;
 
 template<typename T>
-struct complement;
+struct bit_not;
 //@}
 
 /**
@@ -172,7 +172,7 @@ typedef bit_xor_equal<late_parameter_t> late_bit_xor_equal;
 typedef left_shift_equal<late_parameter_t> late_left_shift_equal;
 typedef right_shift_equal<late_parameter_t> late_right_shift_equal;
 
-typedef complement<late_parameter_t> late_complement;
+typedef bit_not<late_parameter_t> late_bit_not;
 //@}
 
 /**
@@ -433,7 +433,7 @@ _FALCON_CREATE_FUNCTIONAL_OPERATORS(logical_or   , ||)
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(unary_negate , -)
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(unary_plus   , +)
 _FALCON_CREATE_FUNCTIONAL_OPERATORS(binary_negate, !)
-_FALCON_CREATE_FUNCTIONAL_OPERATORS(complement   , ~)
+_FALCON_CREATE_FUNCTIONAL_OPERATORS(bit_not      , ~)
 
 
 #undef _FALCON_CREATE_FUNCTIONAL_OPERATORS

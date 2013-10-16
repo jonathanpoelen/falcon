@@ -251,8 +251,7 @@ dichotomic_find et dichotomic_find_if recherche jusqu'à la fin lorsque std::fin
 
 flat_map et flat_multimap avec strategie pour la réorganisation des elements (deplacement de tous ou juste des dernier element). Idem pour flat_set et flat_multiset
 
-bit_not pour l'operateur ~
-
+Changer les interface de templates/*.hpp. Mettre des constexpr quand-il faut. Changer les noms des structures et complement -> bit_not
 
 
 

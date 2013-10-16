@@ -636,7 +636,7 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_complement
+#define __FALCON_NAME_OPERATOR late_bit_not
 #define __FALCON_SIGN_OPERATOR ~
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
