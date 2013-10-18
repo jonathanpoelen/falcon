@@ -2,45 +2,156 @@
 #define _FALCON_ALGORITHM_DICHOTOMIC_ALGORITHM_HPP
 
 #include <algorithm>
+#include <iterator>
 
 namespace falcon {
-
-template<typename RandomAccessIterator, typename T, typename Compare>
-void __dichotomic_lower_bound_advance(RandomAccessIterator& first,
-                                      RandomAccessIterator& last,
-                                      const T& val, Compare comp)
-{
-	typedef typename std::iterator_traits<RandomAccessIterator>::difference_type
-	DistanceType;
-	DistanceType len = std::distance(first, last);
-
-	if (len < 7 || !comp(*first, val))
-		return ;
-
-	DistanceType patt = len/2;
-	first += --patt;
-	bool b = true;
-
-	while (patt > 2)
-	{
-		b = comp(*first, val);
-		if (b)
-			first += patt;
-		else
-			first -= patt;
-		patt /= 2;
-	}
-	if (b && !comp(*first, val))
-		first -= patt * 2;
-}
 
 template<typename T>
 struct __algo_less
 {
-	template<typename _U>
-	bool operator()(const _U& a, const T& b) const
+	template<typename U>
+	bool operator()(const U& a, const T& b) const
 	{ return a < b; }
 };
+
+
+/**
+ *  @brief Finds the first position in a <em>sorted</em> sequence in which
+ *          @a val could be inserted without changing the ordering.
+ *  @ingroup binary_search_algorithms
+ *  @param  first   An iterator.
+ *  @param  last    Another iterator.
+ *  @param  val     The search term.
+ *  @param  comp    A functor to use for comparisons.
+ *  @return An iterator pointing to the first element <em>not less
+ *           than</em> @a val, or end() if every element is greater
+ *           than @a val.
+ *
+ *  The comparison function should have the same effects on ordering as
+ *  the function used for the initial sort.
+ *
+ *  <b>Complexity</b>: Logarithmic
+ */
+template<typename RandomAccessIterator, typename T, typename Compare>
+RandomAccessIterator dichotomic_lower_bound(RandomAccessIterator first,
+                                            RandomAccessIterator last,
+                                            const T& val, Compare comp)
+{
+  typedef typename std::iterator_traits<RandomAccessIterator>
+  ::difference_type difference_type;
+
+  difference_type len = last - first;
+  difference_type half;
+
+  while (len > 0) {
+    half = len >> 1;
+    RandomAccessIterator middle = first + half;
+
+    if (comp(*middle, val)) {
+      first = middle;
+      ++first;
+      len = len - half - 1;
+    }
+    else {
+      len = half;
+    }
+  }
+  return first;
+}
+
+/**
+ *  @brief Finds the first position in a <em>sorted</em> sequence in which
+ *         @a val could be inserted without changing the ordering.
+ *  @ingroup binary_search_algorithms
+ *  @param  first   An iterator.
+ *  @param  last    Another iterator.
+ *  @param  val     The search term.
+ *  @return An iterator pointing to the first element <em>not less
+ *           than</em> @a val, or end() if every element is greater
+ *           than @a val.
+ *
+ *  The comparison function should have the same effects on ordering as
+ *  the function used for the initial sort.
+ */
+template<typename RandomAccessIterator, typename T>
+RandomAccessIterator dichotomic_lower_bound(RandomAccessIterator first,
+                                            RandomAccessIterator last, const T& val)
+{
+  return dichotomic_lower_bound(first, last, val, __algo_less<T>());
+}
+
+
+template<typename T>
+struct __algo_greater
+{
+  template<typename U>
+  bool operator()(const U& a, const T& b) const
+  { return a > b; }
+};
+
+/**
+ *  @brief Finds the last position in a <em>sorted</em> sequence in which
+ *         @a val could be inserted without changing the ordering.
+ *  @ingroup binary_search_algorithms
+ *  @param  first   An iterator.
+ *  @param  last    Another iterator.
+ *  @param  val     The search term.
+ *  @param  comp    A functor to use for comparisons.
+ *  @return An iterator pointing to the first element <em>greater
+ *           than</em> @a val, or end() if no elements are greater than @a val.
+ *
+ *  The comparison function should have the same effects on ordering as
+ *  the function used for the initial sort.
+ *
+ *  <b>Complexity</b>: Logarithmic
+ */
+template<typename RandomAccessIterator, typename T, typename Compare>
+RandomAccessIterator dichotomic_upper_bound(RandomAccessIterator first,
+                                            RandomAccessIterator last,
+                                            const T& val, Compare comp)
+{
+  typedef typename std::iterator_traits<RandomAccessIterator>
+  ::difference_type difference_type;
+
+  difference_type len = last - first;
+  difference_type half;
+
+  while (len > 0) {
+    half = len >> 1;
+    RandomAccessIterator middle = first + half;
+
+    if (comp(val, *middle)) {
+      len = half;
+    }
+    else{
+      first = ++middle;
+      len = len - half - 1;
+    }
+  }
+  return first;
+}
+
+/**
+ *  @brief Finds the last position in a <em>sorted</em> sequence in which
+ *         @a val could be inserted without changing the ordering.
+ *  @ingroup binary_search_algorithms
+ *  @param  first   An iterator.
+ *  @param  last    Another iterator.
+ *  @param  val     The search term.
+ *  @return An iterator pointing to the first element <em>greater
+ *           than</em> @a val, or end() if no elements are greater than @a val.
+ *
+ *  The comparison function should have the same effects on ordering as
+ *  the function used for the initial sort.
+ *
+ *  <b>Complexity</b>: Logarithmic
+ */
+template<typename RandomAccessIterator, typename T>
+RandomAccessIterator dichotomic_upper_bound(RandomAccessIterator first,
+                                            RandomAccessIterator last, const T& val)
+{
+  return dichotomic_upper_bound(first, last, val, __algo_greater<T>());
+}
 
 
 /**
@@ -56,8 +167,11 @@ template<typename RandomAccessIterator, typename T>
 RandomAccessIterator dichotomic_find(RandomAccessIterator first,
                                      RandomAccessIterator last, const T& val)
 {
-  __dichotomic_lower_bound_advance(first, last, val, __algo_less<T>());
-	return std::find(first, last, val);
+  first = dichotomic_lower_bound(first, last, val, __algo_less<T>());
+  if (first != last && *first != val) {
+    return last;
+  }
+	return first;
 }
 
 /**
@@ -75,8 +189,11 @@ RandomAccessIterator dichotomic_find(RandomAccessIterator first,
                                      RandomAccessIterator last, const T& val,
                                      LowerCompare lower_comp)
 {
-	__dichotomic_lower_bound_advance(first, last, val, lower_comp);
-	return std::find(first, last, val);
+  first = dichotomic_lower_bound(first, last, val, lower_comp);
+  if (first != last && *first != val) {
+    return last;
+  }
+  return first;
 }
 
 /**
@@ -94,53 +211,11 @@ RandomAccessIterator dichotomic_find_if(RandomAccessIterator first,
                                         RandomAccessIterator last, const T& val,
                                         LowerCompare lower_comp, Predicate pred)
 {
-	__dichotomic_lower_bound_advance(first, last, val, lower_comp);
-	return std::find_if(first, last, pred);
-}
-
-
-/**
- *  @brief Finds the first position in a <em>sorted</em> sequence in which @a val could be inserted without changing the ordering.
- *  @ingroup binary_search_algorithms
- *  @param  first   An iterator.
- *  @param  last    Another iterator.
- *  @param  val     The search term.
- *  @return An iterator pointing to the first element <em>not less
- *           than</em> @a val, or end() if every element is less
- *           than @a val.
- *
- *  The comparison function should have the same effects on ordering as
- *  the function used for the initial sort.
- */
-template<typename RandomAccessIterator, typename T>
-RandomAccessIterator dichotomic_lower_bound(RandomAccessIterator first,
-                                            RandomAccessIterator last, const T& val)
-{
-  __dichotomic_lower_bound_advance(first, last, val, __algo_less<T>());
-	return std::lower_bound(first, last, val);
-}
-
-/**
- *  @brief Finds the first position in a <em>sorted</em> sequence in which @a val could be inserted without changing the ordering.
- *  @ingroup binary_search_algorithms
- *  @param  first   An iterator.
- *  @param  last    Another iterator.
- *  @param  val     The search term.
- *  @param  comp    A functor to use for comparisons.
- *  @return An iterator pointing to the first element <em>not less
- *           than</em> @a val, or end() if every element is less
- *           than @a val.
- *
- *  The comparison function should have the same effects on ordering as
- *  the function used for the initial sort.
- */
-template<typename RandomAccessIterator, typename T, typename Compare>
-RandomAccessIterator dichotomic_lower_bound(RandomAccessIterator first,
-                                            RandomAccessIterator last,
-                                            const T& val, Compare comp)
-{
-	__dichotomic_lower_bound_advance(first, last, val, comp);
-	return std::lower_bound(first, last, val, comp);
+  first = dichotomic_lower_bound(first, last, val, lower_comp);
+  if (first != last && !pred(*first, val)) {
+    return last;
+  }
+  return first;
 }
 
 }
