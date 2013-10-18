@@ -17,8 +17,16 @@
 // {};
 //
 
+#include <ostream>
+#include <falcon/type_traits/has.hpp>
+
+struct A{};
+struct B{using type = int;};
+
 int main()
 {
+  return falcon::has_char_type<std::wostream>::value;
+
 
 //   using sequence = seq<_1,_2,_3>;
 //   using first = begin<sequence>::type;

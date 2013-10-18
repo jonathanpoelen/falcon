@@ -239,8 +239,6 @@ simplifier ignore() et faire en sorte que la fonction supporte n'importe quel ty
 
 optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le cas (voir put_tuple et intrusive stream)
 
-remove type_traits/is_same.hpp
-
 le namespace detail et publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
 
 unordered_vector. Pas de push_back et co, juste des insert(). Les méthodes de supression existe aussi. Container interne en protected et nommé 'c' (comme pour queue et priority_queue).
