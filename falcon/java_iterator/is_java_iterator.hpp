@@ -6,7 +6,7 @@
 namespace falcon {
 namespace java_iterator {
 
-FALCON_CREATE_HAS_TYPE(is_java_iterator, java_iterator_category);
+FALCON_HAS_TYPE_TRAIT_NAMED_DEF(is_java_iterator, java_iterator_category);
 
 }}
 

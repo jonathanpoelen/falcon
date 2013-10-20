@@ -25,14 +25,14 @@ namespace falcon {
   }
 }
 
-#define FALCON_CREATE_HAS_TYPE(_Name, _TypeName)\
+#define FALCON_HAS_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
   template<typename Falcon_T, class = void>\
   struct __falcon_##_Name##__has_type_test\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T>\
   struct __falcon_##_Name##__has_type_test<Falcon_T\
-  , typename ::falcon::enable_type<typename Falcon_T::_TypeName>::type>\
+  , typename ::falcon::detail::enable_type<typename Falcon_T::_TypeName>::type>\
   : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
@@ -40,18 +40,15 @@ namespace falcon {
 
 #define FALCON_HAS_TYPE_NAME(_TypeName) has_##_TypeName
 
-#define FALCON_CLASS_HAS_TYPE(_TypeName)\
-	FALCON_CREATE_HAS_TYPE(has_##_TypeName, _TypeName)
-
 
 #if __cplusplus >= 201103L
-# define __FALCON_FALCON_CREATE_HAS_TEMPLATE_TYPE(_Name, _TypeName)\
+# define __FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
   template<typename Falcon_T>\
   struct __falcon_##_Name##__has_template_type_test<Falcon_T\
   , typename ::falcon::detail::enable_template<Falcon_T::template _TypeName>::type>\
   : ::falcon::true_type {};
 #else
-# define __FALCON_FALCON_CREATE_HAS_TEMPLATE_TYPE(_Name, _TypeName)\
+# define __FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
   template<typename Falcon_T>\
   struct __falcon_##_Name##__has_template_type_test<Falcon_T\
   , typename ::falcon::detail::enable_template<Falcon_T::template _TypeName>::type>\
@@ -63,14 +60,21 @@ namespace falcon {
   : ::falcon::true_type {};
 #endif
 
-#define FALCON_CREATE_HAS_TEMPLATE_TYPE(_Name, _TypeName)\
+#define FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
 	template<typename Falcon_T, class = void>\
 	struct __falcon_##_Name##__has_template_type_test\
 	: ::falcon::false_type {};\
   \
-  __FALCON_FALCON_CREATE_HAS_TEMPLATE_TYPE(_Name, _TypeName)\
+  __FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
   \
   template<typename Falcon_T>\
   struct _Name : __falcon_##_Name##__has_template_type_test<Falcon_T>::type {}
+
+
+#define FALCON_HAS_TYPE_TRAIT_DEF(_TypeName)\
+  FALCON_HAS_TYPE_TRAIT_NAMED_DEF(has_##_TypeName, _TypeName)
+
+#define FALCON_HAS_TEMPLATE_TYPE_TRAIT_DEF(_TypeName)\
+  FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(has_template_##_TypeName, _TypeName)
 
 #endif

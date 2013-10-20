@@ -179,12 +179,6 @@ move semantique pour class_property + property read_only + operator= pour évite
 
 dans les rbegin, rend pour les tableaux. utiliser un opposite_iterator ?
 
-faire le menage dans les classes de sfinae. Les choose_* sont-elles vraiments indispensable ? faire hériter les classes d'integral_constant. utiliser decltype en C++11 pour alleger le code ?
-FALCON_CREATE_* -> FALCON_HAS_*_TRAIT_NAMED_DEF
-FALCON_CLASS_* -> FALCON_HAS_*_TRAIT_DEF
-faire un has_member qui vérifie l'existance quelque soit le type.
-boost/sfinae ce comporte pareil ? pas de coup à la compil ?
-
 make_iterator_iterator() + amélioration de la construction avec possibilité de passer des container
 
 push_back dans cstring (C++11) et méthode de modification de la chaine (insert, etc)

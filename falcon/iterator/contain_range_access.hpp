@@ -4,25 +4,25 @@
 #include <falcon/container/range_access.hpp>
 
 #if __cplusplus >= 201103L
-# include <falcon/sfinae/function_is_call_possible.hpp>
+# include <falcon/sfinae/function_is_callable.hpp>
 
 namespace falcon {
 	template <typename T>
 	class contain_range_access_iterator
 	{
-		FALCON_CLASS_FUNCTION_IS_CALL_POSSIBLE(begin);
+    FALCON_FUNCTION_IS_CALLABLE_TRAIT_DEF(begin);
 
 	public:
-		static const bool value = FALCON_FUNCTION_IS_CALL_POSSIBLE_NAME(begin)<T&>::value;
+		static const bool value = begin_is_callable<T&>::value;
 	};
 
 	template <typename T>
 	struct contain_range_access_reverse_iterator
 	{
-		FALCON_CLASS_FUNCTION_IS_CALL_POSSIBLE(rbegin);
+    FALCON_FUNCTION_IS_CALLABLE_TRAIT_DEF(rbegin);
 
 	public:
-		static const bool value = FALCON_FUNCTION_IS_CALL_POSSIBLE_NAME(rbegin)<T&>::value;
+    static const bool value = rbegin_is_callable<T&>::value;
 	};
 }
 

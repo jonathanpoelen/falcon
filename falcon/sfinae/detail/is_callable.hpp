@@ -20,6 +20,10 @@ namespace falcon {
 
     class sfinae_unspecified;
 #endif
+    
+    template <bool, typename R = void>
+    struct enable_val
+    { typedef R type; };
   }
 }
 

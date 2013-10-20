@@ -2,7 +2,7 @@
 #define FALCON_ALGORITHM_ALGORITHM_HPP
 
 #include <algorithm>
-#include <falcon/sfinae/member_is_call_possible.hpp>
+#include <falcon/sfinae/member_is_callable.hpp>
 #include <falcon/c++1x/syntax.hpp>
 #include <falcon/container/range_access.hpp>
 #include <falcon/container/container_wrapper.hpp>
@@ -73,13 +73,12 @@
 
 #define __FALCON_ALGORITHM_DETAIL_CLASS_MEMBER_FUNCTION_IS_CALL_POSSIBLE(_Name)\
 	namespace detail {\
-		FALCON_CLASS_HAS_MEMBER_FUNCTION(_Name);\
-		FALCON_CLASS_MEMBER_FUNCTION_IS_CALL_POSSIBLE(_Name);\
+    FALCON_HAS_MEMBER_IS_CALLABLE_TRAIT_DEF(_Name);\
 	}
 
 #define __FALCON_ALGORITHM_FUNC(_Name, TEMPLATE, ARG, VAR)\
 	__FALCON_ALGORITHM_TEMPLATE(TEMPLATE)\
-	CPP1X_DELEGATE_FUNCTION(_Name(Container& container __FALCON_ALGORITHM_##ARG##_ARG), __delegate::_Name##TEMPLATE##ARG##VAR <detail::FALCON_MEMBER_FUNCTION_IS_CALL_POSSIBLE_NAME(_Name)<Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::value, Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::exec(container __FALCON_ALGORITHM_##VAR##_VAR))\
+	CPP1X_DELEGATE_FUNCTION(_Name(Container& container __FALCON_ALGORITHM_##ARG##_ARG), __delegate::_Name##TEMPLATE##ARG##VAR <detail::_Name##_member_is_callable<Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::value, Container __FALCON_ALGORITHM_##TEMPLATE##_TYPE>::exec(container __FALCON_ALGORITHM_##VAR##_VAR))\
 	\
 	template<typename _InitializerT __FALCON_ALGORITHM_PARTIAL_TEMPLATE(TEMPLATE)>\
 	CPP1X_DELEGATE_FUNCTION(_Name(std::initializer_list<_InitializerT> initializer __FALCON_ALGORITHM_##ARG##_ARG), std::_Name(initializer.begin(), initializer.end() __FALCON_ALGORITHM_##VAR##_VAR))\
