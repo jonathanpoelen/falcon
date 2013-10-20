@@ -30,45 +30,45 @@ namespace falcon {
   struct _Name : __falcon_##_Name##__has_member_attribute_test<Falcon_T>::type {}
 
 
-#define FALCON_CREATE_HAS_FUNCTION(_Name, _AttrName)\
+#define FALCON_CREATE_HAS_FUNCTION(_Name, _FuncName)\
   template<typename Falcon_T, class = void, class = void>\
   struct __falcon_##_Name##__has_function_test\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T>\
   struct __falcon_##_Name##__has_function_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_AttrName)>::type\
-  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_AttrName)>::type\
+  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_FuncName)>::type\
+  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_FuncName)>::type\
   > : ::falcon::false_type {};\
   \
   template<typename Falcon_T, typename Falcon_U>\
   struct __falcon_##_Name##__has_function_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_AttrName)>::type\
+  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_FuncName)>::type\
   , Falcon_U> : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
   struct _Name : __falcon_##_Name##__has_function_test<Falcon_T>::type {}
 
 
-#define FALCON_CREATE_HAS_MEMBER_FUNCTION(_Name, _AttrName)\
+#define FALCON_CREATE_HAS_MEMBER_FUNCTION(_Name, _FuncName)\
   template<typename Falcon_T, class = void, class = void>\
   struct __falcon_##_Name##__has_memfunction_test\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T>\
   struct __falcon_##_Name##__has_memfunction_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_AttrName)>::type\
-  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_AttrName)>::type\
+  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_FuncName)>::type\
+  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_FuncName)>::type\
   > : ::falcon::false_type {};\
   \
   template<typename T, typename U>\
   struct __falcon_##_Name##__has_memfunction_test<T\
-  , typename std::enable_val<sizeof(&T::_AttrName)>::type , U>\
+  , typename std::enable_val<sizeof(&T::_FuncName)>::type , U>\
   {\
     template<typename R, typename TT>\
     static ::falcon::sfinae_type::one test(R TT::*);\
     static ::falcon::sfinae_type::two test(...);\
-    static const bool value = sizeof(test(&T::_AttrName)) == 1;\
+    static const bool value = sizeof(test(&T::_FuncName)) == 1;\
   };\
   \
   template<typename Falcon_T>\
