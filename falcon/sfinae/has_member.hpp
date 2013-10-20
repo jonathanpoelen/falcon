@@ -1,7 +1,6 @@
 #ifndef FALCON_SFINAE_HAS_MEMBER_FUNCTION_HPP
 #define FALCON_SFINAE_HAS_MEMBER_FUNCTION_HPP
 
-#include <falcon/sfinae/sfinae.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/type_traits/yes_no_type.hpp>
 #include <falcon/type_traits/integral_constant.hpp>

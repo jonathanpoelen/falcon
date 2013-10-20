@@ -13,20 +13,19 @@ template<typename T, typename U>
 using is_instance_of = std::is_base_of<U, T>;
 }
 #else
-#include <falcon/sfinae/sfinae.hpp>
+#include <falcon/type_traits/yes_no_type.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
 
 namespace falcon {
 
 template<typename T, typename U>
 class __is_instance_of
-: falcon::sfinae_type
 {
-  static one __test(U*);
-  static two __test(...);
+  static yes_type __test(U*);
+  static no_type __test(...);
 
 public:
-  static const bool value = sizeof(__test(static_cast<T*>(0))) == sizeof(one);
+  static const bool value = sizeof(__test(static_cast<T*>(0))) == sizeof(yes_type);
 };
 
 /**
