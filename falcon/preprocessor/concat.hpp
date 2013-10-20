@@ -1,7 +1,7 @@
 #ifndef FALCON_PREPROCESSOR_CONCAT_HPP
 #define FALCON_PREPROCESSOR_CONCAT_HPP
 
-#define __FALCON_CONCAT(a,b) a##b
-#define FALCON_CONCAT(a,b) __FALCON_CONCAT(a, b)
+#define FALCON_CONCAT_I(a,b) a##b
+#define FALCON_CONCAT(a,b) FALCON_CONCAT_I(a, b)
 
 #endif
