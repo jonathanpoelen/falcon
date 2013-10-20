@@ -175,8 +175,6 @@ renommer container_wrapper en sequence_wrapper ?
 
 vector avec fonction de redirection d'indice (type template). Permet par exemple un vecteur 2D (avec en template la fonction/wrapper coord()).
 
-sfinae: FALCON_CREATE_HAS_* -> FALCON_TRAIT_HAS_*
-
 move semantique pour class_property + property read_only + operator= pour éviter de passer par un cast implicit quand il n'y a pas de getter.
 
 dans les rbegin, rend pour les tableaux. utiliser un opposite_iterator ?
