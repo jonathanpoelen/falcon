@@ -64,22 +64,13 @@ tuple_organizer<_Tag, bool no_tuple_parameter_is_tuple = true> pour faire une ag
 
 les tuple_* doivent fonctionner avec std::pair<>/std::array<>, faire des tests
 
-unary_compose et binary_compose doivent pouvoir deviné le type des fonctions
-
-faire en sorte que mulary_compose passe par héritage au lieu de tuple. Le bool passé en template ne doit pas existé autrement qu'en interne. renommer en *_base et passer par un alias ?
-mulary_compose doit hériter et compose retourner unary_compose ou binary_compose quand cela est possible.
-
-unary_compose, binary_compose et mulary_compose doivent supporter falcon::ignore quand on les construits
-
-faire un function_compose<...> (+ fonction composef()) comme mulary_compose mais prend un nombre de paramètre allant de 0 à infinit.
+unary_compose, binary_compose et mulary_compose doivent supporter falcon::ignore_t quand on les construits
 
 dans enumerator faire une allocation de la chaîne en tant que expression constante (déjà fait ?)
 
 support des enumeration à valeur aléatoire dans enumerator.hpp
 
 tester les compose() avec les distributions (voir random_device ? (exemple dans cppreference.com avec les distributions))
-
-les compose() devrais pouvoir fonctionenr avec les références (pas le cas actuellement). Fonctionne avec std::ref() sans perte de perf (même binaire) ?
 
 strong_reference_wrapper: faire des tests
 
@@ -187,8 +178,6 @@ parameter/manip.hpp: séparer chaque fonctionnalite dans des fichier separer et 
 
 mpl (comme boost) mais qui utilise parameter_pack et co
 
-simplifier function/{special_call,compose}.hpp
-
 faire les helper type: `template<...> xxx_t = typename xxx<...>::type` et les macros pour aider à leur construction: FALCON_HELPER_TYPE_2_DEF(name, T, U)
 
 concat supporte de recevoir des nombres est reserve une taille max + utilise to_string.
@@ -196,8 +185,6 @@ concat supporte de recevoir des nombres est reserve une taille max + utilise to_
 to_cstring/to_const_cstring et des fonctions concat et append qui retourne un cstring.
 
 Faire un to_string, to_cstring et to_const_cstring qui supporte plusieurs valeurs et les transforme en [c]string. Si prend un paramètre qui est une référence sur leurs types de retour alors le retourne par référence. Changer le nom pour les différencier de to_string (variables_to_string ?).
-
-functional/compose.hpp: simplifier et utilisation de rvalue
 
 refaire une passe de l'ensemble des fichiers de functional/ et tuple/ pour eliminer les foncteurs non constant et alleger le code. (surtout parameter_index_adapter)
 
@@ -227,8 +214,6 @@ un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avec 
 
 les fonction de flux entrant doivent pouvoir recevoir des modifiers
 
-simplifier ignore() et faire en sorte que la fonction supporte n'importe quel type
-
 optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le cas (voir put_tuple et intrusive stream)
 
 le namespace detail et publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
@@ -241,9 +226,11 @@ dichotomic_find et dichotomic_find_if recherche jusqu'à la fin lorsque std::fin
 
 flat_map et flat_multimap avec strategie pour la réorganisation des elements (deplacement de tous ou juste des dernier element). Idem pour flat_set et flat_multiset
 
-Changer les interface de templates/*.hpp. Mettre des constexpr quand-il faut. Changer les noms des structures et complement -> bit_not
+Changer les interfaces de templates/*.hpp. Mettre des constexpr quand-il faut.
 
+un flux qui fonctionne comme stringstream mais prend en référence le container à aggrandir ???<Container, Pusher = back_insert>
 
+iterator_by_index qui pour récupérer une valeur passe par l'opérateur []
 
 
 
