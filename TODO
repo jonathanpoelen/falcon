@@ -218,9 +218,7 @@ optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le ca
 
 le namespace detail et publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
 
-unordered_vector. Pas de push_back et co, juste des insert(). Les méthodes de supression existe aussi. Container interne en protected et nommé 'c' (comme pour queue et priority_queue).
-
-sequence_queue, sequence_priority_queue et sequence_unordered_vector (permet de récupérer le container interne)
+sequence_queue, sequence_priority_queue (permet de récupérer le container interne)
 
 dichotomic_find et dichotomic_find_if recherche jusqu'à la fin lorsque std::find est utilisé. Faire un dichotomic_upper
 
