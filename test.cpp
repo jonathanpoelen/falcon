@@ -28,6 +28,10 @@ int main()
   for (auto x: v) {
     std::cout << (x) << "\n";
   }
+  v.remove(2);
+  for (auto x: v) {
+    std::cout << (x) << "\n";
+  }
   return v==v;
 
 //   using sequence = seq<_1,_2,_3>;

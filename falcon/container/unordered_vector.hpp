@@ -3,6 +3,7 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/noexcept.hpp>
+#include <falcon/algorithm/unordered_algorithm.hpp>
 
 #include <vector>
 #if __cplusplus >= 201103L
@@ -10,65 +11,6 @@
 #endif
 
 namespace falcon {
-
-template<typename T, typename Allocator>
-typename std::vector<T, Allocator>::iterator
-erase_unordered(std::vector<T, Allocator> & cont,
-#if __cplusplus >= 201103L
-                typename std::vector<T, Allocator>::const_iterator pos
-#else
-                typename std::vector<T, Allocator>::iterator pos
-#endif
-)
-{
-  if(pos + 1 != cont.end()) {
-#if __cplusplus >= 201103L
-    *const_cast<typename std::vector<T, Allocator>::pointer>(pos.base())
-    = std::move(cont.back());
-#else
-    *pos = cont.back();
-#endif
-  }
-  cont.pop_back();
-  return pos;
-}
-
-template<typename T, typename Allocator>
-typename std::vector<T, Allocator>::iterator
-erase_unordered(std::vector<T, Allocator> & cont,
-#if __cplusplus >= 201103L
-                typename std::vector<T, Allocator>::const_iterator first,
-                typename std::vector<T, Allocator>::const_iterator last
-#else
-                typename std::vector<T, Allocator>::iterator first,
-                typename std::vector<T, Allocator>::iterator last,
-#endif
-)
-{
-  if(last = cont.end()) {
-    return cont.erase(first, last);
-  }
-
-  typedef std::vector<T, Allocator> container_type;
-  typedef typename container_type::difference_type difference_type;
-  difference_type dis = last - first;
-  difference_type rdis = cont.end() - last;
-  if(rdis <= dis) {
-    return cont.erase(first, last);
-  }
-
-  typedef typename container_type::iterator iterator;
-  for(iterator pos = cont.end() - dis; first != last; ++first, ++pos) {
-#if __cplusplus >= 201103L
-    *const_cast<typename std::vector<T, Allocator>::pointer>(first.base())
-    = std::move(*pos);
-#else
-    *first = *pos;
-#endif
-  }
-  return cont.erase(cont.end() - dis, cont.end());
-}
-
 
 /**
  * \ingroup sequence
@@ -327,14 +269,14 @@ public:
 #else
   iterator erase(iterator pos)
 #endif
-  { return erase_unordered(c, pos); }
+  { return unordered_erase(c, pos); }
 
 #if __cplusplus >= 201103L
   iterator erase(const_iterator first, const_iterator last)
 #else
   iterator erase(iterator first, iterator last)
 #endif
-  { return erase_unordered(c, first, last); }
+  { return unordered_erase(c, first, last); }
 
 #if __cplusplus >= 201103L
   template<typename... Args>
@@ -357,6 +299,13 @@ public:
 
   void insert(const T & value)
   { c.push_back(value); }
+
+  void remove(const T& x)
+  { c.erase(unordered_remove(c.begin(), c.end(), x), c.end()); }
+
+  template<typename UnaryPredicate>
+  void remove_if(UnaryPredicate pred)
+  { c.erase(unordered_remove_if(c.begin(), c.end(), pred), c.end()); }
   ///@}
 
 protected:
