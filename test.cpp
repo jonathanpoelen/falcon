@@ -17,10 +17,18 @@
 // {};
 //
 
+#include <falcon/container/unordered_vector.hpp>
+#include <iostream>
 
 int main()
 {
-
+  falcon::unordered_vector<int> v{{1,2,3,4}};
+//   v.container().insert(v.begin(), 3);
+  v.insert(5);
+  for (auto x: v) {
+    std::cout << (x) << "\n";
+  }
+  return v==v;
 
 //   using sequence = seq<_1,_2,_3>;
 //   using first = begin<sequence>::type;

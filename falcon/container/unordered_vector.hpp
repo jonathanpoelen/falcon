@@ -1,15 +1,80 @@
 #ifndef FALCON_CONTAINER_UNORDERED_VECTOR_HPP
 #define FALCON_CONTAINER_UNORDERED_VECTOR_HPP
 
+#include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/noexcept.hpp>
+
 #include <vector>
+#if __cplusplus >= 201103L
+# include <utility>
+#endif
 
 namespace falcon {
+
+template<typename T, typename Allocator>
+typename std::vector<T, Allocator>::iterator
+erase_unordered(std::vector<T, Allocator> & cont,
+#if __cplusplus >= 201103L
+                typename std::vector<T, Allocator>::const_iterator pos
+#else
+                typename std::vector<T, Allocator>::iterator pos
+#endif
+)
+{
+  if(pos + 1 != cont.end()) {
+#if __cplusplus >= 201103L
+    *const_cast<typename std::vector<T, Allocator>::pointer>(pos.base())
+    = std::move(cont.back());
+#else
+    *pos = cont.back();
+#endif
+  }
+  cont.pop_back();
+  return pos;
+}
+
+template<typename T, typename Allocator>
+typename std::vector<T, Allocator>::iterator
+erase_unordered(std::vector<T, Allocator> & cont,
+#if __cplusplus >= 201103L
+                typename std::vector<T, Allocator>::const_iterator first,
+                typename std::vector<T, Allocator>::const_iterator last
+#else
+                typename std::vector<T, Allocator>::iterator first,
+                typename std::vector<T, Allocator>::iterator last,
+#endif
+)
+{
+  if(last = cont.end()) {
+    return cont.erase(first, last);
+  }
+
+  typedef std::vector<T, Allocator> container_type;
+  typedef typename container_type::difference_type difference_type;
+  difference_type dis = last - first;
+  difference_type rdis = cont.end() - last;
+  if(rdis <= dis) {
+    return cont.erase(first, last);
+  }
+
+  typedef typename container_type::iterator iterator;
+  for(iterator pos = cont.end() - dis; first != last; ++first, ++pos) {
+#if __cplusplus >= 201103L
+    *const_cast<typename std::vector<T, Allocator>::pointer>(first.base())
+    = std::move(*pos);
+#else
+    *first = *pos;
+#endif
+  }
+  return cont.erase(cont.end() - dis, cont.end());
+}
+
 
 /**
  * \ingroup sequence
  */
 template<typename T, typename Allocator = std::allocator<T> >
-class unordered_vector : protected std::vector<T, Allocator>
+class unordered_vector
 {
   typedef std::vector<T, Allocator> container_type;
 
@@ -29,164 +94,298 @@ public:
   typedef typename container_type::difference_type difference_type;
   typedef typename container_type::allocator_type allocator_type;
 
-#if __cplusplus >= 201103L
-  using container_type::vector;
-#else
-  explicit unordered_vector( const Allocator& alloc = Allocator() )
-  : container_type(alloc)
+
+  explicit unordered_vector(const Allocator & alloc = Allocator())
+  : c(alloc)
   {}
 
   explicit unordered_vector(size_type count,
-                            const T& value = T(),
-                            const Allocator& alloc = Allocator())
-  : container_type(count, value, alloc)
+#if __cplusplus >= 201103L
+                            const T & value,
+#else
+                            const T & value = T(),
+#endif
+                            const Allocator & alloc = Allocator())
+  : c(count, value, alloc)
   {}
 
   template< class InputIt >
-  unordered_vector( InputIt first, InputIt last,
-                    const Allocator& alloc = Allocator() )
-  : container_type(first, last, alloc)
+  unordered_vector(InputIt first, InputIt last,
+                   const Allocator & alloc = Allocator())
+  : c(first, last, alloc)
   {}
 
-  unordered_vector( const unordered_vector& other )
-  : container_type(other.c)
+  unordered_vector(const unordered_vector & other)
+  : c(other.c)
   {}
 
-  unordered_vector( const container_type& other )
-  : container_type(other)
+  unordered_vector(const container_type & other)
+  : c(other)
+  {}
+
+#if __cplusplus >= 201103L
+  unordered_vector(const unordered_vector & other, const Allocator & alloc)
+  : c(std::move(other.c), alloc)
+  {}
+
+  unordered_vector(unordered_vector && other)
+  : c(std::move(other.c))
+  {}
+
+  unordered_vector(unordered_vector && other, const Allocator & alloc)
+  : c(std::move(other.c), alloc)
+  {}
+
+  unordered_vector(const container_type & other, const Allocator & alloc)
+  : c(std::move(other), alloc)
+  {}
+
+  unordered_vector(container_type && other)
+  : c(std::move(other))
+  {}
+
+  unordered_vector(container_type && other, const Allocator & alloc)
+  : c(std::move(other), alloc)
+  {}
+
+  unordered_vector(std::initializer_list<T> init,
+                   const Allocator & alloc = Allocator())
+  : c(init, alloc)
+  {}
+
+#if __cplusplus < 201403L
+  explicit unordered_vector(size_type count)
+  : c(count)
+  {}
+#else
+  explicit unordered_vector(size_type count, const Allocator & alloc = Allocator());
+  : c(count, alloc)
   {}
 #endif
+#endif
 
-  unordered_vector& operator=(const unordered_vector& other)
+  unordered_vector & operator=(const unordered_vector & other)
   {
-    container_type::operator=(other.c);
+    c = other.c;
     return *this;
   }
 
-  unordered_vector& operator=(const container_type & other)
+  unordered_vector & operator=(const container_type& other)
   {
-    container_type::operator=(other);
+    c = other;
     return *this;
   }
 
 #if __cplusplus >= 201103L
-  unordered_vector& operator=(unordered_vector && other) noexcept
+  unordered_vector & operator=(unordered_vector && other) noexcept
   {
-    container_type::operator=(other.c);
+    c = other.c;
     return *this;
   }
 
-  unordered_vector& operator=(container_type && other) noexcept
+  unordered_vector & operator=(container_type && other) noexcept
   {
-    container_type::operator=(other);
+    c = std::move(other);
     return *this;
   }
 
-  unordered_vector& operator=( std::initializer_list<T> ilist )
+  unordered_vector & operator=(std::initializer_list<T> ilist)
   {
-    container_type::operator=(ilist);
+    c = ilist;
     return *this;
   }
 #endif
 
-  using container_type::assign;
-  using container_type::get_allocator;
+  void assign( size_type count, const T& value )
+  { c.assign(count, value); }
 
-  using container_type::at;
-  using container_type::operator[];
-  using container_type::front;
-  using container_type::back;
-
-  using container_type::begin;
-  using container_type::end;
-  using container_type::rbegin;
-  using container_type::rend;
-
-  using container_type::empty;
-  using container_type::size;
-  using container_type::max_size;
-  using container_type::capacity;
-  using container_type::reserve;
-
-  using container_type::clear;
-  using container_type::resize;
-  using container_type::swap;
+  template< class InputIt >
+  void assign( InputIt first, InputIt last )
+  { c.assign(first, last); }
 
 #if __cplusplus >= 201103L
-  using container_type::data;
-  using container_type::cbegin;
-  using container_type::cend;
-  using container_type::crbegin;
-  using container_type::crend;
-
-  using container_type::shrink_to_fit;
+  void assign( std::initializer_list<T> ilist )
+  { c.assign(ilist); }
 #endif
 
+  allocator_type get_allocator() const
+  { return c.get_allocator(); }
+
+  /// Elements access @{
+  reference at(size_type pos)
+  { return c.at(pos); }
+
+  const_reference at(size_type pos) const
+  { return c.at(pos); }
+
+  reference operator[](size_type pos)
+  { return c[pos]; }
+
+  CPP_CONSTEXPR_NOT_CONST const_reference operator[](size_type pos) const
+  { return c[pos]; }
+
+  reference front()
+  { return c.front(); }
+
+  CPP_CONSTEXPR_NOT_CONST const_reference front() const
+  { return c.front(); }
+
+  reference back()
+  { return c.back(); }
+
+  CPP_CONSTEXPR_NOT_CONST const_reference back() const
+  { return c.back(); }
+
+  T* data() CPP_NOEXCEPT
+  { return c.data(); }
+
+  const T* data() const CPP_NOEXCEPT
+  { return c.data(); }
+  ///@}
+
+  /// Iterators @{
+  iterator begin()
+  { return c.begin(); }
+
+  const_iterator begin() const
+  { return c.begin(); }
+
+  iterator end()
+  { return c.end(); }
+
+  const_iterator end() const
+  { return c.end(); }
+
+  iterator rbegin()
+  { return c.rbegin(); }
+
+  const_iterator rbegin() const
+  { return c.rbegin(); }
+
+  iterator rend()
+  { return c.rend(); }
+
+  const_iterator rend() const
+  { return c.rend(); }
+
 #if __cplusplus >= 201103L
-  iterator erase( const_iterator pos )
+  const_iterator cbegin() const
+  { return c.begin(); }
+
+  const_iterator cend() const
+  { return c.end(); }
+
+  const_iterator crbegin() const
+  { return c.rbegin(); }
+
+  const_iterator crend() const
+  { return c.rend(); }
+#endif
+  ///@}
+
+  /// Capacity @{
+  bool empty() const CPP_NOEXCEPT
+  { return c.empty(); }
+
+  size_type size() const CPP_NOEXCEPT
+  { return c.size(); }
+
+  size_type max_size() const CPP_NOEXCEPT
+  { return c.max_size(); }
+
+  void reserve( size_type new_cap )
+  { c.reserve(new_cap); }
+
+  size_type capacity() const CPP_NOEXCEPT
+  { return c.capacity(); }
+
+#if __cplusplus >= 201103L
+  void shrink_to_fit()
+  { c.shrink_to_fit(); }
+#endif
+  ///@}
+
+  /// Modifiers @{
+  void clear() CPP_NOEXCEPT
+  { c.clear(); }
+
+#if __cplusplus >= 201103L
+  void resize( size_type count )
+  { c.resize(count); }
+
+  void resize( size_type count, const value_type & value)
 #else
-  iterator erase( iterator pos )
+  void resize( size_type count, T value = T() )
 #endif
-  {
-    if (pos + 1 != end()) {
-#if __cplusplus >= 201103L
-      *const_cast<pointer>(pos.base()) = std::move(back());
-#else
-      *pos = back();
-#endif
-    }
-    this->pop_back();
-    return pos;
-  }
+  { c.resize(count, value); }
+
+  void swap( unordered_vector & other )
+  { c.swap(other.c); }
 
 #if __cplusplus >= 201103L
-  iterator erase( const_iterator first, const_iterator last )
+  iterator erase(const_iterator pos)
 #else
-  iterator erase( iterator first, iterator last )
+  iterator erase(iterator pos)
 #endif
-  {
-    if (last = end()) {
-      return container_type::erase(first, last);
-    }
+  { return erase_unordered(c, pos); }
 
-    difference_type dis = last - first;
-    difference_type rem = end() - last;
-    if (rem <= dis) {
-      return container_type::erase(first, last);
-    }
-
-    for (iterator pos = end()-dis; first != last; ++first, ++pos) {
 #if __cplusplus >= 201103L
-      *const_cast<pointer>(first.base()) = std::move(*pos);
+  iterator erase(const_iterator first, const_iterator last)
 #else
-      *first = *pos;
+  iterator erase(iterator first, iterator last)
 #endif
-    }
-    return container_type::erase(end() - dis, end());
-  }
+  { return erase_unordered(c, first, last); }
 
 #if __cplusplus >= 201103L
   template<typename... Args>
   void emplace(Args&&... args)
-  { emplace_back(cend(), std::forward<Args>(args)...); }
+  { c.emplace_back(c.cend(), std::forward<Args>(args)...); }
 
   void insert(T && value)
-  { container_type::push_back(std::move(value)); }
+  { c.push_back(std::move(value)); }
 
-  void insert( std::initializer_list<T> ilist )
-  { container_type::insert(end(), ilist); }
+  void insert(std::initializer_list<T> ilist)
+  { c.insert(c.end(), ilist); }
 #endif
 
-  void insert( size_type count, const T& value )
-  { container_type::insert(end(), count, value); }
+  void insert(size_type count, const T& value)
+  { c.insert(c.end(), count, value); }
 
   template< class InputIt >
-  void insert( InputIt first, InputIt last )
-  { container_type::insert(end(), first, last); }
+  void insert(InputIt first, InputIt last)
+  { c.insert(c.end(), first, last); }
 
   void insert(const T & value)
-  { container_type::push_back(value); }
+  { c.push_back(value); }
+  ///@}
+
+protected:
+  container_type c;
 };
+
+
+template<typename T, typename Allocator>
+void swap(const unordered_vector<T, Allocator> & x,
+          const unordered_vector<T, Allocator> & y)
+{ x.swap(y); }
+
+
+template<typename T, typename Allocator>
+unordered_vector< T, Allocator > &
+unordered_vector_cast(std::vector<T, Allocator> & x)
+{ return reinterpret_cast<unordered_vector< T, Allocator > &>(x); }
+
+template<typename T, typename Allocator>
+const unordered_vector< T, Allocator > &
+unordered_vector_cast(const std::vector<T, Allocator> & x)
+{ return reinterpret_cast<const unordered_vector< T, Allocator > &>(x); }
+
+#if __cplusplus >= 201103L
+template<typename T, typename Allocator>
+unordered_vector< T, Allocator > &
+unordered_vector_cast(std::vector<T, Allocator> && x)
+{ return reinterpret_cast<unordered_vector< T, Allocator > &&>(x); }
+#endif
 
 
 template<typename T, typename Allocator>
@@ -198,6 +397,13 @@ template<typename T, typename Allocator>
 const std::vector< T, Allocator > &
 sequence_unordered_vector(const unordered_vector<T, Allocator> & x)
 { return reinterpret_cast<const std::vector< T, Allocator > &>(x); }
+
+#if __cplusplus >= 201103L
+template<typename T, typename Allocator>
+std::vector< T, Allocator > &&
+sequence_unordered_vector(unordered_vector<T, Allocator> && x)
+{ return reinterpret_cast<std::vector< T, Allocator > &&>(x); }
+#endif
 
 
 template<typename T, typename Allocator>
