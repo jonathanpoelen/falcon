@@ -17,22 +17,27 @@
 // {};
 //
 
-#include <falcon/container/unordered_vector.hpp>
+#include <falcon/iterator/iterator_iterator.hpp>
+#include <falcon/container/range_container.hpp>
+#include <falcon/iterator/iterator_pair.hpp>
 #include <iostream>
+
+namespace N {struct B{
+};
+
+int * begin(const B&){
+  std::cout << "begin\n";
+  return 0;
+}
+int * end(const B&){
+  std::cout << "end\n";
+  return 0;
+}}
 
 int main()
 {
-  falcon::unordered_vector<int> v{{1,2,3,4}};
-//   v.container().insert(v.begin(), 3);
-  v.insert(5);
-  for (auto x: v) {
-    std::cout << (x) << "\n";
-  }
-  v.remove(2);
-  for (auto x: v) {
-    std::cout << (x) << "\n";
-  }
-  return v==v;
+  const N::B b;
+  falcon::iterator_pair(b);
 
 //   using sequence = seq<_1,_2,_3>;
 //   using first = begin<sequence>::type;

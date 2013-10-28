@@ -170,10 +170,6 @@ move semantique pour class_property + property read_only + operator= pour évite
 
 dans les rbegin, rend pour les tableaux. utiliser un opposite_iterator ?
 
-make_iterator_iterator() + amélioration de la construction avec possibilité de passer des container
-
-push_back dans cstring (C++11) et méthode de modification de la chaine (insert, etc)
-
 parameter/manip.hpp: séparer chaque fonctionnalite dans des fichier separer et ajouter pop_back et pop_front. Avec une posibilité de retourné un type (plutot  qu'une erreur de compile) quand le pack est vide
 
 mpl (comme boost) mais qui utilise parameter_pack et co
@@ -190,16 +186,12 @@ refaire une passe de l'ensemble des fichiers de functional/ et tuple/ pour elimi
 
 mettre en noexcept les constructeur qui peuvent l'être
 
-un mutable_val comme cmme mutable_pointer mais pour les valeurs
-
-supprimer tuple/detail/tuplefwd.hpp
-
 ajout de ioflag() pour les flux. ioflag<std::ios::hex>(42) et ioflag<=void>(42, std::ios::hex). Permet de mettre un flag juste pour un type.
 
 faire une classe ostream::format() simple (format("%1 %2")(2,34)). ainsi que putf("%1",42). format préévalue les positions alors que puts ajoute à la volée (plus rapide ?)
 http://code.google.com/p/nicola-bonelli-repo/source/browse/trunk/codes.cpp0x/print.hpp?spec=svn612&r=612
 
-au niveau des construct() faire un cast à la port pour transformer les tableau[x][y] en tableau [x*y] (et plud de dimension évidement)
+au niveau des construct() faire un cast à la porc pour transformer les tableau[x][y] en tableau [x*y] (et plus de dimension évidement)
 
 un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basic_stringbuf qui fonctionne avec des cstring (et donc non sûr car ne fait de copie) et basic_stringbuf avec une taille limiter (utilise cstring mais fait une copie quand str() est utilisé). Ces 3 streambuf peuvent avoir une base commune. Le basic_stringbuf avec une taille limitée peut être implémenté un constructeur qui utilise setp avec une donnée fournit par l'extrieur: struct basic_limitbuf: public std::streambuf{
   basic_limitbuf(char *buffer, size_t size)
@@ -228,7 +220,7 @@ Changer les interfaces de templates/*.hpp. Mettre des constexpr quand-il faut.
 
 un flux qui fonctionne comme stringstream mais prend en référence le container à aggrandir ???<Container, Pusher = back_insert>
 
-iterator_by_index qui pour récupérer une valeur passe par l'opérateur []
+
 
 
 

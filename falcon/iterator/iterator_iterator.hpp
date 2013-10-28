@@ -259,6 +259,28 @@ template <typename _I, typename _T, typename _C, typename _R, typename _D, typen
 bool operator>=(const _I& b, const iterator_iterator<_I, _T, _C, _R, _D, _P>& a)
 { return b >= a.current_iterator(); }
 
+
+template <typename _Iterator>
+iterator_iterator<_Iterator> make_iterator_iterator(_Iterator it)
+{ return iterator_iterator<_Iterator>(it); }
+
+template <typename T>
+iterator_iterator<T>
+make_iterator_iterator(const std::vector<std::pair<T,T> > & cont)
+{ return iterator_iterator<T>(cont); }
+
+#if __cplusplus >= 201103L
+template <typename T>
+iterator_iterator<T>
+make_iterator_iterator(std::vector<std::pair<T,T> > && cont)
+{ return iterator_iterator<T>(std::move(cont)); }
+
+template <typename T>
+iterator_iterator<T>
+make_iterator_iterator(std::initializer_list<std::pair<T,T> > ilist)
+{ return iterator_iterator<T>(ilist); }
+#endif
+
 }
 }
 
