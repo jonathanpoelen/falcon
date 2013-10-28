@@ -278,10 +278,16 @@ public:
 #endif
   { return unordered_erase(c, first, last); }
 
+  void push_back(const value_type & value)
+  { c.push_back(value); }
+
 #if __cplusplus >= 201103L
+  void push_back(value_type && value)
+  { c.push_back(std::move(value)); }
+
   template<typename... Args>
-  void emplace(Args&&... args)
-  { c.emplace_back(c.cend(), std::forward<Args>(args)...); }
+  void emplace_back(Args&&... args)
+  { c.emplace_back(std::forward<Args>(args)...); }
 
   void insert(T && value)
   { c.push_back(std::move(value)); }

@@ -49,7 +49,7 @@ do {\
 	CHECK_SEQUENCE(Xfirst_##cont, Xlast_##cont, first, last);\
 } while(0)
 
-#define CHECK_SECHECK_SEQUENCE_MQUENCE3(cont, cont2)\
+#define CHECK_SEQUENCE3(cont, cont2)\
 do {\
 	BOOST_AUTO(Xfirst_##cont2, falcon::begin(cont2));\
 	BOOST_AUTO(Xlast_##cont2, falcon::end(cont2));\
