@@ -2,7 +2,6 @@
 #define FALCON_FUNCTIONAL_PLACEHOLDER_FOR_ARGUMENT_HPP
 
 #include <falcon/functional/call.hpp>
-#include <falcon/preprocessor/not_ide_parser.hpp>
 #include <falcon/parameter/result_pack_of.hpp>
 #include <falcon/parameter/pack_element.hpp>
 
@@ -38,20 +37,20 @@ public:
   template<typename... Args>
   constexpr placeholder_for_argument(const T& __data, Args&&... args)
   : _M_data(__data)
-  , FALCON_PP_NOT_IDE_PARSER(_M_functor{std::forward<Args>(args)...})
+  , _M_functor{std::forward<Args>(args)...}
   {}
 
   template<typename... Args,
     std::size_t CutPosition = (sizeof...(Args) < Position ? sizeof...(Args) : Position) + 1,
-    typename _Indexes = typename parameter_index_cat<
+    typename Indexes = typename parameter_index_cat<
       build_range_parameter_index_t<1, CutPosition>,
       parameter_index<0>,
       build_range_parameter_index_t<CutPosition, sizeof...(Args)+1>
     >::type
   >
   constexpr auto operator()(Args&&... args) const
-  -> decltype(call(_Indexes(), _M_functor, _M_data, std::forward<Args>(args)...))
-  {    return call(_Indexes(), _M_functor, _M_data, std::forward<Args>(args)...); }
+  -> decltype(call(Indexes(), _M_functor, _M_data, std::forward<Args>(args)...))
+  {    return call(Indexes(), _M_functor, _M_data, std::forward<Args>(args)...); }
 
   functor_type& functor()
   { return _M_functor; }

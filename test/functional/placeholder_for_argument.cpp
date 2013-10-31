@@ -12,12 +12,12 @@ struct Out
 	template<typename... _Args>
 	void operator()(const _Args&... args)
 	{
-		falcon::put<>(*oss, args...);
+		falcon::put(*oss, args...);
 	}
 	template<typename... _Args>
 	void operator()(const _Args&... args) const
 	{
-		falcon::put<>(*oss, '@', args...);
+		falcon::put(*oss, '@', args...);
 	}
 };
 
@@ -59,7 +59,7 @@ void placeholder_for_argument_test()
 		c = '#';
 		f(2,3);
 	}
-	CHECK_EQUAL_VALUE("[]()<012-345>@<01@2-3@45>$01#23", oss.str());
+	CHECK_EQUAL_VALUE("[]()<012-345><012-345>$01#23", oss.str());
 
 	CHECK_EQUAL_VALUE(4, falcon::placeholder_for_argument<0, falcon::late_divides, int>(20)(5));
 	CHECK_EQUAL_VALUE(4, falcon::placeholder_for_argument<1, falcon::late_divides, int>(5)(20));

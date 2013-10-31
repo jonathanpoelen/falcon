@@ -14,7 +14,7 @@ void unordered_vector_test()
   }
   v.remove(2);
   {
-    int ab [] = {1,3,4,5};
+    int ab [] = {1,5,3,4};
     CHECK_SEQUENCE3(ab, v);
   }
 }
