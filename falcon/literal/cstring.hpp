@@ -10,13 +10,13 @@ namespace literal {
 namespace string {
 
 #define FALCON_USER_DEFINED_CSTRING_LITERAL(char_type)\
-	inline constexpr ::falcon::basic_cstring<char_type>\
+	inline constexpr ::falcon::basic_cstring<const char_type>\
 	operator "" _cs(const char_type * s, std::size_t len) noexcept\
-	{ return ::falcon::basic_cstring<char_type>(s, len); }\
+	{ return ::falcon::basic_cstring<const char_type>(s, len); }\
 	\
-	inline constexpr ::falcon::basic_cstring<char_type>\
+	inline constexpr ::falcon::basic_cstring<const char_type>\
 	operator "" _cs(char_type c) noexcept\
-	{ return ::falcon::basic_cstring<char_type>(&c, 1); }
+	{ return ::falcon::basic_cstring<const char_type>(&c, 1); }
 
 FALCON_USER_DEFINED_CSTRING_LITERAL(char)
 FALCON_USER_DEFINED_CSTRING_LITERAL(wchar_t)

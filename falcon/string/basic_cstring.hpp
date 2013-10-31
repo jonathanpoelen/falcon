@@ -12,7 +12,6 @@
 
 #include <iosfwd>
 #include <limits>
-#include <string>
 #include <utility>
 #include <iterator>
 #include <algorithm>
@@ -94,7 +93,7 @@ private:
   size_type m_capacity;
 
 public:
-  constexpr basic_string() CPP_NOEXCEPT
+  CPP_CONSTEXPR basic_string() CPP_NOEXCEPT
   : m_begin(0)
   , m_size(0)
   , m_capacity(0)
@@ -2980,75 +2979,76 @@ bool operator>(
 namespace falcon {
 
 template <typename CharT, std::size_t N>
-basic_cstring<CharT>
+typename build_basic_cstring<CharT>::type
 cstring_array(CharT (&s)[N]) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s, cstring_array_size()); }
+{ return typename build_basic_cstring<CharT>::type(s, cstring_array_size()); }
 
 template <typename CharT, std::size_t N>
-basic_cstring<CharT>
+typename build_basic_cstring<CharT>::type
 cstring_array(CharT (&s)[N], std::size_t size) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s, size, cstring_array_capacity()); }
+{ return typename build_basic_cstring<CharT>::type(s, size, cstring_array_capacity()); }
 
 template <typename CharT, std::size_t N>
-CPP_CONSTEXPR basic_cstring<const CharT>
+CPP_CONSTEXPR typename build_basic_cstring<const CharT>::type
 cstring_array(const CharT (&s)[N]) CPP_NOEXCEPT
-{ return basic_cstring<const CharT>(s, cstring_array_size()); }
+{ return typename build_basic_cstring<const CharT>::type(s, cstring_array_size()); }
 
 template <typename CharT, std::size_t N>
-CPP_CONSTEXPR basic_cstring<const CharT>
+CPP_CONSTEXPR typename build_basic_cstring<const CharT>::type
 constexpr_cstring(const CharT (&s)[N]) CPP_NOEXCEPT
-{ return basic_cstring<const CharT>(s, cstring_array_size()); }
+{ return typename build_basic_cstring<const CharT>::type(s, cstring_array_size()); }
 
 
 template <typename CharT, std::size_t N>
-basic_cstring<CharT>
+typename build_basic_cstring<CharT>::type
 make_cstring(CharT (&s)[N], cstring_array_size) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s, cstring_array_size()); }
+{ return typename build_basic_cstring<CharT>::type(s, cstring_array_size()); }
 
 template <typename CharT, std::size_t N>
-basic_cstring<CharT>
+typename build_basic_cstring<CharT>::type
 make_cstring(CharT (&s)[N], cstring_array_capacity) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s, cstring_array_capacity()); }
+{ return typename build_basic_cstring<CharT>::type(s, cstring_array_capacity()); }
 
 template <typename CharT, std::size_t N>
-basic_cstring<CharT>
+typename build_basic_cstring<CharT>::type
 make_cstring(CharT (&s)[N], std::size_t size, cstring_array_size) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s, size, cstring_array_size()); }
+{ return typename build_basic_cstring<CharT>::type(s, size, cstring_array_size()); }
 
 template <typename CharT>
-basic_cstring<CharT>
+typename build_basic_cstring<CharT>::type
 make_cstring(CharT * s, std::size_t n) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s, n); }
+{ return typename build_basic_cstring<CharT>::type(s, n); }
 
 template <typename CharT>
-basic_cstring<CharT>
+typename build_basic_cstring<CharT>::type
 make_cstring(CharT * first, CharT * last) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(first, last); }
+{ return typename build_basic_cstring<CharT>::type(first, last); }
 
 template <typename CharT>
-basic_cstring<CharT> make_cstring(CharT * s) CPP_NOEXCEPT
-{ return basic_cstring<CharT>(s); }
+typename build_basic_cstring<CharT>::type
+make_cstring(CharT * s) CPP_NOEXCEPT
+{ return typename build_basic_cstring<CharT>::type(s); }
 
 
 template <typename CharT, std::size_t N>
-CPP_CONSTEXPR basic_cstring<const CharT, std::char_traits<CharT> >
+CPP_CONSTEXPR typename build_basic_cstring<const CharT>::type
 make_cstring(const CharT (&s)[N], cstring_array_size) CPP_NOEXCEPT
-{ return basic_cstring<const CharT, std::char_traits<CharT> >(s, s + N - 1); }
+{ return typename build_basic_cstring<const CharT>::type(s, s + N - 1); }
 
 template <typename CharT>
-CPP_CONSTEXPR basic_cstring<const CharT, std::char_traits<CharT> >
+CPP_CONSTEXPR typename build_basic_cstring<const CharT>::type
 make_cstring(const CharT * s, std::size_t n) CPP_NOEXCEPT
-{ return basic_cstring<const CharT, std::char_traits<CharT> >(s, n); }
+{ return typename build_basic_cstring<const CharT>::type(s, n); }
 
 template <typename CharT>
-CPP_CONSTEXPR basic_cstring<const CharT, std::char_traits<CharT> >
+CPP_CONSTEXPR typename build_basic_cstring<const CharT>::type
 make_cstring(const CharT * first, const CharT * last) CPP_NOEXCEPT
-{ return basic_cstring<const CharT, std::char_traits<CharT> >(first, last); }
+{ return typename build_basic_cstring<const CharT>::type(first, last); }
 
 template <typename CharT>
-basic_cstring<const CharT, std::char_traits<CharT> >
+typename build_basic_cstring<const CharT>::type
 make_cstring(const CharT * s) CPP_NOEXCEPT
-{ return basic_cstring<const CharT, std::char_traits<CharT> >(s); }
+{ return typename build_basic_cstring<const CharT>::type(s); }
 
 }
 

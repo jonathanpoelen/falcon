@@ -1,0 +1,6 @@
+#ifndef FALCON_PREPROCESSOR_NIL_HPP
+#define FALCON_PREPROCESSOR_NIL_HPP
+
+#define FALCON_PP_NIL()
+
+#endif

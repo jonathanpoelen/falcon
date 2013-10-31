@@ -1,16 +1,19 @@
 #ifndef ITERATOR_ITERATOR_HANDLER_HPP
 #define ITERATOR_ITERATOR_HANDLER_HPP
 
+#include <falcon/c++/boost_or_std.hpp>
+#include <falcon/preprocessor/nil.hpp>
+#include <falcon/preprocessor/qualifier.hpp>
+#include <falcon/type_traits/use.hpp>
+#include <falcon/type_traits/use_if.hpp>
+#include <falcon/type_traits/is_same.hpp>
+
 #include <iterator>
 #if __cplusplus >= 201103L
 # include <utility>
 #else
 # include <boost/type_traits/add_pointer.hpp>
 #endif
-#include <falcon/c++/boost_or_std.hpp>
-#include <falcon/type_traits/is_same.hpp>
-#include <falcon/type_traits/use.hpp>
-#include <falcon/type_traits/use_if.hpp>
 
 namespace falcon {
 namespace iterator {
@@ -36,42 +39,42 @@ public:
 
 #define FALCON_ITERATOR_CORE_ACCESS_HEAD(prefix, result_type, name, qualifier)\
 	FALCON_ITERATOR_HANDLER_TEMPLATE_HEAD()\
-	prefix result_type name(qualifier FALCON_ITERATOR_HANDLER_TYPE()& a)
+	prefix result_type name(qualifier() FALCON_ITERATOR_HANDLER_TYPE()& a)
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, _I&, derived, )
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, _I&, derived, FALCON_PP_NIL)
 	{ return a.downcast(); }
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, const _I&, derived, const)
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, const _I&, derived, FALCON_PP_CONST)
 	{ return a.downcast(); }
 
 #define FALCON_ITERATOR_CORE_ACCESS(result_type, member, qualifier)\
 	FALCON_ITERATOR_CORE_ACCESS_HEAD(static, result_type, member, qualifier)\
 	{ return derived(a).member(); }
 
-	FALCON_ITERATOR_CORE_ACCESS(_IBase&, base_reference, )
-	FALCON_ITERATOR_CORE_ACCESS(const _IBase&, base_reference, const)
+	FALCON_ITERATOR_CORE_ACCESS(_IBase&, base_reference, FALCON_PP_NIL)
+  FALCON_ITERATOR_CORE_ACCESS(const _IBase&, base_reference, FALCON_PP_CONST)
 
-	FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, )
-	FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, const)
+	FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, FALCON_PP_NIL)
+  FALCON_ITERATOR_CORE_ACCESS(typename _I::reference, dereference, FALCON_PP_CONST)
 
-	FALCON_ITERATOR_CORE_ACCESS(void, increment, )
-	FALCON_ITERATOR_CORE_ACCESS(void, decrement, )
+	FALCON_ITERATOR_CORE_ACCESS(void, increment, FALCON_PP_NIL)
+	FALCON_ITERATOR_CORE_ACCESS(void, decrement, FALCON_PP_NIL)
 
 #undef FALCON_ITERATOR_CORE_ACCESS
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, typename _I::reference, operator*, )
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, typename _I::reference, operator*, FALCON_PP_NIL)
 	{ return dereference(a); }
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, typename _I::reference, operator*, const)
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, typename _I::reference, operator*, FALCON_PP_CONST)
 	{ return dereference(a); }
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, _I&, operator++, )
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, _I&, operator++, FALCON_PP_NIL)
 	{
 		increment(a);
 		return derived(a);
 	}
 
-	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, _I&, operator--, )
+	FALCON_ITERATOR_CORE_ACCESS_HEAD(friend, _I&, operator--, FALCON_PP_NIL)
 	{
 		decrement(a);
 		return derived(a);
@@ -231,12 +234,6 @@ public:
 	iterator_handler& operator=(iterator_handler&&) = default;
 	iterator_handler& operator=(_Iterator&& other)
 	{ return operator=(static_cast<iterator_handler&&>(other)); };
-#else
-	iterator_handler& operator=(const iterator_type& other) = default
-	{
-		_M_current = other._M_current;
-		return *this;
-	}
 #endif
 
 	iterator_handler& operator=(const iterator_type& __x)

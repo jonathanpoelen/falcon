@@ -1,0 +1,8 @@
+#ifndef FALCON_PREPROCESSOR_QUALIFIER_HPP
+#define FALCON_PREPROCESSOR_QUALIFIER_HPP
+
+# define FALCON_PP_CONST() const
+# define FALCON_PP_VOLATILE() volatile
+# define FALCON_PP_CONST_VOLATILE() const volatile
+
+#endif
