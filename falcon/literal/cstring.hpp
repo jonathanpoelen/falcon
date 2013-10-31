@@ -3,7 +3,7 @@
 
 #include <falcon/literal/detail/literal_support.hpp>
 
-#include <falcon/string/cstring.hpp>
+#include <falcon/string/basic_cstring.hpp>
 
 namespace falcon {
 namespace literal {

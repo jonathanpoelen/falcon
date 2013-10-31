@@ -1,8 +1,6 @@
 #ifndef FALCON_ISTREAM_IGNORE_HPP
 #define FALCON_ISTREAM_IGNORE_HPP
 
-#include <falcon/string/cstringfwd.hpp>
-
 #include <ios>
 #include <utility>
 #include <type_traits>
@@ -466,46 +464,6 @@ operator>>(std::basic_istream<CharT, Traits>& is,
   : ignore(is, s.__str.begin(), s.__str.end());
 }
 
-/**
- * @brief Discarding a string.
- * @param s A string.
- *
- * If the stream object have @c Traits::eof() so @c std::badbit is set in the stream.
- */
-template<typename CharT, typename Traits, typename StringTraits>
-std::basic_istream<CharT, Traits>&
-ignore(std::basic_istream<CharT, Traits>& is,
-       const basic_cstring<CharT, StringTraits>& s)
-{ return ignore(is, s.begin(), s.end()); }
-
-/**
- * @brief Discarding a string.
- * @param s A string.
- */
-template<typename CharT, typename Traits, typename StringTraits>
-std::basic_istream<CharT, Traits>&
-laxignore(std::basic_istream<CharT, Traits>& is,
-          const basic_cstring<CharT, StringTraits>& s)
-{ return laxignore(is, s.begin(), s.end()); }
-
-/**
- * @brief Manipulator for @c ignore().
- * @param s A string.
- */
-template<typename CharT, typename Traits>
-auto ignore(const basic_cstring<CharT, Traits>&s)
--> decltype(ignore(s.begin(), s.end()))
-{ return ignore(s.begin(), s.end()); }
-
-/**
- * @brief Manipulator for @c laxignore().
- * @param s A string.
- */
-template<typename CharT, typename Traits>
-auto laxignore(const basic_cstring<CharT, Traits>&s)
--> decltype(laxignore(s.begin(), s.end()))
-{ return laxignore(s.begin(), s.end()); }
-
 
 /**
  * @brief Discarding characters of string.
@@ -539,23 +497,6 @@ ignore_of(std::basic_istream<CharT, Traits>& is,
     return ignore(is, [&s](const __int_type& c){
         return std::basic_string<CharT, StringTraits, Alloc>::npos != s.find(__char_traits::to_char_type(c));
     });
-}
-
-/**
- * @brief Discarding characters of string.
- * @param s A string.
- */
-template<typename CharT, typename Traits, typename StringTraits>
-std::basic_istream<CharT, Traits>&
-ignore_of(std::basic_istream<CharT, Traits>& is,
-          const basic_cstring<CharT, StringTraits>& s)
-{
-	typedef std::basic_istream<CharT, Traits> __istream_type;
-	typedef typename __istream_type::int_type __int_type;
-	typedef std::char_traits<CharT> __char_traits;
-	return ignore(is, [&s](const __int_type& c){
-		return std::basic_string<CharT, StringTraits>::npos != s.find(__char_traits::to_char_type(c));
-	});
 }
 
 
@@ -594,25 +535,6 @@ template<typename CharT, typename Traits, typename StringTraits, typename Alloc>
 std::basic_istream<CharT, Traits>&
 operator>>(std::basic_istream<CharT, Traits>& is,
            __ignore_of_string_stream<CharT, StringTraits, Alloc> s)
-{ return ignore_of(is, s.__str); }
-
-template<typename CharT, typename Traits>
-struct __ignore_of_cstring_stream
-{ basic_cstring<CharT, Traits> __str; };
-
-/**
- * @brief Manipulator for @c ignore().
- * @param s A string.
- */
-template<typename CharT, typename Traits>
-__ignore_of_cstring_stream<CharT, Traits>
-ignore_of(const basic_cstring<CharT, Traits>&s)
-{ return {s}; }
-
-template<typename CharT, typename Traits, typename StringTraits>
-std::basic_istream<CharT, Traits>&
-operator>>(std::basic_istream<CharT, Traits>& is,
-           __ignore_of_cstring_stream<CharT, StringTraits> s)
 { return ignore_of(is, s.__str); }
 
 }

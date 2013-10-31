@@ -1,23 +1,12 @@
 #ifndef FALCON_TYPE_TRAITS_IS_STRING_HPP
 #define FALCON_TYPE_TRAITS_IS_STRING_HPP
 
-#include <falcon/string/cstringfwd.hpp>
+#include <iosfwd>
+
 #include <falcon/type_traits/integral_constant.hpp>
 #include <falcon/type_traits/is_character.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_cv)
-
-namespace std {
-  template<typename T>
-  class allocator;
-
-  template <
-    typename CharT,
-    typename Traits = std::char_traits<CharT>,
-    typename Allocator = allocator<CharT>
-  >
-  class basic_cstring;
-}
 
 namespace falcon {
 
@@ -31,8 +20,6 @@ template<> struct is_string<char32_t*> : true_type {};
 #endif
 template<typename CharT, typename Trait, typename Allocator>
 struct is_string<std::basic_string<CharT, Trait, Allocator> > : true_type {};
-template<typename CharT, typename Trait>
-struct is_string<basic_cstring<CharT, Trait> > : true_type {};
 }
 
 template<typename T>

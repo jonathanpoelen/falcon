@@ -17,27 +17,16 @@
 // {};
 //
 
-#include <falcon/iterator/iterator_iterator.hpp>
-#include <falcon/container/range_container.hpp>
-#include <falcon/iterator/iterator_pair.hpp>
 #include <iostream>
-
-namespace N {struct B{
-};
-
-int * begin(const B&){
-  std::cout << "begin\n";
-  return 0;
-}
-int * end(const B&){
-  std::cout << "end\n";
-  return 0;
-}}
+#include <string>
+#include <falcon/string/basic_cstring.hpp>
 
 int main()
 {
-  const N::B b;
-  falcon::iterator_pair(b);
+
+  falcon::const_cstring cs("plop");
+  std::cout << (cs) << "\n";
+
 
 //   using sequence = seq<_1,_2,_3>;
 //   using first = begin<sequence>::type;

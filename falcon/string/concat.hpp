@@ -33,34 +33,80 @@ struct string_type_helper
   >::type
 > {};
 
+template<typename T, typename U>
+struct __dispatch_concat
+{
+  typedef std::basic_string<typename string_type_helper<T>::type> result_type;
+
+  static result_type
+  concat(const T & lhs, const U & rhs)
+  { return lhs + rhs; }
+
+  static result_type
+  concat(T && lhs, const U & rhs)
+  { return std::move(lhs) + rhs; }
+};
 
 template<typename CharT, typename Traits, typename Alloc, typename T>
-inline std::basic_string<CharT, Traits, Alloc>
-concat(std::basic_string<CharT, Traits, Alloc> CPP_RVALUE_OR_CONST_REFERENCE lhs,
-       T CPP_RVALUE_OR_CONST_REFERENCE rhs)
-{ return lhs + rhs; }
+struct __dispatch_concat<std::basic_string<CharT, Traits, Alloc>, T>
+{
+  typedef std::basic_string<CharT, Traits, Alloc> result_type;
+
+  static result_type
+  concat(const result_type & lhs, const T & rhs)
+  { return lhs + rhs; }
+
+  static result_type
+  concat(result_type && lhs, const T & rhs)
+  { return std::move(lhs) + rhs; }
+};
+
+template<typename CharT, typename Traits, typename Alloc, typename Traits2, typename Alloc2>
+struct __dispatch_concat<std::basic_string<CharT, Traits, Alloc>
+, std::basic_string<CharT, Traits2, Alloc2> >
+{
+  typedef std::basic_string<CharT, Traits, Alloc> result_type;
+  static result_type
+  concat(const result_type & lhs,
+         const std::basic_string<CharT, Traits2, Alloc2> & rhs)
+  {
+    std::basic_string<CharT, Traits, Alloc> ret(lhs);
+    ret.append(rhs.begin(), rhs.end());
+    return ret;
+  }
+
+  static result_type
+  concat(result_type && lhs,
+         const std::basic_string<CharT, Traits2, Alloc2> & rhs)
+  { return std::move(lhs.append(rhs.begin(), rhs.end())); }
+};
 
 template<typename T, typename U>
-inline std::basic_string<typename string_type_helper<T>::type>
-concat(T CPP_RVALUE_OR_CONST_REFERENCE lhs, U CPP_RVALUE_OR_CONST_REFERENCE rhs)
-{ return lhs + rhs; }
+inline typename __dispatch_concat<T, U>::result_type
+concat(const T & lhs, const U & rhs)
+{ return __dispatch_concat<T, U>::concat(lhs, rhs); }
 
 #if __cplusplus >= 201103L
+template<typename T, typename U>
+inline typename __dispatch_concat<typename std::remove_reference<T>::type, U>::result_type
+concat(T && lhs, const U & rhs)
+{ return __dispatch_concat<typename std::remove_reference<T>::type, U>::concat(std::move(lhs), rhs); }
+
 template<typename CharT, typename Traits, typename Alloc, typename T, typename... Ts>
 inline std::basic_string<CharT, Traits, Alloc>
-concat(std::basic_string<CharT, Traits, Alloc>&& lhs, T&& rhs1, Ts&&... rhs2)
+concat(std::basic_string<CharT, Traits, Alloc>&& lhs, const T & rhs1, const Ts &... rhs2)
 {
   std::basic_string<CharT, Traits, Alloc> ret(std::move(lhs));
-  append(ret, std::forward<T>(rhs1), std::forward<Ts>(rhs2)...);
+  append(ret, rhs1, rhs2...);
   return ret;
 }
 
 template<typename T, typename U, typename... Ts>
 inline std::basic_string<typename string_type_helper<T>::type>
-concat(T&& lhs, U&& rhs1, Ts&&... rhs2)
+concat(T&& lhs, const U & rhs1, const Ts &... rhs2)
 {
   std::basic_string<typename string_type_helper<T>::type> ret;
-  append(ret, std::forward<T>(lhs), std::forward<U>(rhs1), std::forward<Ts>(rhs2)...);
+  append(ret, lhs, rhs1, rhs2...);
   return ret;
 }
 #else

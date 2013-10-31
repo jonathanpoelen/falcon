@@ -22,11 +22,11 @@ std::size_t __verify_size(T const x)
 }
 
 template<typename T>
-void __append(T& s, T&& other, unsigned& pos, const std::initializer_list<std::size_t>&)
-{ s += std::forward<T>(other); ++pos; }
+void __append(T& s, const T& other, unsigned& pos, const std::initializer_list<std::size_t>&)
+{ s += other; ++pos; }
 
 template<typename T, typename U>
-void __append(T& s, U&& other, unsigned& pos, const std::initializer_list<std::size_t>&)
+void __append(T& s, U& other, unsigned& pos, const std::initializer_list<std::size_t>&)
 ///TODO use trait (append_trait< T,U>)
 { s += other.data(); ++pos; }
 
@@ -36,7 +36,7 @@ void __append(T& s, const U * other, unsigned& pos,
 { s.append(other, *(sz.begin() + pos++)); }
 
 template<typename T, typename... Ts>
-T& append(T& s, Ts&&... ss)
+T& append(T& s, const Ts&... ss)
 {
   std::size_t len_sum = 0;
   std::size_t len_amt;
@@ -51,7 +51,7 @@ T& append(T& s, Ts&&... ss)
   )...};
   s.reserve(len_sum);
   unsigned pos = 0;
-  CPP1X_UNPACK(__append(s, std::forward<Ts>(ss), pos, sz));
+  CPP1X_UNPACK(__append(s, ss, pos, sz));
   return s;
 }
 
