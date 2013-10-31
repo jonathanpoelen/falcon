@@ -3,15 +3,17 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/tuple/array_compatibility.hpp>
-#include <type_traits>
-#include <new>
 
 #if __cplusplus >= 201103L
+#include <falcon/c++1x/unpack.hpp>
 # include <falcon/parameter/parameter_index.hpp>
 # include <falcon/memory/construct_category.hpp>
 # include <falcon/tuple/detail/tuplefwd.hpp>
+# include <type_traits>
 # include <utility>
 #endif
+
+# include <new>
 
 //construct, default_new, nothrow_default_new, allocate, nothrow_allocate
 //construct_wrapper, default_new_wrapper, nothrow_default_new_wrapper, allocate_wrapper, nothrow_allocate_wrapper
@@ -36,62 +38,128 @@ T* nothrow_default_new()
 
 #if __cplusplus >= 201103L
 template<typename T, typename... Args>
-void __construct2(const normal_ctor_tag&, T* p, Args&&... args)
+void __construct(normal_ctor_tag, T* p, Args&&... args)
 { ::new(p) T(std::forward<Args>(args)...); }
 
 template<typename T, typename... Args>
-void __construct2(const brace_init_tag&, T* p, Args&&... args)
+void __construct(brace_init_tag, T* p, Args&&... args)
 { ::new(p) T{std::forward<Args>(args)...}; }
 
 template<typename T>
-void __construct2(const brace_init_tag&, T* p, T&& val)
+void __construct(brace_init_tag, T* p, T&& val)
 { ::new(p) T(std::forward<T>(val)); }
 
 template<typename T>
-void __construct2(const brace_init_tag&, T* p, const T& val)
+void __construct(brace_init_tag, T* p, const T& val)
 { ::new(p) T(val); }
 
 template<typename T, typename... Args>
-void __construct2(const double_brace_init_tag&, T* p, Args&&... args)
+void __construct(double_brace_init_tag, T* p, Args&&... args)
 { ::new(p) T{{std::forward<Args>(args)...}}; }
 
 template<typename T, std::size_t... Indexes>
-void __dispatch_construct2(T* p, T&& val, falcon::parameter_index<Indexes...>)
-{ ::new(p) T{get<Indexes>(std::forward<T>(val))...}; }
+void __dispatch_construct(std::false_type, T* p, T&& val,
+                          falcon::parameter_index<Indexes...>)
+{
+  ::new(p) T{get<Indexes>(std::forward<T>(val))...};
+}
+
+template<typename T, typename... Args>
+void construct(T* p, Args&&... args);
+
+template<typename T, std::size_t... Indexes>
+void __dispatch_construct(std::true_type, T* p, T&& val,
+                          falcon::parameter_index<Indexes...>)
+{
+  auto ref = &(*p)[0];
+  CPP1X_UNPACK(construct(ref++, get<Indexes>(std::forward<T>(val))));
+}
 
 template<typename T>
-void __construct2(const dispatch_index_tag&, T* p, T&& val)
+void __construct(dispatch_index_tag, T* p, T&& val)
 {
-	__dispatch_construct2<T>(
+  typedef typename std::remove_extent<T>::type value_type;
+  __dispatch_construct<T>(
+    std::is_array<value_type>(),
 		p, std::forward<T>(val),
 		typename falcon::build_parameter_index<std::tuple_size<T>::value>::type()
 	);
 }
 
 template<typename T, std::size_t... Indexes>
-void __dispatch_construct2(T* p, const T& val, falcon::parameter_index<Indexes...>)
-{ ::new(p) T{get<Indexes>(val)...}; }
+void __dispatch_construct(std::false_type, T* p, const T& val,
+                          falcon::parameter_index<Indexes...>)
+{
+  ::new(p) T{get<Indexes>(val)...};
+}
+
+template<typename T, std::size_t... Indexes>
+void __dispatch_construct(std::true_type, T* p, const T& val,
+                          falcon::parameter_index<Indexes...>)
+{
+  auto ref = &(*p)[0];
+  CPP1X_UNPACK(construct(ref++, get<Indexes>(val)));
+}
 
 template<typename T>
-void __construct2(const dispatch_index_tag&, T* p, const T& val)
+void __construct(dispatch_index_tag, T* p, const T& val)
 {
-	__dispatch_construct2<T>(
+  typedef typename std::remove_extent<T>::type value_type;
+  __dispatch_construct<T>(
+    std::is_array<value_type>(),
+    p, val,
+    typename falcon::build_parameter_index<std::tuple_size<T>::value>::type()
+  );
+}
+
+template<typename T>
+void __construct(dispatch_index_tag, T* p, T& val)
+{
+  typedef typename std::remove_extent<T>::type value_type;
+  __dispatch_construct<T>(
+    std::is_array<value_type>(),
 		p, val,
 		typename falcon::build_parameter_index<std::tuple_size<T>::value>::type()
 	);
 }
 
 template<typename T, typename... Args>
-void __construct2(const dispatch_index_tag&, T* p, Args&&... args)
+void __dispatch_construct_array_elems(std::false_type, T* p, Args&&... args)
+{ ::new(p) T{std::forward<Args>(args)...}; }
+
+template<typename T, typename... Args>
+void __dispatch_construct_array_elems(std::true_type, T* p, Args&&... args)
 {
-	::new(p) T{std::forward<Args>(args)...};
+  typedef typename std::remove_all_extents<T>::type type;
+  typedef std::integral_constant<std::size_t, sizeof(T)/sizeof(type)> integral;
+  ::new(p) type[integral::value]{std::forward<Args>(args)...};
+}
+
+template<typename T, typename U, typename... Args>
+void __dispatch_construct_array_elems(std::true_type, T* p,
+                                      std::initializer_list<U> ilist,
+                                      Args&&... other)
+{
+  static_assert(std::rank<T>::value < sizeof...(other)+1,
+                "too many initializers for ‘T");
+  auto ref = &p[0];
+  construct(ref, ilist)
+  CPP1X_UNPACK(construct(++ref, other));
+}
+
+template<typename T, typename... Args>
+void __construct(dispatch_index_tag, T* p, Args&&... args)
+{
+  typedef typename std::remove_extent<T>::type value_type;
+  __dispatch_construct_array_elems(std::is_array<value_type>(), p,
+                                   std::forward<Args>(args)...);
 }
 
 template<typename T, typename... Args>
 void construct(T* p, Args&&... args)
 {
 	typedef typename construct_category<T>::type __construct_category;
-	__construct2<T>(__construct_category(), p, std::forward<Args>(args)...);
+	__construct<T>(__construct_category(), p, std::forward<Args>(args)...);
 }
 
 

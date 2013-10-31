@@ -12,15 +12,15 @@ void dichotomic_algorithm_test()
 	auto first = arr.begin();
 	auto last = arr.end();
 
-	CHECK_EQUAL_VALUE(first, dichotomic_lower_bound<>(first, last, -1));
-	CHECK_EQUAL_VALUE(first, dichotomic_lower_bound<>(first, last, 0));
-	CHECK_EQUAL_VALUE(last-1, dichotomic_lower_bound<>(first, last, 20));
-	CHECK_EQUAL_VALUE(last, dichotomic_lower_bound<>(first, last, 30));
+	CHECK_EQUAL_VALUE(first, dichotomic_lower_bound(first, last, -1));
+	CHECK_EQUAL_VALUE(first, dichotomic_lower_bound(first, last, 0));
+	CHECK_EQUAL_VALUE(last-1, dichotomic_lower_bound(first, last, 20));
+	CHECK_EQUAL_VALUE(last, dichotomic_lower_bound(first, last, 30));
 
-	CHECK_EQUAL_VALUE(last, dichotomic_find<>(first, last, -1));
-	CHECK_EQUAL_VALUE(first, dichotomic_find<>(first, last, 0));
-	CHECK_EQUAL_VALUE(last-1, dichotomic_find<>(first, last, 20));
-	CHECK_EQUAL_VALUE(last, dichotomic_find<>(first, last, 30));
-	CHECK_EQUAL_VALUE(first+6, dichotomic_find<>(first, last, 10));
+	CHECK_EQUAL_VALUE(last, dichotomic_find(first, last, -1));
+	CHECK_EQUAL_VALUE(first, dichotomic_find(first, last, 0));
+	CHECK_EQUAL_VALUE(last-1, dichotomic_find(first, last, 20));
+	CHECK_EQUAL_VALUE(last, dichotomic_find(first, last, 30));
+	CHECK_EQUAL_VALUE(first+6, dichotomic_find(first, last, 10));
 }
 FALCON_TEST_TO_MAIN(dichotomic_algorithm_test)

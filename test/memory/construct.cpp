@@ -40,10 +40,10 @@ void construct_test()
 	CHECK((*p4)[1] == 6);
 	CHECK((*p4)[2] == 8);
 
-	falcon::destroy<>(p1);
-	falcon::destroy<>(p2);
-	falcon::destroy<>(p3);
-	falcon::destroy<>(p4);
+	falcon::destroy(p1);
+	falcon::destroy(p2);
+	falcon::destroy(p3);
+	falcon::destroy(p4);
 }
 
 FALCON_TEST_TO_MAIN(construct_test)

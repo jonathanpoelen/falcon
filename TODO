@@ -34,8 +34,6 @@ faire des traits char_traits qui transforme tout en majuscule, en minuscule et �
 
 ne pas oublier le suport de char16_t et char32_t
 
-le hash dans basic_cstring a externaliser dans un hash.hpp. Faire un hash_byte() comme la std.
-
 mettre tous les operator()(...) des foncteurs en const (si cela est possible).
 
 basic_string_repetition<_String>{_String, size_t} ? (os << string_repetition('a', 4) -> "aaaa"). faire std::to_string()
@@ -112,8 +110,6 @@ preprocessor/move.hpp -> c++/move.hpp ?
 
 faire un range qui prend des iterateur pour creer un container_wrapper et être utiliser avec for(auto& v:range(it, it+3)). ainsi qu'un ref_range qui ne va pas copier le first et end mais prendre des references (sauf end si rref). Un make_container_wrapper en fait (crange et reverse_crange?)
 
-mettre des rref quand un foncteur est demander dans les fonctions (tuple_assign, etc)
-
 tableau 2 dimensions allouer comme 1 de la forme:
 int **pptr = malloc(x * sizeof(int*) + y * x * sizeof(int));
 int *ptr = (int*)(pptr) + y * sizeof(int*);
@@ -178,7 +174,7 @@ faire les helper type: `template<...> xxx_t = typename xxx<...>::type` et les ma
 
 concat supporte de recevoir des nombres est reserve une taille max + utilise to_string.
 
-to_cstring/to_const_cstring et des fonctions concat et append qui retourne un cstring.
+to_cstring/to_const_cstring et des fonctions concat et append qui retourne un cstring ou fixed_string.
 
 Faire un to_string, to_cstring et to_const_cstring qui supporte plusieurs valeurs et les transforme en [c]string. Si prend un paramètre qui est une référence sur leurs types de retour alors le retourne par référence. Changer le nom pour les différencier de to_string (variables_to_string ?).
 
@@ -193,14 +189,14 @@ http://code.google.com/p/nicola-bonelli-repo/source/browse/trunk/codes.cpp0x/pri
 
 au niveau des construct() faire un cast à la porc pour transformer les tableau[x][y] en tableau [x*y] (et plus de dimension évidement)
 
-un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basic_stringbuf qui fonctionne avec des cstring (et donc non sûr car ne fait de copie) et basic_stringbuf avec une taille limiter (utilise cstring mais fait une copie quand str() est utilisé). Ces 3 streambuf peuvent avoir une base commune. Le basic_stringbuf avec une taille limitée peut être implémenté un constructeur qui utilise setp avec une donnée fournit par l'extrieur: struct basic_limitbuf: public std::streambuf{
+un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basic_stringbuf qui fonctionne avec des cstring (et donc non sûr car ne fait de copie) et basic_stringbuf avec une taille limiter (utilise cstring mais fait une copie quand str() est utilisé). Ces 3 streambuf peuvent avoir une base commune. Le basic_stringbuf avec une taille limitée peut être implémenter un constructeur qui utilise setp avec une donnée fournit par l'extrieur: struct basic_limitbuf: public std::streambuf{
   basic_limitbuf(char *buffer, size_t size)
   { this->setp(buffer,buffer+size); }
   char *end()
   { return this->pptr(); }
 };
-le basic_stringbuf qui ne copie pas de string peut être remplacer par un range (sous forme de cstring) recuperer via les intrusive data stream (mieux)
-le basic_stringbuf avec cstring peut être fait sous forme d'un basic_stringbuf avec un allocator spécial pour que std::string soit en réaliter un cstring (ajoute cette spécification dans basic_cstring.hpp)
+le basic_stringbuf qui ne copie pas de string peut être remplacer par un range (sous forme de cstring) recuperer via les intrusives data stream (mieux)
+le basic_stringbuf avec cstring se fait avec l'allocator de cstring.
 
 un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avec la local et autre paramètre)
 
@@ -208,18 +204,17 @@ les fonction de flux entrant doivent pouvoir recevoir des modifiers
 
 optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le cas (voir put_tuple et intrusive stream)
 
-le namespace detail et publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
+le namespace detail est publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
 
 sequence_queue, sequence_priority_queue (permet de récupérer le container interne)
 
-dichotomic_find et dichotomic_find_if recherche jusqu'à la fin lorsque std::find est utilisé. Faire un dichotomic_upper
-
 flat_map et flat_multimap avec strategie pour la réorganisation des elements (deplacement de tous ou juste des dernier element). Idem pour flat_set et flat_multiset
 
-Changer les interfaces de templates/*.hpp. Mettre des constexpr quand-il faut.
+Changer les interfaces de templates/*.hpp. Mettre des constexpr quant-il faut.
 
 un flux qui fonctionne comme stringstream mais prend en référence le container à aggrandir ???<Container, Pusher = back_insert>
 
+faire un hash constexpressive spécialisé pour cstring en C++14.
 
 
 

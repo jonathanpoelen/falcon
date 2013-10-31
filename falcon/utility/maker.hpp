@@ -1,14 +1,14 @@
 #ifndef FALCONUTILITY_MAKER_HPP
 #define FALCONUTILITY_MAKER_HPP
 
+#include <falcon/config.hpp>
+#include <falcon/c++/constexpr.hpp>
+#include <falcon/parameter/parameter_index.hpp>
 #if __cplusplus >= 201103L
 # include <falcon/memory/construct_category.hpp>
 # include <falcon/tuple/detail/tuplefwd.hpp>
 # include <utility>
 #endif
-#include <falcon/parameter/parameter_index.hpp>
-#include <falcon/config.hpp>
-#include <falcon/c++/constexpr.hpp>
 
 namespace falcon {
 

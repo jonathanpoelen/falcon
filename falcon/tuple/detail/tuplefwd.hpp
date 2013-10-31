@@ -11,9 +11,9 @@ namespace std {
 }
 
 namespace falcon {
-  struct not_declared;
+  struct __not_declared;
   template<std::size_t I, typename T>
-  not_declared get(const T&);
+  __not_declared get(const T&);
 }
 
 #endif

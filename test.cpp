@@ -17,15 +17,11 @@
 // {};
 //
 
-#include <iostream>
-#include <type_traits>
-#include <falcon/string/cstringfwd.hpp>
-// #include <falcon/string/basic_cstring.hpp>
+// #include <iostream>
 
 int main()
 {
-  typedef typename falcon::build_basic_cstring<char>::type cstring;
-  return std::is_same<cstring, cstring>::value;
+
 
 
 //   using sequence = seq<_1,_2,_3>;

@@ -4,7 +4,14 @@
 #include <falcon/tuple/detail/is_tuple.hpp>
 #include <utility>
 
-namespace std {
+namespace falcon {
+
+template<typename T, std::size_t N>
+struct is_tuple_impl<T[N]>
+: std::true_type
+{};
+
+namespace __private { namespace __tuple_get {
 
 template<std::size_t I, typename T, std::size_t N>
 T& get(T (&a)[N]) noexcept
@@ -18,6 +25,16 @@ template<std::size_t I, typename T, std::size_t N>
 constexpr const T& get(const T (&a)[N]) noexcept
 { return a[I]; }
 
+}}
+
+using __private::__tuple_get::get;
+
+}
+
+namespace std {
+
+using ::falcon::__private::__tuple_get::get;
+
 template<typename T, std::size_t N>
 struct tuple_size<T[N]>
 : public integral_constant<std::size_t, N>
@@ -26,15 +43,6 @@ struct tuple_size<T[N]>
 template<std::size_t I, typename T, std::size_t N>
 struct tuple_element<I, T[N]>
 { typedef T type; };
-
-}
-
-namespace falcon {
-
-template<typename T, std::size_t N>
-struct is_tuple_impl<T[N]>
-: std::true_type
-{};
 
 }
 
