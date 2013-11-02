@@ -520,7 +520,7 @@ operator>>(std::basic_istream<CharT, Traits>& is, __ignore_of_char_stream<CharT>
 
 template<typename CharT, typename Traits, typename Alloc>
 struct __ignore_of_string_stream
-{ std::basic_string<CharT, Traits, Alloc> __str; };
+{ const std::basic_string<CharT, Traits, Alloc> & __str; };
 
 /**
  * @brief Manipulator for @c ignore().

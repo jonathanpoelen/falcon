@@ -182,8 +182,6 @@ refaire une passe de l'ensemble des fichiers de functional/ et tuple/ pour elimi
 
 mettre en noexcept les constructeur qui peuvent l'être
 
-ajout de ioflag() pour les flux. ioflag<std::ios::hex>(42) et ioflag<=void>(42, std::ios::hex). Permet de mettre un flag juste pour un type.
-
 faire une classe ostream::format() simple (format("%1 %2")(2,34)). ainsi que putf("%1",42). format préévalue les positions alors que puts ajoute à la volée (plus rapide ?)
 http://code.google.com/p/nicola-bonelli-repo/source/browse/trunk/codes.cpp0x/print.hpp?spec=svn612&r=612
 
