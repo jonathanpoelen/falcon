@@ -3,6 +3,7 @@
 
 #include <falcon/c++1x/unpack.hpp>
 
+#include <utility>
 #include <iosfwd>
 
 namespace falcon {

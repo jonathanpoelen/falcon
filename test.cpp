@@ -17,11 +17,14 @@
 // {};
 //
 
-// #include <iostream>
+#include <iostream>
+#include <tuple>
+#include <falcon/tuple/put_tuple.hpp>
 
 int main()
 {
-
+  std::tuple<int, int> t(1, 3);
+  std::cout << falcon::put_tuple(t, ',');
 
 
 //   using sequence = seq<_1,_2,_3>;

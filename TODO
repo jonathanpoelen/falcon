@@ -108,8 +108,6 @@ peut-on supprimer les constructeurs de copie et l'affectation dans les iterateur
 
 preprocessor/move.hpp -> c++/move.hpp ?
 
-faire un range qui prend des iterateur pour creer un container_wrapper et être utiliser avec for(auto& v:range(it, it+3)). ainsi qu'un ref_range qui ne va pas copier le first et end mais prendre des references (sauf end si rref). Un make_container_wrapper en fait (crange et reverse_crange?)
-
 tableau 2 dimensions allouer comme 1 de la forme:
 int **pptr = malloc(x * sizeof(int*) + y * x * sizeof(int));
 int *ptr = (int*)(pptr) + y * sizeof(int*);
@@ -146,8 +144,6 @@ support des non exceptions (retourne 0 au lieu de bad_alloc). Flag -fno-exceptio
 
 implementation de simple signal
 
-utilisé FALCON_EMPTY (BOOST_EMPTY ?) pour arguments vide de macro
-
 faire en sorte que enumerator ne dépende plus de __VA_ARGS__ (ou séparer la partie qui en dépend).
 
 trouver un autre nom pour static_new
@@ -158,13 +154,9 @@ shared_allocator. Par exemple shared_allocator<free_list_allocator> partage tous
 
 iterator comme zone mais dans différentes direction: http://www.thonky.com/qr-code-tutorial/module-placement-matrix/#pattern-of-placement. Renommer zonne_iterator ?
 
-renommer container_wrapper en sequence_wrapper ?
-
 vector avec fonction de redirection d'indice (type template). Permet par exemple un vecteur 2D (avec en template la fonction/wrapper coord()).
 
 move semantique pour class_property + property read_only + operator= pour éviter de passer par un cast implicit quand il n'y a pas de getter.
-
-dans les rbegin, rend pour les tableaux. utiliser un opposite_iterator ?
 
 parameter/manip.hpp: séparer chaque fonctionnalite dans des fichier separer et ajouter pop_back et pop_front. Avec une posibilité de retourné un type (plutot  qu'une erreur de compile) quand le pack est vide
 
@@ -178,14 +170,10 @@ to_cstring/to_const_cstring et des fonctions concat et append qui retourne un cs
 
 Faire un to_string, to_cstring et to_const_cstring qui supporte plusieurs valeurs et les transforme en [c]string. Si prend un paramètre qui est une référence sur leurs types de retour alors le retourne par référence. Changer le nom pour les différencier de to_string (variables_to_string ?).
 
-refaire une passe de l'ensemble des fichiers de functional/ et tuple/ pour eliminer les foncteurs non constant et alleger le code. (surtout parameter_index_adapter)
-
-mettre en noexcept les constructeur qui peuvent l'être
+mettre en noexcept les constructeur et fonction qui peuvent l'être
 
 faire une classe ostream::format() simple (format("%1 %2")(2,34)). ainsi que putf("%1",42). format préévalue les positions alors que puts ajoute à la volée (plus rapide ?)
 http://code.google.com/p/nicola-bonelli-repo/source/browse/trunk/codes.cpp0x/print.hpp?spec=svn612&r=612
-
-au niveau des construct() faire un cast à la porc pour transformer les tableau[x][y] en tableau [x*y] (et plus de dimension évidement)
 
 un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basic_stringbuf qui fonctionne avec des cstring (et donc non sûr car ne fait de copie) et basic_stringbuf avec une taille limiter (utilise cstring mais fait une copie quand str() est utilisé). Ces 3 streambuf peuvent avoir une base commune. Le basic_stringbuf avec une taille limitée peut être implémenter un constructeur qui utilise setp avec une donnée fournit par l'extrieur: struct basic_limitbuf: public std::streambuf{
   basic_limitbuf(char *buffer, size_t size)
@@ -198,19 +186,11 @@ le basic_stringbuf avec cstring se fait avec l'allocator de cstring.
 
 un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avec la local et autre paramètre)
 
-les fonction de flux entrant doivent pouvoir recevoir des modifiers
-
-optimiser get_tuple pour que le separator soit une chaîne si ce n'est pas le cas (voir put_tuple et intrusive stream)
-
 le namespace detail est publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
 
 sequence_queue, sequence_priority_queue (permet de récupérer le container interne)
 
-flat_map et flat_multimap avec strategie pour la réorganisation des elements (deplacement de tous ou juste des dernier element). Idem pour flat_set et flat_multiset
-
 Changer les interfaces de templates/*.hpp. Mettre des constexpr quant-il faut.
-
-un flux qui fonctionne comme stringstream mais prend en référence le container à aggrandir ???<Container, Pusher = back_insert>
 
 faire un hash constexpressive spécialisé pour cstring en C++14.
 
