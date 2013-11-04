@@ -1960,7 +1960,7 @@ public:
 
   CPP_CONSTEXPR basic_string(pointer first, pointer last) CPP_NOEXCEPT
   : m_begin(first)
-  , m_size(last - begin)
+  , m_size(last - first)
   {}
 
   CPP_CONSTEXPR basic_string(const basic_string& __str) CPP_NOEXCEPT
