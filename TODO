@@ -172,15 +172,6 @@ Faire un to_string, to_cstring et to_const_cstring qui supporte plusieurs valeur
 
 mettre en noexcept les constructeurs et fonctions qui peuvent l'être
 
-un basic_stringbuf qui ne fait pas de copie de string (donc non sûr ?). Un basic_stringbuf qui fonctionne avec des cstring (et donc non sûr car ne fait de copie) et basic_stringbuf avec une taille limiter (utilise cstring mais fait une copie quand str() est utilisé). Ces 3 streambuf peuvent avoir une base commune. Le basic_stringbuf avec une taille limitée peut être implémenter un constructeur qui utilise setp avec une donnée fournit par l'extrieur: struct basic_limitbuf: public std::streambuf{
-  basic_limitbuf(char *buffer, size_t size)
-  { this->setp(buffer,buffer+size); }
-  char *end()
-  { return this->pptr(); }
-};
-le basic_stringbuf qui ne copie pas de string peut être remplacer par un range (sous forme de cstring) recuperer via les intrusives data stream (mieux)
-le basic_stringbuf avec cstring se fait avec l'allocator de cstring.
-
 un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avec la local et autre paramètre)
 
 le namespace detail est publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
@@ -191,6 +182,7 @@ Changer les interfaces de templates/*.hpp. Mettre des constexpr quant-il faut.
 
 faire un hash constexpressive spécialisé pour cstring en C++14.
 
+basic_cstring.hpp -> cstring.hpp
 
 
 

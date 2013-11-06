@@ -11,10 +11,10 @@ struct cstring_allocator
 public:
   typedef std::size_t     size_type;
   typedef std::ptrdiff_t  difference_type;
-  typedef CharT*          pointer;
-  typedef const CharT*    const_pointer;
-  typedef CharT&          reference;
-  typedef const CharT&    const_reference;
+  typedef CharT *         pointer;
+  typedef const CharT *   const_pointer;
+  typedef CharT &         reference;
+  typedef const CharT &   const_reference;
   typedef CharT           value_type;
 
   template<typename T>
@@ -24,8 +24,16 @@ public:
 
 template<typename CharT>
 struct cstring_allocator<const CharT>
-:  cstring_allocator<CharT>
 {
+public:
+  typedef std::size_t     size_type;
+  typedef std::ptrdiff_t  difference_type;
+  typedef const CharT *   pointer;
+  typedef const CharT *   const_pointer;
+  typedef const CharT &   reference;
+  typedef const CharT &   const_reference;
+  typedef const CharT     value_type;
+
   template<typename T>
   struct rebind
   { typedef cstring_allocator<const T> other; };
