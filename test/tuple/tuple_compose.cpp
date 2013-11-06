@@ -1,6 +1,6 @@
 #include <test/test.hpp>
 #include <falcon/tuple/tuple_compose.hpp>
-#include <falcon/iostreams/put_and_get.hpp>
+#include <falcon/iostreams/put.hpp>
 #include <falcon/utility/maker.hpp>
 #include "tuple_compose.hpp"
 
@@ -20,30 +20,30 @@ void tuple_compose_test()
 	falcon::tuple_compose(
 		unless_functor(),
 		std::make_tuple(
-			falcon::make_ostream_functor(os),
-			falcon::make_ostream_functor(os)
+			falcon::make_ostream_function(os),
+			falcon::make_ostream_function(os)
 		),
 		std::make_tuple(5, ' ', 55)
 	);
 
 	CHECK_EQUAL_VALUE(os.str(), "5 555 55");
 
-    os.str("");
-    falcon::tuple_compose(
-        falcon::parameter_index<0,1,2>(),
-        unless_functor(),
-        std::make_tuple(
-            falcon::make_ostream_functor(os),
-            falcon::make_ostream_functor(os)
-        ),
-        std::make_tuple(5, ' ', 55)
-    );
+  os.str("");
+  falcon::tuple_compose(
+    falcon::parameter_index<0,1,2>(),
+    unless_functor(),
+    std::make_tuple(
+      falcon::make_ostream_function(os),
+      falcon::make_ostream_function(os)
+    ),
+    std::make_tuple(5, ' ', 55)
+  );
 
-    CHECK_EQUAL_VALUE(os.str(), "5 555 55");
+  CHECK_EQUAL_VALUE(os.str(), "5 555 55");
 
 	{
 		os.str("");
-		auto fos = falcon::make_ostream_functor(os);
+		auto fos = falcon::make_ostream_function(os);
 		auto tuple = std::make_tuple(5, ' ', 55);
 		unless_functor f;
 		falcon::tuple_compose(

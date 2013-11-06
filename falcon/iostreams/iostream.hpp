@@ -2,7 +2,8 @@
 #define _FALCON_IOSTREAM_IOSTREAM_HPP
 
 #include <iostream>
-#include <falcon/iostreams/put_and_get.hpp>
+#include <falcon/iostreams/put.hpp>
+#include <falcon/iostreams/get.hpp>
 
 namespace falcon {
 
@@ -91,29 +92,29 @@ std::wostream& wprintln_log(const Args&... args)
   return wprint_log(args...) << '\n';
 }
 
-inline basic_ostream_functor<char> cout_functor()
-{ return basic_ostream_functor<char>(std::cout); }
+inline basic_ostream_function<char> cout_function()
+{ return basic_ostream_function<char>(std::cout); }
 
-inline basic_ostream_functor<wchar_t> wcout_functor()
-{ return basic_ostream_functor<wchar_t>(std::wcout); }
+inline basic_ostream_function<wchar_t> wcout_function()
+{ return basic_ostream_function<wchar_t>(std::wcout); }
 
-inline basic_ostream_functor<char> cerr_functor()
-{ return basic_ostream_functor<char>(std::cerr); }
+inline basic_ostream_function<char> cerr_function()
+{ return basic_ostream_function<char>(std::cerr); }
 
-inline basic_ostream_functor<wchar_t> wcerr_functor()
-{ return basic_ostream_functor<wchar_t>(std::wcerr); }
+inline basic_ostream_function<wchar_t> wcerr_function()
+{ return basic_ostream_function<wchar_t>(std::wcerr); }
 
-inline basic_ostream_functor<char> clog_functor()
-{ return basic_ostream_functor<char>(std::clog); }
+inline basic_ostream_function<char> clog_function()
+{ return basic_ostream_function<char>(std::clog); }
 
-inline basic_ostream_functor<wchar_t> wclog_functor()
-{ return basic_ostream_functor<wchar_t>(std::wclog); }
+inline basic_ostream_function<wchar_t> wclog_function()
+{ return basic_ostream_function<wchar_t>(std::wclog); }
 
-inline basic_istream_functor<char> cin_functor()
-{ return basic_istream_functor<char>(std::cin); }
+inline basic_istream_function<char> cin_function()
+{ return basic_istream_function<char>(std::cin); }
 
-inline basic_istream_functor<wchar_t> wcin_functor()
-{ return basic_istream_functor<wchar_t>(std::wcin); }
+inline basic_istream_function<wchar_t> wcin_function()
+{ return basic_istream_function<wchar_t>(std::wcin); }
 
 //@}
 

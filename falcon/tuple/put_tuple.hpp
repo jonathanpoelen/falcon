@@ -3,7 +3,7 @@
 
 #include <falcon/c++1x/unpack.hpp>
 #include <falcon/string/is_character.hpp>
-#include <falcon/string/basic_cstring.hpp>
+#include <falcon/string/cstring.hpp>
 #include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/tuple/parameter_index.hpp>
 

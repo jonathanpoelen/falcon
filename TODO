@@ -182,7 +182,6 @@ Changer les interfaces de templates/*.hpp. Mettre des constexpr quant-il faut.
 
 faire un hash constexpressive spécialisé pour cstring en C++14.
 
-basic_cstring.hpp -> cstring.hpp
 
 
 

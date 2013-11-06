@@ -1,5 +1,5 @@
-#ifndef FALCON_STRING_BASIC_CSTRING_HPP
-#define FALCON_STRING_BASIC_CSTRING_HPP
+#ifndef FALCON_STRING_CSTRING_HPP
+#define FALCON_STRING_CSTRING_HPP
 
 #include <falcon/config.hpp>
 #include <falcon/c++/noexcept.hpp>
