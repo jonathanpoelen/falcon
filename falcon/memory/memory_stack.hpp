@@ -5,7 +5,7 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/boost_or_std.hpp>
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
 # include <type_traits>
 #else
 #include <boost/type_traits/aligned_storage.hpp>

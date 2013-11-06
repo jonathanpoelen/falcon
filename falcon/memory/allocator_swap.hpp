@@ -1,7 +1,7 @@
 #ifndef FALCON_MEMORY_ALLOCATOR_SWAP_HPP
 #define FALCON_MEMORY_ALLOCATOR_SWAP_HPP
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
 
 #include <memory>
 

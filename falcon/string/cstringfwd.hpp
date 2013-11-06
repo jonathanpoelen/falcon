@@ -8,6 +8,15 @@ namespace falcon {
 template<typename CharT>
 struct cstring_allocator
 {
+public:
+  typedef std::size_t     size_type;
+  typedef std::ptrdiff_t  difference_type;
+  typedef CharT*          pointer;
+  typedef const CharT*    const_pointer;
+  typedef CharT&          reference;
+  typedef const CharT&    const_reference;
+  typedef CharT           value_type;
+
   template<typename T>
   struct rebind
   { typedef cstring_allocator<T> other; };
@@ -15,11 +24,33 @@ struct cstring_allocator
 
 template<typename CharT>
 struct cstring_allocator<const CharT>
+:  cstring_allocator<CharT>
 {
   template<typename T>
   struct rebind
   { typedef cstring_allocator<const T> other; };
 };
+
+template<typename T1, typename T2>
+inline bool
+operator==(const cstring_allocator<T1>&, const cstring_allocator<T2>&)
+{ return true; }
+
+template<typename T>
+inline bool
+operator==(const cstring_allocator<T>&, const cstring_allocator<T>&)
+{ return true; }
+
+template<typename T1, typename T2>
+inline bool
+operator!=(const cstring_allocator<T1>&, const cstring_allocator<T2>&)
+{ return false; }
+
+template<typename T>
+inline bool
+operator!=(const cstring_allocator<T>&, const cstring_allocator<T>&)
+{ return false; }
+
 
 template<typename CharT, typename Traits = std::char_traits<CharT> >
 struct build_basic_cstring

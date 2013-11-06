@@ -22,7 +22,7 @@ public:
   typedef typename __allocator_base::pointer pointer;
   typedef typename __allocator_base::size_type size_type;
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::true_type;
@@ -43,7 +43,7 @@ public:
     m_start->prev = 0;
   }
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   range_minimal_heap_allocator(const range_minimal_heap_allocator&) = delete;
   range_minimal_heap_allocator(range_minimal_heap_allocator&&) noexcept = default;
   range_minimal_heap_allocator& operator=(const range_minimal_heap_allocator&) = delete;
@@ -199,7 +199,7 @@ public:
   typedef typename __allocator_base::pointer pointer;
   typedef typename __allocator_base::size_type size_type;
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::true_type;
@@ -228,7 +228,7 @@ public:
     objfirst->next = reinterpret_cast<Obj*>(last);
   }
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   range_fixed_allocator(const range_fixed_allocator&) = delete;
   range_fixed_allocator(range_fixed_allocator&&) noexcept = default;
   range_fixed_allocator& operator=(const range_fixed_allocator&) = delete;
@@ -303,7 +303,7 @@ public:
   typedef typename __allocator_base::pointer pointer;
   typedef typename __allocator_base::size_type size_type;
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::true_type;
@@ -337,7 +337,7 @@ public:
     m_free->next->next = 0;
   }
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   range_allocator(const range_allocator&) = delete;
   range_allocator(range_allocator&&) noexcept = default;
   range_allocator& operator=(const range_allocator&) = delete;

@@ -20,8 +20,10 @@ struct retain_free_object_allocator_policies {
   static const policy speed_deduction  = 1 << 4;
 };
 
-template<typename T, typename AllocBase, retain_free_object_allocator_policies::policy Policy,
-  bool always_same_size = (Policy & retain_free_object_allocator_policies::always_same_size)>
+template<typename T, typename AllocBase
+  , retain_free_object_allocator_policies::policy Policy
+  , bool always_same_size
+    = (Policy & retain_free_object_allocator_policies::always_same_size)>
 struct __retain_free_object_allocator_traits {
   typedef typename allocator_rebind<AllocBase, T>::type allocator_base;
   typedef typename allocator_base::size_type size_type;
@@ -103,8 +105,9 @@ struct __retain_free_object_allocator_traits<T, AllocBase, Policy, true> {
   { cont.push_back(p); }
 };
 
-template<typename T,
-  retain_free_object_allocator_policies::policy Policy = retain_free_object_allocator_policies::normal_storage,
+template<typename T
+  , retain_free_object_allocator_policies::policy Policy
+    = retain_free_object_allocator_policies::normal_storage,
   typename AllocBase = std::allocator<T> >
 class retain_free_object_allocator
 #if defined(IN_IDE_PARSER)
@@ -120,9 +123,8 @@ class retain_free_object_allocator
 public:
   typedef typename __allocator_base::pointer pointer;
   typedef typename __allocator_base::size_type size_type;
-  typedef typename __allocator_base::const_pointer const_pointer;
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::true_type;
@@ -144,7 +146,7 @@ public:
   , m_ptrs()
   {}
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   retain_free_object_allocator(retain_free_object_allocator&& other)
   : __allocator_base(std::forward<__allocator_base>(other))
   , m_ptrs(std::forward<std::vector<pointer>>(other.m_ptrs))
@@ -165,7 +167,7 @@ public:
     return *this;
   }
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
   retain_free_object_allocator& operator=(retain_free_object_allocator&& other)
   {
     __allocator_base::operator=(std::forward<__allocator_base>(other));

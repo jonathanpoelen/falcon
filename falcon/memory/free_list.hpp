@@ -1,7 +1,6 @@
 #ifndef FALCON_MEMORY_FREE_LIST_HPP
 #define FALCON_MEMORY_FREE_LIST_HPP
 
-#include <falcon/memory/allocator_rebind.hpp>
 #include <falcon/bit/byte_cast.hpp>
 #include <falcon/c++/reference.hpp>
 #include <falcon/c++/noexcept.hpp>
@@ -11,8 +10,10 @@
 #include FALCON_BOOST_OR_STD_TRAITS(aligned_storage)
 
 #include <memory>
-#if __cplusplus > 201100L
-#include <utility>
+#if __cplusplus >= 201103L
+# include <utility>
+#else
+# include <boost/container/allocator_traits.hpp>
 #endif
 #include <stdexcept>
 
@@ -28,14 +29,22 @@ class free_list
   };
 
 public:
-  static const std::size_t _S_align = FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<T>::value;
+  static const std::size_t _S_align
+    = FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<T>::value;
   static const std::size_t _S_heap = (_S_align > sizeof(Node)) ? _S_align : sizeof(Node);
 
 public:
-  typedef typename allocator_rebind<Alloc, byte_t>::type allocator_type;
-  typedef typename allocator_rebind<Alloc, T>::type::value_type value_type;
-  typedef typename allocator_rebind<Alloc, T>::type::pointer pointer;
-  typedef typename allocator_rebind<Alloc, T>::type::size_type size_type;
+  typedef typename FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc>
+    ::template rebind_alloc<byte_t>::type allocator_type;
+
+private:
+  typedef typename FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc>
+    ::template rebind_alloc<T>::type allocator_traits;
+
+public:
+  typedef typename allocator_traits::value_type value_type;
+  typedef typename allocator_traits::pointer pointer;
+  typedef typename allocator_traits::size_type size_type;
 
 public:
   explicit free_list(size_type size_alloc) CPP_NOEXCEPT_OPERATOR2(allocator_type())
@@ -59,7 +68,7 @@ public:
   , m_allocator(FALCON_FORWARD(Args, args)CPP_EXTEND_PACK)
   {}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
   free_list(size_type size_alloc, allocator_type&& allocator)
   CPP_NOEXCEPT_OPERATOR2(allocator_type(std::forward<allocator_type>(allocator)))
   : m_node(0)
@@ -101,7 +110,10 @@ public:
   pointer alloc()
   {
     if ( ! m_node) {
-      return reinterpret_cast<pointer>(m_allocator.allocate(_S_heap + m_size_alloc * sizeof(T)) + _S_heap);
+      return reinterpret_cast<pointer>(
+        allocator_traits::allocate(m_allocator,
+                                   _S_heap + m_size_alloc * sizeof(T)) + _S_heap
+      );
     }
     pointer ret = reinterpret_cast<pointer>(m_node->data);
     m_node = m_node->next;
@@ -119,7 +131,8 @@ public:
   {
     while (m_node) {
       Node * node = m_node->next;
-      m_allocator.deallocate(byte_cast(m_node), _S_heap + m_size_alloc * sizeof(T));
+      allocator_traits::deallocate(m_allocator, byte_cast(m_node),
+                                   _S_heap + m_size_alloc * sizeof(T));
       m_node = node;
     }
   }

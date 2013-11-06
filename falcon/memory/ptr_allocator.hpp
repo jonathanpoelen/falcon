@@ -4,6 +4,9 @@
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/memory/allocator_swap.hpp>
 
+#if __cplusplus < 201103L
+# include <boost/container/allocator_traits.hpp>
+#endif
 #include <memory>
 #include <utility>
 
@@ -12,17 +15,19 @@ namespace falcon {
 template<typename Alloc>
 class ptr_allocator
 {
+  typedef FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc> allocator_traits;
+
 public:
 	typedef Alloc allocator_type;
-	typedef typename Alloc::value_type value_type;
-	typedef typename Alloc::pointer pointer;
-	typedef typename Alloc::const_pointer const_pointer;
-	typedef typename Alloc::reference reference;
-	typedef typename Alloc::const_reference const_reference;
-	typedef typename Alloc::size_type size_type;
-	typedef typename Alloc::difference_type difference_type;
+  typedef typename allocator_traits::value_type value_type;
+  typedef typename allocator_traits::pointer pointer;
+  typedef typename allocator_traits::const_pointer const_pointer;
+  typedef value_type & reference;
+  typedef const value_type & const_reference;
+  typedef typename allocator_traits::size_type size_type;
+  typedef typename allocator_traits::difference_type difference_type;
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
 	using propagate_on_container_copy_assignment = std::true_type;
 	using propagate_on_container_move_assignment = std::true_type;
 	using propagate_on_container_swap = std::true_type;
@@ -56,7 +61,7 @@ public:
 	ptr_allocator& operator=(const ptr_allocator& other) CPP_NOEXCEPT
 	{ m_alloc = other.m_alloc; }
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
 	ptr_allocator(ptr_allocator&& other) CPP_NOEXCEPT
 	: m_alloc(other.m_alloc)
 	{
@@ -79,29 +84,32 @@ public:
 	const_pointer address(const_reference x) const
 	{ return m_alloc->address(x); }
 
-	pointer allocate(size_type n, std::allocator<void>::const_pointer hint = 0)
-	{ return m_alloc->allocate(n, hint); }
+  pointer allocate(size_type n)
+  { return allocator_traits::allocate(m_alloc, n); }
+
+	pointer allocate(size_type n, typename allocator_traits::const_void_pointer hint)
+  { return allocator_traits::allocate(m_alloc, n, hint); }
 
 	void deallocate(pointer p, size_type n)
-	{ m_alloc->deallocate(p, n); }
+  { allocator_traits::deallocate(m_alloc, p, n); }
 
-	size_type max_size() const  CPP_NOEXCEPT_OPERATOR2(m_alloc->max_size())
-	{ return m_alloc->max_size(); }
+	size_type max_size() const
+  { return allocator_traits::max_size(m_alloc); }
 
-#if __cplusplus > 201100L
+#if __cplusplus <= 201103L
 	template<class U, class... Args>
 	void construct(U* p, Args&&... args)
-	{ m_alloc->construct(p, std::forward<Args>(args)...); }
+  { allocator_traits::construct(m_alloc, p, std::forward<Args>(args)...); }
 
 	template<class U>
 	void destroy(U* p)
-	{ m_alloc->destroy(p); }
+  { allocator_traits::destroy(m_alloc, p); }
 #else
 	void construct(pointer p, const_reference val)
-	{ m_alloc->construct(p, val); }
+  { allocator_traits::construct(m_alloc, p, val); }
 
 	void destroy(pointer p)
-	{ m_alloc->destroy(p); }
+  { allocator_traits::destroy(m_alloc, p); }
 #endif
 
 	template<typename U>
@@ -113,9 +121,9 @@ public:
 	{ return !operator==(rhs); }
 
 	void swap(ptr_allocator& other)
-    {
-        using std::swap;
-        swap(m_alloc, other.m_alloc);
+  {
+    using std::swap;
+    swap(m_alloc, other.m_alloc);
 		allocator_swap<__allocator_base>(*this, other);
 	}
 

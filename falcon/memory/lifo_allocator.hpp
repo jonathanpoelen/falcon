@@ -6,10 +6,10 @@
 #include <falcon/memory/allocator_swap.hpp>
 
 #include <memory>
-#if __cplusplus > 201100L
-#include <utility>
+#if __cplusplus >= 201103L
+# include <utility>
 #else
-#include <algorithm>
+# include <algorithm>
 #endif
 
 namespace falcon {
@@ -24,7 +24,7 @@ public:
   typedef typename __allocator_base::pointer pointer;
   typedef typename __allocator_base::size_type size_type;
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::true_type;
@@ -41,7 +41,7 @@ public:
   , m_finish(last)
   {}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
   lifo_allocator(const lifo_allocator&) = delete;
   lifo_allocator(lifo_allocator&&) noexcept = default;
   lifo_allocator& operator=(const lifo_allocator&) = delete;

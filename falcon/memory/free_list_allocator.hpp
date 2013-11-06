@@ -2,26 +2,23 @@
 #define FALCON_MEMORY_FREE_LIST_ALLOCATOR_HPP
 
 #include <falcon/memory/free_list.hpp>
-#include <falcon/memory/allocator_rebind.hpp>
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/extend_pack.hpp>
+#include <falcon/c++/boost_or_std.hpp>
 #include <falcon/utility/move.hpp>
 
 namespace falcon {
 
 template<typename T, typename AllocBase = std::allocator<T> >
 class free_list_allocator
-: public std::allocator<T>
+: public free_list<T, AllocBase>::allocator_type
 {
-  typedef typename allocator_rebind<AllocBase, T>::type __allocator_base;
-
 public:
   typedef free_list<T, AllocBase> free_list_type;
-  typedef typename __allocator_base::pointer pointer;
-  typedef typename __allocator_base::const_pointer const_pointer;
-  typedef typename std::allocator<T>::size_type size_type;
+  typedef typename free_list_type::pointer pointer;
+  typedef typename free_list_type::size_type size_type;
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::false_type;
@@ -48,7 +45,7 @@ public:
   : m_list(size, FALCON_FORWARD(Args, args)CPP_EXTEND_PACK)
   {}
 
-#if __cplusplus > 201100L
+#if __cplusplus >= 201103L
   free_list_allocator(free_list_allocator&& other)
   CPP_NOEXCEPT_OPERATOR2(free_list_type(std::forward<free_list<T>>(other.m_list)))
   : m_list(std::forward<free_list<T>>(other.m_list))

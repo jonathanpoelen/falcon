@@ -37,7 +37,7 @@ using std::align;
 
 
 template<std::size_t I, std::size_t N, std::size_t Idx, std::size_t... Indexes>
-struct __initialize_optimal_grouping_allocae_tuple
+struct __initialize_optimal_grouping_allocate_tuple
 {
   template<typename Tuple, typename Sizes>
   static void init(Tuple& t, const Sizes& szs)
@@ -45,12 +45,12 @@ struct __initialize_optimal_grouping_allocae_tuple
     get<I+1>(t) = reinterpret_cast<
       typename std::tuple_element<I+1, Tuple>::type
     >(static_cast<char*>(get<0>(t)) + szs[Idx]);
-    __initialize_optimal_grouping_allocae_tuple<I+1,N,Indexes...>::init(t, szs);
+    __initialize_optimal_grouping_allocate_tuple<I+1,N,Indexes...>::init(t, szs);
   }
 };
 
 template<std::size_t N>
-struct __initialize_optimal_grouping_allocae_tuple<N,N,0>
+struct __initialize_optimal_grouping_allocate_tuple<N,N,0>
 {
   template<typename Tuple, typename Sizes>
   static void init(Tuple&, const Sizes&)
@@ -85,7 +85,7 @@ __optimal_grouping_allocate(parameter_index<Indexes...>, parameter_pack<Elements
   }
 
   get<0>(ret) = allocate(-1u - sz);
-  __initialize_optimal_grouping_allocae_tuple<0, sizeof...(Elements), Indexes..., 0>
+  __initialize_optimal_grouping_allocate_tuple<0, sizeof...(Elements), Indexes..., 0>
   ::init(ret, szs);
 
   return ret;
@@ -121,7 +121,7 @@ optimal_grouping_allocate(Allocate allocate, S... sizes)
 
 
 template<std::size_t I, std::size_t N>
-struct __initialize_grouping_allocae_tuple
+struct __initialize_grouping_allocate_tuple
 {
   template<typename Tuple, typename Sizes>
   static void init(Tuple& t, const Sizes& szs)
@@ -129,12 +129,12 @@ struct __initialize_grouping_allocae_tuple
     get<I>(t) = reinterpret_cast<
       typename std::tuple_element<I, Tuple>::type
     >(static_cast<char*>(get<0>(t)) + szs[I]);
-    __initialize_grouping_allocae_tuple<I+1,N>::init(t, szs);
+    __initialize_grouping_allocate_tuple<I+1,N>::init(t, szs);
   }
 };
 
 template<std::size_t N>
-struct __initialize_grouping_allocae_tuple<N,N>
+struct __initialize_grouping_allocate_tuple<N,N>
 {
   template<typename Tuple, typename Sizes>
   static void init(Tuple&, const Sizes&)
@@ -167,7 +167,7 @@ grouping_allocate(Allocate allocate, S... sizes)
   }
 
   get<0>(ret) = allocate(-1u - sz);
-  __initialize_grouping_allocae_tuple<1, sizeof...(Elements)>::init(ret, szs);
+  __initialize_grouping_allocate_tuple<1, sizeof...(Elements)>::init(ret, szs);
 
   return ret;
 }
@@ -195,23 +195,33 @@ struct new_element
 
 template <typename T, typename... Elements>
 CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(new_element<T> e, Elements... elems),
-                        optimal_grouping_allocate<typename T::type, typename Elements::type...>(e.size, static_cast<std::size_t>(elems)...))
+                        optimal_grouping_allocate<
+                          typename T::type,
+                          typename Elements::type...
+                        >(e.size, static_cast<std::size_t>(elems)...))
 
 template <typename Allocate, typename T, typename... Elements>
 CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(Allocate allocate,
                                                   new_element<T> e, Elements... elems),
-                        optimal_grouping_allocate<typename T::type, typename Elements::type...>
-                        (e.size, static_cast<std::size_t>(elems)...))
+                        optimal_grouping_allocate<
+                          typename T::type,
+                          typename Elements::type...
+                        >(e.size, static_cast<std::size_t>(elems)...))
 
 template <typename T, typename... Elements>
 CPP1X_DELEGATE_FUNCTION(grouping_allocate(new_element<T> e, Elements... elems),
-                        grouping_allocate<typename T::type, typename Elements::type...>(e.size, static_cast<std::size_t>(elems)...))
+                        grouping_allocate<
+                          typename T::type,
+                          typename Elements::type...
+                        >(e.size, static_cast<std::size_t>(elems)...))
 
 template <typename Allocate, typename T, typename... Elements>
 CPP1X_DELEGATE_FUNCTION(grouping_allocate(Allocate allocate,
                                           new_element<T> e, Elements... elems),
-                        grouping_allocate<typename T::type, typename Elements::type...>
-                        (e.size, static_cast<std::size_t>(elems)...))
+                        grouping_allocate<
+                          typename T::type,
+                          typename Elements::type...
+                        >(e.size, static_cast<std::size_t>(elems)...))
 
 }
 
