@@ -182,7 +182,7 @@ Changer les interfaces de templates/*.hpp. Mettre des constexpr quant-il faut.
 
 faire un hash constexpressive spécialisé pour cstring en C++14.
 
-
+faire des fonctions spéciliasées pour retourner des objets ou faire des algos constexpressive en c++14 pour cstring et format.
 
 
 
