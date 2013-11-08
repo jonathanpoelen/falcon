@@ -184,6 +184,8 @@ faire un hash constexpressive spécialisé pour cstring en C++14.
 
 faire des fonctions spéciliasées pour retourner des objets ou faire des algos constexpressive en c++14 pour cstring et format.
 
+C++14: utilisé integer_sequence à la place de parameter_index.
+
 
 
 

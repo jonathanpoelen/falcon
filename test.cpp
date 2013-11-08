@@ -17,9 +17,20 @@
 // {};
 //
 
+#include <string>
+#include <iostream>
+#include <clocale>
+#include <falcon/cstring.hpp>
+
 int main()
 {
-
+  std::cout <<  std::to_string(1234567.34) << "\n";
+  std::cout <<  1234567.34 << "\n";
+  std::cout.imbue(std::locale("fr_CA.utf8"));
+  setlocale(1, "fr_CA.utf8");
+  std::cout <<  std::to_string(1234567.34) << "\n";
+  std::cout <<  1234567.34 << "\n";
+  std::cout << falcon::constexpr_cstring("plop\n");
 
 //   using sequence = seq<_1,_2,_3>;
 //   using first = begin<sequence>::type;

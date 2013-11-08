@@ -6,6 +6,7 @@
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/string/cstringfwd.hpp>
+#include <falcon/string/stox.hpp>
 #include <falcon/container/range_access.hpp>
 #include <falcon/iterator/normal_iterator.hpp>
 #include <falcon/type_traits/remove_cv_reference.hpp>
@@ -3050,7 +3051,24 @@ typename build_basic_cstring<const CharT>::type
 make_cstring(const CharT * s) CPP_NOEXCEPT
 { return typename build_basic_cstring<const CharT>::type(s); }
 
-}
 
+inline std::string to_string(const cstring& __str)
+{ return std::string(__str.data(), __str.size()); }
+
+inline std::string to_string(const const_cstring& __str)
+{ return std::string(__str.data(), __str.size()); }
+
+inline std::wstring to_wstring(const cwstring& __str)
+{ return std::wstring(__str.data(), __str.size()); }
+
+inline std::wstring to_wstring(const const_cwstring& __str)
+{ return std::wstring(__str.data(), __str.size()); }
+
+template<typename CharT, typename Traits>
+inline std::basic_string<CharT, Traits>
+to_string(const basic_cstring<CharT, Traits>& __str)
+{ return std::basic_string<CharT, Traits>(__str.data(), __str.size()); }
+
+}
 
 #endif
