@@ -186,6 +186,8 @@ faire des fonctions spéciliasées pour retourner des objets ou faire des algos 
 
 C++14: utilisé integer_sequence à la place de parameter_index.
 
+faire des traits parameter des classe générique (tous type template)
+
 
 
 

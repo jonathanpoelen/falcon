@@ -36,7 +36,9 @@ namespace falcon {
   : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
-  struct _Name : __falcon_##_Name##__has_type_test<Falcon_T>::type {}
+  struct _Name : __falcon_##_Name##__has_type_test<Falcon_T>::type {\
+    static const bool value = __falcon_##_Name##__has_type_test<Falcon_T>::value;\
+  }
 
 #define FALCON_HAS_TYPE_NAME(_TypeName) has_##_TypeName
 
@@ -68,7 +70,10 @@ namespace falcon {
   __FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
   \
   template<typename Falcon_T>\
-  struct _Name : __falcon_##_Name##__has_template_type_test<Falcon_T>::type {}
+  struct _Name : __falcon_##_Name##__has_template_type_test<Falcon_T>::type {\
+    const static bool value = \
+      __falcon_##_Name##__has_template_type_test<Falcon_T>::value;\
+  }
 
 
 #define FALCON_HAS_TYPE_TRAIT_DEF(_TypeName)\

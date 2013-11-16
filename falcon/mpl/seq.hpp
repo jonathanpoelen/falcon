@@ -6,12 +6,15 @@
 #include <falcon/type_traits/if.hpp>
 #include <falcon/type_traits/eval_if.hpp>
 #include <falcon/type_traits/use.hpp>
+#include <falcon/mpl/integral.hpp>
 #include <type_traits>
 
 #include <iterator>
 
 namespace falcon {
 namespace mpl {
+
+
 
 template<typename... Args>
 struct seq
@@ -44,7 +47,7 @@ class size_impl;
 template <template <class...> class Seq, typename... Args>
 struct size_impl<Seq<Args...>>
 {
-  static const size_t value = sizeof...(Args);
+  static const std::size_t value = sizeof...(Args);
 };
 
 
@@ -297,8 +300,6 @@ constexpr bool has_mpl_type_impl(unsigned)
 }
 
 
-template<typename T>
-using is_mpl_type = std::integral_constant<bool, (has_mpl_type_impl<T>(1))>;
 
 
 template<typename T>
@@ -312,7 +313,7 @@ struct apply_impl
 
 template<typename T, typename SeqArgs>
 struct apply_impl<protect<T>, SeqArgs>
-{ using type = protect<T>; };
+{ using type = T; };
 
 template<unsigned N, typename SeqArgs>
 struct apply_impl<placeholders::placeholder<N>, SeqArgs>
@@ -342,6 +343,8 @@ struct apply
   using type = typename apply_impl<F, seq<Args...>>::type;
 };
 
+template<typename F, typename... Args>
+using apply_t = typename apply<F, Args...>::type;
 
 
 template <unsigned N>
@@ -438,84 +441,23 @@ struct sizeof_
   static const std::size_t value = sizeof(T);
 };
 
+// template <typename Seq>
+// struct begin
+// {
+//   using type = iterator_impl<Seq, uint_<0>>;
+// };
+//
+// template <typename Seq>
+// struct end
+// {
+//   using type = iterator_impl<Seq, uint_<size_impl<Seq>::value>>;
+// };
 
-struct mpl_iterator_def
-{
-  using mpl_iterator = std::true_type;
-};
+template<typename Seq>
+using begin_t = typename begin<Seq>::type;
 
-
-template <typename Iterator>
-struct iterator_category
-{
-  using type = std::random_access_iterator_tag;
-};
-
-class na;
-
-template<typename Seq, typename Key, typename Tag = typename iterator_category<Seq>::type>
-class iterator_impl;
-
-
-
-template<typename Seq, typename Key, typename Tag = std::forward_iterator_tag>
-struct forward_iterator_impl
-: mpl_iterator_def
-{
-  using type = typename ::falcon::eval_if<
-    (Key::value < 0 || Key::value >= size_impl<Seq>::value),
-    protect<na>,
-    at_c_impl<Seq, Key::value>
-  >::type;
-  using next = iterator_impl<Seq, std::integral_constant<int, Key::value+1>, Tag>;
-};
-
-template<typename Seq, typename Key>
-struct iterator_impl<Seq, Key, std::forward_iterator_tag>
-: forward_iterator_impl<Seq, Key>
-{};
-
-template<typename Seq, typename Key, typename Tag = std::bidirectional_iterator_tag>
-struct bidirectional_iterator_impl
-: forward_iterator_impl<Seq, Key, Tag>
-{
-  using prior = iterator_impl<Seq, std::integral_constant<int, Key::value-1>, Tag>;
-};
-
-template<typename Seq, typename Key>
-struct iterator_impl<Seq, Key, std::bidirectional_iterator_tag>
-: bidirectional_iterator_impl<Seq, Key>
-{};
-
-template<typename Seq, typename Key, typename Tag = std::random_access_iterator_tag>
-struct random_access_iterator_impl
-: bidirectional_iterator_impl<Seq, Key, Tag>
-{
-  template<typename T>
-  struct advance
-  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value+T::value>, Tag>; };
-
-  template<typename T>
-  struct recoil
-  { using type = iterator_impl<Seq, std::integral_constant<int, Key::value-T::value>, Tag>; };
-};
-
-template<typename Seq, typename Key>
-struct iterator_impl<Seq, Key, std::random_access_iterator_tag>
-: random_access_iterator_impl<Seq, Key>
-{};
-
-template <typename Seq>
-struct begin
-{
-  using type = iterator_impl<Seq, std::integral_constant<int, 0>>;
-};
-
-template <typename Seq>
-struct end
-{
-  using type = iterator_impl<Seq, std::integral_constant<int, size_impl<Seq>::value>>;
-};
+template<typename Seq>
+using end_t = typename end<Seq>::type;
 
 
 template<typename T, typename = typename T::next>
@@ -541,9 +483,13 @@ struct next_impl<std::integral_constant<T, N>, false>
 
 template <typename Iterator>
 struct next
+: mpl_apply_def
 {
-  using type = typename Iterator::next;
+  using type = typename next_impl<Iterator>::type;
 };
+
+template<typename Iterator>
+using next_t = typename next<Iterator>::type;
 
 
 template<typename T, typename = typename T::prior>
@@ -569,9 +515,13 @@ struct prior_impl<std::integral_constant<T, N>, false>
 
 template <typename Iterator>
 struct prior
+: mpl_apply_def
 {
-  using type = typename Iterator::prior;
+  using type = typename prior_impl<Iterator>::type;
 };
+
+template<typename Iterator>
+using prior_t = typename prior<Iterator>::type;
 
 
 template <typename Iterator>
@@ -580,9 +530,54 @@ struct deref
   using type = typename Iterator::type;
 };
 
+template<typename Iterator>
+using deref_t = typename deref<Iterator>::type;
+
+template<typename T>
+using __type_t = T;
 
 
 
+
+template<
+  template<class> class Deref
+, typename Begin
+, typename Last
+, typename State
+, typename ForwardOp
+>
+struct __fold
+: __fold<Deref, next_t<Begin>, Last, apply_t<ForwardOp, State, Deref<Begin>>, ForwardOp>
+{};
+
+template<
+  template<class> class Deref
+, typename Last
+, typename State
+, typename ForwardOp
+>
+struct __fold<Deref, Last, Last, State, ForwardOp>
+{ using type = State; };
+
+template<
+  typename Sequence
+, typename State
+, typename ForwardOp
+>
+struct iter_fold
+{
+  using type = typename __fold<__type_t, begin_t<Sequence>, end_t<Sequence>, State, ForwardOp>::type;
+};
+
+template<
+  typename Sequence
+, typename State
+, typename ForwardOp
+>
+struct fold
+{
+  using type = typename __fold<deref_t, begin_t<Sequence>, end_t<Sequence>, State, ForwardOp>::type;
+};
 
 
 }

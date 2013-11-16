@@ -178,6 +178,70 @@ struct pack_reverse
 { typedef typename __pack_reverse<parameter_pack<>, Pack>::__type type; };
 
 
+template<std::size_t Pos, std::size_t N, typename Pack, typename Pack2>
+class __pack_slice;
+
+template<
+  std::size_t Pos
+, std::size_t N
+, typename... LElements
+, typename Element
+, typename... Elements>
+struct __pack_slice<
+  Pos
+, N
+, parameter_pack<LElements...>
+, parameter_pack<Element, Elements...>
+>
+: __pack_slice<
+  Pos+1
+, N
+, parameter_pack<Element, LElements...>
+, parameter_pack<Elements...>
+> {};
+
+template<
+  std::size_t Pos
+, typename... LElements
+, typename Element
+, typename... Elements>
+struct __pack_slice<
+  Pos
+, Pos
+, parameter_pack<LElements...>
+, parameter_pack<Element, Elements...>
+>
+{
+  typedef parameter_pack<LElements...> __first;
+  typedef parameter_pack<Element, Elements...> __second;
+};
+
+template<
+  std::size_t Pos
+, typename... LElements
+, typename... RElements>
+struct __pack_slice<
+  Pos
+, Pos
+, parameter_pack<LElements...>
+, parameter_pack<RElements...>
+>
+{
+  typedef parameter_pack<LElements...> __first;
+  typedef parameter_pack<RElements...> __second;
+};
+
+template<std::size_t N, typename Pack>
+struct pack_slice
+{
+private:
+  typedef __pack_slice<0, N, parameter_pack<>, Pack> __type;
+
+public:
+  typedef typename __type::__first first_type;
+  typedef typename __type::__second second_type;
+};
+
 namespace parameter {
   template<typename Pack>
   using size = pack_size<Pack>;
