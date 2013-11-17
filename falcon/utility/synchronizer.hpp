@@ -289,18 +289,23 @@ constexpr synchronizer<_Elements&...> synchronize(_Elements&... __args)
 
 ///Creates a @c synchronizer of lvalue references on tuple values
 template<typename... _Elements>
-synchronizer<_Elements...>& tuple_synchronise(std::tuple<_Elements...>& t)
+synchronizer<_Elements...>& synchronizer_cast(std::tuple<_Elements...>& t)
 { return static_cast<synchronizer<_Elements...>&>(t); }
 
 ///Creates a const @c synchronizer of lvalue references on tuple values
 template<typename... _Elements>
-const synchronizer<_Elements...>& tuple_synchronise(const std::tuple<_Elements...>& t)
+const synchronizer<_Elements...>& synchronizer_cast(const std::tuple<_Elements...>& t)
 { return static_cast<const synchronizer<_Elements...>&>(t); }
+
+///Creates a @c synchronizer of rvalue references on tuple values
+template<typename... _Elements>
+synchronizer<_Elements...>&& synchronizer_cast(std::tuple<_Elements...>&& t)
+{ return static_cast<synchronizer<_Elements...>&&>(t); }
 
 template<typename... _Elements>
 void swap(falcon::synchronizer<_Elements...>& a,
           falcon::synchronizer<_Elements...>& b)
-{ a.swap(b); };
+{ a.swap(b); }
 
 }
 
