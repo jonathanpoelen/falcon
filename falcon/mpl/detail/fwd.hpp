@@ -3,90 +3,102 @@
 
 #include <falcon/config.hpp>
 
-#include <type_traits>
-
 namespace falcon {
 namespace mpl {
 
-struct mpl_apply_def
-{ using mpl_type = std::true_type; };
-
-namespace detail {
-  template<typename T, T x>
-  struct integral
-  { static const T value = x; };
-
-  template<typename T, typename Integral = typename T::mpl_type>
-  constexpr bool has_mpl_type_impl(int, const Integral& = Integral())
-  { return Integral::value; }
-
-  template<typename T>
-  constexpr bool has_mpl_type_impl(unsigned)
-  { return 0; }
-
-  template<typename...>
-  struct seq;
-}
-
 class na;
 
-#ifdef IN_IDE_PARSER
-# define FALCON_MPL_DEF_TYPE(name) struct name { using type = na; }
-# define FALCON_MPL_DEF_TYPE_AND_VALUE(name) struct name { using type = na; \
-  static const int value = 0; }
-#else
-# define FALCON_MPL_DEF_TYPE(name) class name
-# define FALCON_MPL_DEF_TYPE_AND_VALUE(name) class name
-#endif
+namespace detail {
+
+struct mpl_apply_def
+{ using __mpl_def = mpl_apply_def; };
+
+struct mpl_container_def
+{ using __mpl_container = mpl_container_def; };
+
+template<typename T, T x>
+struct integral
+{ static const T value = x; };
+
+template<typename T, typename Integral = typename T::__mpl_def>
+constexpr bool is_mpl_def(int, Integral = mpl_apply_def())
+{ return 1; }
+
+template<typename T>
+constexpr bool is_mpl_def(unsigned)
+{ return 0; }
+
+template<typename T, typename Integral = typename T::__mpl_container>
+constexpr bool is_mpl_container(int, Integral = mpl_container_def())
+{ return 1; }
+
+template<typename T>
+constexpr bool is_mpl_container(unsigned)
+{ return 0; }
+
+template<typename Seq, bool = is_mpl_container<Seq>(1)>
+class sequence_handler;
 
 template<typename Seq>
-FALCON_MPL_DEF_TYPE_AND_VALUE(size);
+struct sequence_handler<Seq, true>
+{ using type = typename Seq::type; };
 
 template<typename Seq>
-FALCON_MPL_DEF_TYPE_AND_VALUE(empty);
+using sequence_t = typename sequence_handler<Seq>::type;
+
+template<typename...>
+struct seq;
+
+}
+
+namespace aux {
+
+template<typename Seq>
+class size;
+
+template<typename Seq>
+class empty;
 
 template <typename Seq>
-FALCON_MPL_DEF_TYPE(begin);
+class begin;
 
 template <typename Seq>
-FALCON_MPL_DEF_TYPE(end);
+class end;
 
 template<typename Seq>
-FALCON_MPL_DEF_TYPE(front);
+class front;
 
 template<typename Seq>
-FALCON_MPL_DEF_TYPE(back);
+class back;
 
 template<typename Seq, typename Pos>
-FALCON_MPL_DEF_TYPE(at);
+class at;
 
 template<typename Seq, typename Pos, typename T>
-FALCON_MPL_DEF_TYPE(insert);
+class insert;
 
 template<typename Seq, typename Pos, typename Range>
-FALCON_MPL_DEF_TYPE(insert_range);
+class insert_range;
 
 template<typename Seq, typename Pos, typename Last = na>
-FALCON_MPL_DEF_TYPE(erase);
+class erase;
 
 template<typename Seq>
-FALCON_MPL_DEF_TYPE(clear);
+class clear;
 
 template<typename Seq, typename T>
-FALCON_MPL_DEF_TYPE(push_back);
+class push_back;
 
 template<typename Seq, typename T>
-FALCON_MPL_DEF_TYPE(push_front);
+class push_front;
 
 template<typename Seq>
-FALCON_MPL_DEF_TYPE(pop_back);
+class pop_back;
 
 template<typename Seq>
-FALCON_MPL_DEF_TYPE(pop_front);
+class pop_front;
 
-#undef FALCON_MPL_DEF_TYPE
-#undef FALCON_MPL_DEF_TYPE_AND_VALUE
-
+}
 }
 }
 

@@ -42,7 +42,6 @@ using namespace falcon::mpl::placeholders;
 
 int main()
 {
-
   typedef apply< int_plus<_1,_2>, int_<2>, int_<3> >::type r1;
   typedef apply< quote<int_plus>, int_<2>, int_<3> >::type r2;
   typedef apply< tpl<int_plus, 0>, int_<2>, int_<3> >::type r3;

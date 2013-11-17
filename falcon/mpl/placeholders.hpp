@@ -16,7 +16,7 @@ struct placeholder
   static const std::size_t value = N;
 
   template<typename Seq>
-  using apply = at<Seq, int_<N-1> >;
+  using apply = aux::at<Seq, int_<N-1> >;
 };
 
 using _1 = placeholder<1>;

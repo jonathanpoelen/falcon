@@ -29,7 +29,7 @@ template<std::size_t N, typename... Args>
 struct apply_impl<placeholders::placeholder<N>, seq<Args...>, true>
 { using type = typename at_impl<seq<Args...>, N-1>::type; };
 
-template <typename T, bool = has_mpl_type_impl<T>(1)>
+template <typename T, bool = is_mpl_def<T>(1)>
 struct mpl_type_or_type_impl
 { using type = T; };
 
