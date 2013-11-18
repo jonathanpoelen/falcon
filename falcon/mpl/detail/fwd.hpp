@@ -2,12 +2,10 @@
 #define FALCON_MPL_DETAIL_FWD_HPP
 
 #include <falcon/config.hpp>
+#include <falcon/mpl/integral.hpp>
 
 namespace falcon {
 namespace mpl {
-
-class na;
-
 namespace detail {
 
 struct mpl_apply_def
@@ -49,6 +47,8 @@ using sequence_t = typename sequence_handler<Seq>::type;
 template<typename...>
 struct seq;
 
+class na;
+
 }
 
 namespace aux {
@@ -71,7 +71,7 @@ class front;
 template<typename Seq>
 class back;
 
-template<typename Seq, typename Pos>
+template<typename Seq, typename Pos, typename Default = void_>
 class at;
 
 template<typename Seq, typename Pos, typename T>
@@ -80,7 +80,7 @@ class insert;
 template<typename Seq, typename Pos, typename Range>
 class insert_range;
 
-template<typename Seq, typename Pos, typename Last = na>
+template<typename Seq, typename Pos, typename Last = detail::na>
 class erase;
 
 template<typename Seq>
@@ -97,6 +97,21 @@ class pop_back;
 
 template<typename Seq>
 class pop_front;
+
+template<typename Seq, typename Key>
+class count;
+
+template<typename Seq, typename Key>
+class order;
+
+template<typename Seq, typename Key>
+class has_key;
+
+template<typename Seq, typename T>
+class key_type;
+
+template<typename Seq, typename T>
+class value_type;
 
 }
 }

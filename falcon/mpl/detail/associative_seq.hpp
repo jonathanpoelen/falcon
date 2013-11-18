@@ -5,11 +5,9 @@ namespace falcon {
 namespace mpl {
 namespace detail {
 
-template<typename GetKey, typename... Ts>
+template<typename GetKey, typename GetValue, typename... Ts>
 struct associative_seq
-{
-
-};
+{};
 
 }
 }

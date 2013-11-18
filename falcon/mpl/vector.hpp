@@ -7,8 +7,6 @@
 #include <falcon/mpl/detail/insert.hpp>
 #include <falcon/mpl/detail/erase.hpp>
 
-#include <iterator>
-
 namespace falcon {
 namespace mpl {
 
@@ -66,7 +64,7 @@ struct back<vector<Ts...>>
 { using type = typename detail::at_impl<vector<Ts...>, sizeof...(Ts)-1>::type; };
 
 template<typename... Ts, typename Pos>
-struct at<vector<Ts...>, Pos>
+struct at<vector<Ts...>, Pos, void_>
 { using type = typename detail::at_impl<vector<Ts...>, Pos::value>::type; };
 
 template<typename... Ts, typename Pos, typename T>
@@ -78,7 +76,7 @@ struct insert_range<vector<Ts...>, Pos, Range>
 { using type = typename detail::insert_range_impl<vector<Ts...>, Pos::pos, Range>::type; };
 
 template<typename... Ts, typename Pos>
-struct erase<vector<Ts...>, Pos, na>
+struct erase<vector<Ts...>, Pos, detail::na>
 { using type = typename detail::erase_impl<
   vector<Ts...>
 , Pos::pos

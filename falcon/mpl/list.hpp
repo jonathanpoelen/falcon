@@ -6,8 +6,6 @@
 #include <falcon/mpl/detail/insert.hpp>
 #include <falcon/mpl/detail/erase.hpp>
 
-#include <iterator>
-
 namespace falcon {
 namespace mpl {
 
