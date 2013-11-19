@@ -5,6 +5,8 @@
 #include <falcon/mpl/key_type.hpp>
 #include <falcon/mpl/value_type.hpp>
 
+#include <type_traits>
+
 namespace falcon {
 namespace mpl {
 namespace detail {
@@ -15,7 +17,7 @@ struct __assoc_at_impl
 
 template<typename Seq, typename Key, typename T, typename... Ts, typename Default, typename X>
 struct __assoc_at_impl<false, Seq, Key, seq<T, Ts...>, Default, X>
-: __assoc_at_impl<std::is_same<typename key_type<Seq, T>::type, Key>::value
+: __assoc_at_impl<std::is_same</*typename key_type<Seq, T>::type*/T, Key>::value
 , Seq, Key, seq<Ts...>, Default, typename value_type<Seq, T>::type>
 {};
 

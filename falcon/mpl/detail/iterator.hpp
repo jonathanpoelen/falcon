@@ -18,8 +18,6 @@ struct mpl_iterator_def
   using mpl_iterator = std::true_type;
 };
 
-class na;
-
 template<typename Seq, typename Key, typename Tag>
 class iterator_impl;
 

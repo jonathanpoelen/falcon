@@ -3,6 +3,7 @@
 
 #include <falcon/mpl/detail/fwd.hpp>
 #include <falcon/mpl/detail/assoc_at.hpp>
+#include <falcon/mpl/detail/assoc_insert.hpp>
 #include <falcon/mpl/detail/iterator.hpp>
 #include <falcon/mpl/detail/insert.hpp>
 #include <falcon/mpl/detail/erase.hpp>
@@ -82,7 +83,14 @@ struct order<set<Ts...>, Key>
 template<typename... Ts, typename Key, typename Default>
 struct at<set<Ts...>, Key, Default>
 { using type = typename detail::assoc_at_impl<set<Ts...>, Key, Default>::type; };
-// at<s,k,def>::type
+
+template<typename... Ts, typename Pos, typename T>
+struct insert<set<Ts...>, Pos, T>
+{ using type = typename detail::assoc_insert_impl<set<Ts...>, T>::type; };
+
+template<typename... Ts, typename T>
+struct insert<set<Ts...>, T, detail::na>
+{ using type = typename detail::assoc_insert_impl<set<Ts...>, T>::type; };
 
 }
 

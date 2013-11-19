@@ -36,6 +36,7 @@ struct int_plus
 #include <falcon/mpl/quote.hpp>
 #include <falcon/mpl/placeholders.hpp>
 #include <falcon/mpl/tpl.hpp>
+#include <falcon/mpl/at.hpp>
 #include <type_traits>
 #include <iostream>
 using namespace falcon::mpl;
@@ -54,6 +55,10 @@ int main()
     << (r3::value) << "\n"
     << (r4::value) << "\n"
   ;
+
+  using c1 = set<int_<2>, int_<3>, int_<12>>;
+  return at<c1, int_<12>>::type::value;
+
 
 //   using vec = vector<int, float>;
 //   std::cout << (std::is_same<front<vec>::type, int>::value) << "\n";

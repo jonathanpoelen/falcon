@@ -1,9 +1,6 @@
 #ifndef FALCON_MPL_DETAIL_FWD_HPP
 #define FALCON_MPL_DETAIL_FWD_HPP
 
-#include <falcon/config.hpp>
-#include <falcon/mpl/integral.hpp>
-
 namespace falcon {
 namespace mpl {
 namespace detail {
@@ -14,9 +11,9 @@ struct mpl_apply_def
 struct mpl_container_def
 { using __mpl_container = mpl_container_def; };
 
-template<typename T, T x>
-struct integral
-{ static const T value = x; };
+// template<typename T, T x>
+// struct integral
+// { static const T value = x; };
 
 template<typename T, typename Integral = typename T::__mpl_def>
 constexpr bool is_mpl_def(int, Integral = mpl_apply_def())
@@ -71,7 +68,7 @@ class front;
 template<typename Seq>
 class back;
 
-template<typename Seq, typename Pos, typename Default = void_>
+template<typename Seq, typename Pos, typename Default = detail::na>
 class at;
 
 template<typename Seq, typename Pos, typename T>
@@ -80,7 +77,7 @@ class insert;
 template<typename Seq, typename Pos, typename Range>
 class insert_range;
 
-template<typename Seq, typename Pos, typename Last = detail::na>
+template<typename Seq, typename Pos, typename Last>
 class erase;
 
 template<typename Seq>
@@ -112,6 +109,9 @@ class key_type;
 
 template<typename Seq, typename T>
 class value_type;
+
+template<typename Seq, typename Key>
+class erase_key;
 
 }
 }

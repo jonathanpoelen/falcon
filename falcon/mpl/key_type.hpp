@@ -9,7 +9,7 @@ namespace mpl {
 template<typename Seq, typename T>
 struct key_type
 : detail::mpl_apply_def
-{ using type = typename aux::key_type<detail::sequence_t<Seq>, T>; };
+{ using type = typename aux::key_type<detail::sequence_t<Seq>, T>::type; };
 
 }
 }
