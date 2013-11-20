@@ -28,15 +28,11 @@ namespace aux {
 
 template<typename... Ts>
 struct size<set<Ts...>>
-{
-  static const std::size_t value = sizeof...(Ts);
-};
+{ static const std::size_t value = sizeof...(Ts); };
 
 template<typename... Ts>
 struct empty<set<Ts...>>
-{
-  static const bool value = !sizeof...(Ts);
-};
+{ static const bool value = !sizeof...(Ts); };
 
 template<typename... Ts>
 struct begin<set<Ts...>>
@@ -44,7 +40,7 @@ struct begin<set<Ts...>>
   using type = detail::iterator_impl<
     set<Ts...>
   , uint_<0>
-  , std::bidirectional_iterator_tag
+  , std::random_access_iterator_tag
   >;
 };
 
@@ -54,7 +50,7 @@ struct end<set<Ts...>>
   using type = detail::iterator_impl<
     set<Ts...>
   , uint_<sizeof...(Ts)>
-  , std::bidirectional_iterator_tag
+  , std::random_access_iterator_tag
   >;
 };
 

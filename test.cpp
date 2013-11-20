@@ -34,6 +34,7 @@ struct int_plus
 #include <falcon/mpl/list.hpp>
 #include <falcon/mpl/map.hpp>
 #include <falcon/mpl/set.hpp>
+#include <falcon/mpl/range_c.hpp>
 #include <falcon/mpl/apply.hpp>
 #include <falcon/mpl/quote.hpp>
 #include <falcon/mpl/placeholders.hpp>

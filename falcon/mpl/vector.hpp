@@ -25,15 +25,11 @@ namespace aux {
 
 template<typename... Ts>
 struct size<vector<Ts...>>
-{
-  static const std::size_t value = sizeof...(Ts);
-};
+{ static const std::size_t value = sizeof...(Ts); };
 
 template<typename... Ts>
 struct empty<vector<Ts...>>
-{
-  static const bool value = !sizeof...(Ts);
-};
+{ static const bool value = !sizeof...(Ts); };
 
 template<typename... Ts>
 struct begin<vector<Ts...>>
