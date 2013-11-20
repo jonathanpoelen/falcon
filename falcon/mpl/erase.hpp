@@ -7,9 +7,12 @@ namespace falcon {
 namespace mpl {
 
 template<typename Seq, typename Pos, typename Last = detail::na>
-struct erase<vector<Ts...>, Pos, Last>
+struct erase
 : detail::mpl_apply_def
-{ using type = typename aux::erase_impl<detail::sequence_t<Seq>, Pos, Last>::type; };
+{ using type = typename aux::erase<detail::sequence_t<Seq>, Pos, Last>::type; };
+
+template<typename Seq, typename Pos, typename Last = detail::na>
+using erase_t = typename erase<Seq, Pos, Last>::type;
 
 }
 }

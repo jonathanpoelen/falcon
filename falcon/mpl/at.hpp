@@ -12,6 +12,9 @@ struct at
 : detail::mpl_apply_def
 { using type = typename aux::at<detail::sequence_t<Seq>, Pos, Default>::type; };
 
+template<typename Seq, typename Pos, typename Default = void_>
+using at_t = typename at<Seq, Pos, Default>::type;
+
 }
 }
 

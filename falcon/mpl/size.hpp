@@ -15,6 +15,9 @@ struct size
   using type = integral_c<std::size_t, value>;
 };
 
+template<typename Seq>
+using size_t = size<Seq>;
+
 }
 }
 

@@ -31,6 +31,8 @@ struct int_plus
 // { using type = typename less_impl<typename N1::type, typename N2::type>::type; };
 
 #include <falcon/mpl/vector.hpp>
+#include <falcon/mpl/list.hpp>
+#include <falcon/mpl/map.hpp>
 #include <falcon/mpl/set.hpp>
 #include <falcon/mpl/apply.hpp>
 #include <falcon/mpl/quote.hpp>

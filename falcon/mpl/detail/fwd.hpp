@@ -11,10 +11,6 @@ struct mpl_apply_def
 struct mpl_container_def
 { using __mpl_container = mpl_container_def; };
 
-// template<typename T, T x>
-// struct integral
-// { static const T value = x; };
-
 template<typename T, typename Integral = typename T::__mpl_def>
 constexpr bool is_mpl_def(int, Integral = mpl_apply_def())
 { return 1; }

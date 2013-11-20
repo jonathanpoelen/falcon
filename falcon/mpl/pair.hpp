@@ -7,9 +7,9 @@ namespace mpl {
 template<typename T1, typename T2>
 struct pair
 {
-  typedef pair type;
-  typedef T1 first;
-  typedef T2 second;
+  using type = pair;
+  using first = T1;
+  using second = T2;
 };
 
 }

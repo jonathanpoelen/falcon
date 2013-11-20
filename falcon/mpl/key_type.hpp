@@ -11,6 +11,9 @@ struct key_type
 : detail::mpl_apply_def
 { using type = typename aux::key_type<detail::sequence_t<Seq>, T>::type; };
 
+template<typename Seq, typename T>
+using key_type_t = typename key_type<Seq, T>::type;
+
 }
 }
 

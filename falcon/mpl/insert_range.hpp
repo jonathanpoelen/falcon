@@ -11,6 +11,9 @@ struct insert_range
 : detail::mpl_apply_def
 { using type = typename aux::insert_range<detail::sequence_t<Seq>, Pos, Range>::type; };
 
+template<typename Seq, typename Pos, typename Range>
+using insert_range_t = typename insert_range<Seq, Pos, Range>::type;
+
 }
 }
 

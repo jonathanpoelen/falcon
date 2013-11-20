@@ -11,6 +11,9 @@ struct pop_front
 : detail::mpl_apply_def
 { using type = typename aux::pop_front<detail::sequence_t<Seq>>::type; };
 
+template<typename Seq>
+using pop_front_t = typename pop_front<Seq>::type;
+
 }
 }
 

@@ -8,7 +8,7 @@ namespace falcon {
 namespace mpl {
 namespace detail {
 
-template<typename Seq, typename T, bool has_key_impl<Seq, typename key_type<Seq, T>::type>::value>
+template<typename Seq, typename T, bool = has_key_impl<Seq, typename key_type<Seq, T>::type>::value>
 struct assoc_insert_impl
 { using type = Seq;};
 

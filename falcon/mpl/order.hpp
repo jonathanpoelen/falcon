@@ -15,6 +15,9 @@ struct order
   using type = integral_c<std::size_t, value>;
 };
 
+template<typename Seq, typename T>
+using order_t = order<Seq, T>;
+
 }
 }
 

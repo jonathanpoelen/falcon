@@ -11,6 +11,9 @@ struct push_front
 : detail::mpl_apply_def
 { using type = typename aux::push_front<detail::sequence_t<Seq>, T>::type; };
 
+template<typename Seq, typename T>
+using push_front_t = typename push_front<Seq, T>::type;
+
 }
 }
 

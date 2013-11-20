@@ -15,6 +15,9 @@ struct empty
   using type = integral_c<bool, value>;
 };
 
+template<typename Seq>
+using empty_t = empty<Seq>;
+
 }
 }
 

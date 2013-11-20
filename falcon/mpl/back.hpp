@@ -11,6 +11,9 @@ struct back
 : detail::mpl_apply_def
 { using type = typename aux::back<detail::sequence_t<Seq>>; };
 
+template<typename Seq>
+using back_t = typename back<Seq>::type;
+
 }
 }
 

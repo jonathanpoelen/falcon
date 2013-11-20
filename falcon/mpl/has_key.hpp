@@ -15,6 +15,9 @@ struct has_key
   using type = integral_c<bool, value>;
 };
 
+template<typename Seq, typename T>
+using has_key_t = typename has_key<Seq, T>::type;
+
 }
 }
 

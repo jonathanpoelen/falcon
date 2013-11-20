@@ -15,6 +15,9 @@ struct count
   using type = integral_c<std::size_t, value>;
 };
 
+template<typename Seq, typename T>
+using count_t = typename count<Seq, T>::type;
+
 }
 }
 

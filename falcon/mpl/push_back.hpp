@@ -11,6 +11,9 @@ struct push_back
 : detail::mpl_apply_def
 { using type = typename aux::push_back<detail::sequence_t<Seq>, T>::type; };
 
+template<typename Seq, typename T>
+using push_back_t = typename push_back<Seq, T>::type;
+
 }
 }
 

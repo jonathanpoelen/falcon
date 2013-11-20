@@ -11,6 +11,9 @@ struct clear
 : detail::mpl_apply_def
 { using type = typename aux::clear<detail::sequence_t<Seq>>::type; };
 
+template<typename Seq>
+using clear_t = typename clear<Seq>::type;
+
 }
 }
 

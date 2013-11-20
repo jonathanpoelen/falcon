@@ -11,6 +11,9 @@ struct pop_back
 : detail::mpl_apply_def
 { using type = typename aux::pop_back<detail::sequence_t<Seq>>::type; };
 
+template<typename Seq>
+using pop_back_t = typename pop_back<Seq>::type;
+
 }
 }
 
