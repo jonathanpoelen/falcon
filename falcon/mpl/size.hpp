@@ -16,7 +16,7 @@ struct size
 };
 
 template<typename Seq>
-using size_t = size<Seq>;
+using size_t = typename size<Seq>::type;
 
 }
 }

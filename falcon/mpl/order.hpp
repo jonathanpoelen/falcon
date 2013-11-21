@@ -16,7 +16,7 @@ struct order
 };
 
 template<typename Seq, typename T>
-using order_t = order<Seq, T>;
+using order_t = typename order<Seq, T>::type;
 
 }
 }

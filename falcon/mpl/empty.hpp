@@ -16,7 +16,7 @@ struct empty
 };
 
 template<typename Seq>
-using empty_t = empty<Seq>;
+using empty_t = typename empty<Seq>::type;
 
 }
 }

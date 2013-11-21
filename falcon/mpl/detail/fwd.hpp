@@ -20,14 +20,14 @@ constexpr bool is_mpl_def(unsigned)
 { return 0; }
 
 template<typename T, typename Integral = typename T::__mpl_container>
-constexpr bool is_mpl_container(int, Integral = mpl_container_def())
+constexpr bool is_mpl_sequence(int, Integral = mpl_container_def())
 { return 1; }
 
 template<typename T>
-constexpr bool is_mpl_container(unsigned)
+constexpr bool is_mpl_sequence(unsigned)
 { return 0; }
 
-template<typename Seq, bool = is_mpl_container<Seq>(1)>
+template<typename Seq, bool = is_mpl_sequence<Seq>(1)>
 class sequence_handler;
 
 template<typename Seq>
