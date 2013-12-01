@@ -2,7 +2,7 @@
 #define FALCON_MPL_VECTOR_C_HPP
 
 #include <falcon/mpl/vector.hpp>
-#include <falcon/mpl/integral.hpp>
+#include <falcon/mpl/integral_c.hpp>
 
 namespace falcon {
 namespace mpl {

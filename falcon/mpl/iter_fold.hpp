@@ -23,7 +23,7 @@ template<
 , typename State
 , typename ForwardOp
 >
-using iter_fold_t = typename fold<Sequence, State, ForwardOp>::type;
+using iter_fold_t = typename iter_fold<Sequence, State, ForwardOp>::type;
 
 }
 }

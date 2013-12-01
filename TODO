@@ -197,8 +197,6 @@ clamp_unordered
 
 get_contents_file: utiliser pubsetbuf dans la lecture
 
-wrapper -> wrap_t
-
 
 
 

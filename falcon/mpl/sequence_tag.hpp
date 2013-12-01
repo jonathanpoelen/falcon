@@ -12,7 +12,7 @@ namespace detail {
   { using type = int; };
 
   template<typename Sequence>
-  struct sequence_tag_impl<Sequence, FALCON_SFINAE_TYPE_PARAM(Sequence, tag)>
+  struct sequence_tag_impl<Sequence, enable_type_t<typename Sequence::tag>>
   { using type = typename Sequence::tag; };
 }
 
@@ -21,7 +21,7 @@ struct sequence_tag
 { using type = typename detail::sequence_tag_impl<Sequence>::type; };
 
 template<typename Sequence>
-using sequence_tag_t = typename sequence_tag<Sequence>::type; 
+using sequence_tag_t = typename sequence_tag<Sequence>::type;
 
 }
 }

@@ -10,9 +10,12 @@ namespace mpl {
 template<typename Sequence, typename T>
 struct push_front
 {
-  using type = push_front_impl<sequence_tag_t<Sequence>>
-  ::template apply< Sequence,T >::type;
+  using type = typename push_front_impl<sequence_tag_t<Sequence>>
+    ::template apply< Sequence,T >::type;
 };
+
+template<typename Sequence, typename T>
+using push_front_t = typename push_front<Sequence, T>::type;
 
 }
 }

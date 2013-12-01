@@ -15,7 +15,13 @@ template<
 >
 struct fold
 {
-  using type = typename aux::fold_impl<deref_t, begin_t<Sequence>, end_t<Sequence>, State, ForwardOp>::type;
+  using type = typename aux::fold_impl<
+    deref_t
+  , begin_t<Sequence>
+  , end_t<Sequence>
+  , State
+  , ForwardOp
+  >::type;
 };
 
 template<

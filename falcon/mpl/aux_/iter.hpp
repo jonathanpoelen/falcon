@@ -71,13 +71,24 @@ using iterator_impl = ::falcon::eval_if_c<
   >
 >;
 
+
+template<typename Iterator>
+struct forward_iterator_to_bidirectional_iterator
+{ using type = Iterator; };
+
+template<typename Seq, typename Key>
+struct forward_iterator_to_bidirectional_iterator<forward_iterator_impl<Seq, Key>>
+{ using type = bidirectional_iterator_impl<Seq, Key>; };
+
+
 template<typename Iterator>
 struct reverse_iterator
 : Iterator
 {
-  using next = typename Iterator::prior;
-  using prior = typename Iterator::next;
+  using next = reverse_iterator<typename Iterator::prior>;
+  using prior = reverse_iterator<typename Iterator::next>;
 };
+
 
 template<template<class, class> class IterClass, typename Iterator, typename N>
 class iter_advance;

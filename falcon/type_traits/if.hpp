@@ -38,6 +38,20 @@ template<typename T, typename TrueType, typename FalseType>
 struct not_if_c
 { typedef typename if_<!T::value, TrueType, FalseType>::type type; };
 
+#if __cplusplus >= 201103L
+template<bool c, typename TrueType, typename FalseType>
+using if_t = typename if_<c, TrueType, FalseType>::type;
+
+template<bool c, typename TrueType, typename FalseType>
+using not_if_t = typename not_if<c, TrueType, FalseType>::type;
+
+template<class T, typename TrueType, typename FalseType>
+using if_c_t = typename if_c<T, TrueType, FalseType>::type;
+
+template<class T, typename TrueType, typename FalseType>
+using not_if_c_t = typename not_if_c<T, TrueType, FalseType>::type;
+#endif
+
 }
 
 #endif

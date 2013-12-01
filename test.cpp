@@ -44,6 +44,7 @@
 // #include <iostream>
 
 #include <falcon/mpl/vector.hpp>
+#include <falcon/mpl/vector_c.hpp>
 #include <falcon/mpl/at.hpp>
 #include <falcon/mpl/size.hpp>
 #include <falcon/mpl/fold.hpp>
@@ -54,31 +55,30 @@
 #include <falcon/mpl/advance.hpp>
 #include <falcon/mpl/distance.hpp>
 #include <falcon/mpl/deref.hpp>
+#include <falcon/mpl/reverse_fold.hpp>
 
 #include <type_traits>
 
 using namespace falcon::mpl;
 using namespace falcon::mpl::placeholders;
 
+template<typename T, typename U>
+struct less
+: bool_<(T::value < U::value)>
+{};
+
 int main()
 {
-  typedef vector<long,float,short,double,float,long,long double> types;
-//   typedef fold<
-//     types
-//   , int_<0>
-//   , if_< std::is_same<float, _2>, next<_1>, _1 >
-//   >::type number_of_floats;
-  typedef iter_fold<
-    types
-  , int_<0>
-  , if_< std::is_same<float, deref<_2>>, next<_1>, _1 >
-  >::type number_of_floats;
+  typedef vector_c<int,5,-1,0,-7,-2,0,-5,4> numbers;
+//   typedef vector_c<int,-1,-7,-2,-5> negatives;
+  typedef reverse_fold<
+    numbers
+  , vector_c<int>
+  , if_< less< _2,int_<0> >, push_front<_1,_2>, _1 >
+  , push_front<_1,_2>
+  >::type result;
 
-  using numbers = vector<int_<1>, int_<2>, int_<3>>;
-
-  return int(number_of_floats::value)
-    + deref_t<advance_c_t<begin_t<numbers>, 2>>::value
-    + distance_t<begin_t<numbers>, end_t<numbers>>::value;
+  result() = 0;
 
 
 //   typedef apply< int_plus<_1,_2>, int_<2>, int_<3> >::type r1;

@@ -16,7 +16,13 @@ template<
 , typename ForwardOp
 >
 struct fold_impl
-: fold_impl<Deref, next_t<Begin>, Last, apply_t<ForwardOp, State, Deref<Begin>>, ForwardOp>
+: fold_impl<
+  Deref
+, next_t<Begin>
+, Last
+, apply_t<ForwardOp, State, Deref<Begin>>
+, ForwardOp
+>
 {};
 
 template<
