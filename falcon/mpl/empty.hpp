@@ -1,22 +1,19 @@
 #ifndef FALCON_MPL_EMPTY_HPP
 #define FALCON_MPL_EMPTY_HPP
 
-#include <falcon/mpl/detail/fwd.hpp>
-#include <falcon/mpl/integral.hpp>
+#include <falcon/mpl/empty_fwd.hpp>
+#include <falcon/mpl/sequence_tag.hpp>
 
 namespace falcon {
 namespace mpl {
 
-template<typename Seq>
+template<typename Sequence>
 struct empty
-: detail::mpl_apply_def
 {
-  static const bool value = aux::empty<detail::sequence_t<Seq>>::value;
-  using type = integral_c<bool, value>;
+  using type = typename empty_impl<sequence_tag_t<Sequence>>
+    ::template apply<Sequence>;
+  const static decltype(type::value) value = type::value;
 };
-
-template<typename Seq>
-using empty_t = typename empty<Seq>::type;
 
 }
 }

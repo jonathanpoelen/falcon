@@ -1,22 +1,21 @@
 #ifndef FALCON_MPL_COUNT_HPP
 #define FALCON_MPL_COUNT_HPP
 
-#include <falcon/mpl/detail/fwd.hpp>
-#include <falcon/mpl/integral.hpp>
+#include <falcon/mpl/sequence_tag.hpp>
 
 namespace falcon {
 namespace mpl {
 
-template<typename Seq, typename T>
+template<typename Sequence, typename T>
 struct count
-: detail::mpl_apply_def
 {
-  static const std::size_t value = aux::count<detail::sequence_t<Seq>, T>::value;
-  using type = integral_c<std::size_t, value>;
+  using type = typename count_impl<sequence_tag_t<Sequence>>
+    ::template apply<Sequence>;
+  const static decltype(type::value) value = type::value;
 };
 
-template<typename Seq, typename T>
-using count_t = typename count<Seq, T>::type;
+template<typename Sequence>
+using count_t = count<Sequence>;
 
 }
 }

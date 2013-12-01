@@ -1,22 +1,22 @@
 #ifndef FALCON_MPL_SIZE_HPP
 #define FALCON_MPL_SIZE_HPP
 
-#include <falcon/mpl/detail/fwd.hpp>
-#include <falcon/mpl/integral.hpp>
+#include <falcon/mpl/size_fwd.hpp>
+#include <falcon/mpl/sequence_tag.hpp>
 
 namespace falcon {
 namespace mpl {
 
-template<typename Seq>
+template<typename Sequence>
 struct size
-: detail::mpl_apply_def
 {
-  static const std::size_t value = aux::size<detail::sequence_t<Seq>>::value;
-  using type = integral_c<std::size_t, value>;
+  using type = typename size_impl<sequence_tag_t<Sequence>>
+    ::template apply<Sequence>;
+  const static decltype(type::value) value = type::value;
 };
 
-template<typename Seq>
-using size_t = typename size<Seq>::type;
+template<typename Sequence>
+using size_t = size<Sequence>;
 
 }
 }

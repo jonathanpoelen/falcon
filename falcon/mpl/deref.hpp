@@ -4,11 +4,9 @@
 namespace falcon {
 namespace mpl {
 
-template <typename Iterator>
+template<typename Iterator>
 struct deref
-{
-  using type = typename Iterator::type;
-};
+{ using type = typename Iterator::type; };
 
 template<typename Iterator>
 using deref_t = typename deref<Iterator>::type;

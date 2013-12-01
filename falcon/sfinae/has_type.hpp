@@ -3,6 +3,11 @@
 
 #include <falcon/type_traits/integral_constant.hpp>
 
+#define FALCON_SFINAE_TYPE_PARAM(T, name) \
+  typename ::falcon::detail::enable_type<typename T::name>::type
+#define FALCON_SFINAE_TPL_PARAM(Tpl, name) \
+  typename ::falcon::detail::enable_template<Tpl::template name>::type
+
 namespace falcon {
   namespace detail {
     template<class T, class R = void>

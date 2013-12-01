@@ -6,17 +6,17 @@
 namespace falcon {
 namespace mpl {
 
-template<typename C, typename TrueT, typename FalseT>
-using if_ = ::falcon::if_c<C, TrueT, FalseT>;
+template<bool B, typename T, typename U>
+using if_c = ::falcon::if_<B, T, U>;
 
-template<bool c, typename TrueT, typename FalseT>
-using if_c = ::falcon::if_<c, TrueT, FalseT>;
+template<typename B, typename T, typename U>
+using if_ = ::falcon::if_c<B, T, U>;
 
-template<typename C, typename TrueT, typename FalseT>
-using not_if = ::falcon::not_if_c<C, TrueT, FalseT>;
+template<bool B, typename T, typename U>
+using if_c_t = typename ::falcon::if_<B, T, U>::type;
 
-template<bool c, typename TrueT, typename FalseT>
-using not_if_c = ::falcon::not_if<c, TrueT, FalseT>;
+template<typename B, typename T, typename U>
+using if_t = typename ::falcon::if_c<B, T, U>::type;
 
 }
 }

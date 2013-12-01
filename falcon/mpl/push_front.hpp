@@ -1,18 +1,18 @@
 #ifndef FALCON_MPL_PUSH_FRONT_HPP
 #define FALCON_MPL_PUSH_FRONT_HPP
 
-#include <falcon/mpl/detail/fwd.hpp>
+#include <falcon/mpl/push_front_fwd.hpp>
+#include <falcon/mpl/sequence_tag.hpp>
 
 namespace falcon {
 namespace mpl {
 
-template<typename Seq, typename T>
+template<typename Sequence, typename T>
 struct push_front
-: detail::mpl_apply_def
-{ using type = typename aux::push_front<detail::sequence_t<Seq>, T>::type; };
-
-template<typename Seq, typename T>
-using push_front_t = typename push_front<Seq, T>::type;
+{
+  using type = push_front_impl<sequence_tag_t<Sequence>>
+  ::template apply< Sequence,T >::type;
+};
 
 }
 }

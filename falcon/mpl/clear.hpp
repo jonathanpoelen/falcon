@@ -1,20 +1,21 @@
 #ifndef FALCON_MPL_CLEAR_HPP
 #define FALCON_MPL_CLEAR_HPP
 
-#include <falcon/mpl/detail/fwd.hpp>
+#include <falcon/mpl/sequence_tag.hpp>
+#include <falcon/mpl/clear_fwd.hpp>
 
 namespace falcon {
 namespace mpl {
 
-template<typename Seq>
+template<typename Sequence>
 struct clear
-: detail::mpl_apply_def
-{ using type = typename aux::clear<detail::sequence_t<Seq>>::type; };
+{
+  using type = clear_impl<sequence_tag_t<Sequence>>
+    ::template apply<Sequence>::type;
+};
 
-template<typename Seq>
-using clear_t = typename clear<Seq>::type;
+template<typename Sequence>
+using clear_t = typename clear<Sequence>::type;
 
 }
 }
-
-#endif

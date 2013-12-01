@@ -174,7 +174,7 @@ mettre en noexcept les constructeurs et fonctions qui peuvent l'être
 
 un iorepeat. Optimisation pour les type scalaires en fessant un to_string (avec la local et autre paramètre)
 
-le namespace detail est publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace __private contient ceux qui ne doit pas être utilisé par l'extérieur.
+le namespace detail est publique et permet la surcharge des traits (qui sont enlever de leur qualifier dans le namespace falcon). le namespace aux contient ceux qui ne doit pas être utilisé par l'extérieur (namespace privée).
 
 sequence_queue, sequence_priority_queue (permet de récupérer le container interne)
 
@@ -188,7 +188,16 @@ C++14: utilisé integer_sequence à la place de parameter_index.
 
 faire des traits parameter des classe générique (tous type template)
 
+séparer les use_type, use_value_type, etc ainsi que les has_type, has_value_type, etc dans des header différent (un dossier helper ?)
 
+mettre sfinae::detail de has_type dans le dossier detail. De plus un fichier implémente un trait enable_type (ou identique mais avec un nom différent :/)
+
+clamp(x,min,max[,compare]) x < min ? min : x > max ? max : x
+clamp_unordered
+
+get_contents_file: utiliser pubsetbuf dans la lecture
+
+wrapper -> wrap_t
 
 
 

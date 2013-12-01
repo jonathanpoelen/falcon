@@ -5,15 +5,15 @@
 // #include <falcon/memory/grouping_new.hpp>
 //
 // #include <falcon/mpl/seq.hpp>
-#include <falcon/mpl/integral.hpp>
+// #include <falcon/mpl/integral.hpp>
 // #include <falcon/mpl/pair.hpp>
 
-using namespace falcon::mpl;
-
-template< typename N1, typename N2 >
-struct int_plus
-: int_<( N1::value + N2::value )>
-{};
+// using namespace falcon::mpl;
+//
+// template< typename N1, typename N2 >
+// struct int_plus
+// : int_<( N1::value + N2::value )>
+// {};
 
 // template<
 //   typename T
@@ -30,37 +30,71 @@ struct int_plus
 // : mpl_apply_def
 // { using type = typename less_impl<typename N1::type, typename N2::type>::type; };
 
+// #include <falcon/mpl/vector.hpp>
+// #include <falcon/mpl/list.hpp>
+// #include <falcon/mpl/map.hpp>
+// #include <falcon/mpl/set.hpp>
+// #include <falcon/mpl/range_c.hpp>
+// #include <falcon/mpl/apply.hpp>
+// #include <falcon/mpl/quote.hpp>
+// #include <falcon/mpl/placeholders.hpp>
+// #include <falcon/mpl/tpl.hpp>
+// #include <falcon/mpl/at.hpp>
+// #include <type_traits>
+// #include <iostream>
+
 #include <falcon/mpl/vector.hpp>
-#include <falcon/mpl/list.hpp>
-#include <falcon/mpl/map.hpp>
-#include <falcon/mpl/set.hpp>
-#include <falcon/mpl/range_c.hpp>
-#include <falcon/mpl/apply.hpp>
-#include <falcon/mpl/quote.hpp>
-#include <falcon/mpl/placeholders.hpp>
-#include <falcon/mpl/tpl.hpp>
 #include <falcon/mpl/at.hpp>
+#include <falcon/mpl/size.hpp>
+#include <falcon/mpl/fold.hpp>
+#include <falcon/mpl/iter_fold.hpp>
+#include <falcon/mpl/next.hpp>
+#include <falcon/mpl/if.hpp>
+#include <falcon/mpl/placeholders.hpp>
+#include <falcon/mpl/advance.hpp>
+#include <falcon/mpl/distance.hpp>
+#include <falcon/mpl/deref.hpp>
+
 #include <type_traits>
-#include <iostream>
+
 using namespace falcon::mpl;
 using namespace falcon::mpl::placeholders;
 
 int main()
 {
-  typedef apply< int_plus<_1,_2>, int_<2>, int_<3> >::type r1;
-  typedef apply< quote<int_plus>, int_<2>, int_<3> >::type r2;
-  typedef apply< tpl<int_plus, 0>, int_<2>, int_<3> >::type r3;
-  typedef apply< tpl<int_plus, 1>, int_<2>, int_<3>, int_<3> >::type r4;
+  typedef vector<long,float,short,double,float,long,long double> types;
+//   typedef fold<
+//     types
+//   , int_<0>
+//   , if_< std::is_same<float, _2>, next<_1>, _1 >
+//   >::type number_of_floats;
+  typedef iter_fold<
+    types
+  , int_<0>
+  , if_< std::is_same<float, deref<_2>>, next<_1>, _1 >
+  >::type number_of_floats;
 
-  std::cout
-    << (r1::value) << "\n"
-    << (r2::value) << "\n"
-    << (r3::value) << "\n"
-    << (r4::value) << "\n"
-  ;
+  using numbers = vector<int_<1>, int_<2>, int_<3>>;
 
-  using c1 = set<int_<2>, int_<3>, int_<12>>;
-  return at<c1, int_<12>>::type::value;
+  return int(number_of_floats::value)
+    + deref_t<advance_c_t<begin_t<numbers>, 2>>::value
+    + distance_t<begin_t<numbers>, end_t<numbers>>::value;
+
+
+//   typedef apply< int_plus<_1,_2>, int_<2>, int_<3> >::type r1;
+//   typedef apply< quote<int_plus>, int_<2>, int_<3> >::type r2;
+//   typedef apply< tpl<int_plus, 0>, int_<2>, int_<3> >::type r3;
+//   typedef apply< tpl<int_plus, 1>, int_<2>, int_<3>, int_<3> >::type r4;
+//
+//   std::cout
+//     << (r1::value) << "\n"
+//     << (r2::value) << "\n"
+//     << (r3::value) << "\n"
+//     << (r4::value) << "\n"
+//   ;
+//
+//   using c1 = set<int_<2>, int_<3>, int_<12>>;
+//   return at<c1, int_<12>>::type::value;
 
 
 //   using vec = vector<int, float>;

@@ -1,18 +1,18 @@
 #ifndef FALCON_MPL_POP_BACK_HPP
 #define FALCON_MPL_POP_BACK_HPP
 
-#include <falcon/mpl/detail/fwd.hpp>
+#include <falcon/mpl/pop_back_fwd.hpp>
+#include <falcon/mpl/sequence_tag.hpp>
 
 namespace falcon {
 namespace mpl {
 
-template<typename Seq>
+template<typename Sequence>
 struct pop_back
-: detail::mpl_apply_def
-{ using type = typename aux::pop_back<detail::sequence_t<Seq>>::type; };
-
-template<typename Seq>
-using pop_back_t = typename pop_back<Seq>::type;
+{
+  using type = pop_back_impl<sequence_tag_t<Sequence>>
+    ::template apply<Sequence>::type;
+};
 
 }
 }
