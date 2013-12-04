@@ -197,6 +197,8 @@ clamp_unordered
 
 get_contents_file: utiliser pubsetbuf dans la lecture
 
+ajouter -pedantic dans les flags
+
 
 
 

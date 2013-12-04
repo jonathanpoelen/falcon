@@ -56,6 +56,7 @@
 #include <falcon/mpl/distance.hpp>
 #include <falcon/mpl/deref.hpp>
 #include <falcon/mpl/reverse_fold.hpp>
+#include <falcon/mpl/find.hpp>
 
 #include <type_traits>
 
@@ -78,7 +79,9 @@ int main()
   , push_front<_1,_2>
   >::type result;
 
-  result() = 0;
+  return size<result>::value + deref_t<find<numbers, int_<-7>>>::type::value;
+
+//   result() = 0;
 
 
 //   typedef apply< int_plus<_1,_2>, int_<2>, int_<3> >::type r1;

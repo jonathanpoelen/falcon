@@ -51,6 +51,7 @@ add_definitions(
 #   -Wno-unused-function
 
     -Werror
+    -pedantic
 
     -std=c++11
 

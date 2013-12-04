@@ -1,8 +1,8 @@
 #ifndef FALCON_MPL_ITER_FOLD_HPP
 #define FALCON_MPL_ITER_FOLD_HPP
 
-#include <falcon/mpl/aux_/fold_impl.hpp>
 #include <falcon/mpl/begin_end.hpp>
+#include <falcon/mpl/aux_/fold_impl.hpp>
 #include <falcon/type_traits/wrap.hpp>
 
 namespace falcon {
@@ -15,7 +15,13 @@ template<
 >
 struct iter_fold
 {
-  using type = typename aux::fold_impl<wrap_t, begin_t<Sequence>, end_t<Sequence>, State, ForwardOp>::type;
+  using type = typename aux::fold_impl<
+    wrap_t
+  , begin_t<Sequence>
+  , end_t<Sequence>
+  , State
+  , ForwardOp
+  >::type;
 };
 
 template<
