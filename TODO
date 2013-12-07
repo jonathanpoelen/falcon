@@ -195,9 +195,7 @@ mettre sfinae::detail de has_type dans le dossier detail. De plus un fichier imp
 clamp(x,min,max[,compare]) x < min ? min : x > max ? max : x
 clamp_unordered
 
-get_contents_file: utiliser pubsetbuf dans la lecture
 
-ajouter -pedantic dans les flags
 
 
 

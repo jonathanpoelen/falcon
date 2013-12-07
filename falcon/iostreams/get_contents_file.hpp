@@ -19,17 +19,47 @@ void __get_contents_file(String& s, const char * name, std::ios_base::iostate * 
 
   if (buf.open(name, std::ios::in)) {
 #if __cplusplus >= 201103L
+# ifdef __GNUC__
+    s.resize(buf.in_avail()+1);
+    buf.close();
+    buf.pubsetbuf(&s[0], s.size());
+    if (!buf.open(name, std::ios::in)) {
+      return ;
+    }
+    if (traits_type::eq_int_type(buf.sgetc(), traits_type::eof())) {
+      return ;
+    }
+    s.pop_back();
+# else
     s.resize(buf.in_avail());
     const std::streamsize n = buf.sgetn(&s[0], s.size());
+# endif
 #else
+# ifdef __GNUC__
+    const std::streamsize sz = buf.in_avail() + 1;
+    char_type * cs = new char_type[sz];
+    buf.close();
+    buf.pubsetbuf(cs, sz);
+    if (!buf.open(name, std::ios::in)) {
+      return ;
+    }
+    if (traits_type::eq_int_type(buf.sgetc(), traits_type::eof())) {
+      return ;
+    }
+    s.assign(cs, sz - 1);
+    delete[] cs;
+# else
     const std::streamsize sz = buf.in_avail();
     char_type * cs = new char_type[sz];
     const std::streamsize n = buf.sgetn(cs, sz);
     s.assign(cs, sz);
     delete[] cs;
+# endif
 #endif
+#ifndef __GNUC__
     if (err && n == static_cast<std::streamsize>(s.size()))
       *err = std::ios_base::goodbit;
+#endif
   }
 }
 

@@ -57,6 +57,10 @@
 #include <falcon/mpl/deref.hpp>
 #include <falcon/mpl/reverse_fold.hpp>
 #include <falcon/mpl/find.hpp>
+#include <falcon/mpl/find_if.hpp>
+#include <falcon/mpl/contains.hpp>
+#include <falcon/mpl/count.hpp>
+#include <falcon/mpl/count_if.hpp>
 
 #include <type_traits>
 
@@ -79,7 +83,13 @@ int main()
   , push_front<_1,_2>
   >::type result;
 
-  return size<result>::value + deref_t<find<numbers, int_<-7>>>::type::value;
+  return size<result>::value
+    + deref_t<find_t<numbers, int_<-7>>>::value
+    + deref_t<find_if_t<numbers, std::is_same<int_<4>, _1>>>::value
+    + contains_t<numbers, int_<5>>::value
+    + count<numbers, int_<0>>::value
+    + count_if<numbers, std::is_same<int_<0>, _1>>::value
+    ;
 
 //   result() = 0;
 
