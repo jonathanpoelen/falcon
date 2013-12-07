@@ -45,22 +45,9 @@
 
 #include <falcon/mpl/vector.hpp>
 #include <falcon/mpl/vector_c.hpp>
-#include <falcon/mpl/at.hpp>
-#include <falcon/mpl/size.hpp>
-#include <falcon/mpl/fold.hpp>
-#include <falcon/mpl/iter_fold.hpp>
-#include <falcon/mpl/next.hpp>
-#include <falcon/mpl/if.hpp>
-#include <falcon/mpl/placeholders.hpp>
-#include <falcon/mpl/advance.hpp>
 #include <falcon/mpl/distance.hpp>
-#include <falcon/mpl/deref.hpp>
-#include <falcon/mpl/reverse_fold.hpp>
-#include <falcon/mpl/find.hpp>
-#include <falcon/mpl/find_if.hpp>
-#include <falcon/mpl/contains.hpp>
-#include <falcon/mpl/count.hpp>
-#include <falcon/mpl/count_if.hpp>
+#include <falcon/mpl/upper_bound.hpp>
+#include <falcon/mpl/placeholders.hpp>
 
 #include <type_traits>
 
@@ -74,23 +61,10 @@ struct less
 
 int main()
 {
-  typedef vector_c<int,5,-1,0,-7,-2,0,-5,4> numbers;
-//   typedef vector_c<int,-1,-7,-2,-5> negatives;
-  typedef reverse_fold<
-    numbers
-  , vector_c<int>
-  , if_< less< _2,int_<0> >, push_front<_1,_2>, _1 >
-  , push_front<_1,_2>
-  >::type result;
+  typedef vector_c<int,1,2,3,3,3,5,8> numbers;
+  typedef upper_bound< numbers, int_<3> >::type iter;
 
-  return size<result>::value
-    + deref_t<find_t<numbers, int_<-7>>>::value
-    + deref_t<find_if_t<numbers, std::is_same<int_<4>, _1>>>::value
-    + contains_t<numbers, int_<5>>::value
-    + count<numbers, int_<0>>::value
-    + count_if<numbers, std::is_same<int_<0>, _1>>::value
-    ;
-
+  return int(distance< begin<numbers>::type,iter >::value);
 //   result() = 0;
 
 

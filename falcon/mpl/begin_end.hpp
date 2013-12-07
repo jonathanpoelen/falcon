@@ -18,7 +18,7 @@ template<typename Sequence>
 struct end
 {
   using type = typename end_impl<sequence_tag_t<Sequence>>
-  ::template apply<Sequence>::type;
+    ::template apply<Sequence>::type;
 };
 
 template<typename Sequence>

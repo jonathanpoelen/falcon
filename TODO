@@ -195,6 +195,8 @@ mettre sfinae::detail de has_type dans le dossier detail. De plus un fichier imp
 clamp(x,min,max[,compare]) x < min ? min : x > max ? max : x
 clamp_unordered
 
+mpl: initialiser par défaut les attributs avec un arg<>
+
 
 
 
