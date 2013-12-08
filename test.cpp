@@ -46,25 +46,22 @@
 #include <falcon/mpl/vector.hpp>
 #include <falcon/mpl/vector_c.hpp>
 #include <falcon/mpl/distance.hpp>
-#include <falcon/mpl/upper_bound.hpp>
 #include <falcon/mpl/placeholders.hpp>
+#include <falcon/mpl/min_element.hpp>
+#include <falcon/mpl/max_element.hpp>
+#include <falcon/mpl/equal.hpp>
 
 #include <type_traits>
 
 using namespace falcon::mpl;
 using namespace falcon::mpl::placeholders;
 
-template<typename T, typename U>
-struct less
-: bool_<(T::value < U::value)>
-{};
-
 int main()
 {
   typedef vector_c<int,1,2,3,3,3,5,8> numbers;
-  typedef upper_bound< numbers, int_<3> >::type iter;
+  typedef vector_c<int,1,2,3,3,3,5,2> numbers2;
 
-  return int(distance< begin<numbers>::type,iter >::value);
+  return int(equal<numbers, numbers2>::value);
 //   result() = 0;
 
 

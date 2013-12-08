@@ -1,7 +1,7 @@
 #ifndef FALCON_MPL_TPL_HPP
 #define FALCON_MPL_TPL_HPP
 
-#include <falcon/mpl/placeholders.hpp>
+#include <falcon/mpl/arg.hpp>
 
 namespace falcon {
 namespace mpl {
@@ -9,7 +9,7 @@ namespace mpl {
 template<template <class...> class T,
   std::size_t Start, std::size_t Stop, typename... Args>
 struct __tpl
-: __tpl<T, Start+1, Stop, Args..., placeholders::placeholder<Start+1> >
+: __tpl<T, Start+1, Stop, Args..., arg<Start+1> >
 {};
 
 template<template <class...> class T,
