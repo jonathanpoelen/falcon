@@ -6,6 +6,7 @@
 
 namespace falcon {
 namespace mpl {
+namespace aux {
 
 template<typename>
 struct is_arg
@@ -17,6 +18,7 @@ struct is_arg<arg<N>>
 : true_
 {};
 
+}
 }
 }
 

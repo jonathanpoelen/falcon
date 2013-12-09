@@ -196,6 +196,7 @@ clamp(x,min,max[,compare]) x < min ? min : x > max ? max : x
 clamp_unordered
 
 mpl: initialiser par défaut les attributs avec un arg<>
+mpl: or + is_arg -> contains_arg ou s_contains<pack<>, is_arg>
 
 
 

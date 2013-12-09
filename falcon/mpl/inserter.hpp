@@ -8,7 +8,7 @@ template<typename Sequence, typename Operation>
 struct inserter
 {
   using state = Sequence;
-  using operation = operation;
+  using operation = Operation;
 };
 
 }

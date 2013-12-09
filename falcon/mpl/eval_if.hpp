@@ -7,16 +7,20 @@ namespace falcon {
 namespace mpl {
 
 template<typename C, typename TrueT, typename FalseT>
-using eval_if = ::falcon::eval_if_c<C, TrueT, FalseT>;
+struct eval_if
+{ using type = ::falcon::eval_if_c_t<typename C::type, TrueT, FalseT>; };
 
-template<bool c, typename TrueT, typename FalseT>
-using eval_if_c = ::falcon::eval_if<c, TrueT, FalseT>;
+// template<bool c, typename TrueT, typename FalseT>
+// struct eval_if_c
+// { using type = ::falcon::eval_if<c, TrueT, FalseT>; };
 
 template<typename C, typename TrueT, typename FalseT>
-using eval_not_if = ::falcon::eval_not_if_c<C, TrueT, FalseT>;
+struct eval_not_if
+{ using type = ::falcon::eval_not_if_c_t<typename C::type, TrueT, FalseT>; };
 
-template<bool c, typename TrueT, typename FalseT>
-using eval_not_if_c = ::falcon::eval_not_if<c, TrueT, FalseT>;
+// template<bool c, typename TrueT, typename FalseT>
+// struct eval_not_if_c
+// { using type = ::falcon::eval_not_if<c, TrueT, FalseT>; };
 
 }
 }

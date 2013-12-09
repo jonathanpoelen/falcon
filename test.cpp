@@ -43,13 +43,13 @@
 // #include <type_traits>
 // #include <iostream>
 
-#include <falcon/mpl/vector.hpp>
 #include <falcon/mpl/vector_c.hpp>
 #include <falcon/mpl/distance.hpp>
 #include <falcon/mpl/placeholders.hpp>
-#include <falcon/mpl/min_element.hpp>
-#include <falcon/mpl/max_element.hpp>
-#include <falcon/mpl/equal.hpp>
+#include <falcon/mpl/back_inserter.hpp>
+#include <falcon/mpl/size.hpp>
+#include <falcon/mpl/copy_if.hpp>
+#include <falcon/mpl/less.hpp>
 
 #include <type_traits>
 
@@ -58,10 +58,14 @@ using namespace falcon::mpl::placeholders;
 
 int main()
 {
-  typedef vector_c<int,1,2,3,3,3,5,8> numbers;
-  typedef vector_c<int,1,2,3,3,3,5,2> numbers2;
+  typedef vector_c<int,0,9> numbers;
+  typedef copy_if<
+    vector_c<int,1,10,20>
+  , less< _1, int_<5> >
+  , back_inserter< numbers >
+  >::type result;
+  return int(size<result>::value);
 
-  return int(equal<numbers, numbers2>::value);
 //   result() = 0;
 
 

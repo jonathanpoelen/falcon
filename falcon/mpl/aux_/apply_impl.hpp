@@ -7,43 +7,44 @@
 #include <falcon/mpl/detail/s_front.hpp>
 #include <falcon/mpl/aux_/is_arg.hpp>
 #include <falcon/parameter/parameter_pack.hpp>
-#include <falcon/type_traits/or.hpp>
-#include <falcon/type_traits/if.hpp>
-#include <falcon/type_traits/use.hpp>
+#include <falcon/type_traits/use_type.hpp>
+#include <falcon/type_traits/eval_if.hpp>
 #include <falcon/type_traits/use_if.hpp>
+#include <falcon/type_traits/has.hpp>
+#include <falcon/type_traits/or.hpp>
 
 namespace falcon {
 namespace mpl {
+
+
+template<typename F, typename... Args>
+class apply;
+
 namespace aux {
 
 template<typename F, typename...>
 class apply_impl;
 
-template<typename F, typename Seq>
-struct dispath_apply_impl
-: use_if<use_type<F>, use<F>>
-{};
-
-template<typename F, typename T, typename Seq>
-class apply_element;
-
-template<typename F, typename T, typename... Ts>
-struct apply_element<F, T, parameter_pack<Ts...>>
-: apply_impl<T, Ts...>
-{};
-
-template<typename F, typename T, typename... Ts>
-struct apply_element<F, protect<T>, parameter_pack<Ts...>>
+template<typename T, typename Pack>
+struct apply_element
 { using type = T; };
 
-template<typename F, std::size_t N, typename... Ts>
-struct apply_element<F, arg<N>, parameter_pack<Ts...>>
+template<template<class...> class Tpl, typename... Args, typename Pack>
+struct apply_element<Tpl<Args...>, Pack>
+{ using type = Tpl<typename apply_element<Args, Pack>::type...>; };
+
+template<typename T, typename Pack>
+struct apply_element<protect<T>, Pack>
+{ using type = T; };
+
+template<std::size_t N, typename... Ts>
+struct apply_element<arg<N>, parameter_pack<Ts...>>
 : arg<N>::template apply<Ts...>
 {};
 
-template<template<class...> class Tpl, typename... Args, typename Seq>
-struct dispath_apply_impl<Tpl<Args...>, Seq>
-{ using type = typename Tpl<typename apply_element<Tpl<Args...>, Args, Seq>::type...>::type; };
+template<typename T, typename... Args, typename Pack>
+struct apply_element<apply<T, Args...>, Pack>
+{ using type = apply<T, typename apply_element<Args, Pack>::type...>; };
 
 template<typename F, typename... Args>
 struct apply_inner_apply
@@ -51,12 +52,17 @@ struct apply_inner_apply
 
 template<template<class...> class Tpl, typename... Args, typename... Ts>
 struct apply_impl<Tpl<Args...>, Ts...>
-: ::falcon::if_c_t<
-  or_<is_arg<Args>::value...>
-, dispath_apply_impl<Tpl<Args...>, parameter_pack<Ts...>>
-, apply_inner_apply<Tpl<Args...>, Args...>
->
-{};
+{
+  using __elem = Tpl<typename apply_element<Args, parameter_pack<Ts...>>::type...>;
+  using type = ::falcon::eval_if_c_t<
+    ::falcon::or_c<is_arg<Args>...>
+  , use_type<__elem>
+  , use_if<
+      use_type<__elem>
+    , apply_inner_apply<__elem, Args...>
+    >
+  >;
+};
 
 template<typename F, typename... Args>
 struct apply_impl
