@@ -29,6 +29,7 @@
 #include <falcon/mpl/detail/s_push_back.hpp>
 #include <falcon/mpl/detail/s_pop_back.hpp>
 #include <falcon/mpl/detail/s_pop_front.hpp>
+#include <falcon/mpl/detail/seq.hpp>
 #include <falcon/mpl/aux_/iter.hpp>
 #include <falcon/mpl/integral_c.hpp>
 
@@ -40,11 +41,7 @@ namespace aux {
 }
 
 template<typename... Args>
-struct vector
-{
-  using type = vector;
-  using tag = aux::vector_tag;
-};
+using vector = detail::seq<aux::vector_tag, Args...>;
 
 template<>
 struct size_impl<aux::vector_tag>

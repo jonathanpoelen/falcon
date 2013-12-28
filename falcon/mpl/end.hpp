@@ -4,6 +4,3 @@
 #include <falcon/mpl/begin_end.hpp>
 
 #endif
-
-#ifndef BOOST_MPL_END_HPP_INCLUDED
-#define BOOST_MPL_END_HPP_INCLUDED

@@ -5,7 +5,6 @@
 #include <falcon/mpl/fold.hpp>
 #include <falcon/mpl/eval_if.hpp>
 #include <falcon/mpl/identity.hpp>
-#include <falcon/mpl/apply_wrap.hpp>
 #include <falcon/mpl/back_inserter.hpp>
 
 namespace falcon {

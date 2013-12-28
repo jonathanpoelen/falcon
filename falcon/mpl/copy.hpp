@@ -10,7 +10,7 @@ namespace aux {
   class unspecified_in_cpy;
 }
 
-/// TODO is map/set ?
+/// TODO if map/set ?
 template<typename Sequence, typename In = aux::unspecified_in_cpy>
 struct copy
 {

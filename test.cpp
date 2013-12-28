@@ -44,27 +44,31 @@
 // #include <iostream>
 
 #include <falcon/mpl/vector_c.hpp>
-#include <falcon/mpl/distance.hpp>
-#include <falcon/mpl/placeholders.hpp>
-#include <falcon/mpl/back_inserter.hpp>
-#include <falcon/mpl/size.hpp>
-#include <falcon/mpl/copy_if.hpp>
-#include <falcon/mpl/less.hpp>
+#include <falcon/mpl/for_each.hpp>
+// #include <falcon/mpl/placeholders.hpp>
+// #include <falcon/mpl/back_inserter.hpp>
+// #include <falcon/mpl/size.hpp>
+// #include <falcon/mpl/copy_if.hpp>
+// #include <falcon/mpl/less.hpp>
 
 #include <type_traits>
+#include <iostream>
 
 using namespace falcon::mpl;
-using namespace falcon::mpl::placeholders;
+// using namespace falcon::mpl::placeholders;
+
+struct value_printer
+{
+  template< typename U > void operator()(U x)
+  {
+    std::cout << x << 'n';
+  }
+};
 
 int main()
 {
   typedef vector_c<int,0,9> numbers;
-  typedef copy_if<
-    vector_c<int,1,10,20>
-  , less< _1, int_<5> >
-  , back_inserter< numbers >
-  >::type result;
-  return int(size<result>::value);
+  for_each< numbers >( value_printer() );
 
 //   result() = 0;
 

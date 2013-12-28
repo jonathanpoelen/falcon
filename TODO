@@ -198,6 +198,25 @@ clamp_unordered
 mpl: initialiser par défaut les attributs avec un arg<>
 mpl: or + is_arg -> contains_arg ou s_contains<pack<>, is_arg>
 
+construct de tableau -> utiliser l'alignement plutôt qu'une méthode récursive pour l'initialisation.
+
+literal/units.hpp: unité déjà définit dans ratio. inversion zette/zepta et elles n'y sont pas toute. Attention 4 valeurs existe uniquement si l'architecture le permet (voir http://en.cppreference.com/w/cpp/numeric/ratio/ratio)
+
+mettre des namespace pour les composants des literaux
+
+dans les constructeurs de mouvement, vérifier qu'il ne soit pas fait sur lui même. Peut être dangereux dans le cas d'allocation dynamique.
+
+Dans les parametres par rvalue, des move sont utilisées pour les attributs plutôt que des forward ? Concerne surtout les move ctor
+
+Certaine classe implémente un ctor template et redéfinissent les constructeurs de copie. Pas besoin si le ctor templaté ajoute en plus un disable_if_same_or_derived<type_class, U>
+
+template<typename T, typename U>
+using disable_if_same_or_derived =
+  typename std::enable_if<
+    !std::is_base_of<T,typename
+          std::remove_reference<U>::type
+    >::value
+  >::type;
 
 
 
