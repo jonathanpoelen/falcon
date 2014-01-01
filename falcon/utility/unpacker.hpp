@@ -11,7 +11,7 @@ namespace detail {
   template<class T>
   struct unpack_assigner
   {
-    template<typename Tuple>
+    template<class Tuple>
     static void impl(Tuple & t, T && x)
     {
       static_assert(std::tuple_size<Tuple>::value == std::tuple_size<T>::value,
@@ -19,7 +19,7 @@ namespace detail {
       impl_(t, std::forward<T>(x), build_parameter_index_t<std::tuple_size<Tuple>::value>());
     }
 
-    template<typename Tuple>
+    template<class Tuple>
     static void impl(Tuple & t, T & x)
     {
       static_assert(std::tuple_size<Tuple>::value == std::tuple_size<T>::value,
@@ -28,14 +28,14 @@ namespace detail {
     }
 
   private:
-    template<typename Tuple, std::size_t... Indexes>
+    template<class Tuple, std::size_t... Indexes>
     static void impl_(Tuple & t, T && x, parameter_index<Indexes...>)
     {
       using std::get;
       CPP1X_UNPACK(get<Indexes>(t) = get<Indexes>(std::forward<T>(x)));
     }
 
-    template<typename Tuple, std::size_t... Indexes>
+    template<class Tuple, std::size_t... Indexes>
     static void impl_(Tuple & t, T & x, parameter_index<Indexes...>)
     {
       using std::get;
@@ -46,31 +46,23 @@ namespace detail {
   template<class... Ts>
   struct unpack_assigner<std::tuple<Ts...>>
   {
-    template<typename Tuple>
-    static void impl(Tuple t, std::tuple<Ts...> && x)
-    { t = std::forward<std::tuple<Ts...>>(x); }
-
-   template<typename Tuple>
-    static void impl(Tuple t, std::tuple<Ts...> & x)
-    { t = x; }
+    template<class Tuple, class Tuple2>
+    static void impl(Tuple t, Tuple2 && x)
+    { t = std::forward<Tuple2>(x); }
   };
 
   template<class T, class U>
   struct unpack_assigner<std::pair<T, U>>
   {
-    template<typename Tuple>
-    static void impl(Tuple t, std::pair<T, U> && x)
-    { t = std::forward<std::pair<T, U>>(x); }
-
-   template<typename Tuple>
-    static void impl(Tuple t, std::pair<T, U> & x)
-    { t = x; }
+    template<class Tuple, class Pair>
+    static void impl(Tuple t, Pair && x)
+    { t = std::forward<Pair>(x); }
   };
 
   template<class T, std::size_t N>
   struct unpack_assigner<T[N]>
   {
-    template<typename Tuple, typename Array>
+    template<class Tuple, class Array>
     static void impl(Tuple t, Array&& x)
     {
       static_assert(std::tuple_size<Tuple>::value == N, "The size must be equal.");
@@ -79,14 +71,14 @@ namespace detail {
     }
 
   private:
-    template<typename Tuple, std::size_t... Indexes>
+    template<class Tuple, std::size_t... Indexes>
     static void impl_(Tuple & t, T (&x)[N], parameter_index<Indexes...>, std::true_type)
     {
       using std::get;
       CPP1X_UNPACK(get<Indexes>(t) = x[Indexes]);
     }
 
-    template<typename Tuple, std::size_t... Indexes>
+    template<class Tuple, std::size_t... Indexes>
     static void impl_(Tuple & t, T (&x)[N], parameter_index<Indexes...>, std::false_type)
     {
       using std::get;
