@@ -16,7 +16,7 @@ void synchronizer_test()
 		CHECK_EQUAL_VALUE(i, 4);
 		CHECK_EQUAL_VALUE(i2, 6);
 		auto t = std::tie(i,i2);
-		++falcon::tuple_synchronise(t);
+		++falcon::synchronizer_cast(t);
 		CHECK_EQUAL_VALUE(i, 5);
 		CHECK_EQUAL_VALUE(i2, 7);
 	}

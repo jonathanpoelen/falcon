@@ -1,5 +1,5 @@
 // #include <test/A.h>
-#include <type_traits>
+// #include <type_traits>
 // #include <vector>
 // #include <iostream>
 // #include <falcon/memory/grouping_new.hpp>
@@ -51,7 +51,7 @@
 // #include <falcon/mpl/copy_if.hpp>
 // #include <falcon/mpl/less.hpp>
 
-#include <type_traits>
+// #include <type_traits>
 #include <iostream>
 
 using namespace falcon::mpl;

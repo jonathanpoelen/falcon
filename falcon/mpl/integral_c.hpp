@@ -1,8 +1,9 @@
 #ifndef FALCON_MPL_INTEGRAL_C_HPP
 #define FALCON_MPL_INTEGRAL_C_HPP
 
-#include <cstddef>
 #include <falcon/mpl/advance_fwd.hpp>
+#include <type_traits>
+#include <cstddef>
 
 namespace falcon {
 namespace mpl {

@@ -8,10 +8,10 @@ void set_contents_file_test()
 {
   std::streamsize ssize = falcon::set_contents_file<>("/tmp/l", "plop");
   CHECK_EQUAL_VALUE(4, ssize);
-  std::ios_base::iostate err;
+  bool err;
   std::string str = falcon::get_contents_file("/tmp/l", &err);
   CHECK_EQUAL_VALUE("plop", str);
-  CHECK_EQUAL_VALUE(std::ios_base::goodbit, err);
+  CHECK_EQUAL_VALUE(true, err);
 }
 
 FALCON_TEST_TO_MAIN(set_contents_file_test)
