@@ -1,6 +1,6 @@
 #ifndef _FALCON_PREPROCESSOR_VARIADIC_CALL_HPP
 #define _FALCON_PREPROCESSOR_VARIADIC_CALL_HPP
 
-#define FALCON_PP_VARIADIC_CALL(_, args...) _(args)
+#define FALCON_PP_VARIADIC_CALL(_, ...) _(__VA_ARGS__)
 
 #endif

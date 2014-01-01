@@ -110,8 +110,8 @@
  * FALCON_PP_ENUMERATOR(enumerator1, default, A, (B), (C, "C"))
  * @endcode
  */
-#define FALCON_PP_ENUMERATOR(name, rule, elems...)\
-	FALCON_PP_TUPLE_ENUMERATOR(name, rule, FALCON_PP_VARIADIC_SIZE(elems), (elems))
+#define FALCON_PP_ENUMERATOR(name, rule, ...)\
+	FALCON_PP_TUPLE_ENUMERATOR(name, rule, FALCON_PP_VARIADIC_SIZE(__VA_ARGS__), (__VA_ARGS__))
 
 #define FALCON_PP_TUPLE_ENUMERATOR(name, rule, n, tuple)\
 	__FALCON_PP_LIST_ENUMERATOR(name, rule, n, BOOST_PP_TUPLE_TO_LIST(n, tuple))
