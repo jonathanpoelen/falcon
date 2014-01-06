@@ -3,6 +3,7 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/noexcept.hpp>
+#include <falcon/type_traits/add_const_if_reference.hpp>
 
 namespace falcon {
 
@@ -10,10 +11,10 @@ template <class T>
 struct reference_accessor
 {
 	typedef T value_type;
-	typedef T& reference;
+	typedef T & reference;
 	typedef reference argument_type;
 	typedef reference result_type;
-	typedef const T & const_reference;
+	typedef typename add_const_if_reference<T>::type const_reference;
 
 	CPP_CONSTEXPR result_type operator()(reference v) const CPP_NOEXCEPT
 	{ return v; }

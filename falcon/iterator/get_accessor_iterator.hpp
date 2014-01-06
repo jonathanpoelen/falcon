@@ -2,7 +2,7 @@
 #define FALCON_ITERATOR_GET_ACCESSOR_ITERATOR_HPP
 
 #include <iterator>
-#include <falcon/accessor/get_accessor.hpp>
+#include <falcon/accessors/get_accessor.hpp>
 #include <falcon/iterator/indirect_iterator.hpp>
 
 namespace falcon {
@@ -30,7 +30,7 @@ typename build_get_accessor_iterator<Iterator>::type
 make_get_accessor_iterator(Iterator iter)
 {
   typedef typename build_get_accessor_iterator<Iterator>::type iterator_type;
-  return iterator_type(iter); 
+  return iterator_type(iter);
 }
 
 }
