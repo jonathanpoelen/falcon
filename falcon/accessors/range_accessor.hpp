@@ -1,36 +1,35 @@
-#ifndef _FALCON_ACCESSOR_RANGE_ACCESSOR_HPP
-#define _FALCON_ACCESSOR_RANGE_ACCESSOR_HPP
+#ifndef FALCON_ACCESSOR_RANGE_ACCESSOR_HPP
+#define FALCON_ACCESSOR_RANGE_ACCESSOR_HPP
 
 #include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/noexcept.hpp>
 
 namespace falcon {
 
-template <typename _RangeAccessTraits>
+template <class RangeAccessTraits>
 struct begin_accessor
 {
-	typedef _RangeAccessTraits traits_type;
+	typedef RangeAccessTraits traits_type;
 	typedef typename traits_type::container_type container_type;
 	typedef typename traits_type::iterator iterator;
 	typedef iterator result_type;
 
 	CPP_CONSTEXPR result_type operator()(container_type& cont) const
-	{
-		return traits_type::begin(cont);
-	}
+  CPP_NOEXCEPT_OPERATOR2(traits_type::begin(cont))
+  { return traits_type::begin(cont); }
 };
 
-template <typename _RangeAccessTraits>
+template <class RangeAccessTraits>
 struct end_accessor
 {
-	typedef _RangeAccessTraits traits_type;
+	typedef RangeAccessTraits traits_type;
 	typedef typename traits_type::container_type container_type;
 	typedef typename traits_type::iterator iterator;
 	typedef iterator result_type;
 
 	CPP_CONSTEXPR result_type operator()(container_type& cont) const
-	{
-		return traits_type::end(cont);
-	}
+  CPP_NOEXCEPT_OPERATOR2(traits_type::end(cont))
+  { return traits_type::end(cont); }
 };
 
 }
