@@ -222,8 +222,6 @@ algorithm.hpp -> faire un namespace range qui contient les algos (dossier range/
 
 ajout de -pedantic à la compilation (il y a des erreurs dans enumerator.hpp et preprocessor/variadic/* (aucun parametres envoyer dans un pack))
 
-dichotomic_lower_bound et dichotomic_upper_bound sont en fait respectivement std::lower_bound et std::upper_bound
-
 tester get_contents_file sur windows (avec un compilateur en ligne et la macro __FILE__) et regarder si le "hack" pour gnu fonctionne (pas de raison que se ne soit pas le cas)
 
 build_parameter_index_t -> make_parameter_index
