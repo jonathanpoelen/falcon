@@ -1,5 +1,5 @@
-#ifndef _FALCON_ITERATOR_CONTAIN_RANGE_ACCESS_HPP
-#define _FALCON_ITERATOR_CONTAIN_RANGE_ACCESS_HPP
+#ifndef FALCON_ITERATOR_CONTAIN_RANGE_ACCESS_HPP
+#define FALCON_ITERATOR_CONTAIN_RANGE_ACCESS_HPP
 
 #include <falcon/container/range_access.hpp>
 
@@ -27,7 +27,7 @@ namespace falcon {
 }
 
 #else
-#include <falcon/type_traits/has.hpp>
+#include <falcon/helper/has_type.hpp>
 
 namespace falcon {
 	template <typename T>

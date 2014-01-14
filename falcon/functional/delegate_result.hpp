@@ -7,7 +7,10 @@
 #if __cplusplus >= 201103L
 # include <falcon/c++1x/syntax.hpp>
 # include <falcon/type_traits/if.hpp>
-# include <falcon/type_traits/has.hpp>
+# include <falcon/helper/has_result_type.hpp>
+# include <falcon/helper/has_argument_type.hpp>
+# include <falcon/helper/has_first_argument_type.hpp>
+# include <falcon/helper/has_second_argument_type.hpp>
 #endif
 
 namespace falcon {

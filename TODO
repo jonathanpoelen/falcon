@@ -234,6 +234,10 @@ renommer les late_* (surtout les opérateurs) en autre chose. Voir la prepositio
 
 split operators dans plein de fichier (1 opérateur par fichier). Idem pour celui sur les enum, idem pour les algorithm/range
 
+le traits badar pour trnaformer les signer en non-signer et inversement peut être remplacé par std::make_signed et std::make_unsigned
+
+renommer build_class en make_type, build_type, make_of ou autre
+
 
 
 

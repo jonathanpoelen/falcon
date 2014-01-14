@@ -1,30 +1,36 @@
 #ifndef FALCON_ITERATOR_SYNCHRONIZE_ITERATOR_HPP
 #define FALCON_ITERATOR_SYNCHRONIZE_ITERATOR_HPP
 
-#include <tuple>
 #include <falcon/iterator/iterator_handler.hpp>
 #include <falcon/utility/synchronizer.hpp>
+
 #include <falcon/parameter/manip.hpp>
-#include <falcon/parameter/is_parameter_index_tag.hpp>
-#include <falcon/type_traits/build_class.hpp>
-#include <falcon/type_traits/use_type.hpp>
-#include <falcon/type_traits/eval_if.hpp>
-#include <falcon/type_traits/if.hpp>
-#include <falcon/type_traits/enable_if.hpp>
-#include <falcon/type_traits/disable_if.hpp>
 #include <falcon/parameter/pack_reference.hpp>
+#include <falcon/parameter/is_parameter_index_tag.hpp>
+
+#include <falcon/helper/restrict_iterator_category.hpp>
+#include <falcon/helper/restrict_value_type.hpp>
+#include <falcon/helper/restrict_reference.hpp>
+#include <falcon/helper/restrict_pointer.hpp>
+
+#include <falcon/type_traits/build_class.hpp>
+#include <falcon/type_traits/disable_if.hpp>
+#include <falcon/type_traits/enable_if.hpp>
+#include <falcon/type_traits/eval_if.hpp>
+
+#include <tuple>
 
 namespace falcon {
 namespace iterator {
 
-template <typename... _Iterators>
+template <typename... Iterators>
 class synchronize_iterator;
 
 namespace detail {
-	template<typename... _Categories>
+	template<typename... Categories>
 	class __synchronize_category;
 
-	template<typename _Category>
+	template<typename Category>
 	struct __rank_iterator_category
 	{ static const std::size_t value = 0; };
 
@@ -44,39 +50,39 @@ namespace detail {
 	struct __rank_iterator_category<std::random_access_iterator_tag>
 	{ static const std::size_t value = 4; };
 
-	template<typename _Category, typename _Category2, typename... _Categories>
-	struct __synchronize_category<_Category, _Category2, _Categories...>
+	template<typename Category, typename Category2, typename... Categories>
+	struct __synchronize_category<Category, Category2, Categories...>
 	: __synchronize_category<
 		typename if_<
-			(__rank_iterator_category<_Category>::value < __rank_iterator_category<_Category2>::value),
-			_Category,
-			_Category2
+			(__rank_iterator_category<Category>::value < __rank_iterator_category<Category2>::value),
+			Category,
+			Category2
 		>::type,
-		_Categories...
+		Categories...
 	>
 	{};
 
-	template<typename _Category>
-	struct __synchronize_category<_Category>
-	{ typedef _Category iterator_category; };
+	template<typename Category>
+	struct __synchronize_category<Category>
+	{ typedef Category iterator_category; };
 
 	class __no_difference_type;
 
-	template<typename... _Iterators>
+	template<typename... Iterators>
 	struct synchronize_base
 	{
-		static_assert(sizeof...(_Iterators) != 0, "none iterator");
+		static_assert(sizeof...(Iterators) != 0, "none iterator");
 
-		typedef parameter_pack<_Iterators...> __parameter_pack;
+		typedef parameter_pack<Iterators...> __parameter_pack;
 
 		typedef typename parameter_element<
-			sizeof...(_Iterators) - 1,
+			sizeof...(Iterators) - 1,
 			__parameter_pack
 		>::type __last;
 
 		static const bool __is_tag = is_parameter_index_or_tag<__last>();
 
-		static_assert(__is_tag ? sizeof...(_Iterators) != 1 : true, "none iterator");
+		static_assert(__is_tag ? sizeof...(Iterators) != 1 : true, "none iterator");
 
 		typedef typename parameter_index_or_tag_to_tag<
 			typename if_<
@@ -90,7 +96,7 @@ namespace detail {
 		{
 			typedef typename parameter::elements<
 				__parameter_pack,
-				typename build_parameter_index<sizeof...(_Iterators) - 1>::type
+				typename build_parameter_index<sizeof...(Iterators) - 1>::type
 			>::type type;
 		};
 
@@ -102,11 +108,11 @@ namespace detail {
 
 		typedef typename keep_parameter_index<
 			__parameter_index_tag,
-			sizeof...(_Iterators) - (__is_tag ? 1 : 0)
+			sizeof...(Iterators) - (__is_tag ? 1 : 0)
 		>::type __cmp_parameter_index;
 
 		static const bool __cmp_iterators_is_full = std::is_same<
-			typename build_parameter_index<sizeof...(_Iterators)>::type,
+			typename build_parameter_index<sizeof...(Iterators)>::type,
 			__cmp_parameter_index
 		>::value;
 
@@ -115,39 +121,39 @@ namespace detail {
 			__iterators
 		>::type __pack_traits;
 
-		template<template<class...>class _W>
+		template<template<class...>class W>
 		struct __subtype
 		: build_class<
 			synchronizer,
-			typename parameter::modifier<_W, __pack_traits>::type
+			typename parameter::modifier<W, __pack_traits>::type
 		>
 		{};
 
 		typedef typename iterator_handler_types<
-			synchronize_iterator<_Iterators...>,
+			synchronize_iterator<Iterators...>,
 			typename build_class<synchronizer, __iterators>::type,
 			typename build_class<
 				__synchronize_category,
-				typename parameter::modifier<use_iterator_category, __pack_traits>::type
+				typename parameter::modifier<restrict_iterator_category, __pack_traits>::type
 			>::type::iterator_category,
-			typename __subtype<use_value_type>::type,
+			typename __subtype<restrict_value_type>::type,
 			__no_difference_type,
-			typename __subtype<use_pointer>::type,
-			typename __subtype<use_reference>::type
+			typename __subtype<restrict_pointer>::type,
+			typename __subtype<restrict_reference>::type
 		>::base base;
 	};
 }
 
 /**
- * synchronize_iterator< _Iterators...[, \link indexes-tag parameter_index_tag]>
+ * synchronize_iterator< Iterators...[, \link indexes-tag parameter_index_tag]>
  */
-template <typename... _Iterators>
+template <typename... Iterators>
 class synchronize_iterator
-: public detail::synchronize_base<_Iterators...>::base
+: public detail::synchronize_base<Iterators...>::base
 {
 	friend class iterator_core_access;
 
-	typedef detail::synchronize_base<_Iterators...> __detail;
+	typedef detail::synchronize_base<Iterators...> __detail;
 	typedef typename __detail::base __base;
 
 public:
@@ -163,14 +169,14 @@ public:
 	: __base(std::forward<iterator_type>(__x), 1)
 	{}
 
-	template<typename... _Args>
-	explicit synchronize_iterator(std::tuple<_Args...>&& __x)
+	template<typename... Args>
+	explicit synchronize_iterator(std::tuple<Args...>&& __x)
 	: __base(std::forward<iterator_type>(__x), 1)
 	{}
 
-	template<typename... _Args>
-	synchronize_iterator(_Args&&... __args)
-	: __base(std::piecewise_construct, std::forward<_Args>(__args)...)
+	template<typename... Args>
+	synchronize_iterator(Args&&... __args)
+	: __base(std::piecewise_construct, std::forward<Args>(__args)...)
 	{}
 
 	synchronize_iterator(synchronize_iterator&& __x)
@@ -208,18 +214,18 @@ private:
 };
 
 
-template <typename _IteratorOrTag, typename... _Iterators>
+template <typename IteratorOrTag, typename... Iterators>
 typename enable_if_c<
-	is_parameter_index_or_tag<_IteratorOrTag>,
-	synchronize_iterator<_Iterators..., _IteratorOrTag>
->::type make_synchronize_iterator(_IteratorOrTag, _Iterators... __x)
+	is_parameter_index_or_tag<IteratorOrTag>,
+	synchronize_iterator<Iterators..., IteratorOrTag>
+>::type make_synchronize_iterator(IteratorOrTag, Iterators... __x)
 { return {__x...}; }
 
-template <typename _IteratorOrTag, typename... _Iterators>
+template <typename IteratorOrTag, typename... Iterators>
 typename disable_if_c<
-	is_parameter_index_or_tag<_IteratorOrTag>,
-	synchronize_iterator<_Iterators..., _IteratorOrTag>
->::type make_synchronize_iterator(_IteratorOrTag __x, _Iterators... __y)
+	is_parameter_index_or_tag<IteratorOrTag>,
+	synchronize_iterator<Iterators..., IteratorOrTag>
+>::type make_synchronize_iterator(IteratorOrTag __x, Iterators... __y)
 { return {__x, __y...}; }
 
 }

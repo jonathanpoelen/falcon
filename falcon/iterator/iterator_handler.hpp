@@ -2,11 +2,19 @@
 #define ITERATOR_ITERATOR_HANDLER_HPP
 
 #include <falcon/c++/boost_or_std.hpp>
+
 #include <falcon/preprocessor/nil.hpp>
 #include <falcon/preprocessor/qualifier.hpp>
+
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>
 #include <falcon/type_traits/is_same.hpp>
+
+#include <falcon/helper/use_pointer.hpp>
+#include <falcon/helper/use_reference.hpp>
+#include <falcon/helper/use_value_type.hpp>
+#include <falcon/helper/use_difference_type.hpp>
+#include <falcon/helper/use_iterator_category.hpp>
 
 #include <iterator>
 #if __cplusplus >= 201103L

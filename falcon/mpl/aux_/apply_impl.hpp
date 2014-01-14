@@ -7,10 +7,9 @@
 #include <falcon/mpl/detail/s_front.hpp>
 #include <falcon/mpl/aux_/is_arg.hpp>
 #include <falcon/parameter/parameter_pack.hpp>
-#include <falcon/type_traits/use_type.hpp>
+#include <falcon/helper/use_type.hpp>
 #include <falcon/type_traits/eval_if.hpp>
 #include <falcon/type_traits/use_if.hpp>
-#include <falcon/type_traits/has.hpp>
 #include <falcon/type_traits/or.hpp>
 
 namespace falcon {

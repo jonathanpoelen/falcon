@@ -6,9 +6,10 @@
 #include <falcon/utility/move.hpp>
 #if __cplusplus >= 201103L
 # include <falcon/arg/arg.hpp>
-# include <falcon/tuple/tuple_compose.hpp>
-# include <falcon/type_traits/has.hpp>
+# include <falcon/helper/has_argument_type.hpp>
+# include <falcon/helper/has_result_type.hpp>
 # include <falcon/tuple/detail/is_tuple.hpp>
+# include <falcon/tuple/tuple_compose.hpp>
 # include <tuple>
 #endif
 

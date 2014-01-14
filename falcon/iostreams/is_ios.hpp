@@ -3,7 +3,9 @@
 
 #include <falcon/type_traits/integral_constant.hpp>
 #include <falcon/type_traits/is_instance_of.hpp>
-#include <falcon/type_traits/has.hpp>
+#include <falcon/helper/has_allocator_type.hpp>
+#include <falcon/helper/has_traits_type.hpp>
+#include <falcon/helper/has_char_type.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 
 #include FALCON_BOOST_OR_STD_TRAITS(remove_reference)

@@ -9,6 +9,9 @@
 #include <falcon/type_traits/use_if.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
 #include <falcon/java_iterator/is_java_iterator.hpp>
+#include <falcon/helper/use_iterator_category.hpp>
+#include <falcon/helper/use_value_type.hpp>
+#include <falcon/helper/use_reference.hpp>
 
 namespace falcon {
 namespace java_iterator {

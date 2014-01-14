@@ -2,7 +2,6 @@
 #define FALCON_TYPE_TRAITS_USE_IF_HPP
 
 #include <falcon/type_traits/eval_if.hpp>
-#include <falcon/type_traits/use_type.hpp>
 
 namespace falcon
 {

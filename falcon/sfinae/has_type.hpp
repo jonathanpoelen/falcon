@@ -2,32 +2,9 @@
 #define FALCON_SFINAE_HAS_TYPE_HPP
 
 #include <falcon/type_traits/integral_constant.hpp>
-namespace falcon {
-  template<class T, class R = void>
-  struct enable_type
-  { typedef R type; };
+#include <falcon/type_traits/enable_template.hpp>
+#include <falcon/type_traits/enable_type.hpp>
 
-#if __cplusplus >= 201103L
-  template<template<typename...>class T, class R = void>
-  struct enable_template
-  { typedef R type; };
-
-  template<class T, class R = void>
-  using enable_type_t = typename enable_type<T, R>::type;
-
-  template<template<typename...>class T, class R = void>
-  using enable_template_t = typename enable_template<T, R>::type;
-
-#else
-  template<template<typename>class T, class R = void>
-  struct enable_template1
-  { typedef R type; };
-
-  template<template<typename,typename>class T, class R = void>
-  struct enable_template2
-  { typedef R type; };
-#endif
-}
 
 #define FALCON_HAS_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
   template<typename Falcon_T, class = void>\
@@ -57,12 +34,12 @@ namespace falcon {
 # define __FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(_Name, _TypeName)\
   template<typename Falcon_T>\
   struct __falcon_##_Name##__has_template_type_test<Falcon_T\
-  , typename ::falcon::enable_template<Falcon_T::template _TypeName>::type>\
+  , typename ::falcon::enable_template1<Falcon_T::template _TypeName>::type>\
   : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
   struct __falcon_##_Name##__has_template_type_test<Falcon_T\
-  , typename ::falcon::enable_template<Falcon_T::template _TypeName>::type>\
+  , typename ::falcon::enable_template2<Falcon_T::template _TypeName>::type>\
   : ::falcon::true_type {};
 #endif
 
