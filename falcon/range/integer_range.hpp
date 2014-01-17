@@ -1,5 +1,5 @@
-#ifndef _FALCON_RANGE_CRANGE_HPP
-#define _FALCON_RANGE_CRANGE_HPP
+#ifndef FALCON_RANGE_CRANGE_HPP
+#define FALCON_RANGE_CRANGE_HPP
 
 #include <falcon/iterator/integer_iterator.hpp>
 #include <falcon/iterator/nexter_iterator.hpp>
@@ -26,18 +26,18 @@ struct __integer_range_iterator
 	typedef range<__step_iterator> __step_range_type;
 };
 
-template<typename _T>
+template<typename T>
 struct __integer_range_traits
 : __integer_range_iterator<iterator::integer_iterator<
-	_T,
+	T,
 	iterator::integer_iterator_less_comparison_tag
 > >
 {};
 
-template<typename _T>
+template<typename T>
 struct __reverse_integer_range_traits
 : __integer_range_iterator<iterator::reverse_integer_iterator<
-	_T,
+	T,
 	iterator::integer_iterator_less_comparison_tag
 > >
 {};
@@ -60,13 +60,13 @@ struct __reverse_integer_range_traits
  * }
  * @endcode
  */
-template<typename _T>
-inline /*constexpr*/ typename __integer_range_traits<_T>::__range_type
-integer_range(_T first, _T last)
+template<typename T>
+inline /*constexpr*/ typename __integer_range_traits<T>::__range_type
+integer_range(T first, T last)
 {
 	return {
-		typename __integer_range_traits<_T>::__iterator(first),
-		typename __integer_range_traits<_T>::__iterator(last)
+		typename __integer_range_traits<T>::__iterator(first),
+		typename __integer_range_traits<T>::__iterator(last)
 	};
 }
 
@@ -88,13 +88,13 @@ integer_range(_T first, _T last)
  * }
  * @endcode
  */
-template<typename _T>
-inline /*constexpr*/ typename __integer_range_traits<_T>::__step_range_type
-integer_range(_T first, _T last, unsigned step)
+template<typename T>
+inline /*constexpr*/ typename __integer_range_traits<T>::__step_range_type
+integer_range(T first, T last, unsigned step)
 {
 	return {
-		{typename __integer_range_traits<_T>::__iterator(first), step},
-		{typename __integer_range_traits<_T>::__iterator(last), step}
+		{typename __integer_range_traits<T>::__iterator(first), step},
+		{typename __integer_range_traits<T>::__iterator(last), step}
 	};
 }
 
@@ -104,8 +104,8 @@ integer_range(_T first, _T last, unsigned step)
  *
  * @code
  * int main(){
- *   using falcon::rinteger_range;
- *   for (int n: rinteger_range(9,1))
+ *   using falcon::reverse_integer_range;
+ *   for (int n: reverse_integer_range(9,1))
  *     std::cout << n << ' ';
  * }
  * @endcode
@@ -117,13 +117,13 @@ integer_range(_T first, _T last, unsigned step)
  * }
  * @endcode
  */
-template<typename _T>
-inline /*constexpr*/ typename __reverse_integer_range_traits<_T>::__range_type
-reverse_integer_range(_T first, _T last)
+template<typename T>
+inline /*constexpr*/ typename __reverse_integer_range_traits<T>::__range_type
+reverse_integer_range(T first, T last)
 {
 	return {
-		typename __reverse_integer_range_traits<_T>::__iterator(first),
-		typename __reverse_integer_range_traits<_T>::__iterator(last)
+		typename __reverse_integer_range_traits<T>::__iterator(first),
+		typename __reverse_integer_range_traits<T>::__iterator(last)
 	};
 }
 
@@ -132,8 +132,8 @@ reverse_integer_range(_T first, _T last)
  *
  * @code
  * int main(){
- *   using falcon::rinteger_range;
- *   for (int& n: rinteger_range(20,0,2))
+ *   using falcon::reverse_integer_range;
+ *   for (int& n: reverse_integer_range(20,0,2))
  *     std::cout << --n << ' ';
  * }
  * @endcode
@@ -145,13 +145,13 @@ reverse_integer_range(_T first, _T last)
  * }
  * @endcode
  */
-template<typename _T>
-inline /*constexpr*/ typename __reverse_integer_range_traits<_T>::__step_range_type
-reverse_integer_range(_T first, _T last, unsigned step)
+template<typename T>
+inline /*constexpr*/ typename __reverse_integer_range_traits<T>::__step_range_type
+reverse_integer_range(T first, T last, unsigned step)
 {
 	return {
-		{typename __reverse_integer_range_traits<_T>::__iterator(first), step},
-		{typename __reverse_integer_range_traits<_T>::__iterator(last), step}
+		{typename __reverse_integer_range_traits<T>::__iterator(first), step},
+		{typename __reverse_integer_range_traits<T>::__iterator(last), step}
 	};
 }
 
@@ -177,20 +177,20 @@ prefix##range(type first, type last, unsigned step)\
 	__FALCON_BUILD_INTEGER_RANGE(prefix, type, )\
 	__FALCON_BUILD_INTEGER_RANGE(reverse_##prefix, type, reverse_)
 
-///integer_range<int>(first, last)
+///integer_range< int>(first, last)
 FALCON_BUILD_INTEGER_RANGE(i, int)
-///integer_range<unsigned>(first, last)
+///integer_range< unsigned>(first, last)
 FALCON_BUILD_INTEGER_RANGE(u, unsigned)
-///integer_range<long>(first, last)
+///integer_range< long>(first, last)
 FALCON_BUILD_INTEGER_RANGE(l, long)
-///integer_range<unsigned long>(first, last)
+///integer_range< unsigned long >(first, last)
 FALCON_BUILD_INTEGER_RANGE(ul, unsigned long)
-///integer_range<long long>(first, last)
+///integer_range< long long>(first, last)
 FALCON_BUILD_INTEGER_RANGE(ll, long long)
-///integer_range<unsigned long long>(first, last)
+///integer_range< unsigned long long>(first, last)
 FALCON_BUILD_INTEGER_RANGE(ull, unsigned long long)
 
-#undef _FALCON_BUILD_INTEGER_RANGE
+#undef __FALCON_BUILD_INTEGER_RANGE
 #undef FALCON_BUILD_INTEGER_RANGE
 
 }

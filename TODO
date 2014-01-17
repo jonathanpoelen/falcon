@@ -226,18 +226,30 @@ tester get_contents_file sur windows (avec un compilateur en ligne et la macro _
 
 build_parameter_index_t -> make_parameter_index
 
-tuple_for_each qui prend un paramter_index
+coordinates -> coordinate (modifier également le namespace ou le nom des fonctions/classes)
+
+tuple_for_each qui prend un parameter_index
 
 un tableau de taille fixe à plusieurs dimension aplati (flat_array<T, size_t...> ?). accer avec [{...}], [x][y]. le mode initializer retourne soit le type soit un wrapper de sous ensemble soit une erreur car trop d'index. Ajout un accer operateur parenthese qui retourne une valeur. mettre un to_array qui retourne un std::array en reference (cast à l'arrache)
 
-renommer les late_* (surtout les opérateurs) en autre chose. Voir la preposition pour c++14: operator ????. Si pa de parametre template alors consider comme un late ?
+renommer les late_* (surtout les opérateurs) en autre chose. Voir la preposition pour c++14: operator ????. Si pas de parametre template alors consider comme un late ?
 
 split operators dans plein de fichier (1 opérateur par fichier). Idem pour celui sur les enum, idem pour les algorithm/range
 
-le traits badar pour trnaformer les signer en non-signer et inversement peut être remplacé par std::make_signed et std::make_unsigned
+le traits badar pour tranformer les signé en non-signé et inversement peuvent être remplacés par std::make_signed et std::make_unsigned
 
 renommer build_class en make_type, build_type, make_of ou autre
 
+range_modifier -> synchronizer_sequence avec les même fonctionnalités que synchronizer
+
+remplacer range par un iterator_range (comme celui de boost)
+
+faire un integer_iterator_with_step (basé sur integer_iterator)
+
+integer_range devient une classe et son homologue à 3 paramètre aussi (strided_integer_range). Utilise respectivement iterator_range<integer_iterator<T>> et iterator_range<integer_iterator_with_step<T>>
+irange, urange, lrange, ulrange, llrange et ullrange sont supprimé au profil de irange<T>.
+
+step_iterator -> strided_iterator + corriger le pb sur l'avancement qui ne prend pas en compte le step (strided_iterator ne fonctionne que sur les random_access_iterator)
 
 
 
