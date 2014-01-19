@@ -1,6 +1,0 @@
-#ifndef _FALCON_TEST_RANGE_CRANGE_HPP
-#define _FALCON_TEST_RANGE_CRANGE_HPP
-
-void crange_test();
-
-#endif //_FALCON_TEST_RANGE_HPP

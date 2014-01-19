@@ -10,11 +10,11 @@
 #include <falcon/type_traits/use_if.hpp>
 #include <falcon/type_traits/is_same.hpp>
 
-#include <falcon/helper/use_pointer.hpp>
-#include <falcon/helper/use_reference.hpp>
-#include <falcon/helper/use_value_type.hpp>
-#include <falcon/helper/use_difference_type.hpp>
-#include <falcon/helper/use_iterator_category.hpp>
+#include <falcon/helper/restrict_pointer.hpp>
+#include <falcon/helper/restrict_reference.hpp>
+#include <falcon/helper/restrict_value_type.hpp>
+#include <falcon/helper/restrict_difference_type.hpp>
+#include <falcon/helper/restrict_iterator_category.hpp>
 
 #include <iterator>
 #if __cplusplus >= 201103L
@@ -360,22 +360,22 @@ struct iterator_handler_types
 	typedef std::iterator_traits<_IteratorBase> __iterator_traits;
 
 	typedef typename default_or_type<
-		use_iterator_category<__iterator_traits>,
+		restrict_iterator_category<__iterator_traits>,
 		_Category
 	>::type iterator_category;
 	typedef typename default_or_type<
-		use_value_type<__iterator_traits>,
+		restrict_value_type<__iterator_traits>,
 		_Tp
 	>::type value_type;
 	typedef typename default_or_type<
-		use_difference_type<__iterator_traits>,
+		restrict_difference_type<__iterator_traits>,
 		_Distance
 	>::type difference_type;
 	typedef typename eval_if_c<
 		is_default<_Pointer>,
 		eval_if_c<
 			is_default<_Tp>,
-			use_pointer<__iterator_traits>,
+			restrict_pointer<__iterator_traits>,
 			FALCON_BOOST_OR_STD_NAMESPACE::add_pointer<value_type>
 		>,
 		use<_Pointer>
@@ -384,7 +384,7 @@ struct iterator_handler_types
 		is_default<_Reference>,
 		eval_if_c<
 			is_default<_Tp>,
-			use_reference<__iterator_traits>,
+			restrict_reference<__iterator_traits>,
 			use<value_type&>
 		>,
 		use<_Reference>

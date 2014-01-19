@@ -28,7 +28,7 @@ node           :(
 ostream        :)
 parameter      :|
 preprocessor   :|
-range          :(
+range          :)
 sfinae         :)
 string         :)
 templates      :(

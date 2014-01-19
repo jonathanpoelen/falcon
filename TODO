@@ -217,7 +217,6 @@ using disable_if_same_or_derived =
     >::value
   >::type;
 
-renommer la classe range en basic_range.
 algorithm.hpp -> faire un namespace range qui contient les algos (dossier range/algorithm/). Déplacer certain fichier/classe de itérateur pour les mettre dans ce nouveau dossier.
 
 ajout de -pedantic à la compilation (il y a des erreurs dans enumerator.hpp et preprocessor/variadic/* (aucun parametres envoyer dans un pack))
@@ -242,15 +241,11 @@ renommer build_class en make_type, build_type, make_of ou autre
 
 range_modifier -> synchronizer_sequence avec les même fonctionnalités que synchronizer
 
-remplacer range par un iterator_range (comme celui de boost)
+accesors/empty.hpp
 
-faire un integer_iterator_with_step (basé sur integer_iterator)
+iterator_handler: faire en sorte que recoil dépende de advance. Idem pour next avec prev
 
-integer_range devient une classe et son homologue à 3 paramètre aussi (strided_integer_range). Utilise respectivement iterator_range<integer_iterator<T>> et iterator_range<integer_iterator_with_step<T>>
-irange, urange, lrange, ulrange, llrange et ullrange sont supprimé au profil de irange<T>.
-
-step_iterator -> strided_iterator + corriger le pb sur l'avancement qui ne prend pas en compte le step (strided_iterator ne fonctionne que sur les random_access_iterator)
-
+pas de namespace iterator
 
 
 
