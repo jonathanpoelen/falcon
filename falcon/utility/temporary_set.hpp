@@ -26,7 +26,7 @@ public:
 
   ~temporary_set()
   {
-    _value = FALCON_FORWARD(T, _old_value);
+    _value = FALCON_MOVE(_old_value);
   }
 
   const T& old() const

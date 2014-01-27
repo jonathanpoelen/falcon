@@ -1,12 +1,12 @@
-#ifndef _FALCON_FUNCTIONAL_FINALLY_HPP
-#define _FALCON_FUNCTIONAL_FINALLY_HPP
+#ifndef FALCON_FUNCTIONAL_FINALLY_HPP
+#define FALCON_FUNCTIONAL_FINALLY_HPP
 
 #include <utility>
 
 namespace falcon {
 
 /**
- * \brief Call _Functor when @p finally is destroy.
+ * \brief Call Functor when @p finally is destroy.
  *
  * @code
  * {
@@ -31,43 +31,56 @@ namespace falcon {
  * }
  * @endcode
  */
-template <typename _Functor>
+template <typename Functor>
 struct finally
 {
-	_Functor _M_functor;
-
 	finally()
 	: _M_functor()
 	{}
 
 #if __cplusplus >= 201103L
-	finally(_Functor&& func)
-	: _M_functor(std::forward<_Functor>(func))
+	finally(Functor&& func)
+	: _M_functor(std::forward<Functor>(func))
 	{}
+
+  finally(finally&&)=default;
+  finally& operator=(finally&&)=default;
+  finally& operator=(finally const&)=default;
+
+  finally& operator=(Functor && func)
+  {
+    _M_functor = std::forward<Functor>(func);
+    return *this;
+  }
 #else
-	finally(_Functor func)
+	finally(Functor func)
 	: _M_functor(func)
-	{}
+  {}
+
+  finally& operator=(Functor func)
+  {
+    _M_functor = func;
+    return *this;
+  }
 #endif
 
 	~finally()
 	{
 		_M_functor();
 	}
+
+private:
+  Functor _M_functor;
 };
 
 #if __cplusplus >= 201103L
-template<typename _Functor>
-finally<_Functor> make_finally(_Functor&& func)
-{
-	return {std::forward<_Functor>(func)};
-}
+template<typename Functor>
+finally<Functor> make_finally(Functor&& func)
+{ return {std::forward<Functor>(func)}; }
 #else
-template<typename _Functor>
-finally<_Functor> make_finally(_Functor func)
-{
-	return finally<_Functor>(func);
-}
+template<typename Functor>
+finally<Functor> make_finally(Functor func)
+{ return finally<Functor>(func); }
 #endif
 
 }

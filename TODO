@@ -247,6 +247,11 @@ iterator_handler: faire en sorte que recoil dépende de advance. Idem pour next 
 
 pas de namespace iterator
 
+pas de category selectif dans un integer_iterator
+
+get_file_contents qui prend en param u objet quelconque et qui utilise resize+data ou un traits. spécialisation pour le string car pas de data ?
+
+
 
 
 
