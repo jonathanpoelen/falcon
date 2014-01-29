@@ -478,6 +478,10 @@ struct affect
 {
   T& operator()(T& a, const U& b) const
   { return a = b; }
+#if __cplusplus >= 201103L
+  T& operator()(T& a, U&& b) const
+  { return a = std::move(b); }
+#endif
 };
 
 template<typename T>
@@ -486,6 +490,11 @@ struct affect<T, late_parameter_t>
   template<typename U>
   T& operator()(T& a, const U& b) const
   { return a = b; }
+#if __cplusplus >= 201103L
+  template<typename U>
+  T& operator()(T& a, U&& b) const
+  { return a = std::move(b); }
+#endif
 };
 
 template<typename U>
@@ -494,6 +503,11 @@ struct affect<late_parameter_t, U>
   template<typename T>
   T& operator()(T& a, const U& b) const
   { return a = b; }
+#if __cplusplus >= 201103L
+  template<typename T>
+  T& operator()(T& a, U&& b) const
+  { return a = std::move(b); }
+#endif
 };
 
 template<>
@@ -502,6 +516,11 @@ struct affect<late_parameter_t, late_parameter_t>
   template<typename T, typename U>
   T& operator()(T& a, const U& b) const
   { return a = b; }
+#if __cplusplus >= 201103L
+  template<typename T, typename U>
+  T& operator()(T& a, U&& b) const
+  { return a = std::move(b); }
+#endif
 };
 
 
