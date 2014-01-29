@@ -28,12 +28,11 @@ public:
     _assign(*_value, FALCON_FORWARD(UU, new_value));
   }
 
-  template<class UU, class TAssigner>
-  temporary_set(T& old_value, UU CPP_RVALUE_OR_CONST_REFERENCE new_value,
-                TAssigner CPP_RVALUE_OR_CONST_REFERENCE fun)
+  template<class UU, class Assigner>
+  temporary_set(T& old_value, UU CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner fun)
   : _value(&old_value)
   , _old_value(FALCON_MOVE(old_value))
-  , _assign(FALCON_FORWARD(TAssigner, fun))
+  , _assign(fun)
   {
     _assign(*_value, FALCON_FORWARD(UU, new_value));
   }
@@ -70,8 +69,8 @@ temporary_value(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value)
 
 template<class T, class U, class Assigner>
 temporary_set<T, U, Assigner>
-temporary_value(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner fun)
-{ return temporary_set<T, U>(old_value, FALCON_FORWARD(U, new_value), fun); }
+temporary_value(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner CPP_RVALUE fun)
+{ return temporary_set<T, U>(old_value, FALCON_FORWARD(U, new_value), FALCON_FORWARD(Assigner, fun)); }
 
 }
 
