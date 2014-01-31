@@ -231,8 +231,6 @@ tuple_for_each qui prend un parameter_index
 
 un tableau de taille fixe à plusieurs dimension aplati (flat_array<T, size_t...> ?). accer avec [{...}], [x][y]. le mode initializer retourne soit le type soit un wrapper de sous ensemble soit une erreur car trop d'index. Ajout un accer operateur parenthese qui retourne une valeur. mettre un to_array qui retourne un std::array en reference (cast à l'arrache)
 
-renommer les late_* (surtout les opérateurs) en autre chose. Voir la preposition pour c++14: operator ????. Si pas de parametre template alors consider comme un late ?
-
 split operators dans plein de fichier (1 opérateur par fichier). Idem pour celui sur les enum, idem pour les algorithm/range
 
 le traits badar pour tranformer les signé en non-signé et inversement peuvent être remplacés par std::make_signed et std::make_unsigned

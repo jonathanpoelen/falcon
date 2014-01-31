@@ -5,36 +5,39 @@
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/reference.hpp>
 #include <falcon/functional/operators.hpp>
+#if __cplusplus >= 201103L
+# include <type_traits>
+#endif
 
 namespace falcon {
 
 ///\brief Modifies the value passed during the lifetime of the object
-template<class T, class U = T, class Assigner = affect<T, U> >
+template<class T, class Assigner = affect<T, T> >
 class temporary_set
 {
   T * _value;
-  U _old_value;
+  T _old_value;
   Assigner _assign;
 
 public:
   typedef T type;
 
 public:
-  template<class UU>
-  temporary_set(T& old_value, UU CPP_RVALUE_OR_CONST_REFERENCE new_value)
+  template<class U>
+  temporary_set(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value)
   : _value(&old_value)
   , _old_value(FALCON_MOVE(old_value))
   {
-    _assign(*_value, FALCON_FORWARD(UU, new_value));
+    _assign(*_value, FALCON_FORWARD(U, new_value));
   }
 
-  template<class UU, class Assigner>
-  temporary_set(T& old_value, UU CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner fun)
+  template<class U>
+  temporary_set(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner fun)
   : _value(&old_value)
   , _old_value(FALCON_MOVE(old_value))
   , _assign(fun)
   {
-    _assign(*_value, FALCON_FORWARD(UU, new_value));
+    _assign(*_value, FALCON_FORWARD(U, new_value));
   }
 
 #if __cplusplus >= 201103L
@@ -63,14 +66,15 @@ public:
 
 ///\brief make a temporary_set
 template<class T, class U>
-temporary_set<T, U>
+temporary_set<T>
 temporary_value(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value)
-{ return temporary_set<T, U>(old_value, FALCON_FORWARD(U, new_value)); }
+{ return temporary_set<T>(old_value,  FALCON_FORWARD(U, new_value)); }
 
 template<class T, class U, class Assigner>
-temporary_set<T, U, Assigner>
+temporary_set<T, Assigner>
 temporary_value(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner CPP_RVALUE fun)
-{ return temporary_set<T, U>(old_value, FALCON_FORWARD(U, new_value), FALCON_FORWARD(Assigner, fun)); }
+{ return temporary_set<T, Assigner>(old_value
+, FALCON_FORWARD(U, new_value), FALCON_FORWARD(Assigner, fun)); }
 
 }
 

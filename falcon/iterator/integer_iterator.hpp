@@ -308,17 +308,17 @@ public:
 
   integer_iterator_with_step(const iterator_type& other, difference_type step)
   : __base(other)
-  , m_step(step)
+  , m_step(other.m_step)
   {}
 
   integer_iterator_with_step(const integer_iterator_with_step& other)
   : __base(other)
-  , m_step(1)
+  , m_step(other.m_step)
   {}
 
   integer_iterator_with_step(const integer_iterator_with_step& other, difference_type step)
   : __base(other)
-  , m_step(step)
+  , m_step(other.m_step)
   {}
 
 #if __cplusplus >= 201103L

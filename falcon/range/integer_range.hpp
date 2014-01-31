@@ -29,7 +29,7 @@ class strided_integer_range
 public:
   typedef typename __base::difference_type difference_type;
 
-  strided_integer_range(Integer first, Integer last,  difference_type step)
+  strided_integer_range(Integer first, Integer last, difference_type step)
   : __base(__iterator(first, step), __iterator(last, step))
   {}
 };
