@@ -9,272 +9,140 @@ namespace logical {
 
 //@{
 /**
-* equal_to_or(5,5,1,2) different to (5 == 5 || 5 == 1 || 5 == 2) because all values are instanciat.
-* With not
-* @code
-* int ref = 5, a = 5, b = 1, c = 2;
-* equal_to_or(ref, a, b, c);
-* @endcode
-* because values pass to reference
-*/
-template<typename T, typename U, typename... Args>
-constexpr bool equal_to_or(const T& a, const U& b, const Args&... args);
+ * any_equal_to(5,5,1,2) different to (5 == 5 || 5 == 1 || 5 == 2) because all values are instanciat.
+ * With not
+ * @code
+ * int ref = 5, a = 5, b = 1, c = 2;
+ * any_equal_to(ref, a, b, c);
+ * @endcode
+ * because values pass to reference
+ */
+class all_equal_to_t;
+class all_not_equal_to_t;
+class all_less_t;
+class all_greater_t;
+class all_less_equal_t;
+class all_greater_equal_t;
 
-template<typename T, typename U, typename... Args>
-inline constexpr bool equal_to_and(const T& a, const U& b, const Args&... args);
+class any_equal_to_t;
+class any_not_equal_to_t;
+class any_less_t;
+class any_greater_t;
+class any_less_equal_t;
+class any_greater_equal_t;
 
-template<typename T, typename U, typename... Args>
-constexpr bool not_equal_to_or(const T& a, const U& b, const Args&... args);
+template<class T> class all_equal_to_wrapper;
+template<class T> class all_not_equal_to_wrapper;
+template<class T> class all_less_wrapper;
+template<class T> class all_greater_wrapper;
+template<class T> class all_less_equal_wrapper;
+template<class T> class all_greater_equal_wrapper;
 
-template<typename T, typename U, typename... Args>
-constexpr bool not_equal_to_and(const T& a, const U& b, const Args&... args);
+template<class T> class any_equal_to_wrapper;
+template<class T> class any_not_equal_to_wrapper;
+template<class T> class any_less_wrapper;
+template<class T> class any_greater_wrapper;
+template<class T> class any_less_equal_wrapper;
+template<class T> class any_greater_equal_wrapper;
 
-template<typename T, typename U, typename... Args>
-constexpr bool greater_or(const T& a, const U& b, const Args&... args);
+class all_equal_if_t;
+class any_equal_if_t;
+class none_equal_if_t;
 
-template<typename T, typename U, typename... Args>
-constexpr bool greater_and(const T& a, const U& b, const Args&... args);
-
-template<typename T, typename U, typename... Args>
-constexpr bool less_equal_or(const T& a, const U& b, const Args&... args);
-
-template<typename T, typename U, typename... Args>
-constexpr bool less_equal_and(const T& a, const U& b, const Args&... args);
-
-template<typename T, typename U, typename... Args>
-constexpr bool greater_or(const T& a, const U& b, const Args&... args);
-
-template<typename T, typename U, typename... Args>
-constexpr bool greater_and(const T& a, const U& b, const Args&... args);
-
-template<typename T, typename U, typename... Args>
-constexpr bool greater_equal_or(const T& a, const U& b, const Args&... args);
-
-template<typename T, typename U, typename... Args>
-constexpr bool greater_equal_and(const T& a, const U& b, const Args&... args);
-
-template<typename _Predicate, typename T, typename U, typename... Args>
-constexpr bool equal_if_or(_Predicate, const T& a, const U& b, const Args&... args);
-
-template<typename _Predicate, typename T, typename U, typename... Args>
-constexpr bool equal_if_and(_Predicate, const T& a, const U& b, const Args&... args);
-
-template<typename _Predicate, typename T, typename U, typename... Args>
-constexpr bool not_equal_if_or(_Predicate, const T& a, const U& b, const Args&... args);
-
-template<typename _Predicate, typename T, typename U, typename... Args>
-constexpr bool not_equal_if_and(_Predicate, const T& a, const U& b, const Args&... args);
-
-
-template<typename T, typename U>
-constexpr bool equal_to_or(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool equal_to_and(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool not_equal_to_or(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool not_equal_to_and(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool greater_or(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool greater_and(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool less_equal_or(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool less_equal_and(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool greater_or(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool greater_and(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool greater_equal_or(const T& a, const U& b);
-
-template<typename T, typename U>
-constexpr bool greater_equal_and(const T& a, const U& b);
-
-template<typename _Predicate, typename T, typename U>
-constexpr bool equal_if_or(_Predicate, const T& a, const U& b);
-
-template<typename _Predicate, typename T, typename U>
-constexpr bool equal_if_and(_Predicate, const T& a, const U& b);
-
-template<typename _Predicate, typename T, typename U>
-constexpr bool not_equal_if_or(_Predicate, const T& a, const U& b);
-
-template<typename _Predicate, typename T, typename U>
-constexpr bool not_equal_if_and(_Predicate, const T& a, const U& b);
-
-
-template <typename T>
-struct equal_to_or_wrapper;
-
-template <typename T>
-struct equal_to_and_wrapper;
-
-template <typename T>
-struct not_equal_to_or_wrapper;
-
-template <typename T>
-struct not_equal_to_and_wrapper;
-
-template <typename T>
-struct greater_or_wrapper;
-
-template <typename T>
-struct greater_and_wrapper;
-
-template <typename T>
-struct less_equal_or_wrapper;
-
-template <typename T>
-struct less_equal_and_wrapper;
-
-template <typename T>
-struct greater_or_wrapper;
-
-template <typename T>
-struct greater_and_wrapper;
-
-template <typename T>
-struct greater_equal_or_wrapper;
-
-template <typename T>
-struct greater_equal_and_wrapper;
-
-template <typename _Predicate, typename T>
-struct equal_if_or_wrapper;
-
-template <typename _Predicate, typename T>
-struct equal_if_and_wrapper;
-
-template <typename _Predicate, typename T>
-struct not_equal_if_or_wrapper;
-
-template <typename _Predicate, typename T>
-struct not_equal_if_and_wrapper;
+template <class T, class Predicate> class all_equal_if_wrapper;
+template <class T, class Predicate> class any_equal_if_wrapper;
+template <class T, class Predicate> class all_equal_if_wrapper;
 //@}
 
 
-template <typename _Predicate, typename T>
-equal_if_or_wrapper<_Predicate, T> make_equal_if_or(_Predicate, T&&);
+#define FALCON_MAKE_LOGICAL_FUNC(name, op, and_or)                         \
+  constexpr struct name##_t {                                              \
+    template<class T, class U>                                             \
+    constexpr bool operator()(const T& a, const U& b)                      \
+    const noexcept(noexcept(a op b))                                       \
+    { return a op b; }                                                     \
+                                                                           \
+    template<class T, class U, class... Args>                              \
+    constexpr bool operator()(const T& a, const U& b, const Args&... args) \
+    const noexcept(noexcept(a op b))                                       \
+    { return (a op b) and_or operator()(a, args...); }                     \
+  } name {};                                                               \
+                                                                           \
+  template<class T>                                                        \
+  struct name##_wrapper                                                    \
+  {                                                                        \
+    template<class... Args>                                                \
+    constexpr bool operator()(const Args&... args) const                   \
+    { return name(x_, args...); }                                          \
+    const T & x_;                                                          \
+  };
 
-template <typename _Predicate, typename T>
-equal_if_or_wrapper<_Predicate, T> make_equal_if_or(T&&);
+FALCON_MAKE_LOGICAL_FUNC(all_equal_to, ==, &&)
+FALCON_MAKE_LOGICAL_FUNC(all_not_equal_to, !=, &&)
+FALCON_MAKE_LOGICAL_FUNC(all_less, <, &&)
+FALCON_MAKE_LOGICAL_FUNC(all_greater, >, &&)
+FALCON_MAKE_LOGICAL_FUNC(all_less_equal, <=, &&)
+FALCON_MAKE_LOGICAL_FUNC(all_greater_equal, >=, &&)
 
-template <typename _Predicate, typename T>
-equal_if_and_wrapper<_Predicate, T> make_equal_if_and(_Predicate, T&&);
+FALCON_MAKE_LOGICAL_FUNC(any_equal_to, ==, ||)
+FALCON_MAKE_LOGICAL_FUNC(any_not_equal_to, !=, ||)
+FALCON_MAKE_LOGICAL_FUNC(any_less, <, ||)
+FALCON_MAKE_LOGICAL_FUNC(any_greater, >, ||)
+FALCON_MAKE_LOGICAL_FUNC(any_less_equal, <=, ||)
+FALCON_MAKE_LOGICAL_FUNC(any_greater_equal, >=, ||)
 
-template <typename _Predicate, typename T>
-equal_if_and_wrapper<_Predicate, T> make_equal_if_and(T&&);
-
-template <typename _Predicate, typename T>
-not_equal_if_or_wrapper<_Predicate, T> make_not_equal_if_or(_Predicate, T&&);
-
-template <typename _Predicate, typename T>
-not_equal_if_or_wrapper<_Predicate, T> make_not_equal_if_or(T&&);
-
-template <typename _Predicate, typename T>
-not_equal_if_and_wrapper<_Predicate, T> make_not_equal_if_and(_Predicate, T&&);
-
-template <typename _Predicate, typename T>
-not_equal_if_and_wrapper<_Predicate, T> make_not_equal_if_and(T&&);
+#undef FALCON_MAKE_LOGICAL_FUNC
 
 
-#define __FALCON_MAKE_LOGICAL_FUNC(name, op, op_name)\
-	template<typename T, typename U>\
-	inline constexpr bool name##_##op_name(const T& a, const U& b)\
-	{ return a == b; }\
-	\
-	template<typename T, typename U, typename... Args>\
-	constexpr bool name##_##op_name(const T& a, const U& b, const Args&... args)\
-	{ return a == b op_name name##_##op_name(a, args...); }\
-	\
-	template <typename T>\
-	struct name##_##op_name##_wrapper\
-	{\
-		T _value;\
-		\
-		constexpr bool operator()() const\
-		{ return false; }\
-		\
-		template <typename... Args>\
-		constexpr bool operator()(const Args&... args) const\
-		{ return name##_##op_name<Args...>(_value, args...); }\
-	};
+#define FALCON_MAKE_LOGICAL_FUNC(name, and_or, v)                                          \
+  constexpr struct name##_t {                                                              \
+    template<class Predicate, class T, class U>                                            \
+    constexpr bool operator()(Predicate pred, const T& a, const U& b)                      \
+    const noexcept(noexcept(pred(a, b)))                                                   \
+    { return pred(a, b) == v; }                                                            \
+                                                                                           \
+    template<class Predicate, class T, class U, class... Args>                             \
+    constexpr bool operator()(Predicate pred, const T& a, const U& b, const Args&... args) \
+    const noexcept(noexcept(pred(a, b)))                                                   \
+    { return pred(a, b) and_or operator()(pred, a, args...); }                             \
+  } name {};                                                                               \
+                                                                                           \
+  template<class T, class Predicate>                                                       \
+  struct name##_wrapper                                                                    \
+  {                                                                                        \
+    constexpr name##_wrapper() = default;                                                  \
+    constexpr name##_wrapper(name##_wrapper const &) = default;                            \
+    constexpr name##_wrapper(name##_wrapper &&) = default;                                 \
+    constexpr name##_wrapper(T&& x)                                                        \
+    : x_(std::move(x))                                                                     \
+    {}                                                                                     \
+    constexpr name##_wrapper(T const & x)                                                  \
+    : x_(x)                                                                                \
+    {}                                                                                     \
+    constexpr name##_wrapper(T&& x, Predicate pred)                                        \
+    : x_(std::move(x))                                                                     \
+    , pred_(pred)                                                                          \
+    {}                                                                                     \
+    constexpr name##_wrapper(T const & x, Predicate pred)                                  \
+    : x_(x)                                                                                \
+    , pred_(pred)                                                                          \
+    {}                                                                                     \
+    constexpr name##_wrapper(Predicate pred)                                               \
+    : pred_(pred)                                                                          \
+    {}                                                                                     \
+    template<class... Args>                                                                \
+    constexpr bool operator()(const Args&... args) const                                   \
+    { return name(pred_, x_, args...); }                                                   \
+  private:                                                                                 \
+    T x_;                                                                                  \
+    Predicate pred_;                                                                       \
+  };
 
-#define __FALCON_MAKE2_LOGICAL_FUNC(name, op)\
-	__FALCON_MAKE_LOGICAL_FUNC(name, op, or)\
-	__FALCON_MAKE_LOGICAL_FUNC(name, op, and)
+FALCON_MAKE_LOGICAL_FUNC(all_equal_if, &&, true)
+FALCON_MAKE_LOGICAL_FUNC(any_equal_if, ||, true)
+FALCON_MAKE_LOGICAL_FUNC(none_equal_if, &&, false)
 
-__FALCON_MAKE2_LOGICAL_FUNC(equal_to, ==)
-__FALCON_MAKE2_LOGICAL_FUNC(not_equal_to, !=)
-__FALCON_MAKE2_LOGICAL_FUNC(less, <)
-__FALCON_MAKE2_LOGICAL_FUNC(greater, >)
-__FALCON_MAKE2_LOGICAL_FUNC(less_equal, <=)
-__FALCON_MAKE2_LOGICAL_FUNC(greater_equal, >=)
-
-#undef __FALCON_MAKE2_LOGICAL_FUNC
-#undef __FALCON_MAKE_LOGICAL_FUNC
-
-#define __FALCON_LOGICAL_NAME(x) x
-#define __FALCON_MAKE_LOGICAL_FUNC(op, prefix_op, _)\
-template<typename _Predicate, typename T, typename U>\
-	inline constexpr bool __##prefix_op##_##equal_if_##op(_Predicate & pred, const T& a, const U& b)\
-	{ return prefix_op pred(a,b); }\
-	\
-	template<typename _Predicate, typename T, typename U, typename... Args>\
-	constexpr bool __##prefix_op##_##equal_if_##op(_Predicate & pred, const T& a, const U& b, const Args&... args)\
-	{ return (prefix_op pred(a,b)) op __##prefix_op##_##equal_if_##op(a, args...); }\
-	\
-	template<typename _Predicate, typename T, typename U>\
-	inline constexpr bool name##_##op(_Predicate pred, const T& a, const U& b)\
-	{ return pred(a,b); }\
-	\
-	template<typename _Predicate, typename T, typename U, typename... Args>\
-	constexpr bool name##_##op(_Predicate pred, const T& a, const U& b, const Args&... args)\
-	{ return pred(a,b) op __##prefix_op##_##equal_if_##op(a, args...); }\
-	\
-	template <typename _Predicate, typename T>\
-	struct __FALCON_LOGICAL_NAME(prefix_op##_##equal_if_##op##_wrapper)\
-	{\
-		_Predicate _pred;\
-		T _value;\
-	\
-		constexpr bool operator()() const\
-		{ return false; }\
-	\
-		template <typename... Args>\
-		constexpr bool operator()(const Args&... args) const\
-		{ return __##prefix_op##_##equal_if_##op<Args...>(_pred, _value, args...); }\
-	};\
-	\
-	template <typename _Predicate, typename T>\
-	prefix_op##_##equal_if_##op##_wrapper<_Predicate, T>\
-	make_##prefix_op##_##equal_if_##op(_Predicate pred, T&& v)\
-	{ return {pred, std::forward<T>(v)}; }\
-	\
-	template <typename _Predicate, typename T>\
-	prefix_op##_##equal_if_##op##_wrapper<_Predicate, T>\
-	make_##prefix_op##_##equal_if_##op(T&& v)\
-	{ return {_Predicate(), std::forward<T>(v)}; }
-
-__FALCON_MAKE_LOGICAL_FUNC(or,,)
-__FALCON_MAKE_LOGICAL_FUNC(and,,)
-__FALCON_MAKE_LOGICAL_FUNC(or, not, _)
-__FALCON_MAKE_LOGICAL_FUNC(and, not, _)
-
-#undef __FALCON_MAKE_LOGICAL_FUNC
-#undef __FALCON_LOGICAL_NAME
+#undef FALCON_MAKE_LOGICAL_FUNC
 
 }
 }

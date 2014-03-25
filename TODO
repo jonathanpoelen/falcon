@@ -185,14 +185,9 @@ faire des fonctions spéciliasées pour retourner des objets ou faire des algos 
 
 C++14: utilisé integer_sequence à la place de parameter_index.
 
-faire des traits parameter des classe générique (tous type template)
-
-séparer les use_type, use_value_type, etc ainsi que les has_type, has_value_type, etc dans des header différent (un dossier helper ?)
+faire des traits parameter des classes génériques (tous type template (void mpl/detail/s_*))
 
 mettre sfinae::detail de has_type dans le dossier detail. De plus un fichier implémente un trait enable_type (ou identique mais avec un nom différent :/ (see use_def.hpp)
-
-clamp(x,min,max[,compare]) x < min ? min : x > max ? max : x
-clamp_unordered
 
 mpl: initialiser par défaut les attributs avec un arg<>
 mpl: or + is_arg -> contains_arg ou s_contains<pack<>, is_arg>
@@ -227,9 +222,7 @@ build_parameter_index_t -> make_parameter_index
 
 coordinates -> coordinate (modifier également le namespace ou le nom des fonctions/classes)
 
-tuple_for_each qui prend un parameter_index
-
-un tableau de taille fixe à plusieurs dimension aplati (flat_array<T, size_t...> ?). accer avec [{...}], [x][y]. le mode initializer retourne soit le type soit un wrapper de sous ensemble soit une erreur car trop d'index. Ajout un accer operateur parenthese qui retourne une valeur. mettre un to_array qui retourne un std::array en reference (cast à l'arrache)
+un tableau de taille fixe à plusieurs dimension aplati (flat_array<T, size_t...> ? (un dynamique un statique)). accer avec [{...}], [x][y]. le mode initializer retourne soit le type soit un wrapper de sous ensemble soit une erreur car trop d'index. Ajout un accer operateur parenthese qui retourne une valeur. mettre un to_array qui retourne un std::array en reference (cast à l'arrache)
 
 split operators dans plein de fichier (1 opérateur par fichier). Idem pour celui sur les enum, idem pour les algorithm/range
 
@@ -251,7 +244,37 @@ get_file_contents qui prend en param u objet quelconque et qui utilise resize+da
 
 functional/operators.hpp: séparer dans plusieurs fichier et ne pas utiliser late_parameter_t mais void (supprimer late_parameter_t). Ne pas oublier le move sémantique dans les opérateurs
 
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/#mailing2014-01 (entre autre l'implémentation de apply_tuple (apply_from_tuple dans le standars))
 
+natsort compare + avec locale (voir implémentation de martin pool (lien dans la doc php de natsort) et aussi en javascript dans katepart commands/utils.js)
+char_trait insentive case (ci_char_trait)
 
+faire une passe sur les fonctions prenant des references constantes ou/et des rvalue (argument conservé par la fonction) en valeur dure. Utiliser une des mcro pour les code non C++11
 
+adaptater -> view ? Pas pour tous. Les transformer en vues si possible
 
+range_allocator fonctionnel avec std::set (ou autre) ?
+
+unordered_vector -> unordered_view ? Un melange ?
+
+allocator qui alloue plusieurs bloc.
+
+basic_cstring (et basic_string) prent-il en compte les manipulateur de flux dans operator << et >>
+
+max_size dans les allocateurs est le nombre max d'element que alloc() peut théoriquement faire.
+
+pas besoin de swap si move construceur/assignement
+
+faire de certaines fonctions libres des foncteurs en constexpr
+
+pour les foncteurs pris en rvalue, utiliser forward avant l'appel. (parce que ref qualifier: int f()&&)
+
+une combinaison de falcon::default_new/nothrow_default_new et std::default_delete. car default_new<T[2]> creer un tableau de 2 elements mais default_delete<T[2]> ne compile. Il faut default_delete<T[]>. Faire un alias de default_delete mais qui supporte T[x] ?
+
+synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier les valeurs des itrateu par defaut ? (tous, 1 ?). Ajouter des test avec des iterateur de taille different et regarder si ne deborde pas
+
+utiliser boost::addressof ou std::addressof (dans <memory>). enlever detail/addressof.hpp
+
+enable_if_type_exist: Voir comment cela est fait dans les classes de sfinae pour le rafiner
+
+has_${machin} -> has_${machin}_member ? Idem pour use_* et restrict_* ?
