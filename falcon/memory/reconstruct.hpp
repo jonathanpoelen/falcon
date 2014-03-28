@@ -1,317 +1,171 @@
 #ifndef _FALCON_MEMORY_RECONSTRUCT_HPP
 #define _FALCON_MEMORY_RECONSTRUCT_HPP
 
-#include <falcon/memory/construct.hpp>
+#include <falcon/c++/constexpr.hpp>
 #include <falcon/memory/destroy.hpp>
+#include <falcon/memory/construct.hpp>
+#include <falcon/memory/default_new.hpp>
+#include <falcon/memory/default_delete.hpp>
 
 //reconstruct, renew, emplace_new, nothrow_renew, nothrow_emplace_new
-//reconstruct_wrapper, renew_wrapper, emplace_new_wrapper, nothrow_renew_wrapper, nothrow_emplace_new_wrapper
 
 namespace falcon {
 
+CPP_GLOBAL_CONSTEXPR struct reconstruct_t {
 #if __cplusplus >= 201103L
-template<typename _T, typename... _Args>
-inline void reconstruct(_T* p, _Args&&... args)
-{
-	destroy(p);
-	construct(p, std::forward<_Args>(args)...);
-}
+  template<class T, class... Args>
+  void operator()(T* p, Args&&... args) const
+  noexcept(noexcept(construct(p, std::forward<Args>(args)...)))
+  {
+    destroy(p);
+    construct(p, std::forward<Args>(args)...);
+  }
 #else
-template<typename _T>
-inline void reconstruct(_T* p)
-{
-	destroy(p);
-	construct(p);
-}
-template<typename _T, typename _U>
-inline void reconstruct(_T* p, const _U& value)
-{
-	destroy(p);
-	construct(p, value);
-}
+  template<class T>
+  void operator()(T* p) const
+  {
+    destroy(p);
+    construct(p);
+  }
+  template<class T, class U>
+  void operator()(T* p, const U& value) const
+  {
+    destroy(p);
+    construct(p, value);
+  }
 #endif
+} reconstruct;
 
+
+CPP_GLOBAL_CONSTEXPR struct nothrow_renew_t {
 #if __cplusplus >= 201103L
-template<typename _T, typename... _Args>
-inline _T* renew(_T* p, _Args&&... args)
-{
-	default_delete(p);
-	return default_new<_T>(std::forward<_Args>(args)...);
-}
-
-template<typename _T, typename... _Args>
-inline _T* nothrow_renew(_T* p, _Args&&... args)
-{
-	default_delete(p);
-	return nothrow_default_new<_T>(std::forward<_Args>(args)...);
-}
+  template<class T, class... Args>
+  T* operator()(T* p, Args&&... args) const noexcept
+  {
+    default_delete<T>()(p);
+    return nothrow_default_new<T>()()(std::forward<Args>(args)...);
+  }
 #else
-template<typename _T>
-inline _T* renew(_T* p)
-{
-	default_delete(p);
-	return default_new<_T>();
-}
-template<typename _T, typename _U>
-inline _T* renew(_T* p, const _U& value)
-{
-	default_delete(p);
-	return default_new<_T>(value);
-}
+  template<class T>
+  T* operator()(T* p) const throw()
+  {
+    default_delete<T>()(p);
+    return nothrow_default_new<T>()();
+  }
 
-template<typename _T>
-inline _T* nothrow_renew(_T* p)
-{
-	default_delete(p);
-	return nothrow_default_new<_T>();
-}
-template<typename _T, typename _U>
-inline _T* nothrow_renew(_T* p, const _U& value)
-{
-	default_delete(p);
-	return nothrow_default_new<_T>(value);
-}
+  template<class T, class U>
+  T* operator()(T* p, const U& value) const throw()
+  {
+    default_delete<T>()(p);
+    return nothrow_default_new<T>()(value);
+  }
 #endif
+} nothrow_renew;
 
+
+CPP_GLOBAL_CONSTEXPR struct renew_t {
 #if __cplusplus >= 201103L
-template<typename _T, typename... _Args>
-inline void emplace_new(_T*& p, _Args&&... args)
-{
-	if (p)
-		reconstruct(p, std::forward<_Args>(args)...);
-	else
-		p = default_new<_T>(std::forward<_Args>(args)...);
-}
+  template<class T, class... Args>
+  T* operator()(T* p, Args&&... args) const
+  {
+    default_delete<T>()(p);
+    return default_new<T>()(std::forward<Args>(args)...);
+  }
 
-template<typename _T, typename... _Args>
-inline void nothrow_emplace_new(_T*& p, _Args&&... args)
-{
-	if (p)
-		reconstruct(p, std::forward<_Args>(args)...);
-	else
-		p = nothrow_default_new<_T>(std::forward<_Args>(args)...);
-}
+  template<class T, class... Args>
+  T* operator()(std::nothrow_t, T* p, Args&&... args) const noexcept
+  {
+    default_delete<T>()(p);
+    return nothrow_default_new<T>()(std::forward<Args>(args)...);
+  }
 #else
-template<typename _T>
-inline void emplace_new(_T*& p)
-{
-	if (p)
-		reconstruct(p);
-	else
-		p = default_new<_T>();
-}
-template<typename _T, typename _U>
-inline void emplace_new(_T*& p, const _U& value)
-{
-	if (p)
-		reconstruct(p, value);
-	else
-		p = default_new<_T>(value);
-}
+  template<class T>
+  T* operator()(T* p) const
+  {
+    default_delete<T>()(p);
+    return default_new<T>()();
+  }
 
-template<typename _T>
-inline void nothrow_emplace_new(_T*& p)
-{
-	if (p)
-		reconstruct(p);
-	else
-		p = nothrow_default_new<_T>();
-}
-template<typename _T, typename _U>
-inline void nothrow_emplace_new(_T*& p, const _U& value)
-{
-	if (p)
-		reconstruct(p, value);
-	else
-		p = nothrow_default_new<_T>(value);
-}
+  template<class T, class U>
+  T* operator()(T* p, const U& value) const
+  {
+    default_delete<T>()(p);
+    return default_new<T>()(value);
+  }
+
+  template<class T>
+  T* operator()(std::nothrow_t, T* p) const
+  {
+    default_delete<T>()(p);
+    return nothrow_default_new<T>()();
+  }
+
+  template<class T, class U>
+  T* operator()(std::nothrow_t, T* p, const U& value) const
+  {
+    default_delete<T>()(p);
+    return nothrow_default_new<T>()(value);
+  }
 #endif
+} renew;
 
 
-///wrapper of destructor then constructor
-template<typename _Tp>
-struct reconstruct_wrapper
-{
-	CPP_CONSTEXPR reconstruct_wrapper()
-	{}
-
-	template<typename _Up>
-	CPP_CONSTEXPR reconstruct_wrapper(const reconstruct_wrapper<_Up>&)
-	{}
-
-	void operator()(_Tp* ptr) const
-	{
-		reconstruct(ptr);
-	}
-
-	void operator()(_Tp* ptr, const _Tp& v) const
-	{
-		reconstruct(ptr, v);
-	}
-
+CPP_GLOBAL_CONSTEXPR struct nothrow_emplace_new_t {
 #if __cplusplus >= 201103L
-	template<typename... _Args>
-	void operator()(_Tp* ptr, _Args&&... args) const
-	{
-		reconstruct(ptr, std::forward<_Args>(args)...);
-	}
+  template<class T, class... Args>
+  T* operator()(T* p, Args&&... args) const noexcept
+  {
+    return p
+      ? reconstruct(p, std::forward<Args>(args)...), p
+      : nothrow_default_new<T>()(std::forward<Args>(args)...);
+  }
+#else
+  template<class T>
+  T* operator()(T* p) const throw()
+  { return p ? reconstruct(p), p : nothrow_default_new<T>()(); }
+
+  template<class T, class U>
+  T* operator()(T* p, const U& value) const throw()
+  { return p ? reconstruct(p, value), p : nothrow_default_new<T>()(value); }
 #endif
-};
+} nothrow_emplace_new;
 
 
-///wrapper of new then delete
-template<typename _Tp>
-struct renew_wrapper
-{
-	CPP_CONSTEXPR renew_wrapper()
-	{}
-
-	template<typename _Up>
-	CPP_CONSTEXPR renew_wrapper(const renew_wrapper<_Up>&)
-	{}
-
-	_Tp* operator()(_Tp*& ptr) const
-	{
-		return renew(ptr);
-	}
-
-	_Tp* operator()(_Tp*& ptr, const _Tp& v) const
-	{
-		return renew(ptr, v);
-	}
-
+CPP_GLOBAL_CONSTEXPR struct emplace_new_t {
 #if __cplusplus >= 201103L
-	template<typename... _Args>
-	_Tp* operator()(_Tp*& ptr, _Args&&... args) const
-	{
-		return renew(ptr, std::forward<_Args>(args)...);
-	}
+  template<class T, class... Args>
+  T* operator()(T* p, Args&&... args) const
+  {
+    return p
+      ? reconstruct(p, std::forward<Args>(args)...), p
+      : default_new<T>()(std::forward<Args>(args)...);
+  }
+
+  template<class T, class... Args>
+  T* operator()(std::nothrow_t, T* p, Args&&... args) const noexcept
+  {
+    return p
+      ? reconstruct(p, std::forward<Args>(args)...), p
+      : nothrow_default_new<T>()(std::forward<Args>(args)...);
+  }
+#else
+  template<class T>
+  T* operator()(T* p) const
+  { return p ? reconstruct(p), p : default_new<T>()(); }
+
+  template<class T, class U>
+  T* operator()(T* p, const U& value) const
+  { return p ? reconstruct(p, value), p : default_new<T>()(value); }
+
+  template<class T>
+  T* operator()(std::nothrow_t, T* p) const throw()
+  { return p ? reconstruct(p), p : nothrow_default_new<T>()(); }
+
+  template<class T, class U>
+  T* operator()(std::nothrow_t, T* p, const U& value) const throw()
+  { return p ? reconstruct(p, value), p : nothrow_default_new<T>()(value); }
 #endif
-
-	_Tp* operator()(_Tp*& ptr, const std::nothrow_t& nothrow) const
-	{
-		return nothrow_renew(ptr);
-	}
-
-	_Tp* operator()(_Tp*& ptr, const std::nothrow_t& nothrow, const _Tp& v) const
-	{
-		return nothrow_renew(ptr, v);
-	}
-
-#if __cplusplus >= 201103L
-	template<typename... _Args>
-	_Tp* operator()(_Tp*& ptr, const std::nothrow_t& nothrow, _Args&&... args) const
-	{
-		return nothrow_renew(ptr, std::forward<_Args>(args)...);
-	}
-#endif
-};
-
-template<typename _Tp>
-struct nothrow_renew_wrapper
-{
-	CPP_CONSTEXPR nothrow_renew_wrapper()
-	{}
-
-	template<typename _Up>
-	CPP_CONSTEXPR nothrow_renew_wrapper(const nothrow_renew_wrapper<_Up>&)
-	{}
-
-	_Tp* operator()(_Tp*& ptr) const
-	{
-		return nothrow_renew(ptr);
-	}
-
-	_Tp* operator()(_Tp*& ptr, const _Tp& v) const
-	{
-		return nothrow_renew(ptr, v);
-	}
-
-#if __cplusplus >= 201103L
-	template<typename... _Args>
-	_Tp* operator()(_Tp*& ptr, _Args&&... args) const
-	{
-		return nothrow_renew(ptr, std::forward<_Args>(args)...);
-	}
-#endif
-};
-
-///if ptr is null, use new keyword, else reconstruct_wrapper
-template<typename _Tp>
-struct emplace_new_wrapper
-{
-	CPP_CONSTEXPR emplace_new_wrapper()
-	{}
-
-	template<typename _Up>
-	CPP_CONSTEXPR emplace_new_wrapper(const emplace_new_wrapper<_Up>&)
-	{}
-
-	void operator()(_Tp*& ptr) const
-	{
-		emplace_new(ptr);
-	}
-
-	void operator()(_Tp*& ptr, const _Tp& v) const
-	{
-		emplace_new(ptr, v);
-	}
-
-#if __cplusplus >= 201103L
-	template<typename... _Args>
-	void operator()(_Tp*& ptr, _Args&&... args) const
-	{
-		emplace_new(ptr, std::forward<_Args>(args)...);
-	}
-#endif
-
-	void operator()(_Tp*& ptr, const std::nothrow_t& nothrow) const
-	{
-		nothrow_emplace_new(ptr);
-	}
-
-	void operator()(_Tp*& ptr, const std::nothrow_t& nothrow, const _Tp& v) const
-	{
-		nothrow_emplace_new(ptr, v);
-	}
-
-#if __cplusplus >= 201103L
-	template<typename... _Args>
-	void operator()(_Tp*& ptr, const std::nothrow_t& nothrow, _Args&&... args) const
-	{
-		nothrow_emplace_new(ptr, std::forward<_Args>(args)...);
-	}
-#endif
-};
-
-template<typename _Tp>
-struct nothrow_emplace_new_wrapper
-{
-	CPP_CONSTEXPR nothrow_emplace_new_wrapper()
-	{}
-
-	template<typename _Up>
-	CPP_CONSTEXPR nothrow_emplace_new_wrapper(const nothrow_emplace_new_wrapper<_Up>&)
-	{}
-
-	void operator()(_Tp*& ptr) const
-	{
-		nothrow_emplace_new(ptr);
-	}
-
-	void operator()(_Tp*& ptr, const _Tp& v) const
-	{
-		nothrow_emplace_new(ptr, v);
-	}
-
-#if __cplusplus >= 201103L
-	template<typename... _Args>
-	void operator()(_Tp*& ptr, _Args&&... args) const
-	{
-		nothrow_emplace_new(ptr, std::forward<_Args>(args)...);
-	}
-#endif
-};
+} emplace_new;
 
 }
 

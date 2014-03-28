@@ -34,6 +34,9 @@ struct construct_category<T[N]>
 	typedef dispatch_index_tag type;
 };
 
+template<typename T>
+using construct_category_t = typename construct_category<T>::type;
+
 }
 #else
 namespace falcon {

@@ -2,7 +2,7 @@
 #define _FALCON_DETAIL_ADDRESSOF_HPP
 
 #if __cplusplus >= 201103L
-# include <type_traits>
+# include <memory>
 #endif
 
 namespace falcon {

@@ -268,6 +268,7 @@ pas besoin de swap si move construceur/assignement
 faire de certaines fonctions libres des foncteurs en constexpr
 
 pour les foncteurs pris en rvalue, utiliser forward avant l'appel. (parce que ref qualifier: int f()&&)
+faire tous les opérateurs en 2 version ? const & et && ?
 
 une combinaison de falcon::default_new/nothrow_default_new et std::default_delete. car default_new<T[2]> creer un tableau de 2 elements mais default_delete<T[2]> ne compile. Il faut default_delete<T[]>. Faire un alias de default_delete mais qui supporte T[x] ?
 
@@ -278,3 +279,9 @@ utiliser boost::addressof ou std::addressof (dans <memory>). enlever detail/addr
 enable_if_type_exist: Voir comment cela est fait dans les classes de sfinae pour le rafiner
 
 has_${machin} -> has_${machin}_member ? Idem pour use_* et restrict_* ?
+
+nommer les fonction objet sous la forme *_f
+
+const parameter_index & -> parameter_index
+
+
