@@ -1,8 +1,10 @@
 #ifndef FALCON_TUPLE_TUPLE_APPLIER_HPP
 #define FALCON_TUPLE_TUPLE_APPLIER_HPP
 
-#include <falcon/tuple/tuple_apply.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
+#include <falcon/tuple/tuple_apply.hpp>
+#include <falcon/c++1x/syntax.hpp>
+
 #include <utility>
 
 namespace falcon {
@@ -22,10 +24,15 @@ public:
   : _M_func(func)
   {}
 
-  template<typename T, typename BuildIndexes = typename keep_parameter_index<__tag, std::tuple_size<T>::value>::type>
-  auto operator()(T&& t) const
-  -> decltype(tuple_apply(BuildIndexes(), std::declval<const Functor&>(), std::forward<T>(t)))
-  { return tuple_apply(BuildIndexes(), _M_func, std::forward<T>(t)); }
+  template<typename T>
+  CPP1X_DELEGATE_FUNCTION(operator()(T&& t) const &,
+                          tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>(),
+                                      tuple_applier::_M_func, std::forward<T>(t)))
+
+  template<typename T>
+  CPP1X_DELEGATE_FUNCTION(operator()(T&& t) &&,
+                          tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>(),
+                                      std::move(tuple_applier::_M_func), std::forward<T>(t)))
 
   void swap(tuple_applier& other)
   {

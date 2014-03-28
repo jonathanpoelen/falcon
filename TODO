@@ -280,8 +280,5 @@ enable_if_type_exist: Voir comment cela est fait dans les classes de sfinae pour
 
 has_${machin} -> has_${machin}_member ? Idem pour use_* et restrict_* ?
 
-nommer les fonction objet sous la forme *_f
-
 const parameter_index & -> parameter_index
-
 
