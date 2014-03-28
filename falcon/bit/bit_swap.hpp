@@ -4,7 +4,6 @@
 #include <falcon/bit/size.hpp>
 #include <falcon/bit/detail/bit_swap.hpp>
 #include <falcon/detail/addressof.hpp>
-#include <falcon/cast/unreliable_pointer_cast.hpp>
 
 namespace falcon {
 	inline char __get_char_swap(char c)
@@ -52,7 +51,7 @@ namespace falcon {
 	struct __bit_swap
 	{
 		inline static void __impl(_T& bits)
-		{ bit_swap(falcon::unreliable_pointer_cast<char>(falcon::detail::addressof(bits)), sizeof(_T)); }
+		{ bit_swap(reinterpret_cast<char*>(falcon::detail::addressof(bits)), sizeof(_T)); }
 	};
 
 #define __FALCON_CREATE_BIT_SWAP(S)\
@@ -66,7 +65,7 @@ namespace falcon {
 	struct __bit_swap<_T, S>\
 	{\
 		inline static void __impl(_T& bits)\
-		{ falcon::detail::bit::bit##S##_swap(*unreliable_pointer_cast<uint##S##_t>(&bits)); }\
+		{ falcon::detail::bit::bit##S##_swap(*reinterpret_cast<uint##S##_t*>(&bits)); }\
 	};
 
 	__FALCON_CREATE_BIT_SWAP(8)

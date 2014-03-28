@@ -1,14 +1,12 @@
 #ifndef _FALCON_ENDIAN_HPP
 #define _FALCON_ENDIAN_HPP
 
-#include <falcon/cast/unreliable_pointer_cast.hpp>
-
 namespace falcon {
 
 	inline bool __little_endian()
 	{
 		short tester = 0x0001;
-		return *unreliable_pointer_cast<char>(&tester) != 0;
+   return *reinterpret_cast<char*>(&tester) != 0;
 	}
 
 	inline bool little_endian()

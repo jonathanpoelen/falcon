@@ -282,3 +282,5 @@ has_${machin} -> has_${machin}_member ? Idem pour use_* et restrict_* ?
 
 const parameter_index & -> parameter_index
 
+regrouper ostream et istream dans iostreams et faire un namespace iostreams
+

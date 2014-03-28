@@ -65,8 +65,6 @@ struct value_printer
   }
 };
 
-#include <falcon/accessor.hpp>
-
 int main()
 {
   typedef vector_c<int,0,9> numbers;
