@@ -17,6 +17,7 @@ iota(begin(), end(), first_value): le faire avec iota(container, first_value)
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
 flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
 enlever la hack qui permet une fonction consexpr en n'utilisant pas de boucle. C++14 permet les fonctions constexpr avec des boucles. Nouvelle macro ?
+valgrind retourne un jump sur variable non initialisée
 
 optimiser recursive_iterator (et l'algo de recursion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
 

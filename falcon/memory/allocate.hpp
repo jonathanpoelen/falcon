@@ -8,7 +8,8 @@
 namespace falcon {
 
 template<class T>
-struct nothrow_allocate {
+struct nothrow_allocate
+{
   typedef T* pointer;
 
   T* operator()() const CPP_NOEXCEPT
@@ -25,7 +26,8 @@ struct nothrow_allocate {
 
 
 template<class T>
-struct allocate {
+struct allocate
+{
   typedef T* pointer;
 
   T* operator()() const

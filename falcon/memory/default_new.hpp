@@ -16,7 +16,8 @@
 namespace falcon {
 
 template<class T>
-struct nothrow_default_new {
+struct nothrow_default_new
+{
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_extent<T>::type * pointer;
 
   pointer operator()() const CPP_NOEXCEPT
@@ -58,7 +59,8 @@ private:
 
 
 template<class T>
-struct default_new {
+struct default_new
+{
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_extent<T>::type * pointer;
 
   pointer operator()() const CPP_NOEXCEPT_OPERATOR2(T())

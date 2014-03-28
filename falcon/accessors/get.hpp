@@ -21,7 +21,7 @@ template <class T>
 struct __result_get
 {
 #if __cplusplus >= 201103L
-  typedef decltype(std::declval<T>().base()) type;
+  typedef decltype(std::declval<T>().get()) type;
 #else
   typedef typename boost::remove_cv<T>::type::type& __type;
   typedef typename boost::conditional<
