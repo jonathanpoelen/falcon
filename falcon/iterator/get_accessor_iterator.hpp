@@ -15,7 +15,7 @@ class build_get_accessor_iterator
 public:
 	typedef falcon::iterator::indirect_iterator<
 		Iterator,
-		falcon::accessors::get_t<__value_type>,
+		falcon::accessors::get<__value_type>,
 		typename __value_type::type
 	> type;
 };

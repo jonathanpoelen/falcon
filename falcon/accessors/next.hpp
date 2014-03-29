@@ -26,7 +26,7 @@ struct __result_next
 };
 
 template <class T CPP_IF_CPP1X(= void), class Result = use_default>
-struct next_t
+struct next
 {
   typedef typename default_or_type<__result_next<T>, Result>::type result_type;
   typedef T argument_type;
@@ -38,7 +38,7 @@ struct next_t
 
 #if __cplusplus >= 201103L
 template<>
-struct next_t<void, use_default>
+struct next<void, use_default>
 {
   template<class T>
   constexpr auto operator()(T& x) const
@@ -47,7 +47,7 @@ struct next_t<void, use_default>
   { return x.next(); }
 };
 
-CPP_GLOBAL_CONSTEXPR next_t<> next;
+CPP_GLOBAL_CONSTEXPR next<> next_f;
 #endif
 
 }

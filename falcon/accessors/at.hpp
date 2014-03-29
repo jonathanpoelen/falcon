@@ -28,7 +28,7 @@ struct __result_at
 
 template <class T CPP_IF_CPP1X(= void)
 , class Position = use_default, class Result = use_default>
-struct at_t
+struct at
 {
   typedef typename default_or_type<use<std::size_t>, Position>::type
     second_argument_type;
@@ -43,7 +43,7 @@ struct at_t
 
 #if __cplusplus >= 201103L
 template<>
-struct at_t<void, use_default, use_default>
+struct at<void, use_default, use_default>
 {
   template<class T, class Position>
   constexpr auto operator()(T& cont, const Position& pos) const
@@ -52,7 +52,7 @@ struct at_t<void, use_default, use_default>
   { return cont.at(pos); }
 };
 
-CPP_GLOBAL_CONSTEXPR at_t<> at;
+CPP_GLOBAL_CONSTEXPR at<> at_f;
 #endif
 
 }

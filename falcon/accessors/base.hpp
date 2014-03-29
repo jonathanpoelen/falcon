@@ -21,12 +21,12 @@ struct __result_base
 {
   typedef
     CPP_IF_CPP1X(decltype(std::declval<T>().base()))
-    CPP_IF_NOT_CPP1X(typename boost::remove_cv<T>::type::base_type)
+    CPP_IF_NOT_CPP1X(typename boost::remove_cv<T>::type::baseype)
   type;
 };
 
 template<class T CPP_IF_CPP1X(= void), class Result = use_default>
-struct base_t
+struct base
 {
   typedef typename default_or_type<__result_base<T>, Result>::type result_type;
   typedef T argument_type;
@@ -38,7 +38,7 @@ struct base_t
 
 #if __cplusplus >= 201103L
 template<>
-struct base_t<void, use_default>
+struct base<void, use_default>
 {
   template<class T>
   constexpr auto operator()(T& x) const
@@ -47,7 +47,7 @@ struct base_t<void, use_default>
   { return x.base(); }
 };
 
-CPP_GLOBAL_CONSTEXPR base_t<> base;
+CPP_GLOBAL_CONSTEXPR base<> base_f;
 #endif
 
 }

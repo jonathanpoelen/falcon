@@ -9,7 +9,7 @@ namespace falcon {
 namespace accessors {
 
 template <class T CPP_IF_CPP1X(= void)>
-struct empty_t
+struct empty
 {
 	typedef bool result_type;
 	typedef T argument_type;
@@ -21,7 +21,7 @@ struct empty_t
 
 #if __cplusplus >= 201103L
 template<>
-struct empty_t<void>
+struct empty<void>
 {
   template<class T>
   constexpr bool operator()(const T& x) const
@@ -29,7 +29,7 @@ struct empty_t<void>
   { return x.empty(); }
 };
 
-CPP_GLOBAL_CONSTEXPR empty_t<> empty;
+CPP_GLOBAL_CONSTEXPR empty<> empty_f;
 #endif
 
 }

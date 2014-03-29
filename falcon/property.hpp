@@ -4,7 +4,7 @@
 #include <utility>
 #include <type_traits>
 #include <falcon/type_traits/use.hpp>
-#include <falcon/accessors/reference.hpp>
+#include <falcon/accessors/return_reference.hpp>
 #include <falcon/type_traits/eval_if.hpp>
 
 namespace falcon {
@@ -25,7 +25,7 @@ using properties_t = int;
 
 
 template<typename T>
-using __get_property = accessors::reference_t<T>;
+using __get_property = accessors::return_reference<T>;
 
 
 template<typename T>

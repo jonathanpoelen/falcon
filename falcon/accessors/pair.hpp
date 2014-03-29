@@ -10,22 +10,22 @@ namespace falcon {
 namespace accessors {
 
 template <class T CPP_IF_CPP1X(= void)>
-struct first_t
+struct first
 {
   typedef T pair_type;
   typedef pair_type argument_type;
-  typedef typename match_cv_qualifiers<T, typename T::first_type>::type result_type;
+  typedef typename match_cv_qualifiers<T, typename T::firstype>::type result_type;
 
   CPP_CONSTEXPR result_type& operator()(pair_type& pair) const CPP_NOEXCEPT
   { return pair.first; }
 };
 
 template <class T CPP_IF_CPP1X(= void)>
-struct second_t
+struct second
 {
 	typedef T pair_type;
 	typedef pair_type argument_type;
-  typedef typename match_cv_qualifiers<T, typename T::second_type>::type result_type;
+  typedef typename match_cv_qualifiers<T, typename T::secondype>::type result_type;
 
   CPP_CONSTEXPR result_type& operator()(pair_type& pair) const CPP_NOEXCEPT
   { return pair.second; }
@@ -33,7 +33,7 @@ struct second_t
 
 #if __cplusplus >= 201103L
 template <>
-struct first_t<void>
+struct first<void>
 {
   template<class T>
   CPP_CONSTEXPR auto operator()(T& pair) const CPP_NOEXCEPT
@@ -42,7 +42,7 @@ struct first_t<void>
 };
 
 template <>
-struct second_t<void>
+struct second<void>
 {
   template<class T>
   CPP_CONSTEXPR auto operator()(T& pair) const CPP_NOEXCEPT
@@ -50,8 +50,8 @@ struct second_t<void>
   { return pair.second; }
 };
 
-CPP_GLOBAL_CONSTEXPR first_t<> first;
-CPP_GLOBAL_CONSTEXPR second_t<> second;
+CPP_GLOBAL_CONSTEXPR first<> first_f;
+CPP_GLOBAL_CONSTEXPR second<> second_f;
 #endif
 
 }

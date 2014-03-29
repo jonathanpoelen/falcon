@@ -13,9 +13,9 @@ namespace falcon {
 namespace accessors {
 
 template <typename T CPP_IF_CPP1X(= void), typename Result = use_default>
-struct size_t
+struct size
 {
-	typedef typename default_or_type<use_size_type<T>, Result>::type result_type;
+	typedef typename default_or_type<use_sizeype<T>, Result>::type result_type;
 	typedef T argument_type;
 
 	CPP_CONSTEXPR result_type operator()(const T& x) const
@@ -25,7 +25,7 @@ struct size_t
 
 #if __cplusplus >= 201103L
 template <>
-struct size_t<void>
+struct size<void>
 {
   template<class T>
   CPP_CONSTEXPR auto operator()(const T& x) const
@@ -34,7 +34,7 @@ struct size_t<void>
   { return x.size(); }
 };
 
-CPP_GLOBAL_CONSTEXPR size_t<> size;
+CPP_GLOBAL_CONSTEXPR size<> size_f;
 #endif
 
 }

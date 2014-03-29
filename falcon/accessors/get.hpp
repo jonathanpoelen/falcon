@@ -31,7 +31,7 @@ struct __result_get
 };
 
 template <class T CPP_IF_CPP1X(= void), class Result = use_default>
-struct get_t
+struct get
 {
   typedef typename default_or_type<__result_get<T>, Result>::type result_type;
   typedef T argument_type;
@@ -43,7 +43,7 @@ struct get_t
 
 #if __cplusplus >= 201103L
 template<>
-struct get_t<void>
+struct get<void>
 {
   template<class T>
   constexpr auto operator()(T& x) const
@@ -52,7 +52,7 @@ struct get_t<void>
   { return x.get(); }
 };
 
-CPP_GLOBAL_CONSTEXPR get_t<> get;
+CPP_GLOBAL_CONSTEXPR get<> get_f;
 #endif
 
 }

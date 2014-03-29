@@ -22,7 +22,7 @@ namespace falcon {
 namespace accessors {
 
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct begin_t
+struct begin
 {
   typedef T argument_type;
   typedef typename default_or_type<
@@ -39,7 +39,7 @@ struct begin_t
 };
 
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct rbegin_t
+struct rbegin
 {
   typedef T argument_type;
   typedef typename default_or_type<
@@ -56,7 +56,7 @@ struct rbegin_t
 };
 
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct cbegin_t
+struct cbegin
 {
   typedef T argument_type;
   typedef typename default_or_type<use_const_iterator<T>, Result>::type result_type;
@@ -68,7 +68,7 @@ struct cbegin_t
 
 #if __cplusplus >= 201103L
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct crbegin_t
+struct crbegin
 {
   typedef T argument_type;
   typedef typename default_or_type<use_const_reverse_iterator<T>, Result>::type result_type;
@@ -81,7 +81,7 @@ struct crbegin_t
 
 
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct end_t
+struct end
 {
   typedef T argument_type;
   typedef typename default_or_type<
@@ -98,7 +98,7 @@ struct end_t
 };
 
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct rend_t
+struct rend
 {
   typedef T argument_type;
   typedef typename default_or_type<
@@ -115,7 +115,7 @@ struct rend_t
 };
 
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct cend_t
+struct cend
 {
   typedef T argument_type;
   typedef typename default_or_type<use_const_iterator<T>, Result>::type result_type;
@@ -127,7 +127,7 @@ struct cend_t
 
 #if __cplusplus >= 201103L
 template <class T CPP_IF_CPP1X(=void), class Result = use_default>
-struct crend_t
+struct crend
 {
   typedef T argument_type;
   typedef typename default_or_type<use_const_reverse_iterator<T>, Result>::type result_type;
@@ -142,7 +142,7 @@ struct crend_t
 #if __cplusplus >= 201103L
 # define MAKE_ACCESS_VOID(name) \
   template<>                    \
-  struct name##_t<void>         \
+  struct name<void>         \
   {                             \
     template<class T>           \
     auto operator()(T& x) const \
@@ -162,15 +162,15 @@ MAKE_ACCESS_VOID(crend);
 
 # undef MAKE_ACCESS_VOID
 
-CPP_GLOBAL_CONSTEXPR begin_t<> begin;
-CPP_GLOBAL_CONSTEXPR cbegin_t<> cbegin;
-CPP_GLOBAL_CONSTEXPR rbegin_t<> rbegin;
-CPP_GLOBAL_CONSTEXPR crbegin_t<> crbegin;
+CPP_GLOBAL_CONSTEXPR begin<> begin_f;
+CPP_GLOBAL_CONSTEXPR cbegin<> cbegin_f;
+CPP_GLOBAL_CONSTEXPR rbegin<> rbegin_f;
+CPP_GLOBAL_CONSTEXPR crbegin<> crbegin_f;
 
-CPP_GLOBAL_CONSTEXPR end_t<> end;
-CPP_GLOBAL_CONSTEXPR cend_t<> cend;
-CPP_GLOBAL_CONSTEXPR rend_t<> rend;
-CPP_GLOBAL_CONSTEXPR crend_t<> crend;
+CPP_GLOBAL_CONSTEXPR end<> end_f;
+CPP_GLOBAL_CONSTEXPR cend<> cend_f;
+CPP_GLOBAL_CONSTEXPR rend<> rend_f;
+CPP_GLOBAL_CONSTEXPR crend<> crend_f;
 
 #endif
 

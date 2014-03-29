@@ -1,5 +1,5 @@
-#ifndef FALCON_ACCESSOR_REFERENCE_HPP
-#define FALCON_ACCESSOR_REFERENCE_HPP
+#ifndef FALCON_ACCESSOR_RETURN_REFERENCE_HPP
+#define FALCON_ACCESSOR_RETURN_REFERENCE_HPP
 
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/constexpr.hpp>
@@ -10,7 +10,7 @@ namespace falcon {
 namespace accessors {
 
 template <class T CPP_IF_CPP1X(=void)>
-struct reference_t
+struct return_reference
 {
 	typedef T value_type;
 	typedef T & reference;
@@ -26,7 +26,7 @@ struct reference_t
 };
 
 template <class T>
-struct reference_t<const T>
+struct return_reference<const T>
 {
 	typedef T value_type;
 	typedef const T & reference;
@@ -40,14 +40,14 @@ struct reference_t<const T>
 
 #if __cplusplus >= 201103L
 template<>
-struct reference_t<void>
+struct return_reference<void>
 {
   template<class T>
   CPP_CONSTEXPR T& operator()(T & x) const CPP_NOEXCEPT
   { return x; }
 };
 
-CPP_GLOBAL_CONSTEXPR reference_t<> reference;
+CPP_GLOBAL_CONSTEXPR return_reference<> return_reference_f;
 #endif
 
 }

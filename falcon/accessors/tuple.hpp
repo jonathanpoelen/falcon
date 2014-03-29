@@ -15,7 +15,7 @@ namespace __detail {
 namespace accessors {
 
 template <std::size_t N, typename Tuple = void>
-struct tuple_get_t
+struct tuple_get
 {
   typedef typename std::tuple_element<N, Tuple>::type result_type;
   typedef Tuple argument_type;
@@ -27,7 +27,7 @@ struct tuple_get_t
 };
 
 template <std::size_t N, typename Tuple>
-struct tuple_get_t<N, const Tuple>
+struct tuple_get<N, const Tuple>
 {
   typedef typename std::tuple_element<N, Tuple>::type const result_type;
 	typedef Tuple argument_type;
@@ -39,7 +39,7 @@ struct tuple_get_t<N, const Tuple>
 };
 
 template <std::size_t N>
-struct tuple_get_t<N, void>
+struct tuple_get<N, void>
 {
   static const std::size_t index = N;
 
