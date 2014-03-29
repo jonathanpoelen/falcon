@@ -1,38 +1,43 @@
 #include <test/test.hpp>
-#include <falcon/algorithm.hpp>
 #include <falcon/lambda.hpp>
 #include <falcon/container/fixed_grid_cross.hpp>
 #include <falcon/container/grid_cross.hpp>
+#include <falcon/container/range_access.hpp>
+#include <falcon/algorithm/for_n.hpp>
 #include "grid_cross.hpp"
 
-template<typename _Grid>
-void template_grid_test(_Grid&);
+#include <algorithm>
+
+template<typename Grid>
+void template_grid_test(Grid&);
 
 void grid_cross_test()
 {
 	{
 		falcon::container::fixed_grid_cross<int,3,3> grid;
-		template_grid_test<>(grid);
+		template_grid_test(grid);
 	}
 	PASSED();
 	{
 		falcon::container::grid_cross<int> grid(3,3);
-		template_grid_test<>(grid);
+		template_grid_test(grid);
 	}
 }
 
-template<typename _Grid>
-void template_grid_test(_Grid& grid)
+template<typename Grid>
+void template_grid_test(Grid& grid)
 {
 	using namespace falcon::lambda::placeholders;
+  using falcon::begin;
+  using falcon::end;
 
-	//falcon::generate<>(grid, ++falcon::make_lambda(0));
+	//falcon::generate(grid, ++falcon::make_lambda(0));
 	std::stringstream ss;
 	std::string s;
-	falcon::generate<>(grid, ++falcon::lambda::lambda<>(0));
+	std::generate(begin(grid), end(grid), ++falcon::lambda::lambda(0));
 	PASSED();
 
-	falcon::for_each<>(grid, ss << _1 << ',');
+  std::for_each(begin(grid), end(grid), ss << _1 << ',');
 	s += "1,2,3,4,5,6,7,8,9,";
 	PASSED();
 
@@ -45,13 +50,13 @@ void template_grid_test(_Grid& grid)
 	s += "1 1 0 0\n";
 	PASSED();
 
-	falcon::for_n<>(typename _Grid::right_iterator(grid.front()),
+	falcon::for_n(typename Grid::right_iterator(grid.front()),
 					grid.size() , ss << ++_1 << ',');
 	std::endl(ss);
 	s += "2,3,4,5,6,7,8,9,10,\n";
 	PASSED();
 
-	falcon::for_n<>(typename _Grid::left_iterator(&grid.back()),
+	falcon::for_n(typename Grid::left_iterator(&grid.back()),
 					grid.size()*2 , ss << ++_1 << ',');
 	std::endl(ss);
 	s += "11,10,9,8,7,6,5,4,3,12,11,10,9,8,7,6,5,4,\n";
@@ -66,13 +71,13 @@ void template_grid_test(_Grid& grid)
 	s += "1 1 1 1\n";
 	PASSED();
 
-	falcon::for_n<>(typename _Grid::up_iterator(&grid.back()),
+	falcon::for_n(typename Grid::up_iterator(&grid.back()),
 					grid.size() , ss << ++_1 << ',');
 	std::endl(ss);
 	s += "13,10,7,12,9,6,11,8,5,\n";
 	PASSED();
 
-	falcon::for_n<>(typename _Grid::down_iterator(grid.front()),
+	falcon::for_n(typename Grid::down_iterator(grid.front()),
 					grid.size()*2 , ss << ++_1 << ',');
 	std::endl(ss);
 	s += "6,9,12,7,10,13,8,11,14,7,10,13,8,11,14,9,12,15,\n";
@@ -85,7 +90,7 @@ void template_grid_test(_Grid& grid)
 	s += "1 0\n";
 	PASSED();
 
-	falcon::for_n<>(typename _Grid::right_iterator(grid.front()),
+	falcon::for_n(typename Grid::right_iterator(grid.front()),
 					grid.size() , ss << ++_1 << ',');
 	s += "8,9,10,11,12,13,14,15,16,";
 

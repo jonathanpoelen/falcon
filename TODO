@@ -285,3 +285,9 @@ const parameter_index & -> parameter_index
 
 regrouper ostream et istream dans iostreams et faire un namespace iostreams
 
+suffixer les type des foncteur variable avec _f plutôt que _t ?
+
+placeholder_for_argument -> en un static_bind. À moins que bind retourne deja un objet de ce style ?
+
+deplacer certain header de math dans logical
+

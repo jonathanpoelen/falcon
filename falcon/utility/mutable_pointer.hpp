@@ -1,6 +1,8 @@
 #ifndef FALCON_UTILITY_MUTABLE_POINTER_HPP
 #define FALCON_UTILITY_MUTABLE_POINTER_HPP
 
+#include <memory>
+
 namespace falcon {
 
 template<typename T>
@@ -13,12 +15,12 @@ public:
 
   mutable_pointer(const mutable_pointer&) noexcept = default;
 
-  operator T* () const
+  operator T* () const noexcept
   { return ptr; }
 
-  mutable_pointer operator=(T & x) const
+  mutable_pointer operator=(T & x) const noexcept
   {
-    ptr = &x;
+    ptr = std::addressof(x);
     return *this;
   }
 

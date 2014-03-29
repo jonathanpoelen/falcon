@@ -29,16 +29,22 @@ public:
   : v(other.v)
   {}
 
-  operator T& ()
+  operator T& () noexcept
   { return v; }
 
-  operator const T& () const
+  operator const T& () const noexcept
   { return v; }
 
-  T& get()
+  operator T* () noexcept
+  { return &v; }
+
+  operator const T* () const noexcept
+  { return &v; }
+
+  T& get() noexcept
   { return v; }
 
-  const T& get() const
+  const T& get() const noexcept
   { return v; }
 
 private:

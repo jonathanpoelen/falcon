@@ -7,7 +7,8 @@
 #include <falcon/memory/deallocate.hpp>
 #include <falcon/memory/reconstruct.hpp>
 #include <falcon/functional/operators.hpp>
-#include <falcon/algorithm/algorithm.hpp>
+#include <algorithm>
+#include <iterator>
 #include "new.hpp"
 
 void new_test() {
@@ -47,7 +48,7 @@ void new_test() {
 
 		//falcon::algorithm::generate(i, falcon::default_new<A>);
 		//falcon::algorithm::fill(range_access(i), 4);
-		falcon::algorithm::generate(i, std::bind(falcon::default_new<A>(), 4));
+		std::generate(std::begin(i), std::end(i), std::bind(falcon::default_new<A>(), 4));
 		CHECK_EQUAL_VALUE(ss.str(), "A(4)\nA(4)\nA(4)\nA(4)\nA(4)\n"); ss.str("");
 		falcon::delete_all(falcon::begin(i), falcon::end(i));
 		CHECK_EQUAL_VALUE(ss.str(), "~A(4)\n~A(4)\n~A(4)\n~A(4)\n~A(4)\n");
