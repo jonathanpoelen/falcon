@@ -1,13 +1,14 @@
 #ifndef _FALCON_LAMBDA_LAMBDA_HPP
 #define _FALCON_LAMBDA_LAMBDA_HPP
 
-#include <falcon/functional/std_placeholder.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/functional/call.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
 #include <falcon/arg/arg.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
 #include <falcon/iostreams/is_ios.hpp>
+
+#include <functional>
 
 namespace falcon {
 namespace lambda {
@@ -38,8 +39,6 @@ struct is_lambda_expression<___lambda<_Operation, _T, _U> >
 template<int _Num>
 struct placeholder
 {
-	typedef typename std_placeholder<_Num>::type std_placeholder_type;
-
 	template<typename _Index>
 	inline constexpr ___lambda<index<late_parameter_t, _Index>, placeholder<_Num>, const _Index&> operator[](const _Index& idx)
 	{
@@ -70,11 +69,6 @@ struct placeholder
 	inline constexpr ___lambda<late_affect, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
 	{
 		return CPP1X(late_affect{});
-	}
-
-	constexpr std_placeholder_type to_std_placeholderight() const
-	{
-		return std_placeholder_type();
 	}
 
 	template<typename _T, typename _Class>
@@ -815,12 +809,6 @@ constexpr typename std::enable_if<std::is_rvalue_reference<_T&&>::value, ___lamb
 }
 
 }
-
-template<int _N>
-struct to_std_placeholder<lambda::placeholder<_N> >
-{
-	typedef typename lambda::placeholder<_N>::std_placeholder_type type;
-};
 
 }
 

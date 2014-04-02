@@ -31,33 +31,33 @@ using __get_property = accessors::return_reference<T>;
 template<typename T>
 struct __set_property_assign
 {
-	template<typename _U>
-	void operator()(T& oldvalue, const _U& newvalue)
+	template<typename U>
+	void operator()(T& oldvalue, const U& newvalue)
 	{ oldvalue = newvalue; }
 };
 
-template<typename T, typename _Assign>
+template<typename T, typename Assign>
 struct __set_property_through_get
 {
-	_Assign assign = _Assign();
+	Assign assign = Assign();
 
-	template<typename _Property>
-	void operator()(_Property& property, const T& value)
+	template<typename Property>
+	void operator()(Property& property, const T& value)
 	{ assign(property.get(), value); }
 };
 
-template<typename T, typename _Assign = use_default>
+template<typename T, typename Assign = use_default>
 struct __set_property_through_base
 {
 	typedef typename default_or_type<
 		use<__set_property_assign<T>>,
-		_Assign
+		Assign
 	>::type __functor_type;
 
 	__functor_type assign = __functor_type();
 
-	template<typename _Property>
-	void operator()(_Property& property, const T& value)
+	template<typename Property>
+	void operator()(Property& property, const T& value)
 	{ assign(property.base(), value); }
 };
 
@@ -195,12 +195,12 @@ public:
 	auto get() -> decltype(this->dispatch_get(this->getter))
 	{ return getter(base()); }
 
-	template<typename _U>
-	void set(_U&& newvalue)
-	{ return setter(*this, std::forward<_U>(newvalue)); }
+	template<typename U>
+	void set(U&& newvalue)
+	{ return setter(*this, std::forward<U>(newvalue)); }
 
-	template<typename _U>
-	void operator()(_U&& newvalue)
+	template<typename U>
+	void operator()(U&& newvalue)
 	{ return set(newvalue); }
 
 	auto operator()() const -> decltype(this->get())
@@ -209,11 +209,11 @@ public:
 	auto operator()() -> decltype(this->get())
 	{ return get(); }
 
-	template<typename _U>
+	template<typename U>
 	typename std::enable_if<
 		Properties & properties::implicit_cast,
-		typename if_<0, _U, void>::type
-	>::type operator=(_U&& newvalue)
+		typename if_<0, U, void>::type
+	>::type operator=(U&& newvalue)
 	{ set(newvalue); }
 
 	operator typename eval_if<

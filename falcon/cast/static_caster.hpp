@@ -1,7 +1,11 @@
 #ifndef FALCON_CAST_STATIC_CASTER_HPP
 #define FALCON_CAST_STATIC_CASTER_HPP
 
-#include <falcon/c++/noexcept.hpp>
+#if __cplusplus >= 201103L
+# include <utility>
+#else
+# include <falcon/c++/noexcept.hpp>
+#endif
 
 namespace falcon {
 
@@ -9,6 +13,11 @@ namespace falcon {
 template <class Cast>
 struct static_caster
 {
+#if __cplusplus >= 201103L
+  template<class T>
+  Cast operator()(T&& d) const noexcept
+  { return static_cast<Cast>(std::forward<T>(d)); }
+#else
   template<class T>
   Cast operator()(T& d) const CPP_NOEXCEPT
   { return static_cast<Cast>(d); }
@@ -16,6 +25,7 @@ struct static_caster
   template<class T>
   Cast operator()(const T& d) const CPP_NOEXCEPT
   { return static_cast<Cast>(d); }
+#endif
 };
 
 }

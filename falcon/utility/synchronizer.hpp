@@ -3,7 +3,6 @@
 
 #include <falcon/c++1x/syntax.hpp>
 #include <falcon/utility/maker.hpp>
-#include <falcon/functional/placeholder_for_argument.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/tuple/to_tuple_reference.hpp>
 #include <falcon/tuple/tuple_for_each.hpp>
@@ -15,6 +14,7 @@
 #include <falcon/preprocessor/not_ide_parser.hpp>
 
 #include <tuple>
+#include <functional>
 #include <type_traits>
 
 namespace falcon
@@ -118,11 +118,12 @@ public:
 	_FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type, const)\
 	_FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type,)
 
-#define _FALCON_SYNCHRONIZER_OPERATOR(op, func_type)\
-	_FALCON_SYNCHRONIZER_OPERATOR2(op, func_type)\
-	template<typename _U>\
-	synchronizer& operator op##=(_U&& x)\
-	{ tuple_for_each(tuple(), placeholder_for_argument<1, late_##func_type##_equal, _U&>(x));\
+#define _FALCON_SYNCHRONIZER_OPERATOR(op, func_type)                 \
+	_FALCON_SYNCHRONIZER_OPERATOR2(op, func_type)                       \
+	template<typename _U>                                               \
+	synchronizer& operator op##=(_U&& x)                                \
+	{ tuple_for_each(tuple()                                            \
+  , std::bind(late_##func_type##_equal(), std::placeholders::_1, x)); \
 	return *this; }
 
 	_FALCON_SYNCHRONIZER_OPERATOR(+, plus)
@@ -235,7 +236,7 @@ private:
 	{
 		tuple_for_each(
 			this->tuple(),
-			placeholder_for_argument<1, late_affect, _U&>(x)
+			std::bind(late_affect(), std::placeholders::_1, std::ref(x))
 		);
 		return *this;
 	}

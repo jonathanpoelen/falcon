@@ -271,8 +271,6 @@ faire de certaines fonctions libres des foncteurs en constexpr
 pour les foncteurs pris en rvalue, utiliser forward avant l'appel. (parce que ref qualifier: int f()&&)
 faire tous les opérateurs en 2 version ? const & et && ?
 
-une combinaison de falcon::default_new/nothrow_default_new et std::default_delete. car default_new<T[2]> creer un tableau de 2 elements mais default_delete<T[2]> ne compile. Il faut default_delete<T[]>. Faire un alias de default_delete mais qui supporte T[x] ?
-
 synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier les valeurs des itrateu par defaut ? (tous, 1 ?). Ajouter des test avec des iterateur de taille different et regarder si ne deborde pas
 
 utiliser boost::addressof ou std::addressof (dans <memory>). enlever detail/addressof.hpp
@@ -285,9 +283,15 @@ const parameter_index & -> parameter_index
 
 regrouper ostream et istream dans iostreams et faire un namespace iostreams
 
-suffixer les type des foncteur variable avec _f plutôt que _t ?
-
-placeholder_for_argument -> en un static_bind. À moins que bind retourne deja un objet de ce style ?
+suffixer les types des foncteurs variable avec _f plutôt que _t ?
 
 deplacer certain header de math dans logical
+
+un objet mutable avec tous les operators (cast implicite pour ne pas tous les faire)
+
+delegate_result et function_compose font la même chose ? renommer function_compose et supprimer delegate_result. ajouter des operator()() avec plusieurs arguments ?
+
+dynamic_callback avec range. Autre fonction ? paramètres supplémentaire au début qui représente des indices ou des ranges ?
+
+bug memoire dans flag.
 

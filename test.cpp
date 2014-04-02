@@ -66,10 +66,15 @@ struct value_printer
   }
 };
 
+#include <test/A.h>
+
 int main()
 {
-  typedef vector_c<int,0,9> numbers;
-  for_each< numbers >( value_printer() );
+  A a;
+  static_cast<A>(std::move(a));
+
+//   typedef vector_c<int,0,9> numbers;
+//   for_each< numbers >( value_printer() );
 
 //   result() = 0;
 

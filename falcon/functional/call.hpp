@@ -13,7 +13,7 @@ namespace falcon {
  * @{
  */
 /**
- * \brief Call \c func with the indexes \c _Indexes for arguments \c args
+ * \brief Call \c func with the indexes \c Indexes for arguments \c args
  *
  * \code
  * call(parameter_index<0,2,0,1>(), f, 1,2,3,4,5);
@@ -23,11 +23,10 @@ namespace falcon {
  * f(1,3,1,2);
  * \endcode
  */
-template <typename _Function, typename... _Args, std::size_t... _Indexes>
-constexpr auto call(const parameter_index<_Indexes...>&,
-                    _Function func, _Args&&... args)
--> decltype(func(arg<_Indexes>(std::forward<_Args>(args)...)...))
-{    return func(arg<_Indexes>(std::forward<_Args>(args)...)...); }
+template <typename Function, typename... Args, std::size_t... Indexes>
+constexpr auto call(const parameter_index<Indexes...>&, Function && func, Args&&... args)
+-> decltype(std::forward<Function>(func)(arg<Indexes>(std::forward<Args>(args)...)...))
+{    return std::forward<Function>(func)(arg<Indexes>(std::forward<Args>(args)...)...); }
 //@}
 
 }
