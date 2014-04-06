@@ -61,6 +61,10 @@ tuple_applier<Functor> make_tuple_applier(Functor&& func)
 { return {std::forward<Functor>(func)}; }
 
 template <typename Functor, typename Tag>
+tuple_applier<Functor, Tag> make_tuple_applier(Functor&& func, Tag)
+{ return {std::forward<Functor>(func)}; }
+
+template <typename Functor, typename Tag>
 void swap(tuple_applier<Functor, Tag>& a, tuple_applier<Functor, Tag>& b)
 { a.swap(b); }
 

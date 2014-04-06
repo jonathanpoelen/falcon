@@ -109,6 +109,11 @@ struct parameter_index_adapter<Functor, call_partial_recursive_param_loop_tag<Nu
 
 //@}
 
+template <class Functor, class Tag>
+parameter_index_adapter<Functor, Tag>
+make_parameter_index_adapter(Functor && f, Tag)
+{ return parameter_index_adapter<Functor, Tag>{std::forward<Functor>(f)};  }
+
 template <typename Functor, typename Tag>
 void swap(parameter_index_adapter<Functor, Tag>& x,
         parameter_index_adapter<Functor, Tag>& y)

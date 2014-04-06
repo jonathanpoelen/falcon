@@ -8,11 +8,7 @@ rendre operators.hpp un peu compatible c++89
 
 modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
 
-enlever les macros variable et passer par __VA_ARGS__
-
 objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionner avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
-
-iota(begin(), end(), first_value): le faire avec iota(container, first_value)
 
 flag.hpp: doit possèder un constructeur avec avec initializer_list.
 flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
@@ -20,8 +16,6 @@ enlever la hack qui permet une fonction consexpr en n'utilisant pas de boucle. C
 valgrind retourne un jump sur variable non initialisée
 
 optimiser recursive_iterator (et l'algo de recursion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
-
-faire un algorithmfwd.hpp pour bien nommer les champs
 
 optimisation de taille des enum class: enum class E : typename std::conditional<l.size() == 2, bool, int>::type {…}; (minimal_int<>::type ?)
 
@@ -49,13 +43,7 @@ structure englopant un type et pour chaque operateur suceptible de changer le ty
 Permet ainsi de s'affranchir des enum_* en passant par les foncteurs sur operateurs: enum_plus<enum_t> -> plus<integral_wrapper<enum_t>>, enum_increment<enum_t> -> increment<integral_wrapper<enum_t&>>
 ajouter le keyword enum pour enum/operators.hpp ou étendre une classe au nom plus générique qui fait un cast pour les opérations arithmétique ou binaire (plus_conversion, etc ?). La classe generique heriter des operateurs de la façon décrit au-dessus.
 
-amélioré algorithm.hpp en "optimisant" les algos quand possible (nottament quand directement utilisé avec un container). std::remove(s.begin(), s.end(), ',') copie inutile de caractères jusqu'à la première occurence trouvé (vraiment !?). falcon::remove(s, ',') cherche la première occurence (std::find) puis utilise std::remove.
-
 singleton<_T> qui utilise static_new. Peut-être un singleton_id<_T, _Id>. Voir aussi call_once
-
-les lambdas toujours par reference ou il faut parfois utiliser std::ref ? Pas le cas pour while_loop et co...
-
-faire un make_parameter_adapter() et un make_tuple_applier().
 
 temporary_tuple_cat (tuple concatener par reference ? tuple_cat_reference)
 
@@ -77,8 +65,6 @@ enlever les doubles underscore car reservé. Idem pour les underscores suivit de
 
 Vérifier les types tag dans les iterateurs.
 Ajouter dans les iterators les fonctions pour acceder aux fonctorx lorsque ceux-ci en utilisent (fn() ?).
-
-algorithm.hpp : ne prend pas en compte les containers constant…
 
 tuple_get_accessor → get_idx_accessor ? get_index_accessor ?
 
@@ -134,6 +120,7 @@ classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib
 basic_string_reference<String>(String&, start, size)
 string_reference=basic_string_reference<std::string>
 cstring fonctionnant sur pile (alloue un tableau de char (fixed_string?)). Hérite de cstring (private/protected). Implémenter à travers cstring par un CharT = char_type<N, CharT = char> ? (changer le nom de char_type)
+voir std::string_view
 
 local_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau (la copie partage le même storage)
 global_pool_allocator: non thread save. pointeur sauvegarder sous forme de tableau static
@@ -154,7 +141,7 @@ shared_allocator. Par exemple shared_allocator<free_list_allocator> partage tous
 
 iterator comme zone mais dans différentes direction: http://www.thonky.com/qr-code-tutorial/module-placement-matrix/#pattern-of-placement. Renommer zonne_iterator ?
 
-vector avec fonction de redirection d'indice (type template). Permet par exemple un vecteur 2D (avec en template la fonction/wrapper coord()).
+vector avec fonction de redirection d'indice (type template). Permet par exemple un vecteur 2D (avec en template la fonction/wrapper coord()). Voir std::array_view
 
 move semantique pour class_property + property read_only + operator= pour éviter de passer par un cast implicit quand il n'y a pas de getter.
 
@@ -186,9 +173,7 @@ faire des fonctions spéciliasées pour retourner des objets ou faire des algos 
 
 C++14: utilisé integer_sequence à la place de parameter_index.
 
-faire des traits parameter des classes génériques (tous type template (void mpl/detail/s_*))
-
-mettre sfinae::detail de has_type dans le dossier detail. De plus un fichier implémente un trait enable_type (ou identique mais avec un nom différent :/ (see use_def.hpp)
+faire des traits parameter des classes génériques (tous type template (voir mpl/detail/s_*))
 
 mpl: initialiser par défaut les attributs avec un arg<>
 mpl: or + is_arg -> contains_arg ou s_contains<pack<>, is_arg>
@@ -223,7 +208,7 @@ build_parameter_index_t -> make_parameter_index
 
 coordinates -> coordinate (modifier également le namespace ou le nom des fonctions/classes)
 
-un tableau de taille fixe à plusieurs dimension aplati (flat_array<T, size_t...> ? (un dynamique un statique)). accer avec [{...}], [x][y]. le mode initializer retourne soit le type soit un wrapper de sous ensemble soit une erreur car trop d'index. Ajout un accer operateur parenthese qui retourne une valeur. mettre un to_array qui retourne un std::array en reference (cast à l'arrache)
+un tableau de taille fixe à plusieurs dimension aplati (flat_array<T, size_t...> ? (un dynamique un statique)). accer avec [{...}], [x][y]. le mode initializer retourne soit le type soit un wrapper de sous ensemble soit une erreur car trop d'index. Ajout un accer operateur parenthese qui retourne une valeur. mettre un to_array qui retourne un std::array en reference (cast à l'arrache) (voir std::array_view)
 
 split operators dans plein de fichier (1 opérateur par fichier). Idem pour celui sur les enum, idem pour les algorithm/range
 
@@ -231,26 +216,22 @@ le traits badar pour tranformer les signé en non-signé et inversement peuvent 
 
 renommer build_class en make_type, build_type, make_of ou autre
 
-range_modifier -> synchronizer_sequence avec les même fonctionnalités que synchronizer
-
-accesors/empty.hpp
-
 iterator_handler: faire en sorte que recoil dépende de advance. Idem pour next avec prev
 
 pas de namespace iterator
 
 pas de category selectif dans un integer_iterator
 
-get_file_contents qui prend en param u objet quelconque et qui utilise resize+data ou un traits. spécialisation pour le string car pas de data ?
+get_file_contents qui prend en param un objet quelconque et qui utilise resize+data ou un trait. spécialisation pour le string car pas de data ?
 
 functional/operators.hpp: séparer dans plusieurs fichier et ne pas utiliser late_parameter_t mais void (supprimer late_parameter_t). Ne pas oublier le move sémantique dans les opérateurs
 
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/#mailing2014-01 (entre autre l'implémentation de apply_tuple (apply_from_tuple dans le standars))
 
 natsort compare + avec locale (voir implémentation de martin pool (lien dans la doc php de natsort) et aussi en javascript dans katepart commands/utils.js)
-char_trait insentive case (ci_char_trait)
+char_trait insentive case (ci_char_trait). Note et boost ?
 
-faire une passe sur les fonctions prenant des references constantes ou/et des rvalue (argument conservé par la fonction) en valeur dure. Utiliser une des mcro pour les code non C++11
+faire une passe sur les fonctions prenant des references constantes ou/et des rvalue (argument conservé par la fonction) en valeur dure. Utiliser une des macro pour les codes non C++11
 
 adaptater -> view ? Pas pour tous. Les transformer en vues si possible
 
@@ -271,7 +252,7 @@ faire de certaines fonctions libres des foncteurs en constexpr
 pour les foncteurs pris en rvalue, utiliser forward avant l'appel. (parce que ref qualifier: int f()&&)
 faire tous les opérateurs en 2 version ? const & et && ?
 
-synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier les valeurs des itrateu par defaut ? (tous, 1 ?). Ajouter des test avec des iterateur de taille different et regarder si ne deborde pas
+synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier les valeurs des iterateur par defaut ? (tous, 1 ?). Ajouter des tests avec des iterateurs de taille different et regarder si ne debordent pas
 
 utiliser boost::addressof ou std::addressof (dans <memory>). enlever detail/addressof.hpp
 
