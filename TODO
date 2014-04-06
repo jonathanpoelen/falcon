@@ -270,8 +270,6 @@ deplacer certain header de math dans logical
 
 un objet mutable avec tous les operators (cast implicite pour ne pas tous les faire)
 
-delegate_result et function_compose font la même chose ? renommer function_compose et supprimer delegate_result. ajouter des operator()() avec plusieurs arguments ?
-
 dynamic_callback avec range. Autre fonction ? paramètres supplémentaire au début qui représente des indices ou des ranges ?
 
 bug memoire dans flag.

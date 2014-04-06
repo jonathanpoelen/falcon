@@ -112,10 +112,10 @@ public:
 	, fn2(std::forward<OperationU>(y))
 	{}
 
-	template<typename T>
-	auto operator()(T&& x) const
-	-> decltype(this->fn1(this->fn2(std::forward<T>(x))))
-  { return fn1(fn2(std::forward<T>(x))); }
+	template<typename... Ts>
+	auto operator()(Ts&&... args) const
+  -> decltype(this->fn1(this->fn2(std::forward<Ts>(args)...)))
+  { return fn1(fn2(std::forward<Ts>(args)...)); }
 
 };
 
@@ -135,7 +135,7 @@ compose1(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
 
 /** The @c binary_compose is constructed from three functors, @c f, @c g1,
  * and @c g2.  Its @c operator() returns @c f(g1(x),g2(x)).  The function
- * @c compose2 takes f, g1, and g2, and constructs the @c binary_compose
+ * @c compose2 takes f, g1 and g2, and constructs the @c binary_compose
  * instance for you.  For example, if @c f returns an int, then
  * \code
  * int answer = (compose2(f,g1,g2))(x);
@@ -216,10 +216,11 @@ public:
   , fn3()
   {}
 
-  template<typename T>
-  auto operator()(T&& x) const
-  -> decltype(this->fn1(this->fn2(std::forward<T>(x)), this->fn3(std::forward<T>(x))))
-  { return fn1(fn2(std::forward<T>(x)), fn3(std::forward<T>(x))); }
+  template<typename... Ts>
+  auto operator()(Ts&&... args) const
+  -> decltype(this->fn1(this->fn2(std::forward<Ts>(args)...),
+              this->fn3(std::forward<Ts>(args)...)))
+  { return fn1(fn2(std::forward<Ts>(args)...), fn3(std::forward<Ts>(args)...)); }
 };
 //@}
 
@@ -258,13 +259,13 @@ compose2(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
  * The function  @c compose takes f, t and constructs the @c mulary_compose
  * instance for you.  For example, if @c f returns an int, then
  * \code
- * int answer = (composex(f,g1,g2,g3))(x);
+ * int answer = (composex(f,g1,g2,g3))(x,y);
  * \endcode
  * is equivalent to
  * \code
- * int temp1 = g1(x);
- * int temp2 = g2(x);
- * int temp3 = g3(x);
+ * int temp1 = g1(x,y);
+ * int temp2 = g2(x,y);
+ * int temp3 = g3(x,y);
  * int answer = f(temp1,temp2,temp3);
  * \endcode
  * @{
@@ -307,20 +308,22 @@ public:
   , fns(std::forward<Operations>(y))
   {}
 
-  template<typename T>
-  constexpr auto operator()(T&& x) const
-  -> decltype(tuple_compose<const Operation &>(
-      parameter_index<0>(),
-      fn,
-      fns,
-      std::forward_as_tuple(x)
-    ))
+  template<typename... Args>
+  constexpr auto operator()(Args&&... args) const
+  -> decltype(tuple_compose(
+    build_parameter_index_t<sizeof...(Args)>(),
+    build_tuple_index_t<Operations>(),
+    std::cref(this->fn),
+    this->fns,
+    std::forward_as_tuple(std::forward<Args>(args)...)
+  ))
   {
-    return tuple_compose<const Operation &>(
-      parameter_index<0>(),
-      fn,
+    return tuple_compose(
+      build_parameter_index_t<sizeof...(Args)>(),
+      build_tuple_index_t<Operations>(),
+      std::cref(fn),
       fns,
-      std::forward_as_tuple(x)
+      std::forward_as_tuple(std::forward<Args>(args)...)
     );
   }
 };
@@ -352,100 +355,6 @@ composex(Operation&& fn1, OperationT && fn2, Operations&&... fns)
       std::forward<Operations>(fns)...
     )
   };
-}
-//@}
-
-/** The @c function_compose is constructed from tuple functors, @c f, @c t.
- * Its @c operator() returns @c f(std::get<0>(t)(x), ...).
- * The function  @c compose takes f, t and constructs the @c function_compose
- * instance for you.  For example, if @c f returns an int, then
- * \code
- * int answer = (composef(f,g1,g2,g3))(x,y);
- * \endcode
- * is equivalent to
- * \code
- * int temp1 = g1(x,y);
- * int temp2 = g2(x,y);
- * int temp3 = g3(x,y);
- * int answer = f(temp1,temp2,temp3);
- * \endcode
- * @{
- */
-template<class Operation, class Operations>
-class function_compose
-{
-	Operation fn;
-	Operations fns;
-
-public:
-  constexpr function_compose() = default;
-  constexpr function_compose(const function_compose&) = default;
-  constexpr function_compose(function_compose&&) = default;
-  function_compose& operator=(const function_compose&) = default;
-  function_compose& operator=(function_compose&&) = default;
-
-  template<typename Op, typename Ops>
-	constexpr function_compose(Op&& x, Ops&& y)
-	: fn(std::forward<Op>(x))
-	, fns(std::forward<Ops>(y))
-	{}
-
-  template<typename Op>
-  constexpr function_compose(Op&& x)
-  : fn(std::forward<Op>(x))
-  , fns()
-  {}
-
-	constexpr function_compose(Operations&& y)
-	: fn()
-  , fns(std::forward<Operations>(y))
-	{}
-
-  template<typename... Args>
-  constexpr auto operator()(Args&&... args) const
-  -> decltype(tuple_compose<const Operation &>(
-      parameter_index<0>(),
-      fn,
-      fns,
-      std::forward_as_tuple(std::forward<Args>(args)...)
-    ))
-  {
-    return tuple_compose<const Operation &>(
-      parameter_index<0>(),
-      fn,
-      fns,
-      std::forward_as_tuple(std::forward<Args>(args)...)
-    );
-  }
-};
-
-template<typename Operation, typename Operations>
-constexpr function_compose<Operation,
-  typename std::conditional<
-    is_tuple_impl<Operations>::value,
-    Operations,
-    std::tuple<Operation>
-  >::type
->
-composex(Operation&& fn1, Operations&& fns)
-{
-  return {
-    std::forward<Operation>(fn1),
-    std::forward<Operations>(fns)
-  };
-}
-
-template<typename Operation, typename OperationT, typename... Operations>
-constexpr function_compose<Operation, std::tuple<OperationT, Operations...>>
-composex(Operation&& fn1, OperationT && fn2, Operations&&... fns)
-{
-	return {
-		std::forward<Operation>(fn1),
-    std::tuple<OperationT, Operations...>(
-      std::forward<OperationT>(fn2),
-      std::forward<Operations>(fns)...
-    )
-	};
 }
 //@}
 
