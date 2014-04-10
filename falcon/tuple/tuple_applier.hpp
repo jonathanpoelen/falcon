@@ -20,40 +20,32 @@ class tuple_applier
 
 public:
   tuple_applier(Functor && func)
-  : _M_func(std::forward<Functor>(func))
+  : m_func(std::forward<Functor>(func))
   {}
 
   template<typename T>
-  auto operator()(T&& t) const &
+  auto operator()(T&& t) const
   -> decltype(
     tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>()
   , std::declval<Functor&>(), std::forward<T>(t)))
   { return tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>()
-  , _M_func, std::forward<T>(t)); }
-
-  template<typename T>
-  auto operator()(T&& t) &&
-  -> decltype(
-    tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>()
-  , std::declval<Functor&&>(), std::forward<T>(t)))
-  { return tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>()
-  , std::move(_M_func), std::forward<T>(t)); }
+  , m_func, std::forward<T>(t)); }
 
   void swap(tuple_applier& other)
   {
     using std::swap;
-    swap(_M_func, other._M_func);
+    swap(m_func, other.m_func);
   }
 
   template<typename Tag2>
   void swap(tuple_applier<Functor, Tag2>& other)
   {
     using std::swap;
-    swap(_M_func, other._M_func);
+    swap(m_func, other.m_func);
   }
 
 private:
-  Functor _M_func;
+  Functor m_func;
 };
 
 template <typename Functor>
@@ -63,10 +55,6 @@ tuple_applier<Functor> make_tuple_applier(Functor&& func)
 template <typename Functor, typename Tag>
 tuple_applier<Functor, Tag> make_tuple_applier(Functor&& func, Tag)
 { return {std::forward<Functor>(func)}; }
-
-template <typename Functor, typename Tag>
-void swap(tuple_applier<Functor, Tag>& a, tuple_applier<Functor, Tag>& b)
-{ a.swap(b); }
 
 template <typename Functor, typename Tag, typename Tag2>
 void swap(tuple_applier<Functor, Tag>& a, tuple_applier<Functor, Tag2>& b)

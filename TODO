@@ -274,3 +274,9 @@ dynamic_callback avec range. Autre fonction ? paramètres supplémentaire au dé
 
 bug memoire dans flag.
 
+faire le tri dans functional/operators.hpp et functional/indirec_operation.hpp (à renommer en indirec_operators ?)
+
+un objet qui créer un arbre de condition dichtomique xxx(yyy(value_ref, f),...)
+
+les maker en foncteur ?
+
