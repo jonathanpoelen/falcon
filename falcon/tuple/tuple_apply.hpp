@@ -9,17 +9,17 @@
 
 namespace falcon {
 
-template <typename Function, typename Tuple, std::size_t... Indexes>
+template <typename F, typename Tuple, std::size_t... Indexes>
 constexpr CPP1X_DELEGATE_FUNCTION(
-  tuple_apply(parameter_index<Indexes...>, Function && func, Tuple&& t),
-  std::forward<Function>(func)(get<Indexes>(std::forward<Tuple>(t))...)
+  tuple_apply(parameter_index<Indexes...>, F && func, Tuple&& t),
+  std::forward<F>(func)(get<Indexes>(std::forward<Tuple>(t))...)
 )
 
-template <typename Function, typename Tuple, std::size_t... Indexes>
+template <typename F, typename Tuple, std::size_t... Indexes>
 constexpr CPP1X_DELEGATE_FUNCTION(
-  tuple_apply(Function && func, Tuple&& t),
-  tuple_apply(build_tuple_index_t<typename std::decay<Tuple>::type>(),
-              std::forward<Function>(func), std::forward<Tuple>(t)
+  tuple_apply(F && func, Tuple&& t),
+  tuple_apply(build_tuple_index_t<Tuple>(),
+              std::forward<F>(func), std::forward<Tuple>(t)
   )
 )
 

@@ -8,7 +8,7 @@
 # define CPP1X CPP_INITIALIZE
 
 #if defined(IN_IDE_PARSER)
-# define CPP1X_DELEGATE_FUNCTION(Func, impl...)\
+# define CPP1X_DELEGATE_FUNCTION(Func, impl)\
     auto Func -> decltype(impl) { return impl; }
 #else
 # if __cplusplus > 201103L

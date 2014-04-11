@@ -13,9 +13,9 @@ namespace std {
 namespace falcon {
 
 namespace __detail {
-  struct __not_declared;
-  template<std::size_t I, class T>
-  __not_declared get(const T&);
+  struct _not_declared;
+  template<std::size_t I>
+  _not_declared get(_not_declared);
 }
 using __detail::get;
 

@@ -1,55 +1,19 @@
-#ifndef _FALCON_TYPE_TRAITS_DECAY_AND_STRIP_HPP
-#define _FALCON_TYPE_TRAITS_DECAY_AND_STRIP_HPP
+#ifndef FALCON_TYPE_TRAITS_DECAY_AND_STRIP_HPP
+#define FALCON_TYPE_TRAITS_DECAY_AND_STRIP_HPP
 
 #include <falcon/c++/boost_or_std.hpp>
-#include FALCON_BOOST_OR_STD_TRAITS(decay)
+#include <falcon/type_traits/strip_reference_wrapper.hpp>
 
-namespace boost {
-	template<typename>
-	class reference_wrapper;
-}
+#include FALCON_BOOST_OR_STD_TRAITS(decay)
 
 namespace falcon {
 
-// Helper which adds a reference to a type when given a reference_wrapper
-template<typename _Tp>
-struct __strip_reference_wrapper
-{
-	typedef _Tp __type;
-};
-
-#if __cplusplus >= 201103L
-template<typename _Tp>
-struct __strip_reference_wrapper<std::reference_wrapper<_Tp> >
-{
-	typedef _Tp& __type;
-};
-
-template<typename _Tp>
-struct __strip_reference_wrapper<const std::reference_wrapper<_Tp> >
-{
-	typedef _Tp& __type;
-};
-#endif
-
-template<typename _Tp>
-struct __strip_reference_wrapper<boost::reference_wrapper<_Tp> >
-{
-	typedef _Tp& __type;
-};
-
-template<typename _Tp>
-struct __strip_reference_wrapper<const boost::reference_wrapper<_Tp> >
-{
-	typedef _Tp& __type;
-};
-
-template<typename _Tp>
+template<class T>
 struct decay_and_strip
 {
-	typedef typename __strip_reference_wrapper<
-		typename FALCON_BOOST_OR_STD_NAMESPACE::decay<_Tp>::type
-	>::__type type;
+	typedef typename strip_reference_wrapper<
+		typename FALCON_BOOST_OR_STD_NAMESPACE::decay<T>::type
+	>::type type;
 };
 
 }

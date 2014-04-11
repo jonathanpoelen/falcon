@@ -274,9 +274,14 @@ dynamic_callback avec range. Autre fonction ? paramètres supplémentaire au dé
 
 bug memoire dans flag.
 
-faire le tri dans functional/operators.hpp et functional/indirec_operation.hpp (à renommer en indirec_operators ?)
+faire le tri dans functional/operators.hpp et functional/indirect_operation.hpp (à renommer en indirec_operators ?)
 
 un objet qui créer un arbre de condition dichtomique xxx(yyy(value_ref, f),...)
 
 les maker en foncteur ?
+
+modifier les fonction d'accesseur (+accessors/get) sur get pour y ajouter le get de type et constexpr. Faire une simplification pour synchroniser et arguments_wrapper en utilisant que le forwading sur std::get
+
+tuple_apply -> apply_from_tuple
+
 

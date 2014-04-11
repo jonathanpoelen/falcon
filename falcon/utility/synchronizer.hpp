@@ -23,25 +23,21 @@ namespace falcon
 /**
  * Delegate the operation to each items
  */
-template <typename... _Elements>
+template <typename... Elements>
 class synchronizer
-: public std::tuple<_Elements...>
+: std::tuple<Elements...>
 {
-private:
-	typedef std::tuple<_Elements...> __base;
-
-public:
-	typedef __base tuple_type;
+  typedef std::tuple<Elements...> tuple_type;
 
 
 public:
-	using std::tuple<_Elements...>::tuple;
-	using std::tuple<_Elements...>::operator=;
+	using std::tuple<Elements...>::tuple;
+	using std::tuple<Elements...>::operator=;
 
-	const tuple_type& tuple() const
+	constexpr const tuple_type& tuple() const
 	{ return *this; }
 
-	tuple_type& tuple()
+  CPP_CONSTEXPR_NOT_CONST tuple_type& tuple()
 	{ return *this; }
 
 private:
@@ -249,76 +245,55 @@ public:
 	template<typename _U>
 	synchronizer& operator=(const _U& x)
 	{ return assign(x); }
-
-	void swap(synchronizer& other)
-	{
-      using std::swap;
-      swap(this->tuple(), other.tuple());
-    }
 };
 
-template<typename... _Elements>
-constexpr synchronizer<typename decay_and_strip<_Elements>::type...>
-make_synchronizer(_Elements&&... __args)
+template<typename... Elements>
+constexpr synchronizer<typename decay_and_strip<Elements>::type...>
+make_synchronizer(Elements&&... __args)
 {
 	return synchronizer<
-		typename decay_and_strip<_Elements>::type...
-	>(std::forward<_Elements>(__args)...);
+		typename decay_and_strip<Elements>::type...
+	>(std::forward<Elements>(__args)...);
 }
 
 
-template<std::size_t I, typename... Elements>
-auto get(synchronizer<Elements...>& t) noexcept
--> decltype(std::get<I>(t))
-{ return std::get<I>(t); }
-
-template<std::size_t I, typename... Elements>
-auto get(const synchronizer<Elements...>& t) noexcept
--> decltype(std::get<I>(t))
-{ return std::get<I>(t); }
-
-template<std::size_t I, typename... Elements>
-auto get(synchronizer<Elements...>&& t) noexcept
--> decltype(std::get<I>(std::forward<synchronizer<Elements...>>(t)))
-{ return std::get<I>(std::forward<synchronizer<Elements...>>(t)); }
-
-
 ///Creates a @c synchronizer of lvalue references
-template<typename... _Elements>
-constexpr synchronizer<_Elements&...> synchronize(_Elements&... __args)
-{ return synchronizer<_Elements&...>(__args...); }
+template<typename... Elements>
+constexpr synchronizer<Elements&...> synchronize(Elements&... __args)
+{ return synchronizer<Elements&...>(__args...); }
+
 
 ///Creates a @c synchronizer of lvalue references on tuple values
-template<typename... _Elements>
-synchronizer<_Elements...>& synchronizer_cast(std::tuple<_Elements...>& t)
-{ return static_cast<synchronizer<_Elements...>&>(t); }
+template<typename... Elements>
+synchronizer<Elements...>& synchronizer_cast(std::tuple<Elements...>& t)
+{ return static_cast<synchronizer<Elements...>&>(t); }
 
 ///Creates a const @c synchronizer of lvalue references on tuple values
-template<typename... _Elements>
-const synchronizer<_Elements...>& synchronizer_cast(const std::tuple<_Elements...>& t)
-{ return static_cast<const synchronizer<_Elements...>&>(t); }
+template<typename... Elements>
+const synchronizer<Elements...>& synchronizer_cast(const std::tuple<Elements...>& t)
+{ return static_cast<const synchronizer<Elements...>&>(t); }
 
 ///Creates a @c synchronizer of rvalue references on tuple values
-template<typename... _Elements>
-synchronizer<_Elements...>&& synchronizer_cast(std::tuple<_Elements...>&& t)
-{ return static_cast<synchronizer<_Elements...>&&>(t); }
+template<typename... Elements>
+synchronizer<Elements...>&& synchronizer_cast(std::tuple<Elements...>&& t)
+{ return static_cast<synchronizer<Elements...>&&>(t); }
 
-template<typename... _Elements>
-void swap(falcon::synchronizer<_Elements...>& a,
-          falcon::synchronizer<_Elements...>& b)
+template<typename... Elements>
+void swap(falcon::synchronizer<Elements...>& a,
+          falcon::synchronizer<Elements...>& b)
 { a.swap(b); }
 
 }
 
 namespace std
 {
-	template<typename... _Elements>
-	struct tuple_size<falcon::synchronizer<_Elements...>>
-	{ static const int value = sizeof...(_Elements); };
+	template<typename... Elements>
+	struct tuple_size<falcon::synchronizer<Elements...>>
+	{ static const int value = sizeof...(Elements); };
 
-	template<std::size_t _Index, typename... _Elements>
-	struct tuple_element<_Index, falcon::synchronizer<_Elements...>>
-	: tuple_element<_Index, std::tuple<_Elements...>>
+	template<std::size_t _Index, typename... Elements>
+	struct tuple_element<_Index, falcon::synchronizer<Elements...>>
+	: tuple_element<_Index, std::tuple<Elements...>>
 	{};
 }
 
