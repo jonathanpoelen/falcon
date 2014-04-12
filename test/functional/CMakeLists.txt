@@ -2,8 +2,6 @@ include(../../CMakeDefinitions.txt)
 include_directories(.. ../..)
 
 create_exec_test(call)
-create_exec_test(cut_and_place)
-create_exec_test(generator)
 create_exec_test(store_if)
 create_exec_test(compose)
 create_exec_test(arguments_wrapper)

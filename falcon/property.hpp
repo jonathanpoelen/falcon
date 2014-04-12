@@ -4,6 +4,7 @@
 #include <utility>
 #include <type_traits>
 #include <falcon/type_traits/use.hpp>
+#include <falcon/type_traits/default_or_type.hpp>
 #include <falcon/accessors/return_reference.hpp>
 #include <falcon/type_traits/eval_if.hpp>
 

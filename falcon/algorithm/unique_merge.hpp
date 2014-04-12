@@ -110,7 +110,7 @@ OutputIt unique_merge(InputIt1 first1, InputIt1 last1,
                       InputIt2 first2, InputIt2 last2,
                       OutputIt d_first)
 {
-  return __unique_merge(first1, last1, first2, last2, d_first, late_equal_to(),
+  return __unique_merge(first1, last1, first2, last2, d_first, equal_to<>(),
                         std::iterator_traits<InputIt1>::iterator_category());
 }
 

@@ -24,7 +24,7 @@ namespace falcon
  * Delegate the operation to each items
  */
 template <typename... Elements>
-class synchronizer
+struct synchronizer
 : std::tuple<Elements...>
 {
   typedef std::tuple<Elements...> tuple_type;
@@ -65,7 +65,7 @@ private:
 		)
 	};
 
-	typedef typename tuple_to_parameter_pack<__base>::type __parameter_pack;
+	typedef typename tuple_to_parameter_pack<tuple_type>::type __parameter_pack;
 	typedef typename parameter::modifier<std::add_const, __parameter_pack>::type __const_parameter_pack;
 
 	typedef late_maker<std::tuple> late_tupe;
@@ -108,7 +108,7 @@ public:
 #define _FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type, override)\
 	template<typename _U>\
 	CPP1X_DELEGATE_FUNCTION(operator op(_U&& x) override,\
-							this->__call<late_##func_type>(std::forward_as_tuple(x)))
+							this->__call<func_type<>>(std::forward_as_tuple(x)))
 
 #define _FALCON_SYNCHRONIZER_OPERATOR2(op, func_type)\
 	_FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type, const)\
@@ -119,7 +119,7 @@ public:
 	template<typename _U>                                               \
 	synchronizer& operator op##=(_U&& x)                                \
 	{ tuple_for_each(tuple()                                            \
-  , std::bind(late_##func_type##_equal(), std::placeholders::_1, x)); \
+  , std::bind(func_type##_equal<>(), std::placeholders::_1, x)); \
 	return *this; }
 
 	_FALCON_SYNCHRONIZER_OPERATOR(+, plus)
@@ -151,7 +151,7 @@ public:
 #define _FALCON_SYNCHRONIZER_OPERATOR_QUALIFIER(op, func_type, override)\
 	template<typename _U = void>\
 	CPP1X_DELEGATE_FUNCTION(operator op() override,\
-							this->__call<late_##func_type>(std::tuple<>()))
+							this->__call<func_type<>>(std::tuple<>()))
 
 	_FALCON_SYNCHRONIZER_OPERATOR(->, arrow)
 	_FALCON_SYNCHRONIZER_OPERATOR(&, address)
@@ -202,13 +202,13 @@ public:
 
 	synchronizer& operator++()
 	{
-		tuple_for_each(this->tuple(), late_increment());
+		tuple_for_each(this->tuple(), increment<>());
 		return *this;
 	}
 
 	synchronizer& operator--()
 	{
-		tuple_for_each(this->tuple(), late_decrement());
+		tuple_for_each(this->tuple(), decrement<>());
 		return *this;
 	}
 
@@ -232,7 +232,7 @@ private:
 	{
 		tuple_for_each(
 			this->tuple(),
-			std::bind(late_affect(), std::placeholders::_1, std::ref(x))
+			std::bind(affect<>(), std::placeholders::_1, std::ref(x))
 		);
 		return *this;
 	}

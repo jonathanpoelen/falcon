@@ -9,6 +9,7 @@
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>
 #include <falcon/type_traits/is_same.hpp>
+#include <falcon/type_traits/default_or_type.hpp>
 
 #include <falcon/helper/restrict_pointer.hpp>
 #include <falcon/helper/restrict_reference.hpp>

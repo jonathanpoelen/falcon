@@ -224,7 +224,7 @@ pas de category selectif dans un integer_iterator
 
 get_file_contents qui prend en param un objet quelconque et qui utilise resize+data ou un trait. spécialisation pour le string car pas de data ?
 
-functional/operators.hpp: séparer dans plusieurs fichier et ne pas utiliser late_parameter_t mais void (supprimer late_parameter_t). Ne pas oublier le move sémantique dans les opérateurs
+functional/operators.hpp: séparer dans plusieurs fichier. Ne pas oublier le move sémantique dans les opérateurs
 
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/#mailing2014-01 (entre autre l'implémentation de apply_tuple (apply_from_tuple dans le standars))
 
@@ -283,5 +283,7 @@ les maker en foncteur ?
 modifier les fonction d'accesseur (+accessors/get) sur get pour y ajouter le get de type et constexpr. Faire une simplification pour synchroniser et arguments_wrapper en utilisant que le forwading sur std::get
 
 tuple_apply -> apply_from_tuple
+
+les container_wrapper -> reverse_view, etc (alias ?)
 
 

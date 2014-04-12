@@ -20,10 +20,10 @@ public:
 	typedef typename __type_traits::reference reference;
 
 public:
-	iterator begin() const
+	static iterator begin()
 	{ return _Traits::begin(); }
 
-	iterator end() const
+  static iterator end()
 	{ return _Traits::end(); }
 };
 

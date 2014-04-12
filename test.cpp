@@ -66,11 +66,14 @@ struct value_printer
   }
 };
 
+#include <falcon/enum/enumerator.hpp>
+#include <falcon/iterator/integer_iterator.hpp>
 
 int main()
 {
-  typedef vector_c<int,0,9> numbers;
-  for_each< numbers >( value_printer() );
+
+//   typedef vector_c<int,0,9> numbers;
+//   for_each< numbers >( value_printer() );
 
 //   result() = 0;
 

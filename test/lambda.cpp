@@ -112,49 +112,49 @@ void lambda_test() {
 	{
 		{
 			using namespace std::placeholders;
-			auto f = std::bind(falcon::late_plus(), _1, _2);
+			auto f = std::bind(falcon::plus<>(), _1, _2);
 			auto lambda_f2 = -f;
 			LAMBDA_TEST(-10, lambda_f2, 4,6,4);
 		}
 
 		{
 			using namespace std::placeholders;
-			auto f = std::bind(falcon::late_plus(), _1, _2);
+			auto f = std::bind(falcon::plus<>(), _1, _2);
 			auto lambda_f2 = f+f;
 			LAMBDA_TEST(20, lambda_f2, 4,6,4);
 		}
 
 		{
 			using namespace std::placeholders;
-			auto f = std::bind(falcon::late_plus(), _1, _2);
+			auto f = std::bind(falcon::plus<>(), _1, _2);
 			auto lambda_f2 = f + phr::_1;
 			LAMBDA_TEST(14, lambda_f2, 4,6,4);
 		}
 
 		{
 			using namespace std::placeholders;
-			auto f = std::bind(falcon::late_plus(), _1, _2);
+			auto f = std::bind(falcon::plus<>(), _1, _2);
 			auto lambda_f2 = phr::_1 + f;
 			LAMBDA_TEST(14, lambda_f2, 4,6,4);
 		}
 
 		{
 			using namespace std::placeholders;
-			auto f = std::bind(falcon::late_plus(), _1, _2);
+			auto f = std::bind(falcon::plus<>(), _1, _2);
 			auto lambda_f2 = (phr::_1 + f) + phr::_3;
 			LAMBDA_TEST(18, lambda_f2, 4,6,4);
 		}
 
 		{
 			using namespace std::placeholders;
-			auto f = std::bind(falcon::late_plus(), _1, _2);
+			auto f = std::bind(falcon::plus<>(), _1, _2);
 			auto lambda_f2 = phr::_1 + (f + phr::_3);
 			LAMBDA_TEST(18, lambda_f2, 4,6,4);
 		}
 
 		{
 			using namespace std::placeholders;
-			auto f = std::bind(falcon::late_plus(), _1, _2);
+			auto f = std::bind(falcon::plus<>(), _1, _2);
 			auto lambda_f2 = (f + phr::_1) + (f + phr::_3);
 			LAMBDA_TEST(28, lambda_f2, 4,6,4);
 		}

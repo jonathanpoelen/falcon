@@ -7,6 +7,7 @@
 #endif
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>
+#include <falcon/type_traits/default_or_type.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
 #include <falcon/java_iterator/is_java_iterator.hpp>
 #include <falcon/helper/use_iterator_category.hpp>

@@ -40,9 +40,9 @@ template<int _Num>
 struct placeholder
 {
 	template<typename _Index>
-	inline constexpr ___lambda<index<late_parameter_t, _Index>, placeholder<_Num>, const _Index&> operator[](const _Index& idx)
+	inline constexpr ___lambda<index<>, placeholder<_Num>, const _Index&> operator[](const _Index& idx)
 	{
-		return CPP1X(index<late_parameter_t, _Index>{}, idx);
+		return CPP1X(index<>{}, idx);
 	}
 
 	/* use std::bind ?
@@ -54,21 +54,21 @@ struct placeholder
 	inline CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), arg<_Num-1>(args...))
 
 	template<typename _T>
-	inline constexpr ___lambda<late_affect, placeholder<_Num>, const _T&> operator=(const _T& v)
+	inline constexpr ___lambda<affect<>, placeholder<_Num>, const _T&> operator=(const _T& v)
 	{
-		return CPP1X(late_affect{}, v);
+		return CPP1X(affect<>{}, v);
 	}
 
 	template<typename _T>
-	inline constexpr ___lambda<late_affect, placeholder<_Num>, _T> operator=(_T&& v)
+	inline constexpr ___lambda<affect<>, placeholder<_Num>, _T> operator=(_T&& v)
 	{
-		return CPP1X(late_affect{}, v);
+		return CPP1X(affect<>{}, v);
 	}
 
 	template<int _Num2>
-	inline constexpr ___lambda<late_affect, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
+	inline constexpr ___lambda<affect<>, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
 	{
-		return CPP1X(late_affect{});
+		return CPP1X(affect<>{});
 	}
 
 	template<typename _T, typename _Class>
@@ -337,49 +337,49 @@ namespace placeholders {
 #define __FALCON_CALIFIER_FIRST_PARAM const
 
 //@{
-#define __FALCON_NAME_OPERATOR late_plus
+#define __FALCON_NAME_OPERATOR plus<>
 #define __FALCON_SIGN_OPERATOR +
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_minus
+#define __FALCON_NAME_OPERATOR minus<>
 #define __FALCON_SIGN_OPERATOR -
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_multiplies
+#define __FALCON_NAME_OPERATOR multiplies<>
 #define __FALCON_SIGN_OPERATOR *
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_modulus
+#define __FALCON_NAME_OPERATOR modulus<>
 #define __FALCON_SIGN_OPERATOR %
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_divides
+#define __FALCON_NAME_OPERATOR divides<>
 #define __FALCON_SIGN_OPERATOR /
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_bit_and
+#define __FALCON_NAME_OPERATOR bit_and<>
 #define __FALCON_SIGN_OPERATOR &
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_bit_or
+#define __FALCON_NAME_OPERATOR bit_or<>
 #define __FALCON_SIGN_OPERATOR |
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_bit_xor
+#define __FALCON_NAME_OPERATOR bit_xor<>
 #define __FALCON_SIGN_OPERATOR ^
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
@@ -391,49 +391,49 @@ namespace placeholders {
 // #define __FALCON_RETURN_TYPE_OPERATOR(_Sign) bool
 
 //@{
-#define __FALCON_NAME_OPERATOR late_equal_to
+#define __FALCON_NAME_OPERATOR equal_to<>
 #define __FALCON_SIGN_OPERATOR ==
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_not_equal_to
+#define __FALCON_NAME_OPERATOR not_equal_to<>
 #define __FALCON_SIGN_OPERATOR !=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_greater
+#define __FALCON_NAME_OPERATOR greater<>
 #define __FALCON_SIGN_OPERATOR >
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_greater_equal
+#define __FALCON_NAME_OPERATOR greater_equal<>
 #define __FALCON_SIGN_OPERATOR >=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_less
+#define __FALCON_NAME_OPERATOR less<>
 #define __FALCON_SIGN_OPERATOR <
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_less_equal
+#define __FALCON_NAME_OPERATOR less_equal<>
 #define __FALCON_SIGN_OPERATOR <=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_logical_and
+#define __FALCON_NAME_OPERATOR logical_and<>
 #define __FALCON_SIGN_OPERATOR &&
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_logical_or
+#define __FALCON_NAME_OPERATOR logical_or<>
 #define __FALCON_SIGN_OPERATOR ||
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
@@ -523,73 +523,73 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 #define __FALCON_CALIFIER_FIRST_PARAM
 
 //@{
-#define __FALCON_NAME_OPERATOR late_plus_equal
+#define __FALCON_NAME_OPERATOR plus_equal<>
 #define __FALCON_SIGN_OPERATOR +=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_minus_equal
+#define __FALCON_NAME_OPERATOR minus_equal<>
 #define __FALCON_SIGN_OPERATOR -=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_multiplies_equal
+#define __FALCON_NAME_OPERATOR multiplies_equal<>
 #define __FALCON_SIGN_OPERATOR *=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_modulus_equal
+#define __FALCON_NAME_OPERATOR modulus_equal<>
 #define __FALCON_SIGN_OPERATOR %=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_divides_equal
+#define __FALCON_NAME_OPERATOR divides_equal<>
 #define __FALCON_SIGN_OPERATOR /=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_bit_and_equal
+#define __FALCON_NAME_OPERATOR bit_and_equal<>
 #define __FALCON_SIGN_OPERATOR &=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_bit_or_equal
+#define __FALCON_NAME_OPERATOR bit_or_equal<>
 #define __FALCON_SIGN_OPERATOR |=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_bit_xor_equal
+#define __FALCON_NAME_OPERATOR bit_xor_equal<>
 #define __FALCON_SIGN_OPERATOR ^=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_left_shift
+#define __FALCON_NAME_OPERATOR left_shift<>
 #define __FALCON_SIGN_OPERATOR <<
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_right_shift
+#define __FALCON_NAME_OPERATOR right_shift<>
 #define __FALCON_SIGN_OPERATOR >>
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_left_shift_equal
+#define __FALCON_NAME_OPERATOR left_shift_equal<>
 #define __FALCON_SIGN_OPERATOR <<=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_right_shift_equal
+#define __FALCON_NAME_OPERATOR right_shift_equal<>
 #define __FALCON_SIGN_OPERATOR >>=
 #include <falcon/lambda/binary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
@@ -600,37 +600,37 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 // #define __FALCON_RETURN_TYPE_OPERATOR(_Sign) decltype(_Sign std::declval<_T&>())
 
 //@{
-#define __FALCON_NAME_OPERATOR late_pointer
+#define __FALCON_NAME_OPERATOR pointer<>
 #define __FALCON_SIGN_OPERATOR *
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_unary_negate
+#define __FALCON_NAME_OPERATOR unary_negate<>
 #define __FALCON_SIGN_OPERATOR -
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_unary_plus
+#define __FALCON_NAME_OPERATOR unary_plus<>
 #define __FALCON_SIGN_OPERATOR +
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_increment
+#define __FALCON_NAME_OPERATOR increment<>
 #define __FALCON_SIGN_OPERATOR ++
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_decrement
+#define __FALCON_NAME_OPERATOR decrement<>
 #define __FALCON_SIGN_OPERATOR --
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR late_bit_not
+#define __FALCON_NAME_OPERATOR bit_not<>
 #define __FALCON_SIGN_OPERATOR ~
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
@@ -644,7 +644,7 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 #define __FALCON_CALIFIER_FIRST_PARAM const
 
 //@{
-#define __FALCON_NAME_OPERATOR late_binary_negate
+#define __FALCON_NAME_OPERATOR binary_negate<>
 #define __FALCON_SIGN_OPERATOR !
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
@@ -727,7 +727,7 @@ struct __is_ostream_lambda<___lambda<void, _T&>>
 {};
 
 template<typename _Lambda1, typename _Lambda2>
-struct __is_ostream_lambda<___lambda<late_left_shift, _Lambda1, _Lambda2>>
+struct __is_ostream_lambda<___lambda<left_shift<>, _Lambda1, _Lambda2>>
 : __is_ostream_lambda<_Lambda1>
 {};
 
@@ -743,7 +743,7 @@ struct __is_istream_lambda<___lambda<void, _T&>>
 {};
 
 template<typename _Lambda1, typename _Lambda2>
-struct __is_istream_lambda<___lambda<late_left_shift, _Lambda1, _Lambda2>>
+struct __is_istream_lambda<___lambda<left_shift<>, _Lambda1, _Lambda2>>
 : __is_istream_lambda<_Lambda1>
 {};
 
@@ -753,7 +753,7 @@ inline typename std::enable_if<
 		___lambda<_Operation, _TL, _TR>
 	>::__value,
 	___lambda<
-		late_left_shift,
+		left_shift<>,
 		___lambda<_Operation, _TL, _TR>,
 		typename __is_ostream_lambda<
 			___lambda<_Operation, _TL, _TR>
@@ -762,7 +762,7 @@ inline typename std::enable_if<
 >::type
 operator<<(___lambda<_Operation, _TL, _TR> l,
 		   typename __is_ostream_lambda<___lambda<_Operation, _TL, _TR>>::__iomanip_type __pf)
-{ return {late_left_shift(), l, __pf}; }
+{ return {left_shift<>(), l, __pf}; }
 
 template<typename _Operation, typename _TL, typename _TR>
 inline typename std::enable_if<
@@ -770,7 +770,7 @@ inline typename std::enable_if<
 		___lambda<_Operation, _TL, _TR>
 	>::__value,
 	___lambda<
-		late_right_shift,
+		right_shift<>,
 		___lambda<_Operation, _TL, _TR>,
 		typename __is_istream_lambda<
 			___lambda<_Operation, _TL, _TR>
@@ -779,7 +779,7 @@ inline typename std::enable_if<
 >::type
 operator>>(___lambda<_Operation, _TL, _TR> l,
 		   typename __is_istream_lambda<___lambda<_Operation, _TL, _TR>>::__iomanip_type __pf)
-{ return {late_right_shift(), l, __pf}; }
+{ return {right_shift<>(), l, __pf}; }
 
 }
 

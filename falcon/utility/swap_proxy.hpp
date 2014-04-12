@@ -2,7 +2,7 @@
 #define _FALCON_UTILITY_SWAP_PROXY_HPP
 
 #if __cplusplus >= 201103L
-#include <falcon/type_traits/use.hpp>
+#include <falcon/type_traits/use_default.hpp>
 #include <utility>
 #else
 #include <algorithm>

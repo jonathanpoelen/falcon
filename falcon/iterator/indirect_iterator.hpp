@@ -1,12 +1,13 @@
 #ifndef FALCON_ITERATOR_PROXY_ITERATOR_HPP
 #define FALCON_ITERATOR_PROXY_ITERATOR_HPP
 
+#include <falcon/iterator/iterator_handler.hpp>
+
 #if __cplusplus >= 201103L
 # include <type_traits>
 #else
 # include <boost/type_traits/remove_pointer.hpp>
 #endif
-#include <falcon/iterator/iterator_handler.hpp>
 
 namespace falcon {
 namespace iterator {

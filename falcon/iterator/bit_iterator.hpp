@@ -4,7 +4,9 @@
 #include <falcon/iterator/iterator_handler.hpp>
 #include <falcon/bit/size.hpp>
 #include <falcon/bit/bit_reference.hpp>
+#include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
+#include <falcon/type_traits/default_or_type.hpp>
 
 namespace falcon {
 namespace iterator {

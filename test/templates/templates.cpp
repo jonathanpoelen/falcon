@@ -18,17 +18,17 @@ void templates_test()
 	STATIC_CHECK_VALUE(false, falcon::template_and<std::is_pointer, std::is_integral>::filter<int>);
 	STATIC_CHECK_VALUE(true, falcon::template_or<static_value>::filter<int, int>);
 	STATIC_CHECK_VALUE(false, falcon::template_not<falcon::template_or<static_value>::filter>::filter<int, int>);
-	STATIC_CHECK_VALUE(false, falcon::template_binary<falcon::late_equal_to, std::is_pointer, std::is_integral>::value_wrapper<int>);
-	STATIC_CHECK_VALUE(true, falcon::template_unary<falcon::late_binary_negate, std::is_pointer>::value_wrapper<int>);
+	STATIC_CHECK_VALUE(false, falcon::template_binary<falcon::equal_to<>, std::is_pointer, std::is_integral>::value_wrapper<int>);
+	STATIC_CHECK_VALUE(true, falcon::template_unary<falcon::binary_negate<>, std::is_pointer>::value_wrapper<int>);
 	STATIC_CHECK_VALUE(true, falcon::template_left_accumulator<falcon::template_or<static_value>::filter, int>::value_wrapper<int>);
 	STATIC_CHECK_VALUE(true, falcon::template_right_accumulator<falcon::template_or<static_value>::filter, int>::value_wrapper<int>);
 	STATIC_CHECK_VALUE(6, falcon::template_size<int,int,int,int,int,int>);
-	STATIC_CHECK_VALUE(15, falcon::template_binary<falcon::late_plus, falcon::template_size, falcon::template_val<int, 10>::filter>::value_wrapper<int,int,int,int,int>);
+	STATIC_CHECK_VALUE(15, falcon::template_binary<falcon::plus<>, falcon::template_size, falcon::template_val<int, 10>::filter>::value_wrapper<int,int,int,int,int>);
 
 	STATIC_CHECK_VALUE(1, falcon::template_to_val<std::rank>::filter<int[]>);
 
 	CHECK_EQUAL_VALUE(6u, falcon::template_binary<
-		falcon::late_multiplies,
+		falcon::multiplies<>,
 		falcon::template_to_val<
 			std::rank
 		>::filter,

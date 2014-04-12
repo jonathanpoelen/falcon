@@ -6,8 +6,8 @@
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/c++/conditional_cpp.hpp>
 
-#include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/eval_if.hpp>
+#include <falcon/type_traits/default_or_type.hpp>
 
 #include <falcon/helper/use_iterator.hpp>
 #include <falcon/helper/use_const_iterator.hpp>

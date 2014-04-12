@@ -5,7 +5,7 @@
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/conditional_cpp.hpp>
 
-#include <falcon/type_traits/use.hpp>
+#include <falcon/type_traits/default_or_type.hpp>
 
 #if __cplusplus >= 201103L
 # include <utility>

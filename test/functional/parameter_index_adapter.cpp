@@ -6,7 +6,7 @@
 void parameter_index_adapter_test()
 {
 	typedef falcon::parameter_index_adapter<
-		falcon::late_plus,
+		falcon::plus<>,
 		falcon::range_parameter_index_tag<1, 2>
 	> adapter_type;
 	adapter_type adapter;
