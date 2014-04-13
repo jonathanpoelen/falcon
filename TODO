@@ -286,4 +286,5 @@ tuple_apply -> apply_from_tuple
 
 les container_wrapper -> reverse_view, etc (alias ?)
 
+c++1x/syntax.hpp -> delegate_function.hpp et enlever les includes
 

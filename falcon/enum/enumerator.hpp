@@ -1,28 +1,28 @@
 #ifndef _FALCON_ENUM_ENUMERATOR_HPP
 #define _FALCON_ENUM_ENUMERATOR_HPP
 
-#include <boost/preprocessor/logical/and.hpp>
 #include <boost/preprocessor/list/at.hpp>
+#include <boost/preprocessor/list/size.hpp>
+#include <boost/preprocessor/logical/and.hpp>
 #include <boost/preprocessor/list/for_each.hpp>
 #include <boost/preprocessor/list/for_each_product.hpp>
-#include <boost/preprocessor/list/size.hpp>
 
 #include <falcon/preprocessor/d_prefix.hpp>
-#include <falcon/preprocessor/d_punctuation.hpp>
-#include <falcon/preprocessor/variadic/punctuation.hpp>
-#include <falcon/preprocessor/variadic/call.hpp>
 #include <falcon/preprocessor/variadic/arg.hpp>
+#include <falcon/preprocessor/d_punctuation.hpp>
+#include <falcon/preprocessor/variadic/call.hpp>
 #include <falcon/preprocessor/variadic/enum.hpp>
-#include <falcon/preprocessor/variadic/d_values.hpp>
 #include <falcon/preprocessor/variadic/size.hpp>
 #include <falcon/preprocessor/variadic/is_empty.hpp>
+#include <falcon/preprocessor/variadic/d_values.hpp>
+#include <falcon/preprocessor/variadic/punctuation.hpp>
 #include <falcon/preprocessor/variadic/has_parenthesis.hpp>
 
-#include <falcon/iterator/nexter_iterator.hpp>
-#include <falcon/iterator/integer_iterator.hpp>
+#include <falcon/cast/static_caster.hpp>
 #include <falcon/functional/compose.hpp>
 #include <falcon/functional/operators.hpp>
-#include <falcon/enum/operators.hpp>
+#include <falcon/iterator/nexter_iterator.hpp>
+#include <falcon/iterator/integer_iterator.hpp>
 #include <falcon/container/static_container_wrapper.hpp>
 
 /**
@@ -315,7 +315,7 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
     ::falcon::iterator::nexter_iterator<\
       ::falcon::iterator::integer_iterator<enum_t>,\
       ::falcon::unary_compose<\
-        ::falcon::enum_increment<enum_t>,\
+        ::falcon::increment_emulation<enum_t>,\
         ::falcon::pointer<falcon::iterator::integer_iterator<enum_t> >\
       >\
     >\
@@ -418,7 +418,8 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 
 //@{
 #define __FALCON_PP_LIST_ENUM_LAST_VALUE_ITERATOR_LINEAR(list, index, add)\
-	::falcon::enum_plus<enum_t>()(__FALCON_PP_LIST_ENUMERATOR_ENUM_NAME(BOOST_PP_LIST_AT(list, index)), add)
+	static_cast<enum_t>(std::plus<int>()\
+	(__FALCON_PP_LIST_ENUMERATOR_ENUM_NAME(BOOST_PP_LIST_AT(list, index)), add))
 #define __FALCON_PP_LIST_ENUM_LAST_VALUE_ITERATOR_default(rule, index, list)\
 	__FALCON_PP_LIST_ENUM_LAST_VALUE_ITERATOR_LINEAR(list, index, 1)
 #define __FALCON_PP_LIST_ENUM_LAST_VALUE_ITERATOR_linear(n)\

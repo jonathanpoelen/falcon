@@ -3,10 +3,10 @@
 
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/c++/conditional_cpp.hpp>
 #include <falcon/type_traits/default_or_type.hpp>
 
 #if __cplusplus >= 201103L
+# include <falcon/c++1x/syntax.hpp>
 # include <utility>
 #else
 # include <boost/type_traits/is_const.hpp>
@@ -17,23 +17,25 @@
 namespace falcon {
 namespace accessors {
 
-template <class T>
-struct __result_get
-{
+namespace _aux {
+  template <class T>
+  struct result_get
+  {
 #if __cplusplus >= 201103L
-  typedef decltype(std::declval<T>().get()) type;
+    typedef decltype(std::declval<T>().get()) type;
 #else
-  typedef typename boost::remove_cv<T>::type::type& __type;
-  typedef typename boost::conditional<
-    boost::is_const<T>::value, const __type &, __type &
-  >::type type;
+    typedef typename boost::remove_cv<T>::type::type& __type;
+    typedef typename boost::conditional<
+      boost::is_const<T>::value, const __type &, __type &
+    >::type type;
 #endif
-};
+  };
+}
 
-template <class T CPP_IF_CPP1X(= void), class Result = use_default>
+template <class T = void, class Result = void>
 struct get
 {
-  typedef typename default_or_type<__result_get<T>, Result>::type result_type;
+  typedef typename default_or_type<_aux::result_get<T>, Result, void>::type result_type;
   typedef T argument_type;
 
   CPP_CONSTEXPR result_type operator()(T& x) const
@@ -41,19 +43,22 @@ struct get
   { return x.get(); }
 };
 
-#if __cplusplus >= 201103L
 template<>
-struct get<void>
+struct get<void, void>
 {
   template<class T>
-  constexpr auto operator()(T& x) const
-  CPP_NOEXCEPT_OPERATOR2(x.get())
-  -> decltype(x.get())
+#if __cplusplus >= 201103L
+  constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
+    operator()(T& x) const
+  , x.get())
+#else
+  typename _aux::result_get<T>::type
+  operator()(T& x) const
   { return x.get(); }
+#endif
 };
 
 CPP_GLOBAL_CONSTEXPR get<> get_f;
-#endif
 
 }
 }

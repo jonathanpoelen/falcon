@@ -4,12 +4,16 @@
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/reference.hpp>
 #include <falcon/c++/boost_or_std.hpp>
-#include <falcon/c++1x/syntax.hpp>
 #include <falcon/utility/move.hpp>
 #include <falcon/type_traits/default_or_type.hpp>
 
+#if __cplusplus >= 201103L
+#include <falcon/c++1x/syntax.hpp>
+#endif
+
 #include <iosfwd>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_const)
+#include <boost/concept_check.hpp>
 
 namespace falcon {
 
@@ -28,6 +32,12 @@ struct modulus;
 template<typename T = void, typename U = T>
 struct divides;
 
+CPP_GLOBAL_CONSTEXPR plus<> plus_f;
+CPP_GLOBAL_CONSTEXPR minus<> minus_f;
+CPP_GLOBAL_CONSTEXPR multiplies<> multiplies_f;
+CPP_GLOBAL_CONSTEXPR modulus<> modulus_f;
+CPP_GLOBAL_CONSTEXPR divides<> divides_f;
+
 template<typename T = void, typename U = T>
 struct plus_equal;
 template<typename T = void, typename U = T>
@@ -39,6 +49,13 @@ struct modulus_equal;
 template<typename T = void, typename U = T>
 struct divides_equal;
 
+CPP_GLOBAL_CONSTEXPR plus_equal<> plus_equal_f;
+CPP_GLOBAL_CONSTEXPR minus_equal<> minus_equal_f;
+CPP_GLOBAL_CONSTEXPR multiplies_equal<> multiplies_equal_f;
+CPP_GLOBAL_CONSTEXPR modulus_equal<> modulus_equal_f;
+CPP_GLOBAL_CONSTEXPR divides_equal<> divides_equal_f;
+
+
 template<typename T = void>
 struct increment;
 template<typename T = void>
@@ -48,10 +65,26 @@ struct post_increment;
 template<typename T = void>
 struct post_decrement;
 
+CPP_GLOBAL_CONSTEXPR increment<> increment_f;
+CPP_GLOBAL_CONSTEXPR decrement<> decrement_f;
+CPP_GLOBAL_CONSTEXPR post_increment<> post_increment_f;
+CPP_GLOBAL_CONSTEXPR post_decrement<> post_decrement_f;
+
+template<typename T = void>
+struct increment_emulation;
+template<typename T = void>
+struct decrement_emulation;
+
+CPP_GLOBAL_CONSTEXPR increment_emulation<> increment_emulation_f;
+CPP_GLOBAL_CONSTEXPR decrement_emulation<> decrement_emulation_f;
+
 template<typename T = void>
 struct unary_negate;
 template<typename T = void>
 struct unary_plus;
+
+CPP_GLOBAL_CONSTEXPR unary_negate<> unary_negate_f;
+CPP_GLOBAL_CONSTEXPR binary_negate<> binary_negate_f;
 //@}
 
 /**
@@ -72,6 +105,14 @@ template<typename T = void, typename U = T>
 struct less_equal;
 template<typename T = void, typename U = T>
 struct equivalent;
+
+CPP_GLOBAL_CONSTEXPR equal_to<> equal_to_f;
+CPP_GLOBAL_CONSTEXPR not_equal_to<> not_equal_to_f;
+CPP_GLOBAL_CONSTEXPR greater<> greater_f;
+CPP_GLOBAL_CONSTEXPR less<> less_f;
+CPP_GLOBAL_CONSTEXPR greater_equal<> greater_equal_f;
+CPP_GLOBAL_CONSTEXPR less_equal<> less_equal_f;
+CPP_GLOBAL_CONSTEXPR equivalent<> equivalent_f;
 //@}
 
 /**
@@ -82,6 +123,9 @@ template<typename T = void, typename U = T>
 struct logical_and;
 template<typename T = void, typename U = T>
 struct logical_or;
+
+CPP_GLOBAL_CONSTEXPR logical_and<> logical_and_f;
+CPP_GLOBAL_CONSTEXPR logical_or<> logical_or_f;
 //@}
 
 /**
@@ -99,6 +143,12 @@ struct left_shift;
 template<typename T = void, typename U = T>
 struct right_shift;
 
+CPP_GLOBAL_CONSTEXPR bit_and<> bit_and_f;
+CPP_GLOBAL_CONSTEXPR bit_or<> bit_or_f;
+CPP_GLOBAL_CONSTEXPR bit_xor<> bit_xor_f;
+CPP_GLOBAL_CONSTEXPR left_shift<> left_shift_f;
+CPP_GLOBAL_CONSTEXPR right_shift<> right_shift_f;
+
 template<typename T = void, typename U = T>
 struct bit_and_equal;
 template<typename T = void, typename U = T>
@@ -110,8 +160,16 @@ struct left_shift_equal;
 template<typename T = void, typename U = T>
 struct right_shift_equal;
 
+CPP_GLOBAL_CONSTEXPR bit_and_equal<> bit_and_equal_f;
+CPP_GLOBAL_CONSTEXPR bit_or_equal<> bit_or_equal_f;
+CPP_GLOBAL_CONSTEXPR bit_xor_equal<> bit_xor_equal_f;
+CPP_GLOBAL_CONSTEXPR left_shift_equal<> left_shift_equal_f;
+CPP_GLOBAL_CONSTEXPR right_shift_equal<> right_shift_equal_f;
+
 template<typename T = void>
 struct bit_not;
+
+CPP_GLOBAL_CONSTEXPR bit_not<> bit_not_f;
 //@}
 
 /**
@@ -120,6 +178,8 @@ struct bit_not;
  */
 template<typename T = void>
 struct binary_negate;
+
+CPP_GLOBAL_CONSTEXPR binary_negate<> binary_negate_f;
 //@}
 
 /**
@@ -136,6 +196,12 @@ template<typename T = void, typename Index = void>
 struct index;
 template<typename T = void, typename Index = void>
 struct index_emulation;
+
+CPP_GLOBAL_CONSTEXPR pointer<> pointer_f;
+CPP_GLOBAL_CONSTEXPR address<> address_f;
+CPP_GLOBAL_CONSTEXPR arrow<> arrow_f;
+CPP_GLOBAL_CONSTEXPR index<> index_f;
+CPP_GLOBAL_CONSTEXPR index_emulation<> index_emulation_f;
 //@}
 
 /**
@@ -144,6 +210,8 @@ struct index_emulation;
  */
 template<typename T = void, typename U = T>
 struct affect;
+
+CPP_GLOBAL_CONSTEXPR affect<> affect_f;
 //@}
 
 /**
@@ -151,9 +219,14 @@ struct affect;
  */
 template<typename T = void, typename U = T>
 struct comma;
+
+CPP_GLOBAL_CONSTEXPR comma<> comma_f;
+
 #if __cplusplus >= 201103L
 template<typename T = void, typename Member = void>
 struct pointer_to_member;
+
+CPP_GLOBAL_CONSTEXPR pointer_to_member<> pointer_to_member_f;
 #endif
 //@}
 
@@ -384,9 +457,9 @@ template<typename T>
 struct pointer
 {
   typedef T argument_type;
-  typedef typename T::value_type result_type;
+  typedef typename T::value_type& result_type;
 
-  CPP_CONSTEXPR result_type&
+  CPP_CONSTEXPR result_type
   operator()(T & a) const
   { return *a; }
 };
@@ -395,9 +468,9 @@ template<typename T>
 struct pointer<const T>
 {
   typedef T argument_type;
-  typedef const typename T::value_type result_type;
+  typedef const typename T::value_type& result_type;
 
-  CPP_CONSTEXPR result_type&
+  CPP_CONSTEXPR result_type
   operator()(const T & a) const
   { return *a; }
 };
@@ -406,9 +479,9 @@ template<typename T>
 struct pointer<T*>
 {
   typedef T* argument_type;
-  typedef T result_type;
+  typedef T& result_type;
 
-  CPP_CONSTEXPR result_type&
+  CPP_CONSTEXPR result_type
   operator()(T* a) const
   { return *a; }
 };
@@ -446,9 +519,9 @@ template<typename T>
 struct post_increment
 {
   typedef T argument_type;
-  typedef T result_type;
+  typedef T& result_type;
 
-  CPP_CONSTEXPR T& operator()(T& a) const
+  CPP_CONSTEXPR result_type operator()(T& a) const
   { return a++; }
 };
 
@@ -465,9 +538,9 @@ template<typename T>
 struct post_decrement
 {
   typedef T argument_type;
-  typedef T result_type;
+  typedef T& result_type;
 
-  CPP_CONSTEXPR T& operator()(T& a) const
+  CPP_CONSTEXPR result_type operator()(T& a) const
   { return a--; }
 };
 
@@ -481,13 +554,63 @@ struct post_decrement<void>
 
 
 template<typename T>
+struct increment_emulation
+{
+  typedef T argument_type;
+  typedef T& result_type;
+
+  result_type operator()(T& a) const
+  {
+    a = static_cast<T>(a + 1);
+    return a;
+  }
+};
+
+template<>
+struct increment_emulation<void>
+{
+  template<typename T>
+  T& operator()(T& a) const
+  {
+    a = static_cast<T>(a + 1);
+    return a;
+  }
+};
+
+
+template<typename T>
+struct decrement_emulation
+{
+  typedef T argument_type;
+  typedef T& result_type;
+
+  result_type operator()(T& a) const
+  {
+    a = static_cast<T>(a - 1);
+    return a;
+  }
+};
+
+template<>
+struct decrement_emulation<void>
+{
+  template<typename T>
+  T& operator()(T& a) const
+  {
+    a = static_cast<T>(a - 1);
+    return a;
+  }
+};
+
+
+template<typename T>
 struct arrow
 {
   typedef T argument_type;
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE
-    ::remove_const<T>::type::type result_type;
+    ::remove_const<T>::type::type& result_type;
 
-  CPP_CONSTEXPR result_type& operator()(T& a) const
+  CPP_CONSTEXPR result_type operator()(T& a) const
   { return a.operator->(); }
 };
 
@@ -514,9 +637,9 @@ struct index
   typedef typename default_or_type<std::size_t, Index, void>
     ::type second_argument_type;
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE
-    ::remove_const<T>::type::value_type result_type;
+    ::remove_const<T>::type::value_type& result_type;
 
-  CPP_CONSTEXPR result_type& operator()(T& a, second_argument_type i) const
+  CPP_CONSTEXPR result_type operator()(T& a, second_argument_type i) const
   { return a[i]; }
 };
 
@@ -526,9 +649,9 @@ struct index<T*, Index>
   typedef T* first_argument_type;
   typedef typename default_or_type<std::size_t, Index, void>
     ::type second_argument_type;
-  typedef T result_type;
+  typedef T& result_type;
 
-  CPP_CONSTEXPR result_type& operator()(T& a, second_argument_type i) const
+  CPP_CONSTEXPR result_type operator()(T& a, second_argument_type i) const
   { return a[i]; }
 };
 
@@ -551,7 +674,7 @@ struct index<void, void>
     operator()(T& a, const Index& i) const
   , a[i])
 #else
-  typename index<T, Index>::result_type&
+  typename index<T, Index>::result_type
   operator()(T& a, const Index& i) const
   { return a[i]; }
 #endif
@@ -565,9 +688,9 @@ struct index_emulation
   typedef typename default_or_type<std::size_t, Index, void>
     ::type second_argument_type;
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE
-    ::remove_const<T>::type::type result_type;
+    ::remove_const<T>::type::type& result_type;
 
-  CPP_CONSTEXPR result_type& operator()(T& a, second_argument_type i) const
+  CPP_CONSTEXPR result_type operator()(T& a, second_argument_type i) const
   { return *(a + i); }
 };
 
@@ -595,7 +718,7 @@ struct index_emulation<void, void>
     operator()(T& a, const Index& i) const
   , *(a + i))
 #else
-  typename index_emulation<T, Index>::result_type&
+  typename index_emulation<T, Index>::result_type
   operator()(T& a, const Index& i) const
   { return *(a + i); }
 #endif
@@ -607,9 +730,9 @@ struct comma
 {
   typedef T first_argument_type;
   typedef U second_argument_type;
-  typedef T result_type;
+  typedef T& result_type;
 
-  constexpr result_type& operator()(T& a, U& b) const
+  constexpr result_type operator()(T& a, U& b) const
   { return (a , b); }
 };
 
@@ -620,7 +743,7 @@ struct comma<void, void>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(operator()(T& a, U& b) const, (a , b))
 #else
-  typename comma<T, U>::result_type&
+  typename comma<T, U>::result_type
   operator()(T& a, U& b) const
   { return (a , b); }
 #endif

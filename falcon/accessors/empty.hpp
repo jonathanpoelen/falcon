@@ -3,12 +3,11 @@
 
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/c++/conditional_cpp.hpp>
 
 namespace falcon {
 namespace accessors {
 
-template <class T CPP_IF_CPP1X(= void)>
+template <class T = void>
 struct empty
 {
 	typedef bool result_type;
@@ -19,7 +18,6 @@ struct empty
   { return x.empty(); }
 };
 
-#if __cplusplus >= 201103L
 template<>
 struct empty<void>
 {
@@ -30,7 +28,6 @@ struct empty<void>
 };
 
 CPP_GLOBAL_CONSTEXPR empty<> empty_f;
-#endif
 
 }
 }

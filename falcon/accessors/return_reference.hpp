@@ -9,7 +9,7 @@
 namespace falcon {
 namespace accessors {
 
-template <class T CPP_IF_CPP1X(=void)>
+template <class T = void>
 struct return_reference
 {
 	typedef T value_type;
@@ -38,7 +38,6 @@ struct return_reference<const T>
 	{ return x; }
 };
 
-#if __cplusplus >= 201103L
 template<>
 struct return_reference<void>
 {
@@ -48,7 +47,6 @@ struct return_reference<void>
 };
 
 CPP_GLOBAL_CONSTEXPR return_reference<> return_reference_f;
-#endif
 
 }
 }

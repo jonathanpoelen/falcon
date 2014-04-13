@@ -3,10 +3,10 @@
 
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/c++/conditional_cpp.hpp>
 #include <falcon/type_traits/default_or_type.hpp>
 
 #if __cplusplus >= 201103L
+# include <falcon/c++1x/syntax.hpp>
 # include <utility>
 #else
 # include <falcon/detail/inner_reference.hpp>
@@ -15,20 +15,22 @@
 namespace falcon {
 namespace accessors {
 
-template<class T>
-struct __result_next
-{
+namespace _aux {
+  template<class T>
+  struct result_next
+  {
 #if __cplusplus >= 201103L
-  typedef decltype(std::declval<T>().next()) type;
+    typedef decltype(std::declval<T>().next()) type;
 #else
-  typedef typename __detail::inner_reference<T>::type type;
+    typedef typename __detail::inner_reference<T>::type type;
 #endif
-};
+  };
+}
 
-template <class T CPP_IF_CPP1X(= void), class Result = use_default>
+template <class T = void, class Result = void>
 struct next
 {
-  typedef typename default_or_type<__result_next<T>, Result>::type result_type;
+  typedef typename default_or_type<_aux::result_next<T>, Result, void>::type result_type;
   typedef T argument_type;
 
   CPP_CONSTEXPR result_type operator()(T& x) const
@@ -36,19 +38,22 @@ struct next
   { return x.next(); }
 };
 
-#if __cplusplus >= 201103L
 template<>
-struct next<void, use_default>
+struct next<void, void>
 {
   template<class T>
-  constexpr auto operator()(T& x) const
-  CPP_NOEXCEPT_OPERATOR2(x.next())
-  -> decltype(x.next())
+# if __cplusplus >= 201103L
+  constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
+    operator()(T& x) const
+  , x.next())
+# else
+  typename _aux::result_next<T>::type
+  operator()(T& x) const
   { return x.next(); }
+# endif
 };
 
 CPP_GLOBAL_CONSTEXPR next<> next_f;
-#endif
 
 }
 }

@@ -12,7 +12,7 @@
 # include <falcon/tuple/tuple_compose.hpp>
 # include <tuple>
 #endif
-
+#include <falcon/c++1x/syntax.hpp>
 #include <functional>
 
 namespace falcon {
@@ -113,16 +113,15 @@ public:
 	{}
 
 	template<typename... Ts>
-	auto operator()(Ts&&... args) const
-  -> decltype(this->fn1(this->fn2(std::forward<Ts>(args)...)))
-  { return fn1(fn2(std::forward<Ts>(args)...)); }
-
+  constexpr CPP1X_DELEGATE_FUNCTION(
+    operator()(Ts&&... args) const
+  , this->fn1(this->fn2(std::forward<Ts>(args)...)))
 };
 
 #endif
 
 template <class Operation1, class Operation2>
-unary_compose<Operation1, Operation2>
+CPP_CONSTEXPR unary_compose<Operation1, Operation2>
 compose1(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
          Operation2 CPP_RVALUE_OR_CONST_REFERENCE fn2)
 {
@@ -217,10 +216,10 @@ public:
   {}
 
   template<typename... Ts>
-  auto operator()(Ts&&... args) const
-  -> decltype(this->fn1(this->fn2(std::forward<Ts>(args)...),
+  constexpr CPP1X_DELEGATE_FUNCTION(
+    operator()(Ts&&... args) const
+  , this->fn1(this->fn2(std::forward<Ts>(args)...),
               this->fn3(std::forward<Ts>(args)...)))
-  { return fn1(fn2(std::forward<Ts>(args)...), fn3(std::forward<Ts>(args)...)); }
 };
 //@}
 
@@ -228,7 +227,7 @@ public:
 
 template <class Operation1, class Operation2, class Operation3>
 
-binary_compose<Operation1, Operation2, Operation3>
+CPP_CONSTEXPR binary_compose<Operation1, Operation2, Operation3>
 compose2(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
          Operation2 CPP_RVALUE_OR_CONST_REFERENCE fn2,
          Operation3 CPP_RVALUE_OR_CONST_REFERENCE fn3)
@@ -241,7 +240,7 @@ compose2(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
 }
 
 template <class Operation1, class Operation2>
-binary_compose<Operation1, Operation2, Operation2>
+CPP_CONSTEXPR binary_compose<Operation1, Operation2, Operation2>
 compose2(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
          Operation2 CPP_RVALUE_OR_CONST_REFERENCE fn2)
 {
@@ -309,23 +308,16 @@ public:
   {}
 
   template<typename... Args>
-  constexpr auto operator()(Args&&... args) const
-  -> decltype(tuple_compose(
-    build_parameter_index_t<sizeof...(Args)>(),
-    build_tuple_index_t<Operations>(),
-    std::cref(this->fn),
-    this->fns,
-    std::forward_as_tuple(std::forward<Args>(args)...)
-  ))
-  {
-    return tuple_compose(
+  constexpr CPP1X_DELEGATE_FUNCTION(
+    operator()(Args&&... args) const
+  , tuple_compose(
       build_parameter_index_t<sizeof...(Args)>(),
       build_tuple_index_t<Operations>(),
-      std::cref(fn),
-      fns,
+      std::cref(this->fn),
+      this->fns,
       std::forward_as_tuple(std::forward<Args>(args)...)
-    );
-  }
+    )
+  )
 };
 
 template<typename Operation, typename Operations>

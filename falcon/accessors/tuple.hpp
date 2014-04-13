@@ -4,14 +4,6 @@
 #include <falcon/tuple/detail/tuplefwd.hpp>
 
 namespace falcon {
-
-namespace __detail {
-  template<std::size_t I, class T>
-  constexpr auto __tuple_get(T& t) noexcept
-  -> decltype(get<I>(t))
-  { return get<I>(t); }
-}
-
 namespace accessors {
 
 template <std::size_t N, typename Tuple = void>
@@ -22,8 +14,8 @@ struct tuple_get
 
   static const std::size_t index = N;
 
-  constexpr result_type & operator()(Tuple & t) const noexcept
-  { return __detail::__tuple_get<N>(t); }
+  constexpr result_type & operator()(Tuple & t) const
+  { return ::falcon::__detail::get<N>(t); }
 };
 
 template <std::size_t N, typename Tuple>
@@ -34,8 +26,8 @@ struct tuple_get<N, const Tuple>
 
 	static const std::size_t index = N;
 
-  constexpr result_type & operator()(Tuple const & t) const noexcept
-  { return __detail::__tuple_get<N>(t); }
+  constexpr result_type & operator()(Tuple const & t) const
+  { return ::falcon::__detail::get<N>(t); }
 };
 
 template <std::size_t N>
@@ -44,9 +36,9 @@ struct tuple_get<N, void>
   static const std::size_t index = N;
 
   template<class Tuple>
-  constexpr auto operator()(Tuple & t) const noexcept
-  -> decltype(__detail::__tuple_get<N>(t))
-  { return __detail::__tuple_get<N>(t); }
+  constexpr auto operator()(Tuple & t) const
+  -> decltype(::falcon::__detail::get<N>(t))
+  { return ::falcon::__detail::get<N>(t); }
 };
 
 }
