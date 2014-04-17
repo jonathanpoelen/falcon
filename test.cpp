@@ -69,7 +69,7 @@ struct value_printer
 
 int main()
 {
-  
+
 
 //   typedef vector_c<int,0,9> numbers;
 //   for_each< numbers >( value_printer() );

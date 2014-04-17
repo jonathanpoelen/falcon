@@ -274,8 +274,6 @@ dynamic_callback avec range. Autre fonction ? paramètres supplémentaire au dé
 
 bug memoire dans flag.
 
-faire le tri dans functional/operators.hpp et functional/indirect_operation.hpp (à renommer en indirec_operators ?)
-
 un objet qui créer un arbre de condition dichtomique xxx(yyy(value_ref, f),...)
 
 les maker en foncteur ?
@@ -288,3 +286,7 @@ les container_wrapper -> reverse_view, etc (alias ?)
 
 c++1x/syntax.hpp -> delegate_function.hpp et enlever les includes
 
+macro pour créer les fonctions de comparaisons !=, >, <=, >=
+macro pour créer les operateur arithmetique +, -, /, %, *
+macro pour créer les operateur bitwise &, |, ^, <<, >>
+macro pour créer les operateur de post incrementation et post decrementation
