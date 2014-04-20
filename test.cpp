@@ -43,8 +43,8 @@
 // #include <type_traits>
 // #include <iostream>
 
-#include <falcon/mpl/vector_c.hpp>
-#include <falcon/mpl/for_each.hpp>
+// #include <falcon/mpl/vector_c.hpp>
+// #include <falcon/mpl/for_each.hpp>
 // #include <falcon/mpl/placeholders.hpp>
 // #include <falcon/mpl/back_inserter.hpp>
 // #include <falcon/mpl/size.hpp>
@@ -52,24 +52,36 @@
 // #include <falcon/mpl/less.hpp>
 
 // #include <type_traits>
-#include <iostream>
-#include <tuple>
 
-using namespace falcon::mpl;
+// using namespace falcon::mpl;
 // using namespace falcon::mpl::placeholders;
 
-struct value_printer
-{
-  template< typename U > void operator()(U x)
-  {
-    std::cout << x << 'n';
-  }
+// struct value_printer
+// {
+//   template< typename U > void operator()(U x)
+//   {
+//     std::cout << x << 'n';
+//   }
+// };
+
+
+// #include <iostream>
+// #include <tuple>
+
+struct SC {
+  static int * begin() { return 0; }
+  static int * end() { return 0; }
 };
 
+#include <falcon/container/reference_vector.hpp>
+#include <falcon/container/indirect_container.hpp>
 
 int main()
 {
-
+  falcon::container::vector<int&> v;
+  int i = 2;
+  v.push_back(i);
+  falcon::indirect_container(v);
 
 //   typedef vector_c<int,0,9> numbers;
 //   for_each< numbers >( value_printer() );

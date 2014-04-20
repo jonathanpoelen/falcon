@@ -52,15 +52,21 @@ struct reverse_range_access_traits
 };
 
 
-template<class AccessIteratorTraits, class ToIterator>
+template<class Container, class AccessIteratorTraits, class ToIterator>
 struct range_access_to_iterator_traits
 {
   typedef typename AccessIteratorTraits::container_type container_type;
   typedef ToIterator iterator;
 
-  template<class OtherAccessIteratorTraits>
+  template<class OtherContainer>
   struct rebind
-  { typedef range_access_to_iterator_traits<OtherAccessIteratorTraits, ToIterator> other; };
+  {
+    typedef range_access_to_iterator_traits<
+      OtherContainer
+    , typename AccessIteratorTraits::template rebind<OtherContainer>::other
+    , ToIterator
+    > other;
+  };
 
   ToIterator begin(container_type& cont) const
   { return ToIterator(_access.begin(cont)); }

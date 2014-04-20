@@ -134,7 +134,9 @@ struct build_container_view
 {
   typedef container_view<
     Container
-  , range_access_to_iterator_traits<range_access_traits<Container>, Iterator>
+  , range_access_to_iterator_traits<
+      Container
+    , range_access_traits<Container>, Iterator>
   > type;
 };
 
@@ -143,7 +145,9 @@ struct build_reverse_container_view
 {
   typedef container_view<
     Container
-  , range_access_to_iterator_traits<reverse_range_access_traits<Container>, Iterator>
+  , range_access_to_iterator_traits<
+      Container
+    , reverse_range_access_traits<Container>, Iterator>
   > type;
 };
 

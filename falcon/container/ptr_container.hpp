@@ -154,7 +154,7 @@ public:
 
 	void swap(ptr_container& other) CPP_NOEXCEPT
 	{
-        using std::swap;
+    using std::swap;
 		swap(_M_first, other._M_first);
 		swap(_M_last, other._M_last);
 	}

@@ -1,7 +1,7 @@
 #include <test/test.hpp>
 #include <sstream>
 #include <falcon/container/zone_access.hpp>
-#include <falcon/container/container_wrapper.hpp>
+#include <falcon/container/container_view.hpp>
 #include "zone_access.hpp"
 
 void zone_access_test()
@@ -16,7 +16,7 @@ void zone_access_test()
 
 	typedef decltype(a) container_type;
 	typedef falcon::zone_access<container_type> zone_access;
-	typedef falcon::container_wrapper<container_type, zone_access> zone_type;
+	typedef falcon::container_view<container_type, zone_access> zone_type;
 	zone_type cont(a, {5, 1, 1, 3, 3});
 	{
 		zone_access zone{5, 1, 1, 3, 3};

@@ -238,6 +238,7 @@ adaptater -> view ? Pas pour tous. Les transformer en vues si possible
 range_allocator fonctionnel avec std::set (ou autre) ?
 
 unordered_vector -> unordered_view ? Un melange ?
+fixed_grid_cross, grid_cross -> grid_cross_view
 
 allocator qui alloue plusieurs bloc.
 
@@ -282,11 +283,19 @@ modifier les fonction d'accesseur (+accessors/get) sur get pour y ajouter le get
 
 tuple_apply -> apply_from_tuple
 
-les container_wrapper -> reverse_view, etc (alias ?)
-
 c++1x/syntax.hpp -> delegate_function.hpp et enlever les includes
 
 macro pour créer les fonctions de comparaisons !=, >, <=, >=
-macro pour créer les operateur arithmetique +, -, /, %, *
-macro pour créer les operateur bitwise &, |, ^, <<, >>
-macro pour créer les operateur de post incrementation et post decrementation
+macro pour créer les operateurs arithmetique +, -, /, %, *
+macro pour créer les operateurs bitwise &, |, ^, <<, >>
+macro pour créer les operateurs de post incrementation et post decrementation
+
+reference_vector -> reference_container + reference_accosiative_container (le premier peut si key_type existe utiliser le second ?)
+
+simplifier arg/* en utilisant les types parameter et autres
+
+fake_container qui definit les protos et les types des containers standars (fake_container + fake_associative_container ? fake -> placebo (en anglais) ?)
+
+
+
+

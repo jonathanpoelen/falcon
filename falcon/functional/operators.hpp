@@ -32,12 +32,6 @@ struct modulus;
 template<typename T = void, typename U = T>
 struct divides;
 
-CPP_GLOBAL_CONSTEXPR plus<> plus_f;
-CPP_GLOBAL_CONSTEXPR minus<> minus_f;
-CPP_GLOBAL_CONSTEXPR multiplies<> multiplies_f;
-CPP_GLOBAL_CONSTEXPR modulus<> modulus_f;
-CPP_GLOBAL_CONSTEXPR divides<> divides_f;
-
 template<typename T = void, typename U = T>
 struct plus_equal;
 template<typename T = void, typename U = T>
@@ -49,13 +43,6 @@ struct modulus_equal;
 template<typename T = void, typename U = T>
 struct divides_equal;
 
-CPP_GLOBAL_CONSTEXPR plus_equal<> plus_equal_f;
-CPP_GLOBAL_CONSTEXPR minus_equal<> minus_equal_f;
-CPP_GLOBAL_CONSTEXPR multiplies_equal<> multiplies_equal_f;
-CPP_GLOBAL_CONSTEXPR modulus_equal<> modulus_equal_f;
-CPP_GLOBAL_CONSTEXPR divides_equal<> divides_equal_f;
-
-
 template<typename T = void>
 struct increment;
 template<typename T = void>
@@ -65,26 +52,15 @@ struct post_increment;
 template<typename T = void>
 struct post_decrement;
 
-CPP_GLOBAL_CONSTEXPR increment<> increment_f;
-CPP_GLOBAL_CONSTEXPR decrement<> decrement_f;
-CPP_GLOBAL_CONSTEXPR post_increment<> post_increment_f;
-CPP_GLOBAL_CONSTEXPR post_decrement<> post_decrement_f;
-
 template<typename T = void>
 struct increment_emulation;
 template<typename T = void>
 struct decrement_emulation;
 
-CPP_GLOBAL_CONSTEXPR increment_emulation<> increment_emulation_f;
-CPP_GLOBAL_CONSTEXPR decrement_emulation<> decrement_emulation_f;
-
 template<typename T = void>
 struct unary_negate;
 template<typename T = void>
 struct unary_plus;
-
-CPP_GLOBAL_CONSTEXPR unary_negate<> unary_negate_f;
-CPP_GLOBAL_CONSTEXPR binary_negate<> binary_negate_f;
 //@}
 
 /**
@@ -105,14 +81,6 @@ template<typename T = void, typename U = T>
 struct less_equal;
 template<typename T = void, typename U = T>
 struct equivalent;
-
-CPP_GLOBAL_CONSTEXPR equal_to<> equal_to_f;
-CPP_GLOBAL_CONSTEXPR not_equal_to<> not_equal_to_f;
-CPP_GLOBAL_CONSTEXPR greater<> greater_f;
-CPP_GLOBAL_CONSTEXPR less<> less_f;
-CPP_GLOBAL_CONSTEXPR greater_equal<> greater_equal_f;
-CPP_GLOBAL_CONSTEXPR less_equal<> less_equal_f;
-CPP_GLOBAL_CONSTEXPR equivalent<> equivalent_f;
 //@}
 
 /**
@@ -123,9 +91,6 @@ template<typename T = void, typename U = T>
 struct logical_and;
 template<typename T = void, typename U = T>
 struct logical_or;
-
-CPP_GLOBAL_CONSTEXPR logical_and<> logical_and_f;
-CPP_GLOBAL_CONSTEXPR logical_or<> logical_or_f;
 //@}
 
 /**
@@ -143,12 +108,6 @@ struct left_shift;
 template<typename T = void, typename U = T>
 struct right_shift;
 
-CPP_GLOBAL_CONSTEXPR bit_and<> bit_and_f;
-CPP_GLOBAL_CONSTEXPR bit_or<> bit_or_f;
-CPP_GLOBAL_CONSTEXPR bit_xor<> bit_xor_f;
-CPP_GLOBAL_CONSTEXPR left_shift<> left_shift_f;
-CPP_GLOBAL_CONSTEXPR right_shift<> right_shift_f;
-
 template<typename T = void, typename U = T>
 struct bit_and_equal;
 template<typename T = void, typename U = T>
@@ -160,16 +119,8 @@ struct left_shift_equal;
 template<typename T = void, typename U = T>
 struct right_shift_equal;
 
-CPP_GLOBAL_CONSTEXPR bit_and_equal<> bit_and_equal_f;
-CPP_GLOBAL_CONSTEXPR bit_or_equal<> bit_or_equal_f;
-CPP_GLOBAL_CONSTEXPR bit_xor_equal<> bit_xor_equal_f;
-CPP_GLOBAL_CONSTEXPR left_shift_equal<> left_shift_equal_f;
-CPP_GLOBAL_CONSTEXPR right_shift_equal<> right_shift_equal_f;
-
 template<typename T = void>
 struct bit_not;
-
-CPP_GLOBAL_CONSTEXPR bit_not<> bit_not_f;
 //@}
 
 /**
@@ -178,8 +129,6 @@ CPP_GLOBAL_CONSTEXPR bit_not<> bit_not_f;
  */
 template<typename T = void>
 struct binary_negate;
-
-CPP_GLOBAL_CONSTEXPR binary_negate<> binary_negate_f;
 //@}
 
 /**
@@ -196,12 +145,6 @@ template<typename T = void, typename Index = void>
 struct index;
 template<typename T = void, typename Index = void>
 struct index_emulation;
-
-CPP_GLOBAL_CONSTEXPR pointer<> pointer_f;
-CPP_GLOBAL_CONSTEXPR address<> address_f;
-CPP_GLOBAL_CONSTEXPR arrow<> arrow_f;
-CPP_GLOBAL_CONSTEXPR index<> index_f;
-CPP_GLOBAL_CONSTEXPR index_emulation<> index_emulation_f;
 //@}
 
 /**
@@ -210,8 +153,6 @@ CPP_GLOBAL_CONSTEXPR index_emulation<> index_emulation_f;
  */
 template<typename T = void, typename U = T>
 struct affect;
-
-CPP_GLOBAL_CONSTEXPR affect<> affect_f;
 //@}
 
 /**
@@ -219,14 +160,9 @@ CPP_GLOBAL_CONSTEXPR affect<> affect_f;
  */
 template<typename T = void, typename U = T>
 struct comma;
-
-CPP_GLOBAL_CONSTEXPR comma<> comma_f;
-
 #if __cplusplus >= 201103L
 template<typename T = void, typename Member = void>
 struct pointer_to_member;
-
-CPP_GLOBAL_CONSTEXPR pointer_to_member<> pointer_to_member_f;
 #endif
 //@}
 
@@ -776,6 +712,109 @@ struct pointer_to_member<void, void>
 #undef FALCON_CREATE_OPERATORS
 #undef FALCON_UNARY_RETURN
 #undef FALCON_UNARY_PARAM
+
+/**
+ * Arithmetic operations
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR plus<> plus_f;
+CPP_GLOBAL_CONSTEXPR minus<> minus_f;
+CPP_GLOBAL_CONSTEXPR multiplies<> multiplies_f;
+CPP_GLOBAL_CONSTEXPR modulus<> modulus_f;
+CPP_GLOBAL_CONSTEXPR divides<> divides_f;
+
+CPP_GLOBAL_CONSTEXPR plus_equal<> plus_equal_f;
+CPP_GLOBAL_CONSTEXPR minus_equal<> minus_equal_f;
+CPP_GLOBAL_CONSTEXPR multiplies_equal<> multiplies_equal_f;
+CPP_GLOBAL_CONSTEXPR modulus_equal<> modulus_equal_f;
+CPP_GLOBAL_CONSTEXPR divides_equal<> divides_equal_f;
+
+CPP_GLOBAL_CONSTEXPR increment<> increment_f;
+CPP_GLOBAL_CONSTEXPR decrement<> decrement_f;
+CPP_GLOBAL_CONSTEXPR post_increment<> post_increment_f;
+CPP_GLOBAL_CONSTEXPR post_decrement<> post_decrement_f;
+
+CPP_GLOBAL_CONSTEXPR increment_emulation<> increment_emulation_f;
+CPP_GLOBAL_CONSTEXPR decrement_emulation<> decrement_emulation_f;
+
+CPP_GLOBAL_CONSTEXPR unary_negate<> unary_negate_f;
+CPP_GLOBAL_CONSTEXPR unary_plus<> unary_plus_f;
+//@}
+
+/**
+ * Comparisons
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR equal_to<> equal_to_f;
+CPP_GLOBAL_CONSTEXPR not_equal_to<> not_equal_to_f;
+CPP_GLOBAL_CONSTEXPR greater<> greater_f;
+CPP_GLOBAL_CONSTEXPR less<> less_f;
+CPP_GLOBAL_CONSTEXPR greater_equal<> greater_equal_f;
+CPP_GLOBAL_CONSTEXPR less_equal<> less_equal_f;
+CPP_GLOBAL_CONSTEXPR equivalent<> equivalent_f;
+//@}
+
+/**
+ * Logical operations
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR logical_and<> logical_and_f;
+CPP_GLOBAL_CONSTEXPR logical_or<> logical_or_f;
+//@}
+
+/**
+ * Bitwise operations
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR bit_and<> bit_and_f;
+CPP_GLOBAL_CONSTEXPR bit_or<> bit_or_f;
+CPP_GLOBAL_CONSTEXPR bit_xor<> bit_xor_f;
+CPP_GLOBAL_CONSTEXPR left_shift<> left_shift_f;
+CPP_GLOBAL_CONSTEXPR right_shift<> right_shift_f;
+
+CPP_GLOBAL_CONSTEXPR bit_and_equal<> bit_and_equal_f;
+CPP_GLOBAL_CONSTEXPR bit_or_equal<> bit_or_equal_f;
+CPP_GLOBAL_CONSTEXPR bit_xor_equal<> bit_xor_equal_f;
+CPP_GLOBAL_CONSTEXPR left_shift_equal<> left_shift_equal_f;
+CPP_GLOBAL_CONSTEXPR right_shift_equal<> right_shift_equal_f;
+
+CPP_GLOBAL_CONSTEXPR bit_not<> bit_not_f;
+//@}
+
+/**
+ * Negators
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR binary_negate<> binary_negate_f;
+//@}
+
+/**
+ * Accessor operations
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR pointer<> pointer_f;
+CPP_GLOBAL_CONSTEXPR address<> address_f;
+CPP_GLOBAL_CONSTEXPR arrow<> arrow_f;
+CPP_GLOBAL_CONSTEXPR index<> index_f;
+CPP_GLOBAL_CONSTEXPR index_emulation<> index_emulation_f;
+//@}
+
+/**
+ * Affectation
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR affect<> affect_f;
+//@}
+
+/**
+ * @{
+ */
+CPP_GLOBAL_CONSTEXPR comma<> comma_f;
+
+#if __cplusplus >= 201103L
+constexpr pointer_to_member<> pointer_to_member_f;
+#endif
+//@}
 
 }
 

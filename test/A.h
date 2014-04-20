@@ -15,7 +15,9 @@ struct A{
   ~A() { std::cout << "~A(" << i << ')' << std::endl; }
 
   A& operator=(const A&a) {i=a.i; std::cout << "A& A::operator=(A(" << a.i << "))" << std::endl; return *this;}
+#if __cplusplus >= 201103L
   A& operator=(A&&a) {i=a.i; std::cout << "A& A::operator=(A&&(" << a.i << "))" << std::endl; return *this;}
+#endif
   A& operator=(int ii) {i=ii; std::cout << "A& A::operator=(" << ii << ')' << std::endl; return *this;}
   A& operator+=(int ii) {i+=ii; std::cout << "A& A::operator+=(" << ii << ')' << std::endl; return *this; }
   A& operator+=(const A&a) {i+=a.i; std::cout << "A& A::operator+=(A(" << a.i << "))" << std::endl; return *this; }

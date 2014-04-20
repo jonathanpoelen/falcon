@@ -1,97 +1,95 @@
 #ifndef FALCON_CONTAINER_INDIRECT_CONTAINER_HPP
 #define FALCON_CONTAINER_INDIRECT_CONTAINER_HPP
 
-#include <functional>
-#include <boost/ref.hpp>
+#include <falcon/type_traits/rebind.hpp>
 #include <falcon/c++/extend_parameter.hpp>
-#include <falcon/container/container_wrapper.hpp>
+#include <falcon/container/container_view.hpp>
 #include <falcon/iterator/get_accessor_iterator.hpp>
+
+#if __cplusplus >= 201103L
+# include <functional>
+#endif
+#ifndef FALCON_NOT_BOOST
+# include <boost/ref.hpp>
+#endif
 
 namespace falcon {
 
-template<typename _Container,
-	typename _Value = typename range_access_subtype<_Container>::type>
-struct indirect_container_iterator_type
-{
-	template<typename _Iterator
-#if __cplusplus >= 201103L
-	, typename _Proxy = use_default,
-		typename _Tp = use_default, typename _Category = use_default,
-		typename _Reference = use_default, typename _Distance = use_default,
-		typename _Pointer = use_default
-#endif
-	>
-	struct builder
-	{
-		typedef falcon::iterator::indirect_iterator<_Iterator
-#if __cplusplus >= 201103L
-			, _Proxy, _Tp, _Category, _Reference, _Distance, _Pointer
-#endif
-		> type;
-	};
-};
+namespace _aux {
+  template<class Container, class = typename range_access_subtype<Container>::type>
+  struct indirect_iterator_access_traits
+  {
+    template<typename Iterator>
+    struct builder
+    { typedef falcon::iterator::indirect_iterator<Iterator> type; };
+  };
 
-template<typename _Container, typename _Value>
-struct indirect_container_iterator_type<_Container, boost::reference_wrapper<_Value> >
-{
-	template<typename _Iterator>
-	struct builder
-	: falcon::iterator::build_get_accessor_iterator<_Iterator>
-	{};
-};
-
-#if __cplusplus >= 201103L
-template<typename _Container, typename _Value>
-struct indirect_container_iterator_type<_Container, std::reference_wrapper<_Value>>
-{
-	template<typename _Iterator>
-	struct builder
-	: falcon::iterator::build_get_accessor_iterator<_Iterator>
-	{};
-};
+#ifndef FALCON_NOT_BOOST
+  template<class Container, class T>
+  struct indirect_iterator_access_traits<Container, boost::reference_wrapper<T> >
+  {
+    template<typename Iterator>
+    struct builder
+    : falcon::iterator::build_get_accessor_iterator<Iterator>
+    {};
+  };
 #endif
 
-template<typename _Container,
-	template<CPP_USE_OPTIONAL_EXTEND_PARAMETER(class)> class _IteratorBuild
-	= indirect_container_iterator_type<_Container>::template builder
-	CPP_OTHER_OPTIONAL_EXTEND_PARAMETER(typename, _ArgsIterator)
->
+#if __cplusplus >= 201103L
+  template<class Container, class T>
+  struct indirect_iterator_access_traits<Container, std::reference_wrapper<T>>
+  {
+    template<typename Iterator>
+    struct builder
+    : falcon::iterator::build_get_accessor_iterator<Iterator>
+    {};
+  };
+#endif
+}
+
+template<class Container, class AccessTraits = range_access_traits<Container> >
+class indirect_iterator_access_traits
+{
+  typedef typename rebind<AccessTraits, Container>::type access_traits;
+
+public:
+  typedef range_access_to_iterator_traits<
+    Container
+  , access_traits
+  , typename _aux::indirect_iterator_access_traits<Container>
+  ::template builder<typename access_traits::iterator>::type
+  > type;
+};
+
+template<class Container, class AccessTraits = range_access_traits<Container> >
 struct build_indirect_container
 {
-	typedef container_wrapper<
-		_Container,
-		range_access_traits<
-			_Container,
-			typename _IteratorBuild<
-				typename range_access_iterator<_Container>::type
-				CPP_USE_OTHER_OPTIONAL_EXTEND_PARAMETER(_ArgsIterator)
-			>::type
-		>
+	typedef container_view<
+   Container
+  , typename indirect_iterator_access_traits<Container>::type
 	> type;
 };
 
-template<typename _Container>
-typename build_indirect_container<_Container>::type
-indirect_container(_Container& cont)
+template<class Container>
+typename build_indirect_container<Container>::type
+indirect_container(Container& cont)
 {
-	typedef typename build_indirect_container<_Container>::type __result_type;
-	return __result_type(cont);
+	typedef typename build_indirect_container<Container>::type result_type;
+	return result_type(cont);
 }
 
-template<typename _Container, typename _Build>
-typename build_indirect_container<_Container, _Build::template rebind>::type
-indirect_container(_Container& cont, _Build)
+template<class Container, class AccessTraits>
+typename build_indirect_container<Container, AccessTraits>::type
+indirect_container(Container& cont, AccessTraits access)
 {
-	typedef typename build_indirect_container<_Container, _Build::template rebind>::type __result_type;
-	return __result_type(cont);
+	typedef typename build_indirect_container<Container, AccessTraits>::type result_type;
+	return result_type(cont);
 }
 
 #if __cplusplus >= 201103L
-template<typename _Container,
-	template<class...> class _IteratorBuild = indirect_container_iterator_type<_Container>::template builder,
-	typename... _ArgsIterator>
-using indirect_container_wrapper = typename build_indirect_container<
-	_Container, _IteratorBuild, _ArgsIterator...>::type;
+template<class Container, class AccessTraits = range_access_traits<Container> >
+using indirect_container_view
+= typename build_indirect_container<Container, AccessTraits>::type;
 #endif
 
 }

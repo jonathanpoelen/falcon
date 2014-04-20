@@ -8,11 +8,10 @@
 # define CPP_CONSTEXPR_OR_CONST constexpr
 # if __cplusplus > 201103L
 #   define CPP_CONSTEXPR_NOT_CONST constexpr
-#   define CPP_GLOBAL_CONSTEXPR constexpr
 # else
 #   define CPP_CONSTEXPR_NOT_CONST
-#   define CPP_GLOBAL_CONSTEXPR static constexpr
 # endif
+# define CPP_GLOBAL_CONSTEXPR constexpr
 #else
 # define CPP_CONSTEXPR
 # define CPP_CONSTEXPR_OR_CONST const

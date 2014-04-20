@@ -23,7 +23,6 @@
 #include <falcon/functional/operators.hpp>
 #include <falcon/iterator/nexter_iterator.hpp>
 #include <falcon/iterator/integer_iterator.hpp>
-#include <falcon/container/static_container_wrapper.hpp>
 
 /**
  * struct Enumerator
@@ -60,8 +59,6 @@
  * 		static iterator begin();
  * 		static iterator end();
  * 	};
- *
- * 	typedef ::falcon::static_container_wrapper<enumeration> enumeration_wrapper;
  *
  * 	static std::size_t enum_to_index_string(enum_t e);
  * };
@@ -658,7 +655,7 @@ namespace enum_class{
 }
 #else
 # define __FALCON_PP_LIST_ENUMERATOR_INNER_STRINGS(rule, n, list)\
-	struct __strings\
+	struct strings\
 	{\
 		typedef FALCON_PP_LIST_ENUM_ELEMENT_CHAR_TYPE(BOOST_PP_LIST_FIRST(list)) char_type;\
 		typedef const char_type* value_type;\
@@ -679,8 +676,7 @@ namespace enum_class{
 		{\
 			return strings::begin() + n;\
 		}\
-	};\
-	typedef ::falcon::static_container_wrapper<__strings> strings;
+	};
 #endif
 
 ///TODO cette macro pourrait être couper en plusieurs parties utiles
@@ -715,7 +711,6 @@ public:\
 			return iterator(__FALCON_PP_LIST_ENUM_LAST_VALUE_ITERATOR(rule, n, list));\
 		}\
 	};\
-	typedef ::falcon::static_container_wrapper<enumeration> enumeration_wrapper;\
 \
 	static std::size_t enum_to_index_string(enum_t e)\
 	{\
