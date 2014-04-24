@@ -1,10 +1,8 @@
-#ifndef _FALCON_ALGORITHM_RECURSIVE_FOR_EACH_HPP
-#define _FALCON_ALGORITHM_RECURSIVE_FOR_EACH_HPP
+#ifndef FALCON_ALGORITHM_RECURSIVE_FOR_EACH_HPP
+#define FALCON_ALGORITHM_RECURSIVE_FOR_EACH_HPP
 
-#if __cplusplus >= 201103L
-# include <initializer_list>
-#endif
-#include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/reference.hpp>
+#include <falcon/c++/conditional_cpp.hpp>
 #include <falcon/iterator/subrange_access_iterator.hpp>
 #include <falcon/type_traits/dimension.hpp>
 #include <falcon/type_traits/ignore.hpp>
@@ -12,391 +10,388 @@
 
 namespace falcon {
 namespace algorithm {
+namespace _aux {
 
-template <typename _Function, typename _T, bool _Break = true>
-struct __break_off
+template <class Function, class T, bool Break = true>
+struct break_off
 {
-	_Function function;
-	const _T& value;
+  Function function;
+  T value;
 
 #if __cplusplus < 201103L
-	__break_off(const _Function& function, const _T& value)
-	: function(function)
-	, value(value)
-	{}
+  break_off(const Function& function, const T& value)
+  : function(function)
+  , value(value)
+  {}
 #endif
 };
 
-template <typename _Function, typename _Functor, bool _Break = true>
-struct __break_if
+template <class Function, class Functor, bool Break = true>
+struct break_if
 {
-	_Function function;
-	_Functor functor;
+  Function function;
+  Functor functor;
 
 #if __cplusplus < 201103L
-	__break_if(const _Function& function, const _T& functor)
-	: function(function)
-	, functor(functor)
-	{}
+  break_if(const Function& function, const T& functor)
+  : function(function)
+  , functor(functor)
+  {}
 #endif
 };
 
-template <typename _Function, typename _T, bool _Break = true>
-struct __return_off
+template <class Function, class T, bool Break = true>
+struct return_off
 {
-	_Function function;
-	const _T& value;
+  Function function;
+  T value;
 
 #if __cplusplus < 201103L
-	__return_off(const _Function& function, const _T& value)
-	: function(function)
-	, value(value)
-	{}
+  return_off(const Function& function, const T& value)
+  : function(function)
+  , value(value)
+  {}
 #endif
 };
 
-template <typename _Function, typename _Functor, bool _Break = true>
-struct __return_if
+template <class Function, class Functor, bool Break = true>
+struct return_if
 {
-	_Function function;
-	_Functor functor;
+  Function function;
+  Functor functor;
 
 #if __cplusplus < 201103L
-	__return_if(const _Function& function, const _T& functor)
-	: function(function)
-	, functor(functor)
-	{}
+  return_if(const Function& function, const T& functor)
+  : function(function)
+  , functor(functor)
+  {}
 #endif
 };
+
+template <std::size_t Dimension>
+struct recursive_for_each
+{
+  template<class Iterator, class Function>
+  static void for_each(Iterator first, Iterator last, Function& f)
+  {
+    for (; first != last; ++first) {
+      recursive_for_each<Dimension-1>::for_each(begin(*first), end(*first), f);
+    }
+  }
+
+  template<class Iterator, class Function, class T, bool Break>
+  static bool for_each(Iterator first, Iterator last, return_off<Function, T, Break>& w)
+  {
+    for (; first != last; ++first) {
+      if (!recursive_for_each<Dimension-1>::for_each(begin(*first), end(*first), w)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template<class Iterator, class Function, class Functor, bool Break>
+  static bool for_each(Iterator first, Iterator last, return_if<Function, Functor, Break>& w)
+  {
+    for (; first != last; ++first) {
+      if (!recursive_for_each<Dimension-1>::for_each(begin(*first), end(*first), w)) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+template <>
+struct recursive_for_each<0>
+{
+  template<class Iterator, class Function>
+  static void for_each(Iterator first, Iterator last, Function& f)
+  {
+    for (; first != last; ++first) {
+      f(*first);
+    }
+  }
+
+  template<class Iterator, class Function, class T, bool B>
+  static void for_each(Iterator first, Iterator last, break_off<Function, T, B>& w)
+  {
+    for (; first != last && (B ? *first != w.value : *first != w.value); ++first) {
+      w.function(*first);
+    }
+  }
+
+  template<class Iterator, class Function, class Functor, bool B>
+  static void for_each(Iterator first, Iterator last, break_if<Function, Functor, B>& w)
+  {
+    for (; first != last && B == w.functor(*first); ++first) {
+      w.function(*first);
+    }
+  }
+
+  template<class Iterator, class Function, class T, bool B>
+  static bool for_each(Iterator first, Iterator last, return_off<Function, T, B>& w)
+  {
+    for (; first != last; ++first) {
+      if (B ? *first == w.value : *first != w.value) {
+        return false;
+      }
+      w.function(*first);
+    }
+    return true;
+  }
+
+  template<class Iterator, class Function, class Functor, bool B>
+  static bool for_each(Iterator first, Iterator last, return_if<Function, Functor, B>& w)
+  {
+    for (; first != last; ++first) {
+      if (B != w.functor(*first)) {
+        return false;
+      }
+      w.function(*first);
+    }
+    return true;
+  }
+};
+
+template<class Preface, class Function, class Postface, std::size_t Dimension>
+class recursive_intermediate;
+
+}
 
 #if __cplusplus >= 201103L
-template <typename _Function, typename _T>
-inline __break_off<_Function, _T> break_off(_Function&& function, const _T& value)
-{
-	return {function, value};
-}
+template <class Function, class T>
+inline _aux::break_off<Function, T> break_off(Function&& function, T&& value)
+{ return {std::forward<Function>(function), std::forward<T>(value)}; }
 
-template <typename _Function, typename _T>
-inline __break_off<_Function, _T, false> break_off_not(_Function&& function, const _T& value)
-{
-	return {function, value};
-}
+template <class Function, class T>
+inline _aux::break_off<Function, T, false> break_off_not(Function&& function, T&& value)
+{ return {std::forward<Function>(function), std::forward<T>(value)}; }
 
-template <typename _Function, typename _Functor>
-inline __break_if<_Function, _Functor> break_if(_Function&& function, _Functor&& functor)
-{
-	return {function, functor};
-}
+template <class Function, class Functor>
+inline _aux::break_if<Function, Functor> break_if(Function&& function, Functor&& functor)
+{ return {std::forward<Function>(function), std::forward<Functor>(functor)}; }
 
-template <typename _Function, typename _Functor>
-inline __break_if<_Function, _Functor, false> break_if_not(_Function&& function, _Functor&& functor)
-{
-	return {function, functor};
-}
+template <class Function, class Functor>
+inline _aux::break_if<Function, Functor, false> break_if_not(Function&& function, Functor&& functor)
+{ return {std::forward<Function>(function), std::forward<Functor>(functor)}; }
 #else
-template <typename _Function, typename _T>
-inline __break_off<_Function, _T> break_off(_Function function, const _T& value)
-{
-	return __break_off<_Function, _T>(function, value);
-}
+template <class Function, class T>
+inline _aux::break_off<Function, T> break_off(Function function, const T& value)
+{ return _aux::break_off<Function, T>(function, value); }
 
-template <typename _Function, typename _T>
-inline __break_off<_Function, _T, false> break_off_not(_Function function, const _T& value)
-{
-	return __break_off<_Function, _T, false>(function, value);
-}
+template <class Function, class T>
+inline _aux::break_off<Function, T, false> break_off_not(Function function, const T& value)
+{ return _aux::break_off<Function, T, false>(function, value); }
 
-template <typename _Function, typename _Functor>
-inline __break_if<_Function, _Functor> break_if(_Function function, _Functor functor)
-{
-	return __break_if<_Function, _Functor>(function, functor);
-}
+template <class Function, class Functor>
+inline _aux::break_if<Function, Functor> break_if(Function function, Functor functor)
+{ return _aux::break_if<Function, Functor>(function, functor); }
 
-template <typename _Function, typename _Functor>
-inline __break_if<_Function, _Functor, false> break_if_not(_Function function, _Functor functor)
-{
-	return __break_if<_Function, _Functor, false>(function, functor);
-}
+template <class Function, class Functor>
+inline _aux::break_if<Function, Functor, false> break_if_not(Function function, Functor functor)
+{ return _aux::break_if<Function, Functor, false>(function, functor); }
 #endif
 
 #if __cplusplus >= 201103L
-template <typename _Function, typename _T>
-inline __return_off<_Function, _T> return_off(_Function&& function, const _T& value)
-{
-	return {function, value};
-}
+template <class Function, class T>
+inline _aux::return_off<Function, T> return_off(Function&& function, T&& value)
+{ return {std::forward<Function>(function), std::forward<T>(value)}; }
 
-template <typename _Function, typename _T>
-inline __return_off<_Function, _T, false> return_off_not(_Function&& function, const _T& value)
-{
-	return {function, value};
-}
+template <class Function, class T>
+inline _aux::return_off<Function, T, false> return_off_not(Function&& function, T&& value)
+{ return {std::forward<Function>(function), std::forward<T>(value)}; }
 
-template <typename _Function, typename _Functor>
-inline __return_if<_Function, _Functor> return_if(_Function&& function, _Functor&& functor)
-{
-	return {function, functor};
-}
+template <class Function, class Functor>
+inline _aux::return_if<Function, Functor> return_if(Function&& function, Functor&& functor)
+{ return {std::forward<Function>(function), std::forward<Functor>(functor)}; }
 
-template <typename _Function, typename _Functor>
-inline __return_if<_Function, _Functor, false> return_if_not(_Function&& function, _Functor&& functor)
-{
-	return {function, functor};
-}
+template <class Function, class Functor>
+inline _aux::return_if<Function, Functor, false> return_if_not(Function&& function, Functor&& functor)
+{ return {std::forward<Function>(function), std::forward<Functor>(functor)}; }
 #else
-template <typename _Function, typename _T>
-inline __return_off<_Function, _T> return_off(_Function function, const _T& value)
-{
-	return __return_off<_Function, _T>(function, value);
-}
+template <class Function, class T>
+inline _aux::return_off<Function, T> return_off(Function function, const T& value)
+{ return _aux::return_off<Function, T>(function, value); }
 
-template <typename _Function, typename _T>
-inline __return_off<_Function, _T, false> return_off_not(_Function function, const _T& value)
-{
-	return __return_off<_Function, _T, false>(function, value);
-}
+template <class Function, class T>
+inline _aux::return_off<Function, T, false> return_off_not(Function function, const T& value)
+{ return _aux::return_off<Function, T, false>(function, value); }
 
-template <typename _Function, typename _Functor>
-inline __return_if<_Function, _Functor> return_if(_Function function, _Functor functor)
-{
-	return __return_if<_Function, _Functor>(function, functor);
-}
+template <class Function, class Functor>
+inline _aux::return_if<Function, Functor> return_if(Function function, Functor functor)
+{ return _aux::return_if<Function, Functor>(function, functor); }
 
-template <typename _Function, typename _Functor>
-inline __return_if<_Function, _Functor, false> return_if_not(_Function function, _Functor functor)
-{
-	return __return_if<_Function, _Functor, false>(function, functor);
-}
+template <class Function, class Functor>
+inline _aux::return_if<Function, Functor, false> return_if_not(Function function, Functor functor)
+{ return _aux::return_if<Function, Functor, false>(function, functor); }
 #endif
 
-template <typename _Iterator, std::size_t _Dimension>
-struct __recursive_for_each
+template <class Iterator, class Function>
+Function recursive_for_each(Iterator first, Iterator last, Function f)
 {
-	template<typename _Function>
-	static void for_each(_Iterator first, _Iterator last, _Function& f)
-	{
-		for (; first != last; ++first)
-			__recursive_for_each<typename subrange_access_iterator<_Iterator>::type, _Dimension-1>::for_each(begin(*first), end(*first), f);
-	}
-
-	template<typename _Function, typename _T, bool _Break>
-	static bool for_each(_Iterator first, _Iterator last, __return_off<_Function, _T, _Break>& w)
-	{
-		for (; first != last; ++first) {
-			if (!__recursive_for_each<typename subrange_access_iterator<_Iterator>::type, _Dimension-1>::for_each(begin(*first), end(*first), w))
-				return false;
-		}
-		return true;
-	}
-
-	template<typename _Function, typename _Functor, bool _Break>
-	static bool for_each(_Iterator first, _Iterator last, __return_if<_Function, _Functor, _Break>& w)
-	{
-		for (; first != last; ++first) {
-			if (!__recursive_for_each<typename subrange_access_iterator<_Iterator>::type, _Dimension-1>::for_each(begin(*first), end(*first), w))
-				return false;
-		}
-		return true;
-	}
-};
-
-template <typename _Iterator>
-struct __recursive_for_each<_Iterator, 0>
-{
-	template<typename _Function>
-	static void for_each(_Iterator first, _Iterator last, _Function& f)
-	{
-		for (; first != last; ++first) {
-			f(*first);
-		}
-	}
-
-	template<typename _Function, typename _T>
-	static void for_each(_Iterator first, _Iterator last, __break_off<_Function, _T, true>& w)
-	{
-		for (; first != last && *first != w.value; ++first) {
-			w.function(*first);
-		}
-	}
-
-	template<typename _Function, typename _T>
-	static void for_each(_Iterator first, _Iterator last, __break_off<_Function, _T, false>& w)
-	{
-		for (; first != last && *first == w.value; ++first) {
-			w.function(*first);
-		}
-	}
-
-	template<typename _Function, typename _Functor>
-	static void for_each(_Iterator first, _Iterator last, __break_if<_Function, _Functor, true>& w)
-	{
-		for (; first != last && w.functor(*first); ++first) {
-			w.function(*first);
-		}
-	}
-
-	template<typename _Function, typename _Functor>
-	static void for_each(_Iterator first, _Iterator last, __break_if<_Function, _Functor, false>& w)
-	{
-		for (; first != last && !w.functor(*first); ++first) {
-			w.function(*first);
-		}
-	}
-
-	template<typename _Function, typename _T>
-	static bool for_each(_Iterator first, _Iterator last, __return_off<_Function, _T, true>& w)
-	{
-		for (; first != last; ++first) {
-			if (*first == w.value)
-				return false;
-			w.function(*first);
-		}
-		return true;
-	}
-
-	template<typename _Function, typename _T>
-	static bool for_each(_Iterator first, _Iterator last, __return_off<_Function, _T, false>& w)
-	{
-		for (; first != last; ++first) {
-			if (*first != w.value)
-				return false;
-			w.function(*first);
-		}
-		return true;
-	}
-
-	template<typename _Function, typename _Functor>
-	static bool for_each(_Iterator first, _Iterator last, __return_if<_Function, _Functor, true>& w)
-	{
-		for (; first != last; ++first) {
-			if (!w.functor(*first))
-				return false;
-			w.function(*first);
-		}
-		return true;
-	}
-
-	template<typename _Function, typename _Functor>
-	static bool for_each(_Iterator first, _Iterator last, __return_if<_Function, _Functor, false>& w)
-	{
-		for (; first != last; ++first) {
-			if (w.functor(*first))
-				return false;
-			w.function(*first);
-		}
-		return true;
-	}
-};
-
-template <std::size_t _Dimension = -1ul, typename _Iterator, typename _Function>
-_Function recursive_for_each(_Iterator first, _Iterator last, _Function f)
-{
-	typedef _Iterator& iterator;
-	__recursive_for_each<iterator, _Dimension == -1ul ? dimension<decltype(*std::declval<_Iterator>())>::value : _Dimension>::for_each(first, last, f);
-	return FALCON_MOVE(f);
-}
-
-template <std::size_t _Dimension = -1ul, typename _Container, typename _Function>
-_Function recursive_for_each(_Container& container, _Function f)
-{
-	typedef typename range_access_iterator<_Container>::type iterator;
-	__recursive_for_each<iterator, (_Dimension == -1ul ? dimension<_Container>::value : _Dimension) - 1>::for_each(begin(container), end(container), f);
-	return FALCON_MOVE(f);
-}
-
+  _aux::recursive_for_each<dimension<
 #if __cplusplus >= 201103L
-template <std::size_t _Dimension = -1ul, typename _T, typename _Function>
-_Function recursive_for_each(std::initializer_list<_T> list, _Function f)
-{
-	__recursive_for_each<typename std::initializer_list<_T>::iterator, (_Dimension == -1ul ? dimension<std::initializer_list<_T> >::value : _Dimension) - 1>::for_each(begin(list), end(list), f);
-	return FALCON_MOVE(f);
+    decltype(*std::declval<Iterator>())
+#else
+    std::iterator_traits<Iterator>::type
+#endif
+  >::value - 1>::for_each(first, last, f);
+  return FALCON_FORWARD(Function, f);
 }
+
+template <std::size_t Dimension, class Iterator, class Function>
+Function recursive_for_each(Iterator first, Iterator last, Function f)
+{
+  _aux::recursive_for_each<
+    (Dimension == -1u ? dimension<
+#if __cplusplus >= 201103L
+      decltype(*std::declval<Iterator>())
+#else
+      std::iterator_traits<Iterator>::type
+#endif
+    >::value : Dimension) - 1
+  >::for_each(first, last, f);
+  return FALCON_FORWARD(Function, f);
+}
+
+template <class Container, class Function>
+Function recursive_for_each(Container CPP_RVALUE_OR_REFERENCE container, Function f)
+{
+  _aux::recursive_for_each<dimension<Container>::value - 1>
+    ::for_each(begin(container), end(container), f);
+  return FALCON_FORWARD(Function, f);
+}
+
+template <std::size_t Dimension, class Container, class Function>
+Function recursive_for_each(Container CPP_RVALUE_OR_REFERENCE container, Function f)
+{
+  _aux::recursive_for_each<
+    (Dimension == -1u ? dimension<Container>::value : Dimension) - 1
+  >::for_each(begin(container), end(container), f);
+  return FALCON_FORWARD(Function, f);
+}
+
+template<class Preface, class Function, class Postface CPP_IF_CPP11(= ignore_t)>
+_aux::recursive_intermediate<Preface, Function, Postface, -1u>
+recursive_intermediate(Preface CPP_RVALUE preface, Function CPP_RVALUE functor,
+                       Postface CPP_RVALUE postface = Postface())
+{
+#if __cplusplus >= 201103L
+  return {
+    std::forward<Preface>(preface)
+  , std::forward<Function>(functor)
+  , std::forward<Postface>(postface)
+  };
+#else
+  return _aux::recursive_intermediate<Preface, Function, Postface, -1u>(
+    preface, functor, postface);
+#endif
+}
+
+template<std::size_t Dimension, class Preface, class Function, class Postface CPP_IF_CPP11(= ignore_t)>
+_aux::recursive_intermediate<Preface, Function, Postface, Dimension>
+recursive_intermediate(Preface CPP_RVALUE preface, Function CPP_RVALUE functor,
+                       Postface CPP_RVALUE postface = Postface())
+{
+#if __cplusplus >= 201103L
+  return {
+    std::forward<Preface>(preface)
+  , std::forward<Function>(functor)
+  , std::forward<Postface>(postface)
+  };
+#else
+  return _aux::recursive_intermediate<Preface, Function, Postface, Dimension>(
+    preface, functor, postface);
+#endif
+}
+
+namespace _aux {
+
+template<class Preface, class Function, class Postface, std::size_t Dimension>
+struct recursive_intermediate
+{
+  Preface preface;
+  Function functor;
+  Postface postface;
+
+#if __cplusplus < 201103L
+    recursive_intermediate(Preface preface, Function functor, Postface postface)
+  : preface(preface)
+  , functor(functor)
+  , postface(postface)
+  {}
 #endif
 
-template<typename _Preface, typename _Function, typename _Postface, std::size_t _Dimension>
-class __recursive_intermediate
-{
-	_Preface _preface;
-	_Function _functor;
-	_Postface _postface;
-
-public:
-	__recursive_intermediate(_Preface preface, _Function functor, _Postface postface)
-	: _preface(preface)
-	, _functor(functor)
-	, _postface(postface)
-	{}
-
-	template<typename _Container>
-	void operator()(_Container& v)
-	{
-		_preface();
-		recursive_for_each<_Dimension>(v, _functor);
-		_postface();
-	}
+  template<class Container>
+  void operator()(Container& v)
+  {
+    preface();
+    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+    postface();
+  }
 };
 
-template<typename _Function, typename _Postface, std::size_t _Dimension>
-class __recursive_intermediate<ignore_t, _Function, _Postface, _Dimension>
+template<class Function, class Postface, std::size_t Dimension>
+struct recursive_intermediate<ignore_t, Function, Postface, Dimension>
 {
-	_Function _functor;
-	_Postface _postface;
+  Function functor;
+  Postface postface;
 
-public:
-	__recursive_intermediate(const ignore_t&, _Function functor, _Postface postface)
-	: _functor(functor)
-	, _postface(postface)
-	{}
+#if __cplusplus < 201103L
+  recursive_intermediate(const ignore_t&, Function functor, Postface postface)
+  : functor(functor)
+  , postface(postface)
+  {}
+#endif
 
-	template<typename _Container>
-	void operator()(_Container& v)
-	{
-		recursive_for_each<_Dimension>(v, _functor);
-		_postface();
-	}
+  template<class Container>
+  void operator()(Container& v)
+  {
+    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+    postface();
+  }
 };
 
-template<typename _Preface, typename _Function, std::size_t _Dimension>
-class __recursive_intermediate<_Preface, _Function, ignore_t, _Dimension>
+template<class Preface, class Function, std::size_t Dimension>
+struct recursive_intermediate<Preface, Function, ignore_t, Dimension>
 {
-	_Preface _preface;
-	_Function _functor;
+  Preface preface;
+  Function functor;
 
-public:
-	__recursive_intermediate(_Preface preface, _Function functor, const ignore_t&)
-	: _preface(preface)
-	, _functor(functor)
-	{}
+#if __cplusplus < 201103L
+  recursive_intermediate(Preface preface, Function functor, const ignore_t&)
+  : preface(preface)
+  , functor(functor)
+  {}
+#endif
 
-	template<typename _Container>
-	void operator()(_Container& v)
-	{
-		_preface();
-		recursive_for_each<_Dimension>(v, _functor);
-	}
+  template<class Container>
+  void operator()(Container& v)
+  {
+    preface();
+    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+  }
 };
 
-template<typename _Function, std::size_t _Dimension>
-class __recursive_intermediate<ignore_t, _Function, ignore_t, _Dimension>
+template<class Function, std::size_t Dimension>
+struct recursive_intermediate<ignore_t, Function, ignore_t, Dimension>
 {
-	_Function _functor;
+  Function functor;
 
-public:
-	__recursive_intermediate(const ignore_t&, _Function functor, const ignore_t&)
-	: _functor(functor)
-	{}
+#if __cplusplus < 201103L
+  recursive_intermediate(const ignore_t&, Function functor, const ignore_t&)
+  : functor(functor)
+  {}
+#endif
 
-	template<typename _Container>
-	void operator()(_Container& v)
-	{
-		recursive_for_each<_Dimension>(v, _functor);
-	}
+  template<class Container>
+  void operator()(Container& v)
+  {
+    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+  }
 };
 
-template<std::size_t _Dimension = -1ul, typename _Preface, typename _Function, typename _Postface = ignore_t>
-__recursive_intermediate<_Preface, _Function, _Postface, _Dimension> recursive_intermediate(_Preface preface, _Function functor, _Postface postface = _Postface())
-{
-	return __recursive_intermediate<_Preface, _Function, _Postface, _Dimension>(FALCON_MOVE(preface), FALCON_MOVE(functor), FALCON_MOVE(postface));
 }
 
 }

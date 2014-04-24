@@ -296,6 +296,6 @@ simplifier arg/* en utilisant les types parameter et autres
 
 fake_container qui definit les protos et les types des containers standars (fake_container + fake_associative_container ? fake -> placebo (en anglais) ?)
 
+placeholders -> placeholder
 
-
-
+le dossier range a sup, deplacer les fichiers

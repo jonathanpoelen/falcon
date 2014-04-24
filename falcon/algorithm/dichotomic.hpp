@@ -1,9 +1,10 @@
-#ifndef FALCON_ALGORITHM_DICHOTOMIC_ALGORITHM_HPP
-#define FALCON_ALGORITHM_DICHOTOMIC_ALGORITHM_HPP
+#ifndef FALCON_ALGORITHM_DICHOTOMIC_HPP
+#define FALCON_ALGORITHM_DICHOTOMIC_HPP
 
 #include <algorithm>
 
 namespace falcon {
+namespace algorithm {
 
 /**
  *  @brief Find the first occurrence of a value in a <em>sorted</em> sequence.
@@ -47,6 +48,7 @@ RandomAccessIterator dichotomic_find(RandomAccessIterator first,
   return first;
 }
 
+}
 }
 
 #endif

@@ -5,10 +5,15 @@
 
 namespace falcon {
 namespace iterator {
-	template<typename _Iterator>
-	typename std::iterator_traits<_Iterator>::iterator_category
-	iterator_category(const _Iterator&)
-	{ return std::iterator_traits<_Iterator>::iterator_category(); }
+  template<typename Iterator>
+  typename std::iterator_traits<Iterator>::iterator_category
+  iterator_category(const Iterator&)
+  { return std::iterator_traits<Iterator>::iterator_category(); }
+
+	template<typename Iterator>
+	typename std::iterator_traits<Iterator>::iterator_category
+	iterator_category()
+	{ return std::iterator_traits<Iterator>::iterator_category(); }
 }}
 
 #endif

@@ -5,9 +5,11 @@
 
 #if __cplusplus >= 201103L
 # define CPP_RVALUE_OR_CONST_REFERENCE &&
+# define CPP_RVALUE_OR_REFERENCE &&
 # define CPP_RVALUE &&
 #else
 # define CPP_RVALUE_OR_CONST_REFERENCE const &
+# define CPP_RVALUE_OR_REFERENCE &
 # define CPP_RVALUE
 #endif
 
