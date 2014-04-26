@@ -35,7 +35,7 @@ template <typename _Iterator, typename _Tp, typename _Category,
 class zone_iterator
 : public detail::zone_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base
 {
-	friend iterator_core_access;
+	friend class iterator_core_access;
 
 	typedef typename detail::zone_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
 

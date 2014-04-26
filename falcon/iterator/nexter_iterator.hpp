@@ -44,7 +44,7 @@ template <typename _Iterator, typename _Nexter, bool _ContentsDistance, typename
 class nexter_iterator
 : public detail::nexter_base<_Iterator, _Nexter, _ContentsDistance, _Tp, _Category, _Reference, _Distance, _Pointer>::base
 {
-	friend iterator_core_access;
+	friend class iterator_core_access;
 
 	typedef typename detail::nexter_base<_Iterator, _Nexter, _ContentsDistance, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
 

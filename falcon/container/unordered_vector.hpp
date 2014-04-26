@@ -3,7 +3,7 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/noexcept.hpp>
-#include <falcon/algorithm/unordered_algorithm.hpp>
+#include <falcon/algorithm/unordered.hpp>
 
 #include <vector>
 #if __cplusplus >= 201103L
@@ -269,14 +269,14 @@ public:
 #else
   iterator erase(iterator pos)
 #endif
-  { return unordered_erase(c, pos); }
+  { return algorithm::unordered_erase(c, pos); }
 
 #if __cplusplus >= 201103L
   iterator erase(const_iterator first, const_iterator last)
 #else
   iterator erase(iterator first, iterator last)
 #endif
-  { return unordered_erase(c, first, last); }
+  { return algorithm::unordered_erase(c, first, last); }
 
   void push_back(const value_type & value)
   { c.push_back(value); }
@@ -307,11 +307,11 @@ public:
   { c.push_back(value); }
 
   void remove(const T& x)
-  { c.erase(unordered_remove(c.begin(), c.end(), x), c.end()); }
+  { c.erase(algorithm::unordered_remove(c.begin(), c.end(), x), c.end()); }
 
   template<typename UnaryPredicate>
   void remove_if(UnaryPredicate pred)
-  { c.erase(unordered_remove_if(c.begin(), c.end(), pred), c.end()); }
+  { c.erase(algorithm::unordered_remove_if(c.begin(), c.end(), pred), c.end()); }
   ///@}
 
 protected:

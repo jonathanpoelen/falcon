@@ -6,6 +6,7 @@
 #include <falcon/preprocessor/nil.hpp>
 #include <falcon/preprocessor/qualifier.hpp>
 
+#include <falcon/type_traits/if.hpp>
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>
 #include <falcon/type_traits/is_same.hpp>
@@ -273,47 +274,31 @@ protected:
 	const iterator_type& base_reference() const
 	{ return _M_current; }
 
-private:
-	typedef integral_constant<bool, is_same<std::input_iterator_tag, iterator_category>::value> __is_input_tag;
-
-	void dereference(true_type) const;
-
-	reference dereference(false_type) const
-	{ return *_M_current; }
-
-	reference dereference(false_type)
-	{ return *_M_current; }
-
-	void increment(true_type)
-	{}
-
-	void increment(false_type)
-	{ ++_M_current; }
-
-	void decrement(true_type)
-	{}
-
-	void decrement(false_type)
-	{ --_M_current; }
-
-protected:
 	_Iterator& downcast()
 	{ return static_cast<_Iterator&>(*this); }
 
 	const _Iterator& downcast() const
 	{ return static_cast<const _Iterator&>(*this); }
 
-	reference dereference() const
-	{ return dereference(__is_input_tag()); }
+  typename if_c<
+    is_same<std::output_iterator_tag, iterator_category>
+  , const _IteratorBase
+  , reference
+  >::type dereference() const
+  { return *_M_current; }
 
-	reference dereference()
-	{ return dereference(__is_input_tag()); }
+  typename if_c<
+    is_same<std::output_iterator_tag, iterator_category>
+  , _IteratorBase
+  , reference
+  >::type dereference()
+  { return *_M_current; }
 
 	void increment()
-	{ increment(__is_input_tag()); }
+  { ++_M_current; }
 
 	void decrement()
-	{ decrement(__is_input_tag()); }
+  { --_M_current; }
 
 	bool equal(const iterator_handler& x) const
 	{ return _M_current == x._M_current; }

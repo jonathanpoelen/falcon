@@ -58,7 +58,7 @@ class bit_iterator
 {
 	typedef typename detail::bit_base<_Iterator, _IsConst>::base __base;
 
-	friend iterator_core_access;
+	friend class iterator_core_access;
 
 	unsigned _M_offset;
 

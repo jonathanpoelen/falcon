@@ -77,7 +77,7 @@ class integer_iterator
 {
 	typedef typename detail::integer_base<T, ComparisonTag, Category, Reference, Distance, Pointer>::base __base;
 
-	friend iterator_core_access;
+	friend class iterator_core_access;
 
 public:
 	typedef typename __base::reference reference;
@@ -172,7 +172,7 @@ class reverse_integer_iterator
 {
 	typedef typename detail::reverse_integer_base<T, ComparisonTag, Category, Reference, Distance, Pointer>::base __base;
 
-	friend iterator_core_access;
+	friend class iterator_core_access;
 
 public:
 	typedef typename __base::reference reference;
@@ -288,7 +288,7 @@ class integer_iterator_with_step
   , T, ComparisonTag, Category, Reference, Distance, Pointer
   >::base __base;
 
-  friend iterator_core_access;
+  friend class iterator_core_access;
 
 public:
   typedef typename __base::reference reference;
@@ -423,7 +423,7 @@ class reverse_integer_iterator_with_step
   , ComparisonTag, Category, Reference, Distance, Pointer
   >::base __base;
 
-  friend iterator_core_access;
+  friend class iterator_core_access;
 
 public:
   typedef typename __base::reference reference;

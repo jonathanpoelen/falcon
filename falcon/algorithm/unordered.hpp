@@ -2,46 +2,27 @@
 #define FALCON_ALGORITHM_UNORDERED_HPP
 
 #include <falcon/utility/move.hpp>
+#include <falcon/container/range_access.hpp>
 
 namespace falcon {
+namespace algorithm {
 
 template<typename Container>
-typename Container::iterator
-unordered_erase(Container & cont,
-#if __cplusplus >= 201103L
-                typename Container::const_iterator pos
-#else
-                typename Container::iterator pos
-#endif
-)
+typename range_access_iterator<Container>::type
+unordered_erase(Container & cont, typename range_access_iterator<Container>::type pos)
 {
   if(pos + 1 != cont.end()) {
-#if __cplusplus >= 201103L
-    *const_cast<typename Container::pointer>(pos.base())
-    = std::move(cont.back());
-#else
     *pos = cont.back();
-#endif
   }
   cont.pop_back();
-#if __cplusplus >= 201103L
-  return cont.begin() + (cont.end() - pos);
-#else
   return pos;
-#endif
 }
 
 template<typename Container>
-typename Container::iterator
+typename range_access_iterator<Container>::type
 unordered_erase(Container & cont,
-#if __cplusplus >= 201103L
-                typename Container::const_iterator first,
-                typename Container::const_iterator last
-#else
-                typename Container::iterator first,
-                typename Container::iterator last,
-#endif
-)
+                typename range_access_iterator<Container>::type first,
+                typename range_access_iterator<Container>::type last)
 {
   if(last = cont.end()) {
     return cont.erase(first, last);
@@ -57,12 +38,7 @@ unordered_erase(Container & cont,
 
   typedef typename container_type::iterator iterator;
   for(iterator pos = cont.end() - dis; first != last; ++first, ++pos) {
-#if __cplusplus >= 201103L
-    *const_cast<typename Container::pointer>(first.base())
-    = std::move(*pos);
-#else
     *first = *pos;
-#endif
   }
   return cont.erase(cont.end() - dis, cont.end());
 }
@@ -107,6 +83,7 @@ BidirectionIt unordered_remove(BidirectionIt first, BidirectionIt last, const T&
   return first;
 }
 
+}
 }
 
 #endif

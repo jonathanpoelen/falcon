@@ -8,12 +8,12 @@ namespace iterator {
   template<typename Iterator>
   typename std::iterator_traits<Iterator>::iterator_category
   iterator_category(const Iterator&)
-  { return std::iterator_traits<Iterator>::iterator_category(); }
+  { return typename std::iterator_traits<Iterator>::iterator_category(); }
 
 	template<typename Iterator>
 	typename std::iterator_traits<Iterator>::iterator_category
 	iterator_category()
-	{ return std::iterator_traits<Iterator>::iterator_category(); }
+	{ return typename std::iterator_traits<Iterator>::iterator_category(); }
 }}
 
 #endif

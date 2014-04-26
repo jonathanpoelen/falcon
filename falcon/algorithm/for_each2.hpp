@@ -8,7 +8,7 @@
 #include <falcon/type_traits/is_iterator.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 
-#include FALCON_BOOST_OR_STDTRAITS(remove_const)
+#include FALCON_BOOST_OR_STD_TRAITS(remove_const)
 
 namespace falcon {
 namespace algorithm {
@@ -42,7 +42,7 @@ for_each2(Container& cont, Iterator first, BinaryFunction func)
 
 template <class Container, class Container2, class BinaryFunction>
 typename disable_if_c<is_iterator<
-	typename FALCON_BOOST_OR_STDNAMESPACE::remove_const<Container2>::type
+	typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<Container2>::type
 >, BinaryFunction>::type
 for_each2(Container& cont, Container2& cont2, BinaryFunction func)
 {
@@ -57,7 +57,7 @@ BinaryFunction for_each2(Container& cont, T(&cont2)[N], BinaryFunction func)
 
 template <class ForwardIterator, class Container, class BinaryFunction>
 typename disable_if_c<is_iterator<
-	typename FALCON_BOOST_OR_STDNAMESPACE::remove_const<Container>::type
+	typename FALCON_BOOST_OR_STD_NAMESPACE::remove_const<Container>::type
 >, BinaryFunction>::type
 for_each2(ForwardIterator first, ForwardIterator last,
 					Container& cont, BinaryFunction func)

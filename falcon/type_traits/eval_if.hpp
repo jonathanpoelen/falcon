@@ -42,7 +42,7 @@ struct eval_not_if_c
   typedef typename eval_if<!T::value, TrueClass, FalseClass>::type type;
 };
 
-
+#if __cplusplus >= 201103L
 template<bool c, class TrueClass, class FalseClass>
 using eval_if_t = typename eval_if<c, TrueClass, FalseClass>::type;
 
@@ -54,6 +54,7 @@ using eval_if_c_t = typename eval_if_c<T, TrueClass, FalseClass>::type;
 
 template<class T, class TrueClass, class FalseClass>
 using eval_not_if_c_t = typename eval_not_if_c<T, TrueClass, FalseClass>::type;
+#endif
 
 }
 

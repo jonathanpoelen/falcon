@@ -79,6 +79,7 @@ namespace falcon { namespace node {
 		typedef typename iterator_traits::value_type value_type;
 		typedef typename iterator_traits::reference reference;
 		typedef typename iterator_traits::difference_type difference_type;
+		typedef std::forward_iterator_tag iterator_category;
 
 	protected:
 		pointer _value;
@@ -159,6 +160,7 @@ namespace falcon { namespace node {
 		typedef typename iterator_traits::value_type value_type;
 		typedef typename iterator_traits::reference reference;
 		typedef typename iterator_traits::difference_type difference_type;
+    typedef std::bidirectional_iterator_tag iterator_category;
 
 	protected:
 		pointer _value;

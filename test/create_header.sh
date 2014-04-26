@@ -7,7 +7,7 @@ for f in $*; do
 	fi
 	m=${base^^*}
 	m=${m:0:-1}
-	m=_FALCON_TEST_${m/\//_}_HPP
+	m=FALCON_TEST_${m/\//_}_HPP
 	echo "#ifndef $m
 #define $m
 
