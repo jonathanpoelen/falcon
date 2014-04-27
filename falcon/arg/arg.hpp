@@ -1,48 +1,44 @@
 #ifndef FALCON_ARG_ARG_HPP
 #define FALCON_ARG_ARG_HPP
 
-#include <falcon/preprocessor/not_ide_parser.hpp>
 #include <falcon/parameter/parameter_element.hpp>
+#include <type_traits>
+#include <utility>
 
 namespace falcon {
 
-template <typename... _Args>
+template <class... Args>
 struct arg_size
-{
-	static const int value = sizeof...(_Args);
-};
+: std::integral_constant<std::size_t, sizeof...(Args)>
+{};
 
-template <unsigned int __i, typename... _Args>
+template <std::size_t I, class... Args>
 struct arg_element
-{
-	typedef typename parameter_element<__i, parameter_pack<_Args...>>::type type;
-};
+{ typedef typename parameter_element<I, parameter_pack<Args...>>::type type; };
 
+namespace _aux {
+  template<std::size_t I, class Result>
+  struct arg
+  {
+    template<class T, class... Args>
+    static constexpr Result get(T&&, Args&&... args)
+    { return arg<I-1, Result>::get(args...); }
+  };
 
-template<unsigned int __i, typename _Result>
-struct __arg
-{
-	template<typename _T, typename... _Args>
-	inline static constexpr _Result arg(_T&&, _Args&&... __args)
-	{
-		return __arg<__i-1, _Result>::arg(__args...);
-	}
-};
+  template<class Result>
+  struct arg<0, Result>
+  {
+    template<class T, class... Args>
+    static constexpr Result get(T&& a, Args&&...)
+    { return a; }
+  };
+}
 
-template<typename _Result>
-struct __arg<0, _Result>
+template<std::size_t I, class... Args>
+constexpr typename arg_element<I, Args...>::type arg(Args&&... args)
 {
-	template<typename _T, typename... _Args>
-	inline static constexpr _Result arg(_T&& a, _Args&&... FALCON_PP_NOT_IDE_PARSER())
-	{
-		return a;
-	}
-};
-
-template<unsigned int __i, typename... _Args>
-constexpr typename arg_element<__i, _Args...>::type arg(_Args&&... __args)
-{
-	return __arg<__i, typename arg_element<__i, _Args...>::type>::arg(__args...);
+  return _aux::arg<I, typename arg_element<I, Args...>::type>
+    ::get(std::forward<Args>(args)...);
 }
 
 }

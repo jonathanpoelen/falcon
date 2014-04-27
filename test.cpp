@@ -65,23 +65,13 @@
 // };
 
 
-// #include <iostream>
-// #include <tuple>
-
-struct SC {
-  static int * begin() { return 0; }
-  static int * end() { return 0; }
-};
-
-#include <falcon/container/reference_vector.hpp>
-#include <falcon/container/indirect_container.hpp>
-
 int main()
 {
-  falcon::container::vector<int&> v;
-  int i = 2;
-  v.push_back(i);
-  falcon::indirect_container(v);
+
+
+
+
+
 
 //   typedef vector_c<int,0,9> numbers;
 //   for_each< numbers >( value_printer() );

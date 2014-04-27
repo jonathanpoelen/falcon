@@ -300,3 +300,7 @@ placeholders -> placeholder
 
 le dossier range a sup, deplacer les fichiers
 
+[int,bool,...]_constant dans integral_constant pour c++11
+
+or_c and and_c (dans type_traits) à optimisé (ne fait pas ::value)
+
