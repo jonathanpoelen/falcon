@@ -35,7 +35,7 @@ namespace detail
 	struct bit_base
 	{
 		struct __bit_reference_type {
-			typedef falcon::basic_bit_reference<
+			typedef falcon::bit_reference<
 				typename std::iterator_traits<_Iterator>::value_type
 			> type;
 		};

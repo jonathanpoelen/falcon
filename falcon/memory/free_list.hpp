@@ -4,7 +4,7 @@
 #include <falcon/bit/byte_cast.hpp>
 #include <falcon/c++/reference.hpp>
 #include <falcon/c++/noexcept.hpp>
-#include <falcon/c++/extend_pack.hpp>
+#include <falcon/c++/pack.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/utility/move.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(aligned_storage)
@@ -60,12 +60,12 @@ public:
   , m_allocator(allocator)
   {}
 
-  template<typename CPP_EXTEND_PACK Args>
-  free_list(size_type size_alloc, Args CPP_RVALUE_OR_CONST_REFERENCE CPP_EXTEND_PACK args)
-  CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_EXTEND_PACK))
+  template<typename CPP_PACK Args>
+  free_list(size_type size_alloc, Args CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK args)
+  CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_PACK))
   : m_node(0)
   , m_size_alloc(size_alloc)
-  , m_allocator(FALCON_FORWARD(Args, args)CPP_EXTEND_PACK)
+  , m_allocator(FALCON_FORWARD(Args, args)CPP_PACK)
   {}
 
 #if __cplusplus >= 201103L

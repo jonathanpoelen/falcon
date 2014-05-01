@@ -3,7 +3,7 @@
 
 #include <falcon/memory/free_list.hpp>
 #include <falcon/c++/noexcept.hpp>
-#include <falcon/c++/extend_pack.hpp>
+#include <falcon/c++/pack.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/utility/move.hpp>
 
@@ -38,11 +38,11 @@ public:
   : m_list(other.count_by_alloc(), other.m_allocator)
   {}
 
-  template<typename CPP_EXTEND_PACK Args>
+  template<typename CPP_PACK Args>
   free_list_allocator(size_type size,
-                      Args CPP_RVALUE_OR_CONST_REFERENCE CPP_EXTEND_PACK args)
-  CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_EXTEND_PACK))
-  : m_list(size, FALCON_FORWARD(Args, args)CPP_EXTEND_PACK)
+                      Args CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK args)
+  CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_PACK))
+  : m_list(size, FALCON_FORWARD(Args, args)CPP_PACK)
   {}
 
 #if __cplusplus >= 201103L

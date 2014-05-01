@@ -3,7 +3,7 @@
 
 #include <falcon/utility/move.hpp>
 #include <falcon/c++/reference.hpp>
-#include <falcon/c++/extend_pack.hpp>
+#include <falcon/c++/pack.hpp>
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/arg/arg.hpp>
 #include <falcon/type_traits/enable_type.hpp>
@@ -125,20 +125,20 @@ class temporary_insert
   Position position;
 
 public:
-  template<class CPP_EXTEND_PACK U>
+  template<class CPP_PACK U>
   temporary_insert(Container & cont,
-                   U CPP_RVALUE_OR_CONST_REFERENCE CPP_EXTEND_PACK new_value)
+                   U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
   : x(&cont)
-  , position(inserter(cont, FALCON_FORWARD(U, new_value)CPP_EXTEND_PACK))
+  , position(inserter(cont, FALCON_FORWARD(U, new_value)CPP_PACK))
   {}
 
-  template<class CPP_EXTEND_PACK U>
+  template<class CPP_PACK U>
   temporary_insert(Container & cont, Inserter func_inserter, Deleter func_deleter,
-                   U CPP_RVALUE_OR_CONST_REFERENCE CPP_EXTEND_PACK new_value)
+                   U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
   : x(&cont)
   , inserter(func_inserter)
   , deleter(func_deleter)
-  , position(inserter(cont, FALCON_FORWARD(U, new_value)CPP_EXTEND_PACK))
+  , position(inserter(cont, FALCON_FORWARD(U, new_value)CPP_PACK))
   {}
 
 #if __cplusplus >= 201103L
@@ -155,29 +155,29 @@ public:
 };
 
 
-template<class Container, class Inserter, class Deleter, class CPP_EXTEND_PACK U>
+template<class Container, class Inserter, class Deleter, class CPP_PACK U>
 temporary_insert<Container, typename Container::iterator, Inserter, Deleter>
 make_temporary_insert(Container & cont, Inserter CPP_RVALUE inserter, Deleter CPP_RVALUE deleter,
-                      U CPP_RVALUE_OR_CONST_REFERENCE CPP_EXTEND_PACK new_value)
+                      U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
 {
   return temporary_insert<Container, typename Container::iterator, Inserter, Deleter>(
     cont
   , FALCON_FORWARD(Inserter, inserter)
   , FALCON_FORWARD(Deleter, deleter)
-  , FALCON_FORWARD(U, new_value)CPP_EXTEND_PACK
+  , FALCON_FORWARD(U, new_value)CPP_PACK
   );
 }
 
-template<class Position, class Container, class Inserter, class Deleter, class CPP_EXTEND_PACK U>
+template<class Position, class Container, class Inserter, class Deleter, class CPP_PACK U>
 temporary_insert<Container, Position, Inserter, Deleter>
 make_temporary_insert(Container & cont, Inserter CPP_RVALUE inserter, Deleter CPP_RVALUE deleter,
-                      U CPP_RVALUE_OR_CONST_REFERENCE CPP_EXTEND_PACK new_value)
+                      U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
 {
   return temporary_insert<Container, Position, Inserter, Deleter>(
     cont
   , FALCON_FORWARD(Inserter, inserter)
   , FALCON_FORWARD(Deleter, deleter)
-  , FALCON_FORWARD(U, new_value)CPP_EXTEND_PACK
+  , FALCON_FORWARD(U, new_value)CPP_PACK
   );
 }
 

@@ -1,7 +1,7 @@
 #ifndef FALCON_TUPLE_TUPLE_ASSIGN_HPP
 #define FALCON_TUPLE_TUPLE_ASSIGN_HPP
 
-#include <falcon/c++1x/unpack.hpp>
+#include <falcon/utility/unpack.hpp>
 #include <falcon/tuple/detail/is_tuple.hpp>
 #include <falcon/tuple/parameter_index.hpp>
 #include <falcon/parameter/parameter_index.hpp>
@@ -14,7 +14,7 @@ template<typename Tuple1, typename Tuple2, typename Functor, std::size_t... Inde
 void __tuple_assign(std::false_type, parameter_index<Indexes...>,
                     Tuple1& t1, Tuple2 && t2, Functor && func)
 {
-  CPP1X_UNPACK(
+  FALCON_UNPACK(
     get<Indexes>(t1)
     = func(get<Indexes>(std::forward<Tuple2>(t2))));
 }
@@ -23,7 +23,7 @@ template<typename Tuple1, typename Tuple2, typename Functors, std::size_t... Ind
 void __tuple_assign(std::true_type, parameter_index<Indexes...>,
                     Tuple1& t1, Tuple2 && t2, Functors && t_func)
 {
-  CPP1X_UNPACK(
+  FALCON_UNPACK(
     get<Indexes>(t1)
     = get<Indexes>(std::forward<Functors>(t_func))
     (get<Indexes>(std::forward<Tuple2>(t2))));

@@ -1,21 +1,22 @@
-#ifndef _FALCON_BIT_FIRST_HPP
-#define _FALCON_BIT_FIRST_HPP
+#ifndef FALCON_BIT_FIRST_HPP
+#define FALCON_BIT_FIRST_HPP
 
-#include <falcon/bit/edge.hpp>
 #include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/noexcept.hpp>
+#include <falcon/bit/edge.hpp>
 
 namespace falcon {
 namespace bit {
 
-template <typename _T>
-CPP_CONSTEXPR inline _T first(_T d)
+template <typename T>
+CPP_CONSTEXPR T first(T d) CPP_NOEXCEPT
 {
-	struct R { CPP_CONSTEXPR static inline _T
-	r(_T x, _T dd = right<_T>::value >> 1){
+	struct R { CPP_CONSTEXPR static T
+	r(T x, T dd = right<T>::value >> 1) CPP_NOEXCEPT {
 		return dd < x ? r(dd << 1) : dd >> 1;
 	} };
-	return !d ? left<_T>::value
-	: (d == right<_T>::value ? d : R::r(d));
+	return !d ? left<T>::value
+	: (d == right<T>::value ? d : R::r(d));
 }
 
 }

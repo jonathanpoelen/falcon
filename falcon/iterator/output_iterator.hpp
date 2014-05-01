@@ -1,10 +1,10 @@
 #ifndef FALCON_ITERATOR_OUTPUT_ITERATOR_HPP
 #define FALCON_ITERATOR_OUTPUT_ITERATOR_HPP
 
-#include <iterator>
-#include <boost/typeof/typeof.hpp>
+#include <falcon/c++/pack.hpp>
 #include <falcon/utility/move.hpp>
-#include <falcon/c++/extend_parameter.hpp>
+#include <boost/typeof/typeof.hpp>
+#include <iterator>
 
 namespace falcon {
 namespace iterator {
@@ -37,15 +37,15 @@ template<typename>
 struct __argument_obj;
 
 template<typename _Result, typename _Functor, typename _FirstArg
-	CPP_OTHER_TYPENAME_EXTEND_PARAMETER(_Args)>
+	CPP_OPTIONAL_PACK(_Args)>
 struct __argument_obj<_Result(_Functor::*)(_FirstArg
-	CPP_USE_OTHER_OPTIONAL_EXTEND_PARAMETER(_Args))>
+	CPP_USE_OPTIONAL_PACK(_Args))>
 { typedef _FirstArg type; };
 
 template<typename _Result, typename _Functor, typename _FirstArg
-	CPP_OTHER_TYPENAME_EXTEND_PARAMETER(_Args)>
+	CPP_OPTIONAL_PACK(_Args)>
 struct __argument_obj<_Result(_Functor::*)(_FirstArg
-	CPP_USE_OTHER_OPTIONAL_EXTEND_PARAMETER(_Args)) const>
+	CPP_USE_OPTIONAL_PACK(_Args)) const>
 { typedef _FirstArg type; };
 
 template<typename _Functor>

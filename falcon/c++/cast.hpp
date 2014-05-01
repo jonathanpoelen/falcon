@@ -9,8 +9,8 @@
 # define CPP_EXPLICIT_CAST
 #endif
 
-#define CPP_EXPLICIT_BOOL_CAST(_Cast)\
+#define CPP_EXPLICIT_BOOL_CAST(body)\
 	CPP_EXPLICIT_CAST operator bool() const\
-	{ return _Cast; }
+	{ return body; }
 
 #endif

@@ -5,7 +5,7 @@
 
 #if __cplusplus >= 201103L
 
-#include <falcon/c++1x/unpack.hpp>
+#include <falcon/utility/unpack.hpp>
 
 #include <cassert>
 #include <utility>
@@ -51,7 +51,7 @@ T& append(T& s, const Ts&... ss)
   )...};
   s.reserve(len_sum);
   unsigned pos = 0;
-  CPP1X_UNPACK(__append(s, ss, pos, sz));
+  FALCON_UNPACK(__append(s, ss, pos, sz));
   return s;
 }
 

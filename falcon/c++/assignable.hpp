@@ -5,31 +5,19 @@
 
 #if __cplusplus >= 201103L
 
-# define __CPP_DEFAULT = default
-# define __CPP_DELETE = delete
-# define __CPP_FINAL final
-
-# define __CPP_DELETE_VISIBILITY
+#define CPP_DELETE_COPY_CONSTUCTIBLE(class_name) \
+  class_name(const class_name&) = delete
+#define CPP_DELETE_ASSIGNABLE(class_name) \
+  class_name& operator=(const class_name&) = delete
 
 #else
 
-# define __CPP_DEFAULT
-# define __CPP_DELETE
-# define __CPP_FINAL
-
-# define __CPP_DELETE_VISIBILITY private:
+#define CPP_DELETE_COPY_CONSTUCTIBLE(class_name) \
+  private: class_name(const class_name&);
+#define CPP_DELETE_ASSIGNABLE(class_name) \
+  private: class_name& operator=(const class_name&);
 
 #endif
-
-
-#define __CPP_COPY_CONSTRUCTOR(class_name) class_name(const class_name&)
-#define __CPP_ASSIGNABLE(class_name) class_name& operator=(const class_name&)
-
-#define CPP_DELETE_COPY_CONSTUCTIBLE(class_name)\
-	__CPP_DELETE_VISIBILITY __CPP_COPY_CONSTRUCTOR(class_name) __CPP_DELETE
-
-#define CPP_DELETE_ASSIGNABLE(class_name)\
-		__CPP_DELETE_VISIBILITY __CPP_ASSIGNABLE(class_name) __CPP_DELETE
 
 #define CPP_DELETE_SGI_ASSIGNABLE(class_name)\
 	CPP_DELETE_COPY_CONSTUCTIBLE(class_name);\

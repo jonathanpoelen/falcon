@@ -1,7 +1,7 @@
 #ifndef FALCON_IOSTREAM_PUT_HPP
 #define FALCON_IOSTREAM_PUT_HPP
 
-#include <falcon/c++1x/unpack.hpp>
+#include <falcon/utility/unpack.hpp>
 
 #include <utility>
 #include <iosfwd>
@@ -12,7 +12,7 @@ template<typename CharT, typename Traits, typename... Args>
 std::basic_ostream<CharT, Traits>&
 put(std::basic_ostream<CharT, Traits>& os, const Args&... args)
 {
-  CPP1X_UNPACK(os << args);
+  FALCON_UNPACK(os << args);
   return os;
 }
 

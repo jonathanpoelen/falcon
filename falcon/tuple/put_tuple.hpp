@@ -1,7 +1,7 @@
 #ifndef FALCON_TUPLE_PUT_TUPLE_HPP
 #define FALCON_TUPLE_PUT_TUPLE_HPP
 
-#include <falcon/c++1x/unpack.hpp>
+#include <falcon/utility/unpack.hpp>
 #include <falcon/string/is_character.hpp>
 #include <falcon/string/cstring.hpp>
 #include <falcon/tuple/detail/tuplefwd.hpp>
@@ -37,7 +37,7 @@ void __ostream_tuple(parameter_index<0, Indexes...>,
     const Sep&
   >::type;
   OptimizeSep osep = sep;
-  CPP1X_UNPACK(os << osep << get<Indexes>(t));
+  FALCON_UNPACK(os << osep << get<Indexes>(t));
 }
 
 template<typename Tuple>

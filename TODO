@@ -273,7 +273,7 @@ un objet mutable avec tous les operators (cast implicite pour ne pas tous les fa
 
 dynamic_callback avec range. Autre fonction ? paramètres supplémentaire au début qui représente des indices ou des ranges ?
 
-bug memoire dans flag.
+bug memoire dans flag. flag -> std::bitset ? (héritage ?)
 
 un objet qui créer un arbre de condition dichtomique xxx(yyy(value_ref, f),...)
 
@@ -303,4 +303,5 @@ le dossier range a sup, deplacer les fichiers
 [int,bool,...]_constant dans integral_constant pour c++11
 
 or_c and and_c (dans type_traits) à optimisé (ne fait pas ::value)
+
 

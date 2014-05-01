@@ -1,5 +1,5 @@
-#ifndef _FALCON_CPP_NOEXCEPT_HPP
-#define _FALCON_CPP_NOEXCEPT_HPP
+#ifndef FALCON_CPP_NOEXCEPT_HPP
+#define FALCON_CPP_NOEXCEPT_HPP
 
 #include <falcon/config.hpp>
 

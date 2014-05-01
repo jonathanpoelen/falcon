@@ -1,7 +1,7 @@
 #ifndef FALCON_IOSTREAMS_FORMAT_HPP
 #define FALCON_IOSTREAMS_FORMAT_HPP
 
-#include <falcon/c++1x/unpack.hpp>
+#include <falcon/utility/unpack.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 #include <falcon/string/cstring.hpp>
 #include <falcon/istream/ignore.hpp>
@@ -111,7 +111,7 @@ private:
     for (const item_type & e: elems) {
       os << basic_const_cstring<CharT>(e.pptr, e.epptr);
       if (e.arg) {
-        CPP1X_UNPACK((Indexes+1 == e.arg ? void(os << args) : void()));
+        FALCON_UNPACK((Indexes+1 == e.arg ? void(os << args) : void()));
       }
     }
   }
@@ -126,7 +126,7 @@ private:
         }
       }
       if (e.arg) {
-        CPP1X_UNPACK((Indexes+1 == e.arg ? void(is >> args) : void()));
+        FALCON_UNPACK((Indexes+1 == e.arg ? void(is >> args) : void()));
       }
     }
   }
@@ -257,7 +257,7 @@ void __putgetf(parameter_index<Indexes...>, Stream & ss,
 
       pos = first;
       --n;
-      CPP1X_UNPACK((Indexes == n ? void(FormatTraits::arg(ss, args)) : void()));
+      FALCON_UNPACK((Indexes == n ? void(FormatTraits::arg(ss, args)) : void()));
       continue;
     }
     ++first;

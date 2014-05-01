@@ -2,7 +2,6 @@
 #define FALCON_CONTAINER_INDIRECT_CONTAINER_HPP
 
 #include <falcon/type_traits/rebind.hpp>
-#include <falcon/c++/extend_parameter.hpp>
 #include <falcon/container/container_view.hpp>
 #include <falcon/iterator/get_accessor_iterator.hpp>
 

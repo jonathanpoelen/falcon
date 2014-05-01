@@ -16,9 +16,9 @@ void bit_swap_test()
 		int16_t ii = 5;
 		uint16_t& i = *reinterpret_cast<uint16_t*>(&ii);
 		CHECK_EQUAL_VALUE(0x0005, i);
-		falcon::detail::bit::bit16_swap(i);
+		falcon::bit16_swap(i);
 		CHECK_EQUAL_VALUE(static_cast<uint16_t>(0xA000), i);
-		falcon::detail::bit::bit16_swap(i);
+		falcon::bit16_swap(i);
 		CHECK_EQUAL_VALUE(0x0005, i);
 	}
 	{

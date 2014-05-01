@@ -1,5 +1,5 @@
-#ifndef _FALCON_BIT_CIRCULAR_BIT_HPP
-#define _FALCON_BIT_CIRCULAR_BIT_HPP
+#ifndef FALCON_BIT_CIRCULAR_BIT_HPP
+#define FALCON_BIT_CIRCULAR_BIT_HPP
 
 #include <falcon/c++/boost_or_std.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_cv)
@@ -12,35 +12,36 @@
 #include <falcon/bit/left.hpp>
 
 namespace falcon {
+namespace _aux {
 
-template <typename _Class, typename _T, bool _IsReverse = false>
-class __circular_bit
+template <class Class, class T, bool IsReverse = false>
+class circular_bit
 {
 public:
-	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_cv<_T>::type value_type;
+	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_cv<T>::type value_type;
 
 private:
-	typedef typename unqualified<value_type>::type __unqualified_type;
-	static const __unqualified_type _S_left = bit::left<__unqualified_type>::value;
-	static const __unqualified_type _S_right = bit::right<__unqualified_type>::value;
+	typedef typename unqualified<value_type>::type unqualified_type;
+	static const unqualified_type s_left = bit::left<unqualified_type>::value;
+	static const unqualified_type s_right = bit::right<unqualified_type>::value;
 
 private:
 	value_type _mask;
 
 public:
-	__circular_bit()
-	: _mask(_IsReverse ? _S_right : _S_left)
+	circular_bit()
+	: _mask(IsReverse ? s_right : s_left)
 	{}
 
-	__circular_bit(const value_type& mask)
+	circular_bit(const value_type& mask)
 	: _mask(mask)
 	{}
 
-	__circular_bit(const __circular_bit& other)
+	circular_bit(const circular_bit& other)
 	: _mask(other._mask)
 	{}
 
-	__circular_bit& operator=(const __circular_bit& other)
+	circular_bit& operator=(const circular_bit& other)
 	{
 		_mask == other._mask;
 		return *this;
@@ -55,91 +56,99 @@ public:
 private:
 	void move(false_type)
 	{
-		if (_mask == _S_left)
-			_mask = _S_right;
+		if (_mask == s_left)
+			_mask = s_right;
 		else
-			_mask = static_cast<_T>(_mask << 1);
+			_mask = static_cast<T>(_mask << 1);
 	}
 
 	void move(true_type)
 	{
-		if (_mask == _S_right)
-			_mask = _S_left;
+		if (_mask == s_right)
+			_mask = s_left;
 		else
-			_mask = static_cast<_T>(_mask >> 1);
+			_mask = static_cast<T>(_mask >> 1);
 	}
 
 public:
-	_Class& operator++()
+	Class& operator++()
 	{
-		move(integral_constant<bool, !_IsReverse>());
-		return static_cast<_Class&>(*this);
+		move(integral_constant<bool, !IsReverse>());
+		return static_cast<Class&>(*this);
 	}
 
-	_Class operator++(int)
+	Class operator++(int)
 	{
-		_Class tmp(static_cast<_Class&>(*this));
+		Class tmp(static_cast<Class&>(*this));
 		return ++tmp;
 	}
 
-	_Class& operator--()
+	Class& operator--()
 	{
-		move(integral_constant<bool, _IsReverse>());
-		return static_cast<_Class&>(*this);
+		move(integral_constant<bool, IsReverse>());
+		return static_cast<Class&>(*this);
 	}
 
-	_Class operator--(int)
+	Class operator--(int)
 	{
-		_Class tmp(static_cast<_Class&>(*this));
+		Class tmp(static_cast<Class&>(*this));
 		return --tmp;
 	}
 
-	FALCON_MEMBER_COMPARISON2_ALL_OPERATOR(__circular_bit, _mask, other._mask)
+	FALCON_MEMBER_COMPARISON2_ALL_OPERATOR(circular_bit, _mask, other._mask)
 
 	void reset()
-	{ _mask = _IsReverse ? _S_right : _S_left; }
+	{ _mask = IsReverse ? s_right : s_left; }
 };
 
-template <typename _T>
+}
+
+template <class T>
 class basic_circular_bit
-: public __circular_bit<basic_circular_bit<_T>, _T>
+: public _aux::circular_bit<basic_circular_bit<T>, T>
 {
-	typedef __circular_bit<basic_circular_bit<_T>, _T> __base;
+  typedef _aux::circular_bit<basic_circular_bit<T>, T> base_type;
 
 public:
-	typedef typename __base::value_type value_type;
+	typedef typename base_type::value_type value_type;
 
 public:
 	basic_circular_bit()
-	: __base()
+	: base_type()
 	{}
 
 	basic_circular_bit(const value_type& mask)
-	: __base(mask)
+	: base_type(mask)
 	{}
 };
 
-template <typename _T>
+template <class T>
 class basic_reverse_circular_bit
-: public __circular_bit<basic_reverse_circular_bit<_T>, _T, true>
+: public _aux::circular_bit<basic_reverse_circular_bit<T>, T, true>
 {
-	typedef __circular_bit<basic_reverse_circular_bit<_T>, _T, true> __base;
+  typedef _aux::circular_bit<basic_reverse_circular_bit<T>, T, true> base_type;
 
 public:
-	typedef typename __base::value_type value_type;
+	typedef typename base_type::value_type value_type;
 
 public:
 	basic_reverse_circular_bit()
-	: __base()
+	: base_type()
 	{}
 
 	basic_reverse_circular_bit(const value_type& mask)
-	: __base(mask)
+	: base_type(mask)
 	{}
 };
 
-typedef basic_circular_bit<unsigned long> circular_bit;
-typedef basic_reverse_circular_bit<unsigned long> reverse_circular_bit;
+typedef basic_circular_bit<unsigned> u_circular_bit;
+typedef basic_reverse_circular_bit<unsigned> reverse_u_circular_bit;
+typedef basic_circular_bit<unsigned long> ul_circular_bit;
+typedef basic_reverse_circular_bit<unsigned long> reverse_ul_circular_bit;
+#if __cplusplus >= 201103L
+typedef basic_circular_bit<unsigned long long> ull_circular_bit;
+typedef basic_reverse_circular_bit<unsigned long long> reverse_ull_circular_bit;
+#endif
 
 }
 
