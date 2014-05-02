@@ -18,7 +18,7 @@ namespace _aux {
   template<class Container, class = typename range_access_subtype<Container>::type>
   struct indirect_iterator_access_traits
   {
-    template<typename Iterator>
+    template<class Iterator>
     struct builder
     { typedef falcon::iterator::indirect_iterator<Iterator> type; };
   };
@@ -27,7 +27,7 @@ namespace _aux {
   template<class Container, class T>
   struct indirect_iterator_access_traits<Container, boost::reference_wrapper<T> >
   {
-    template<typename Iterator>
+    template<class Iterator>
     struct builder
     : falcon::iterator::build_get_accessor_iterator<Iterator>
     {};
@@ -38,7 +38,7 @@ namespace _aux {
   template<class Container, class T>
   struct indirect_iterator_access_traits<Container, std::reference_wrapper<T>>
   {
-    template<typename Iterator>
+    template<class Iterator>
     struct builder
     : falcon::iterator::build_get_accessor_iterator<Iterator>
     {};

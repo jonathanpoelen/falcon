@@ -18,11 +18,22 @@
 
 namespace falcon {
 
-#if __cplusplus >= 201103L
+#if __cplusplus > 201103L
+
+using std::begin;
+using std::end;
+using std::rbegin;
+using std::rend;
+using std::cbegin;
+using std::cend;
+using std::crbegin;
+using std::crend;
+
+#elif __cplusplus == 201103L
+
   using std::begin;
   using std::end;
 
-#if __cplusplus < 201403L
   template<class Container>
   auto rbegin(Container& cont)
   noexcept(noexcept(cont.rbegin()))
@@ -46,7 +57,6 @@ namespace falcon {
   noexcept(noexcept(cont.rend()))
   -> decltype(cont.rend())
   { return cont.rend(); }
-#endif
 
   template<class Container>
   auto cbegin(const Container& cont)
@@ -74,73 +84,73 @@ namespace falcon {
 
 #else
 
-  template <typename Container>
+  template<class Container>
   struct range_access_iterator
   : use_if<use_iterator<Container>, use_const_iterator<Container> >
   {};
 
-  template <typename T, std::size_t N>
+  template<class T std::size_t N>
   struct range_access_iterator<T[N]>
   {
       typedef T* type;
   };
 
-  template <typename Container>
+  template<class Container>
   struct range_access_iterator<const Container>
   : use_if<use_const_iterator<Container>, use_iterator<Container> >
   {};
 
-  template <typename Container>
+  template<class Container>
   struct range_access_reverse_iterator
   : use_if<use_reverse_iterator<Container>, use_const_reverse_iterator<Container> >
   {};
 
-  template <typename T, std::size_t N>
+  template<class T std::size_t N>
   struct range_access_reverse_iterator<T[N]>
   {
       typedef T* type;
   };
 
-  template <typename Container>
+  template<class Container>
   struct range_access_reverse_iterator<const Container>
   : use_if<use_const_reverse_iterator<Container>, use_reverse_iterator<Container> >
   {};
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_iterator<Container>::type begin(Container& cont)
   { return cont.begin(); }
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_iterator<Container>::type end(Container& cont)
   { return cont.end(); }
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_reverse_iterator<Container>::type rbegin(Container& cont)
   { return cont.rbegin(); }
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_reverse_iterator<Container>::type rend(Container& cont)
   { return cont.rend(); }
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_iterator<const Container>::type cbegin(const Container& cont)
   { return begin(cont); }
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_iterator<const Container>::type cend(const Container& cont)
   { return end(cont); }
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_reverse_iterator<const Container>::type crbegin(const Container& cont)
   { return rbegin(cont); }
 
-  template<typename Container>
+  template<class Container>
   inline typename range_access_reverse_iterator<const Container>::type crend(const Container& cont)
   { return rend(cont); }
 
 #endif
 
-#if __cplusplus < 201403L
+#if __cplusplus <= 201103L
   template<class T, std::size_t N>
   std::reverse_iterator<T*>
   rbegin(T (&arr)[N]) CPP_NOEXCEPT
@@ -160,7 +170,6 @@ namespace falcon {
   std::reverse_iterator<const T*>
   rend(const T (&arr)[N]) CPP_NOEXCEPT
   { return std::reverse_iterator<const T*>(arr); }
-#endif
 
   template<class T, std::size_t N>
   CPP_CONSTEXPR T const *
@@ -181,15 +190,16 @@ namespace falcon {
   std::reverse_iterator<const T*>
   crend(const T (&arr)[N]) CPP_NOEXCEPT
   { return rbegin(arr); }
+#endif
 
 #if __cplusplus >= 201103L
-  template <typename Container>
+  template<class Container>
   struct range_access_iterator
   {
     typedef decltype(begin(std::declval<Container&>())) type;
   };
 
-  template <typename Container>
+  template<class Container>
   struct range_access_reverse_iterator
   {
     typedef decltype(rbegin(std::declval<Container&>())) type;
@@ -197,7 +207,7 @@ namespace falcon {
 #endif
 
 
-  template <typename Container>
+  template<class Container>
   struct range_access_subtype
   {
     typedef typename std::iterator_traits<

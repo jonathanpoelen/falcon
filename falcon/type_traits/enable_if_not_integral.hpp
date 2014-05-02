@@ -7,11 +7,9 @@
 namespace falcon {
 template<typename _T, typename _Result = _T>
 struct enable_if_not_integral
-{
-	typedef typename std::enable_if<
-		!std::is_integral<_T>::value, _Result
-	>::type type;
-};
+: std::enable_if<
+  !std::is_integral<_T>::value, _Result
+>{};
 }
 #else
 # include <boost/type_traits/is_integral.hpp>

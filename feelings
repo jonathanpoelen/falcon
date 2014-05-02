@@ -3,7 +3,7 @@ module /dir   feel
 accessors      :)
 algorithm      :)
 arg            :)
-bit            :|
+bit            :)
 c++            :)
 c++1x          :)
 cast           :)
@@ -37,3 +37,6 @@ tree           :(
 tuple          :)
 type_traits    :)
 utility        :)
+
+container/fixed_grid_cross.hpp :|
+container/grid_cross.hpp :|

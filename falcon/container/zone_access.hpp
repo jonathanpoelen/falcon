@@ -6,55 +6,51 @@
 
 namespace falcon {
 
-template<typename _Container, typename _Access = range_access_traits<_Container> >
+template<class Container, class Access = range_access_traits<Container> >
 struct zone_access
 {
 private:
-	typedef typename _Access::iterator __sub_iterator;
-	typedef std::iterator_traits<__sub_iterator> __traits;
+	typedef typename Access::iterator sub_iterator;
+	typedef std::iterator_traits<sub_iterator> traits;
 
 public:
-	typedef typename __traits::difference_type difference_type;
+	typedef typename traits::difference_type difference_type;
 	typedef difference_type size_t;
 
-	typedef falcon::iterator::zone_iterator<__sub_iterator> iterator;
+	typedef falcon::iterator::zone_iterator<sub_iterator> iterator;
 
-	size_t width_container;
-	size_t x;
-	size_t y;
-	size_t width_zone;
-	size_t height_zone;
-	_Access access;
+	size_t width_container_;
+	size_t x_;
+	size_t y_;
+	size_t width_zone_;
+	size_t height_zone_;
+	Access access_;
 
-	constexpr zone_access(size_t __width_container,
-												size_t __x, size_t __y,
-												size_t __width_zone,
-												size_t __height_zone,
-												_Access __access = _Access())
-	: width_container(__width_container)
-	, x(__x)
-	, y(__y)
-	, width_zone(__width_zone)
-	, height_zone(__height_zone)
-	, access(__access)
+	constexpr zone_access(size_t width_container,
+												size_t x, size_t y,
+												size_t width_zone,
+												size_t height_zone,
+												Access access = Access())
+	: width_container_(width_container)
+	, x_(x)
+	, y_(y)
+	, width_zone_(width_zone)
+	, height_zone_(height_zone)
+	, access_(access)
 	{}
 
-	iterator begin(_Container& cont) const
+	iterator begin(Container& cont) const
 	{
-		return iterator(
-			access.begin(cont) + (y * width_container + x),
-			width_container,
-			width_zone
-		);
+		return iterator( access_.begin(cont) + (y_ * width_container_ + x_)
+                   , width_container_
+                   , width_zone_);
 	}
 
-	iterator end(_Container& cont) const
+	iterator end(Container& cont) const
 	{
-		return iterator(
-			access.begin(cont) + ((y + height_zone) * width_container) + x,
-			width_container,
-			width_zone
-		);
+		return iterator( access_.begin(cont) + ((y_ + height_zone_) * width_container_) + x_
+                   , width_container_
+                   , width_zone_);
 	}
 };
 

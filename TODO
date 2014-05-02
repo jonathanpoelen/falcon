@@ -129,8 +129,6 @@ les mêmes allocateur (de pool) mais qui sont utilisé avec scoped_adapter_alloc
 
 support des non exceptions (retourne 0 au lieu de bad_alloc). Flag -fno-exceptions pour gcc. Utiliser la macro BOOST_NO_EXCEPTIONS dans boost/config.hpp
 
-implementation de simple signal
-
 faire en sorte que enumerator ne dépende plus de __VA_ARGS__ (ou séparer la partie qui en dépend).
 
 trouver un autre nom pour static_new
@@ -139,7 +137,8 @@ dans les allocateur, ajouter un constructeur qui prend le parent en argument (co
 
 shared_allocator. Par exemple shared_allocator<free_list_allocator> partage tous le même allocateur. Moyen de le faire avec un scoped_adapter_allocator ?
 
-iterator comme zone mais dans différentes direction: http://www.thonky.com/qr-code-tutorial/module-placement-matrix/#pattern-of-placement. Renommer zonne_iterator ?
+iterator comme zone mais dans différentes direction: http://www.thonky.com/qr-code-tutorial/module-placement-matrix/#pattern-of-placement. Renommer zonne_iterator ? std::array_view suffit ?
+zone_access est vraiment utile maintenant qu'il y std::array_view ?
 
 vector avec fonction de redirection d'indice (type template). Permet par exemple un vecteur 2D (avec en template la fonction/wrapper coord()). Voir std::array_view
 
@@ -237,7 +236,6 @@ adaptater -> view ? Pas pour tous. Les transformer en vues si possible
 
 range_allocator fonctionnel avec std::set (ou autre) ?
 
-unordered_vector -> unordered_view ? Un melange ?
 fixed_grid_cross, grid_cross -> grid_cross_view
 
 allocator qui alloue plusieurs bloc.

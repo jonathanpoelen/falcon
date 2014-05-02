@@ -5,7 +5,7 @@
 
 namespace falcon {
 
-template<typename Container>
+template<class Container>
 struct range_access_traits
 {
 	typedef Container container_type;
@@ -28,7 +28,7 @@ struct range_access_traits
   }
 };
 
-template<typename Container>
+template<class Container>
 struct reverse_range_access_traits
 {
 	typedef Container container_type;
