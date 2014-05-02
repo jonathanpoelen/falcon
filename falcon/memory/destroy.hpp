@@ -4,7 +4,7 @@
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/boost_or_std.hpp>
-#include <falcon/detail/addressof.hpp>
+#include <falcon/memory/addressof.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
 
 #if __cplusplus >= 201103L
@@ -64,7 +64,7 @@ private:
   void destroy_aux(integral_constant<bool, false>, ForwardIterator first, ForwardIterator last) const
   {
     for (; first != last; ++first) {
-      operator()(falcon::detail::addressof(*first));
+      operator()(falcon::addressof(*first));
     }
   }
 

@@ -4,7 +4,7 @@
 #include <cstddef> //std::size_t
 #include <falcon/c++/pack.hpp>
 #include <falcon/parameter/parameter_pack.hpp>
-#include <falcon/detail/typeof.hpp>
+#include <falcon/templates/detail/typeof.hpp>
 
 namespace falcon {
 	template <std::size_t _NmLoop, template<class CPP_PACK> class _Template>

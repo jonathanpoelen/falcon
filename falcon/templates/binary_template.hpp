@@ -4,7 +4,7 @@
 #if __cplusplus >= 201103L
 # include <type_traits>
 #endif
-#include <falcon/detail/typeof.hpp>
+#include <falcon/templates/detail/typeof.hpp>
 
 namespace falcon {
 

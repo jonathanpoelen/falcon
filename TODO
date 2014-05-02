@@ -302,4 +302,6 @@ le dossier range a sup, deplacer les fichiers
 
 or_c and and_c (dans type_traits) à optimisé (ne fait pas ::value)
 
+array_view / bounds / index peuvent remplacer totalement coordinates ?
+
 

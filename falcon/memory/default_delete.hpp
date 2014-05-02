@@ -2,7 +2,6 @@
 #define FALCON_MEMORY_DEFAULT_DELETE_HPP
 
 #include <falcon/c++/boost_or_std.hpp>
-#include <falcon/detail/addressof.hpp>
 
 #if __cplusplus >= 201103L
 # include <type_traits>

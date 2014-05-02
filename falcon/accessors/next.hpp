@@ -9,7 +9,7 @@
 # include <falcon/c++1x/syntax.hpp>
 # include <utility>
 #else
-# include <falcon/detail/inner_reference.hpp>
+# include <falcon/type_traits/internal_reference.hpp>
 #endif
 
 namespace falcon {
@@ -20,9 +20,9 @@ namespace _aux {
   struct result_next
   {
 #if __cplusplus >= 201103L
-    typedef decltype(std::declval<T>().next()) type;
+    typedef decltype(std::declval<T&>().next()) type;
 #else
-    typedef typename __detail::inner_reference<T>::type type;
+    typedef typename ::falcon::internal_reference<T>::type;
 #endif
   };
 }

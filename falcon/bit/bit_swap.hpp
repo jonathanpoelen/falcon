@@ -3,7 +3,7 @@
 
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/bit/size.hpp>
-#include <falcon/detail/addressof.hpp>
+#include <falcon/memory/addressof.hpp>
 // #include <falcon/bit/bit_back.hpp>
 // #include <falcon/type_traits/numeric/minimal_int.hpp>
 
@@ -208,7 +208,7 @@ namespace _aux {
 	struct bit_swap
 	{
 		inline static void impl(T& bits) CPP_NOEXCEPT
-		{ bit_swap(reinterpret_cast<char*>(falcon::detail::addressof(bits)), sizeof(T)); }
+		{ bit_swap(reinterpret_cast<char*>(falcon::addressof(bits)), sizeof(T)); }
 	};
 
 #define FALCON_CREATE_BIT_SWAP(S)\

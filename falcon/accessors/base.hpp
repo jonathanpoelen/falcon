@@ -20,7 +20,7 @@ namespace _aux {
 #if __cplusplus >= 201103L
   template <class T>
   struct result_base
-  { typedef decltype(std::declval<T>().base()) type; };
+  { typedef decltype(std::declval<T&>().base()) type; };
 #else
   template <
     class T

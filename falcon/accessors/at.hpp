@@ -3,7 +3,6 @@
 
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/c++/conditional_cpp.hpp>
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/default_or_type.hpp>
 
@@ -11,7 +10,7 @@
 # include <falcon/c++1x/syntax.hpp>
 # include <utility>
 #else
-# include <falcon/detail/inner_reference.hpp>
+# include <falcon/type_traits/internal_reference.hpp>
 #endif
 
 #include <cstddef>
@@ -23,10 +22,11 @@ namespace _aux {
   template<class T, class Position>
   struct result_at
   {
-    typedef
-      CPP_IF_CPP1X(decltype(std::declval<T>().at(std::declval<Position>())))
-      CPP_IF_NOT_CPP1X(typename __detail::inner_reference<T>::type)
-    type;
+#if __cplusplus >= 201103L
+    typedef decltype(std::declval<T&>().next()) type;
+#else
+    typedef typename ::falcon::internal_reference<T>::type;
+#endif
   };
 }
 

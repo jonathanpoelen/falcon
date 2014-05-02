@@ -2,7 +2,6 @@
 #define FALCON_MEMORY_DEALLOCATE_HPP
 
 #include <falcon/c++/boost_or_std.hpp>
-#include <falcon/detail/addressof.hpp>
 
 #include FALCON_BOOST_OR_STD_TRAITS(remove_extent)
 #include <new>
