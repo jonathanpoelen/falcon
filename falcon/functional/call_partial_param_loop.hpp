@@ -1,5 +1,5 @@
-#ifndef _FALCON_FUNCTIONAL_CALL_PARTIAL_PARAM_LOOP_HPP
-#define _FALCON_FUNCTIONAL_CALL_PARTIAL_PARAM_LOOP_HPP
+#ifndef FALCON_FUNCTIONAL_CALL_PARTIAL_PARAM_LOOP_HPP
+#define FALCON_FUNCTIONAL_CALL_PARTIAL_PARAM_LOOP_HPP
 
 #include <falcon/utility/unpack.hpp>
 #include <falcon/functional/call.hpp>
@@ -9,19 +9,21 @@
 
 namespace falcon {
 
-template<std::size_t NumberArg, typename Function,
-  typename... Args, std::size_t... Indexes>
-void __call_partial_param_loop(parameter_index<Indexes...>,
-                               Function func, Args&&... args)
-{
-  FALCON_UNPACK(call(
-    build_range_parameter_index_t<
-      Indexes * NumberArg,
-      Indexes * NumberArg + NumberArg
-    >(),
-    func,
-    std::forward<Args>(args)...
-  ));
+namespace _aux {
+  template<std::size_t NumberArg, typename F,
+    typename... Args, std::size_t... Indexes>
+  void call_partial_param_loop(parameter_index<Indexes...>,
+                               F && func, Args&&... args)
+  {
+    FALCON_UNPACK(call(
+      build_range_parameter_index_t<
+        Indexes * NumberArg
+      , Indexes * NumberArg + NumberArg
+      >()
+    , std::forward<F>(func)
+    , std::forward<Args>(args)...
+    ));
+  }
 }
 
 /**
@@ -41,16 +43,16 @@ void __call_partial_param_loop(parameter_index<Indexes...>,
  *
  * \ingroup call-arguments
  */
-template<std::size_t NumberArg, typename Function, typename... Args,
-  std::size_t N = sizeof...(Args) / NumberArg - ((sizeof...(Args) % NumberArg) ? 0 : 1),
-  typename Indexes = build_parameter_index_t<N>,
-  typename LastIndexes = build_range_parameter_index_t<N*NumberArg, sizeof...(Args)>
+template<std::size_t NumberArg, typename F, typename... Args
+, std::size_t N = sizeof...(Args) / NumberArg - ((sizeof...(Args) % NumberArg) ? 0 : 1)
+, typename Indexes = build_parameter_index_t<N>
+, typename LastIndexes = build_range_parameter_index_t<N*NumberArg, sizeof...(Args)>
 >
-auto call_partial_param_loop(Function func, Args&&... args)
--> decltype(call(LastIndexes(), func, std::forward<Args>(args)...))
+auto call_partial_param_loop(F func, Args&&... args)
+-> decltype(call(LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...))
 {
-  __call_partial_param_loop<NumberArg>(Indexes(), func, std::forward<Args>(args)...);
-  return call(LastIndexes(), func, std::forward<Args>(args)...);
+  _aux::call_partial_param_loop<NumberArg>(Indexes(), func, std::forward<Args>(args)...);
+  return call(LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...);
 }
 
 }

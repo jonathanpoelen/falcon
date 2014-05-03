@@ -10,36 +10,35 @@
 
 namespace falcon {
 
-/**
- * \tparam TOrUnary must be a pointer type or a unary functor
- */
+namespace _aux {
+
 template <
   class TOrUnary
 , class Predicate = static_caster<bool>
 , bool IsNot = false
 >
-struct __store_if
+struct store_if
 {
   typedef TOrUnary type;
 
 
-  __store_if(TOrUnary x, Predicate tester)
+  store_if(TOrUnary x, Predicate tester)
   : _val(x)
   , _test(tester)
   {}
 
-  __store_if(Predicate tester)
+  store_if(Predicate tester)
   : _test(tester)
   {}
 
-  __store_if(TOrUnary x)
+  store_if(TOrUnary x)
   : _val(x)
   {}
 
 #if __cplusplus >= 201103L
-  __store_if() = default;
+  store_if() = default;
 # else
-  __store_if() {}
+  store_if() {}
 #endif
 
   template<class U>
@@ -80,40 +79,46 @@ private:
   Predicate _test;
 };
 
+}
+
+/**
+ * \tparam TOrUnary must be a pointer type or a unary functor
+ * @{
+ */
 #if __cplusplus >= 201103L
 template <
   class TOrUnary
 , class Predicate = static_caster<bool>
 >
-using store_if = __store_if<TOrUnary, Predicate>;
+using store_if = _aux::store_if<TOrUnary, Predicate>;
 
 template <
   class TOrUnary
 , class Predicate = static_caster<bool>
 >
-using store_if_not = __store_if<TOrUnary, Predicate, true>;
+using store_if_not = _aux::store_if<TOrUnary, Predicate, true>;
 #else
 template <
   typename TOrUnary,
   typename Predicate = static_caster<bool>,
 >
 struct store_if
-: __store_if<TOrUnary, Predicate>
+: _aux::store_if<TOrUnary, Predicate>
 {
 private:
-  typedef __store_if<TOrUnary, Predicate> __base;
+  typedef _aux::store_if<TOrUnary, Predicate> base_type;
 
 public:
   store_if(const TOrUnary & p, Predicate tester)
-  : __base(tester, p)
+  : base_type(tester, p)
   {}
 
   store_if(Predicate tester)
-  : __base(tester, p)
+  : base_type(tester, p)
   {}
 
   store_if(const TOrUnary & p)
-  : __base(p)
+  : base_type(p)
   {}
 
   store_if()
@@ -125,28 +130,29 @@ template <
   typename Predicate = static_caster<bool>
 >
 struct store_if_not
-: __store_if<TOrUnary, Predicate, true>
+: _aux::store_if<TOrUnary, Predicate, true>
 {
 private:
-  typedef __store_if<TOrUnary, Predicate, true> __base;
+  typedef _aux::store_if<TOrUnary, Predicate, true> base_type;
 
 public:
   store_if_not(const TOrUnary & p, Predicate tester)
-  : __base(tester, assignval, p)
+  : base_type(tester, assignval, p)
   {}
 
   store_if_not(Predicate tester)
-  : __base(tester, p)
+  : base_type(tester, p)
   {}
 
   store_if_not(const TOrUnary & p)
-  : __base(p)
+  : base_type(p)
   {}
 
   store_if_not()
   {}
 };
 #endif
+//@}
 
 template<class TOrUnary, class Predicate>
 store_if<TOrUnary, Predicate> make_store_if(

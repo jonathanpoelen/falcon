@@ -1,71 +1,56 @@
-#ifndef _FALCON_FUNCTIONAL_CALL_PARTIAL_RECURSIVE_PARAM_HPP
-#define _FALCON_FUNCTIONAL_CALL_PARTIAL_RECURSIVE_PARAM_HPP
+#ifndef FALCON_FUNCTIONAL_CALL_PARTIAL_RECURSIVE_PARAM_HPP
+#define FALCON_FUNCTIONAL_CALL_PARTIAL_RECURSIVE_PARAM_HPP
 
+#include <falcon/math/min.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/functional/call.hpp>
 #include <falcon/parameter/manip.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
-#include <falcon/math/min.hpp>
 
 namespace falcon {
 
-template<std::size_t NumberArg, std::size_t N>
-struct __call_partial_recursive_param_loop
-{
-  static_assert(NumberArg > 1, "NumberArg < 2");
-
-  template<typename Function, typename... Args,
-    std::size_t Start = (N - 1) * (NumberArg - 1) + NumberArg + 1>
-  static constexpr auto impl(Function func, Args&&... args)
-  -> decltype(call(
-    typename parameter_index_cat<
-      parameter_index<0>,
-      build_range_parameter_index_t<
-        Start,
-        min(Start + (NumberArg - 1), sizeof...(Args) + 1)
-      >
-    >::type(),
-    func,
-    __call_partial_recursive_param_loop<NumberArg, N-1>
-    ::impl(func, std::forward<Args>(args)...),
-    std::forward<Args>(args)...
-  ))
+namespace _aux {
+  template<std::size_t NumberArg, std::size_t N>
+  struct call_partial_recursive_param_loop
   {
-    return call(
-      typename parameter_index_cat<
-        parameter_index<0>,
-        build_range_parameter_index_t<
-          Start,
-          min(Start + (NumberArg - 1), sizeof...(Args) + 1)
-        >
-      >::type(),
-      func,
-      __call_partial_recursive_param_loop<NumberArg, N-1>
-      ::impl(func, std::forward<Args>(args)...),
-      std::forward<Args>(args)...
-    );
-  }
-};
+    static_assert(NumberArg > 1, "NumberArg < 2");
 
-template<std::size_t NumberArg>
-struct __call_partial_recursive_param_loop<NumberArg, 0>
-{
-  static_assert(NumberArg > 1, "NumberArg < 2");
+    template<typename Function, typename... Args
+    , std::size_t Start = (N - 1) * (NumberArg - 1) + NumberArg + 1>
+    static constexpr CPP1X_DELEGATE_FUNCTION(
+      impl(Function func, Args&&... args)
+    , call(
+        typename parameter_index_cat<
+          parameter_index<0>,
+          build_range_parameter_index_t<
+            Start
+          , min(Start + (NumberArg - 1), sizeof...(Args) + 1)
+          >
+        >::type()
+      , func
+      , call_partial_recursive_param_loop<NumberArg, N-1>
+        ::impl(func, std::forward<Args>(args)...)
+      , std::forward<Args>(args)...
+      )
+    )
+  };
 
-  template<typename Function, typename... Args>
-  static constexpr auto impl(Function func, Args&&... args)
-  -> decltype(call(
-    build_parameter_index_t<min(NumberArg, sizeof...(Args))>(),
-    func,
-    std::forward<Args>(args)...
-  ))
+  template<std::size_t NumberArg>
+  struct call_partial_recursive_param_loop<NumberArg, 0>
   {
-    return call(
-      build_parameter_index_t<min(NumberArg, sizeof...(Args))>(),
-      func,
-      std::forward<Args>(args)...
-    );
-  }
-};
+    static_assert(NumberArg > 1, "NumberArg < 2");
+
+    template<typename Function, typename... Args>
+    static constexpr CPP1X_DELEGATE_FUNCTION(
+      impl(Function func, Args&&... args)
+    , call(
+        build_parameter_index_t<min(NumberArg, sizeof...(Args))>()
+      , func
+      , std::forward<Args>(args)...
+      )
+    )
+  };
+}
 
 
 /**
@@ -83,15 +68,13 @@ struct __call_partial_recursive_param_loop<NumberArg, 0>
  *
  * \ingroup call-arguments
  */
-template<std::size_t NumberArg, typename Function, typename... Args,
-  std::size_t N = (sizeof...(Args) - 2) / (NumberArg - 1)>
-constexpr auto call_partial_recursive_param_loop(Function func, Args&&... args)
--> decltype(__call_partial_recursive_param_loop<NumberArg, N>
-            ::impl(func, std::forward<Args>(args)...))
-{
-  return __call_partial_recursive_param_loop<NumberArg, N>
-  ::impl(func, std::forward<Args>(args)...);
-}
+template<std::size_t NumberArg, typename Function, typename... Args
+, std::size_t N = (sizeof...(Args) - 2) / (NumberArg - 1)>
+constexpr CPP1X_DELEGATE_FUNCTION(
+  call_partial_recursive_param_loop(Function func, Args&&... args)
+, _aux::call_partial_recursive_param_loop<NumberArg, N>
+  ::impl(func, std::forward<Args>(args)...)
+)
 
 }
 

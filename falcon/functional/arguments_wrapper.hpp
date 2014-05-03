@@ -98,9 +98,9 @@ namespace std
 	struct tuple_size<falcon::arguments_wrapper<Elements...>>
 	{ static const int value = sizeof...(Elements); };
 
-	template<std::size_t _Index, typename... Elements>
-	struct tuple_element<_Index, falcon::arguments_wrapper<Elements...>>
-	: tuple_element<_Index, std::tuple<Elements...>>
+	template<std::size_t Index, typename... Elements>
+	struct tuple_element<Index, falcon::arguments_wrapper<Elements...>>
+	: tuple_element<Index, std::tuple<Elements...>>
 	{};
 }
 

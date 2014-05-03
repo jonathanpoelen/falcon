@@ -13,7 +13,6 @@
 
 #include <iosfwd>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_const)
-#include <boost/concept_check.hpp>
 
 namespace falcon {
 

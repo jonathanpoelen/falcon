@@ -157,7 +157,7 @@ struct ___lambda<_Func, placeholder<_Num>, __force_placearg>
 	_Func function;
 
 	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), call<_Func&>(
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), call(
 		typename keep_parameter_index<
 			ignore_parameter_index_tag<_Num, 1>,
 			sizeof...(_Args)+1
@@ -194,7 +194,7 @@ struct ___lambda<_Func, placeholder<_Num>, __placearg>
 // 	_Func function;
 //
 // 	template<typename... _Args>
-// 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),call<_Func&>(
+// 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),call(
 // 		typename keep_parameter_index<
 // 			ignore_parameter_index_tag<_Num, 1>,
 // 			sizeof...(_Args)+1
