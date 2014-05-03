@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(compare_type, __use_compare_type);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(compare_type, use_compare_type);
+}
 
 template <class T>
 struct use_compare_type
-: __use_compare_type<T>
+: _aux::use_compare_type<T>
 {};
 
 }

@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(const_iterator, __use_const_iterator);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(const_iterator, use_const_iterator);
+}
 
 template <class T>
 struct use_const_iterator
-: __use_const_iterator<T>
+: _aux::use_const_iterator<T>
 {};
 
 }

@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(reference, __use_reference);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(reference, use_reference);
+}
 
 template <class T>
 struct use_reference
-: __use_reference<T>
+: _aux::use_reference<T>
 {};
 
 }

@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(off_type, __use_off_type);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(off_type, use_off_type);
+}
 
 template <class T>
 struct use_off_type
-: __use_off_type<T>
+: _aux::use_off_type<T>
 {};
 
 }

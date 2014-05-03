@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(reverse_iterator, __use_reverse_iterator);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(reverse_iterator, use_reverse_iterator);
+}
 
 template <class T>
 struct use_reverse_iterator
-: __use_reverse_iterator<T>
+: _aux::use_reverse_iterator<T>
 {};
 
 }

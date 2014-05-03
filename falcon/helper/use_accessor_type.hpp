@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(accessor_type, __use_accessor_type);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(accessor_type, use_accessor_type);
+}
 
 template <class T>
 struct use_accessor_type
-: __use_accessor_type<T>
+: _aux::use_accessor_type<T>
 {};
 
 }

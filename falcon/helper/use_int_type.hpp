@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(int_type, __use_int_type);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(int_type, use_int_type);
+}
 
 template <class T>
 struct use_int_type
-: __use_int_type<T>
+: _aux::use_int_type<T>
 {};
 
 }

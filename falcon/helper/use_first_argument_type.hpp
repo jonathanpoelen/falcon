@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(first_argument_type, __use_first_argument_type);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(first_argument_type, use_first_argument_type);
+}
 
 template <class T>
 struct use_first_argument_type
-: __use_first_argument_type<T>
+: _aux::use_first_argument_type<T>
 {};
 
 }

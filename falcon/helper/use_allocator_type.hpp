@@ -5,11 +5,13 @@
 
 namespace falcon {
 
-FALCON_USE_XXX_TRAIT_NAMED_DEF(allocator_type, __use_allocator_type);
+namespace _aux {
+FALCON_USE_XXX_TRAIT_NAMED_DEF(allocator_type, use_allocator_type);
+}
 
 template <class T>
 struct use_allocator_type
-: __use_allocator_type<T>
+: _aux::use_allocator_type<T>
 {};
 
 }
