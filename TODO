@@ -305,3 +305,5 @@ or_c and and_c (dans type_traits) à optimisé (ne fait pas ::value)
 array_view / bounds / index peuvent remplacer totalement coordinates ?
 
 synchroniser: une vue
+
+un objet transaction qui dans son destructeur fait un commit si aucune exception n'est lancée, sinon un rollback (std::uncaught_exception())

@@ -3,6 +3,10 @@
 
 #include <initializer_list>
 
-#define FALCON_UNPACK(...) (void(::std::initializer_list<char>{(void((__VA_ARGS__)), char())...}))
+#if defined(IN_IDE_PARSER)
+# define FALCON_UNPACK(impl)
+#else
+# define FALCON_UNPACK(...) (void(::std::initializer_list<char>{(void((__VA_ARGS__)), char())...}))
+#endif
 
 #endif

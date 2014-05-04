@@ -7,6 +7,7 @@
 #include <iosfwd>
 
 namespace falcon {
+namespace iostreams {
 
 template<typename CharT, typename Traits, typename... Args>
 std::basic_istream<CharT, Traits>&
@@ -76,6 +77,7 @@ void swap(basic_istream_function<CharT, Traits>& x,
           basic_istream_function<CharT, Traits>& y)
 { x.swap(y); }
 
+}
 }
 
 #endif

@@ -9,7 +9,7 @@
 #include <iosfwd>
 
 namespace falcon {
-namespace ostream {
+namespace iostreams {
 
 template <
   typename CharT
@@ -198,11 +198,13 @@ formatter(const std::basic_string<CharT, Traits, Allocator> & s) {
 }
 
 
+namespace _aux {
+
 template <typename FormatTraits, typename Stream, typename Size
 , std::size_t... Indexes, typename... Args>
-void __putgetf(parameter_index<Indexes...>, Stream & ss,
-               const typename Stream::char_type * fmt,
-               Size fmtlen, Args&&... args)
+void putgetf(::falcon::parameter_index<Indexes...>, Stream & ss,
+             const typename Stream::char_type * fmt,
+             Size fmtlen, Args&&... args)
 {
   static_assert(sizeof...(args) < 1000, "too many arguments (the limit is 999)");
   using Traits = typename Stream::traits_type;
@@ -262,12 +264,13 @@ void __putgetf(parameter_index<Indexes...>, Stream & ss,
     }
     ++first;
   }
+
   if (pos != last) {
     FormatTraits::send(ss, pos, last);
   }
 }
 
-struct __putf_traits {
+struct putf_traits {
   template <typename CharT, typename Traits>
   static void send(std::basic_ostream<CharT, Traits> & os,
                    const CharT * first, const CharT * last) {
@@ -280,11 +283,11 @@ struct __putf_traits {
   }
 };
 
-struct __getf_traits {
+struct getf_traits {
   template <typename CharT, typename Traits>
   static void send(std::basic_istream<CharT, Traits> & is,
                    const CharT * first, const CharT * last) {
-    istream::ignore(is, first, last);
+    falcon::istream::ignore(is, first, last);
   }
 
   template <typename CharT, typename Traits, typename T>
@@ -293,11 +296,13 @@ struct __getf_traits {
   }
 };
 
+}
+
 template <typename CharT, typename Traits, typename... Args>
 std::basic_ostream<CharT, Traits> &
 putf(std::basic_ostream<CharT, Traits> & os, const char * fmt, const Args&... args)
 {
-  __putgetf<__putf_traits>(build_parameter_index_t<sizeof...(args)>(), os, fmt,
+  _aux::putgetf<_aux::putf_traits>(build_parameter_index_t<sizeof...(args)>(), os, fmt,
                            std::char_traits<char>::length(fmt), args...);
   return os;
 }
@@ -306,7 +311,7 @@ template <typename CharT, typename Traits, typename... Args>
 std::basic_istream<CharT, Traits> &
 getf(std::basic_istream<CharT, Traits> & is, const char * fmt, Args&... args)
 {
-  __putgetf<__getf_traits>(build_parameter_index_t<sizeof...(args)>(), is, fmt,
+  _aux::putgetf<_aux::getf_traits>(build_parameter_index_t<sizeof...(args)>(), is, fmt,
                            std::char_traits<char>::length(fmt), args...);
   return is;
 }
@@ -317,7 +322,7 @@ putf(std::basic_ostream<CharT, Traits> & os,
      std::basic_string<CharT, Traits, Allocator> fmt,
      const Args&... args)
 {
-  __putgetf<__putf_traits>(build_parameter_index_t<sizeof...(args)>(), os, fmt,
+  _aux::putgetf<_aux::putf_traits>(build_parameter_index_t<sizeof...(args)>(), os, fmt,
                            fmt.size(), args...);
   return os;
 }
@@ -328,7 +333,7 @@ getf(std::basic_istream<CharT, Traits> & is,
      std::basic_string<CharT, Traits, Allocator> fmt,
      Args&... args)
 {
-  __putgetf<__getf_traits>(build_parameter_index_t<sizeof...(args)>(), is, fmt,
+  _aux::putgetf<_aux::getf_traits>(build_parameter_index_t<sizeof...(args)>(), is, fmt,
                            fmt.size(), args...);
   return is;
 }

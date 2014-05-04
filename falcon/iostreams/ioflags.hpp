@@ -5,6 +5,7 @@
 #include <istream>
 
 namespace falcon {
+namespace iostreams {
 
 template<std::ios_base::fmtflags F, typename T>
 struct __ioflags
@@ -454,6 +455,7 @@ struct iosetfmt<F, std::ios_base::fmtflags(0)>
   { return {F|flags, mask, std::forward<T>(x)}; }
 };
 
+}
 }
 
 #endif
