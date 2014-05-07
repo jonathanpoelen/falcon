@@ -21,29 +21,18 @@ get(std::basic_istream<CharT, Traits>& is, Args&... args)
  * \brief Functor for @p falcon::get()
  */
 template<typename CharT, typename Traits = std::char_traits<CharT>>
-class basic_istream_function
+struct basic_istream_function
 {
-public:
   typedef std::basic_istream<CharT, Traits> istream_type;
 
-public:
-  basic_istream_function(istream_type& is)
+
+  basic_istream_function(istream_type& is) noexcept
   : m_is(&is)
   {}
 
-  basic_istream_function(const basic_istream_function& other)
-  : m_is(other.m_is)
-  {}
-
-  basic_istream_function& operator=(istream_type& is)
+  basic_istream_function& operator=(istream_type& is) noexcept
   {
     m_is = &is;
-    return *this;
-  }
-
-  basic_istream_function& operator=(const basic_istream_function& ither)
-  {
-    m_is = ither.m_is;
     return *this;
   }
 
@@ -51,14 +40,8 @@ public:
   istream_type& operator()(Args&... args) const
   { return get(*m_is, args...); }
 
-  istream_type& base() const
+  istream_type& base() const noexcept
   { return *m_is; }
-
-  void swap(basic_istream_function& other)
-  {
-    using std::swap;
-    swap(m_is, other.m_is);
-  }
 
 private:
   istream_type* m_is;
@@ -69,13 +52,8 @@ typedef basic_istream_function<wchar_t> wistream_function;
 
 template<typename CharT, typename Traits>
 basic_istream_function<CharT, Traits>
-make_istream_function(std::basic_istream<CharT, Traits>& is)
+make_istream_function(std::basic_istream<CharT, Traits>& is) noexcept
 { return basic_istream_function<CharT, Traits>(is); }
-
-template<typename CharT, typename Traits>
-void swap(basic_istream_function<CharT, Traits>& x,
-          basic_istream_function<CharT, Traits>& y)
-{ x.swap(y); }
 
 }
 }

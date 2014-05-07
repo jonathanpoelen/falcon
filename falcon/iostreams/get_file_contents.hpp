@@ -12,12 +12,11 @@
 namespace falcon {
 namespace iostreams {
 
-template<
-  class String>
-int
-get_file_contents(
-  String& s
-, const char * name)
+/**
+ * \return errno or 0
+ */
+template<class String>
+int get_file_contents(String& s, const char * name)
 {
   typedef typename String::value_type char_type;
   typedef typename String::traits_type traits_type;
@@ -48,12 +47,12 @@ get_file_contents(
 #endif
 }
 
-template<
-  class String>
-String
-get_file_contents(
-  const char * name
-, int * err)
+/**
+ * \param[out] err  set to errno or 0
+ * @{
+ */
+template<class String>
+String get_file_contents(const char * name, int * err)
 {
   String s;
   const int ret = get_file_contents(s, name);
@@ -63,11 +62,21 @@ get_file_contents(
   return s;
 }
 
-template<
-  class String>
-String
-get_file_contents(
-  const char * name)
+std::string
+get_file_contents(const char * name, int * err)
+{ return get_file_contents<std::string>(name, err); }
+
+std::wstring
+get_wfile_contents(const char * name, int * err)
+{ return get_file_contents<std::wstring>(name, err); }
+//@}
+
+/**
+ * \exception system_error
+ * @{
+ */
+template<class String>
+String get_file_contents(const char * name)
 {
   String s;
   const int ret = get_file_contents(s, name);
@@ -78,35 +87,17 @@ get_file_contents(
 }
 
 std::string
-get_file_contents(
-  const char * name
-, int * err)
-{ return get_file_contents<std::string>(name, err); }
-
-std::string
-get_file_contents(
-  const char * name)
+get_file_contents(const char * name)
 { return get_file_contents<std::string>(name); }
 
 std::wstring
-get_wfile_contents(
-  const char * name
-, int * err)
-{ return get_file_contents<std::wstring>(name, err); }
-
-std::wstring
-get_wfile_contents(
-  const char * name)
+get_wfile_contents(const char * name)
 { return get_file_contents<std::wstring>(name); }
+//@}
 
-
-template<
-  class CharT>
+template<class CharT>
 std::streamsize
-get_file_contents(
-  const char * name
-, const CharT * s
-, std::streamsize n)
+get_file_contents(const char * name, const CharT * s, std::streamsize n)
 {
   errno = 0;
   if (n) {
@@ -118,9 +109,7 @@ get_file_contents(
   return 0;
 }
 
-template<
-  class CharT
-, class Traits>
+template<class CharT, class Traits>
 std::ios_base::iostate
 get_file_contents(
   const char * name
@@ -139,9 +128,7 @@ get_file_contents(
   return ret;
 }
 
-template<
-  class CharT
-, class Traits>
+template<  class CharT, class Traits>
 std::ios_base::iostate
 get_file_contents(
   const char * name
@@ -149,34 +136,23 @@ get_file_contents(
 { return get_file_contents(name, out.rdbuf()); }
 
 
-#if __cplusplus >= 201103L
-template<
-  class String>
-int
-get_file_contents(
-  String& s
-, std::string const & name)
+template<class String>
+int get_file_contents(String& s, std::string const & name)
 { return get_file_contents(s, name.c_str()); }
 
-template<
-  class String>
-String
-get_file_contents(
+template<class String>
+String get_file_contents(
   std::string const & name
 , int * err)
 { return get_file_contents(name.c_str(), err); }
 
-template<
-  class String>
-String
-get_file_contents(
+template<class String>
+String get_file_contents(
   std::string const & name)
 { return get_file_contents(name.c_str()); }
 
 std::string
-get_file_contents(
-  std::string const & name
-, int * err)
+get_file_contents(std::string const & name, int * err)
 { return get_file_contents<std::string>(name.c_str(), err); }
 
 std::string
@@ -185,18 +161,14 @@ get_file_contents(
 { return get_file_contents<std::string>(name.c_str()); }
 
 std::wstring
-get_wfile_contents(
-  std::string const & name
-, int * err)
+get_wfile_contents(std::string const & name, int * err)
 { return get_file_contents<std::wstring>(name.c_str(), err); }
 
 std::wstring
-get_wfile_contents(
-  std::string const & name)
+get_wfile_contents(std::string const & name)
 { return get_file_contents<std::wstring>(name.c_str()); }
 
-template<
-  class CharT>
+template<class CharT>
 std::streamsize
 get_file_contents(
   std::string const & name
@@ -204,24 +176,19 @@ get_file_contents(
 , std::streamsize n)
 { return get_file_contents(name.c_str(), s, n); }
 
-template<
-  class CharT
-, class Traits>
+template<class CharT, class Traits>
 std::ios_base::iostate
 get_file_contents(
   std::string const & name
 , std::basic_streambuf<CharT, Traits> * sbout)
 { return get_file_contents(name.c_str(), sbout); }
 
-template<
-  class CharT
-, class Traits>
+template<class CharT, class Traits>
 std::ios_base::iostate
 get_file_contents(
   std::string const & name
 , std::basic_ostream<CharT, Traits>& out)
 { return get_file_contents(name.c_str(), out.rdbuf()); }
-#endif
 
 }
 }

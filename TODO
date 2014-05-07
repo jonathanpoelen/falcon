@@ -201,8 +201,6 @@ algorithm.hpp -> faire un namespace range qui contient les algos (dossier range/
 
 ajout de -pedantic à la compilation (il y a des erreurs dans enumerator.hpp et preprocessor/variadic/* (aucun parametres envoyer dans un pack))
 
-tester get_contents_file sur windows (avec un compilateur en ligne et la macro __FILE__) et regarder si le "hack" pour gnu fonctionne (pas de raison que se ne soit pas le cas)
-
 build_parameter_index_t -> make_parameter_index
 
 coordinates -> coordinate (modifier également le namespace ou le nom des fonctions/classes)
@@ -221,7 +219,7 @@ pas de namespace iterator
 
 pas de category selectif dans un integer_iterator
 
-get_file_contents qui prend en param un objet quelconque et qui utilise resize+data ou un trait. spécialisation pour le string car pas de data ?
+get_file_contents qui prend en param un objet quelconque et qui utilise resize+data ou un trait. spécialisation pour le string car pas de data ? virer la partie specifique c++11, se débrouiller pour rester comptible
 
 functional/operators.hpp: séparer dans plusieurs fichier. Ne pas oublier le move sémantique dans les opérateurs
 

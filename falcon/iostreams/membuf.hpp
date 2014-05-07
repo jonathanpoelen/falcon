@@ -5,39 +5,40 @@
 #include <limits>
 
 namespace falcon {
+namespace iostreams {
 
 template<typename CharT, typename Traits = std::char_traits<CharT> >
 class basic_membuf
 : public std::basic_streambuf<CharT, Traits>
 {
-  typedef std::basic_streambuf<CharT, Traits> __streambuf_base;
+  typedef std::basic_streambuf<CharT, Traits> streambuf_base;
 
 public:
-  typedef typename __streambuf_base::traits_type traits_type;
-  typedef typename __streambuf_base::char_type char_type;
-  typedef typename __streambuf_base::int_type int_type;
-  typedef typename __streambuf_base::pos_type pos_type;
-  typedef typename __streambuf_base::off_type off_type;
+  typedef typename streambuf_base::traits_type traits_type;
+  typedef typename streambuf_base::char_type char_type;
+  typedef typename streambuf_base::int_type int_type;
+  typedef typename streambuf_base::pos_type pos_type;
+  typedef typename streambuf_base::off_type off_type;
 
 public:
   explicit
-  basic_membuf(std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-  : __streambuf_base(), m_mode(__mode)
+  basic_membuf(std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  : streambuf_base(), m_mode(mode)
   { }
 
   basic_membuf(CharT * memory, std::size_t len,
-               std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-  : __streambuf_base(), m_mode(__mode)
+               std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  : streambuf_base(), m_mode(mode)
   { mem(memory, len); }
 
-#if __cplusplus >= 201103L
+#if cplusplus >= 201103L
   basic_membuf(const basic_membuf& other)
-  : __streambuf_base(other)
+  : streambuf_base(other)
   {}
 
   basic_membuf & operator=(const basic_membuf& other)
   {
-    __streambuf_base::operator=(other);
+    streambuf_base::operator=(other);
     return *this;
   }
 #endif
@@ -57,118 +58,115 @@ protected:
 
   virtual std::streamsize showmanyc()
   {
-    std::streamsize __ret = -1;
+    std::streamsize ret = -1;
     if (m_mode & std::ios_base::in)
     {
       _update_egptr();
-      __ret = this->egptr() - this->gptr();
+      ret = this->egptr() - this->gptr();
     }
-    return __ret;
+    return ret;
   }
 
-  virtual pos_type seekoff(off_type __off, std::ios_base::seekdir __way,
-                           std::ios_base::openmode __mode)
+  virtual pos_type seekoff(off_type off, std::ios_base::seekdir way,
+                           std::ios_base::openmode mode)
   {
-    pos_type __ret =  pos_type(off_type(-1));
-    bool __testin = (std::ios_base::in & m_mode & __mode) != 0;
-    bool __testout = (std::ios_base::out & m_mode & __mode) != 0;
-    const bool __testboth = __testin && __testout && __way != std::ios_base::cur;
-    __testin &= !(__mode & std::ios_base::out);
-    __testout &= !(__mode & std::ios_base::in);
+    pos_type ret =  pos_type(off_type(-1));
+    bool testin = (std::ios_base::in & m_mode & mode) != 0;
+    bool testout = (std::ios_base::out & m_mode & mode) != 0;
+    const bool testboth = testin && testout && way != std::ios_base::cur;
+    testin &= !(mode & std::ios_base::out);
+    testout &= !(mode & std::ios_base::in);
 
-    const char_type* __beg = __testin ? this->eback() : this->pbase();
-    if ((__beg || !__off) && (__testin || __testout || __testboth))
+    const char_type* beg = testin ? this->eback() : this->pbase();
+    if ((beg || !off) && (testin || testout || testboth))
     {
       _update_egptr();
 
-      off_type __newoffi = __off;
-      off_type __newoffo = __newoffi;
-      if (__way == std::ios_base::cur)
+      off_type newoffi = off;
+      off_type newoffo = newoffi;
+      if (way == std::ios_base::cur)
       {
-        __newoffi += this->gptr() - __beg;
-        __newoffo += this->pptr() - __beg;
+        newoffi += this->gptr() - beg;
+        newoffo += this->pptr() - beg;
       }
-      else if (__way == std::ios_base::end) {
-        __newoffo = __newoffi += this->egptr() - __beg;
+      else if (way == std::ios_base::end) {
+        newoffo = newoffi += this->egptr() - beg;
       }
 
-
-      if ((__testin || __testboth)
-        && __newoffi >= 0
-        && this->egptr() - __beg >= __newoffi)
+      if ((testin || testboth)
+        && newoffi >= 0
+        && this->egptr() - beg >= newoffi)
       {
-        std::cout << "__newoffi: " << __newoffi << std::endl;
-        this->setg(this->eback(), this->eback() + __newoffi, this->egptr());
-        __ret = pos_type(__newoffi);
+        this->setg(this->eback(), this->eback() + newoffi, this->egptr());
+        ret = pos_type(newoffi);
       }
-      if ((__testout || __testboth)
-        && __newoffo >= 0
-        && this->egptr() - __beg >= __newoffo)
+      if ((testout || testboth)
+        && newoffo >= 0
+        && this->egptr() - beg >= newoffo)
       {
-        std::cout << "__newoffo: " << __newoffo << std::endl;
-        _pbump(__newoffo);
-        __ret = pos_type(__newoffo);
+        _pbump(newoffo);
+        ret = pos_type(newoffo);
       }
     }
-    return __ret;
+    return ret;
   }
 
-  virtual pos_type seekpos(pos_type __sp, std::ios_base::openmode __mode)
+  virtual pos_type seekpos(pos_type sp, std::ios_base::openmode mode)
   {
-    pos_type __ret =  pos_type(off_type(-1));
-    const bool __testin = (std::ios_base::in & m_mode & __mode) != 0;
-    const bool __testout = (std::ios_base::out & m_mode & __mode) != 0;
+    pos_type ret =  pos_type(off_type(-1));
+    const bool testin = (std::ios_base::in & m_mode & mode) != 0;
+    const bool testout = (std::ios_base::out & m_mode & mode) != 0;
 
-    const char_type* __beg = __testin ? this->eback() : this->pbase();
-    if ((__beg || !off_type(__sp)) && (__testin || __testout))
+    const char_type* beg = testin ? this->eback() : this->pbase();
+    if ((beg || !off_type(sp)) && (testin || testout))
     {
       _update_egptr();
 
-      const off_type __pos(__sp);
-      const bool __testpos = (0 <= __pos && __pos <= this->egptr() - __beg);
-      if (__testpos)
+      const off_type pos(sp);
+      const bool testpos = (0 <= pos && pos <= this->egptr() - beg);
+      if (testpos)
       {
-        if (__testin) {
-          this->setg(this->eback(), this->eback() + __pos, this->egptr());
+        if (testin) {
+          this->setg(this->eback(), this->eback() + pos, this->egptr());
         }
-        if (__testout) {
-          _pbump(__pos);
+        if (testout) {
+          _pbump(pos);
         }
-        __ret = __sp;
+        ret = sp;
       }
     }
-    return __ret;
+    return ret;
   }
 
-  virtual int_type pbackfail(int_type __c)
+  virtual int_type pbackfail(int_type c)
   {
-    int_type __ret = traits_type::eof();
+    int_type ret = traits_type::eof();
     if (this->eback() < this->gptr())
     {
-      // Try to put back __c into input sequence in one of three ways.
+      // Try to put back c into input sequence in one of three ways.
       // Order these tests done in is unspecified by the standard.
-      const bool __testeof = traits_type::eq_int_type(__c, __ret);
-      if (!__testeof)
+      const bool testeof = traits_type::eq_int_type(c, ret);
+      if (!testeof)
       {
-        const bool __testeq = traits_type::eq(traits_type::
-        to_char_type(__c),
+        const bool testeq = traits_type::eq(traits_type::
+        to_char_type(c),
         this->gptr()[-1]);
-        const bool __testout = m_mode & std::ios_base::out;
-        if (__testeq || __testout)
+        const bool testout = m_mode & std::ios_base::out;
+        if (testeq || testout)
         {
           this->gbump(-1);
-          if (!__testeq)
-          *this->gptr() = traits_type::to_char_type(__c);
-          __ret = __c;
+          if (!testeq)
+          *this->gptr() = traits_type::to_char_type(c);
+          ret = c;
         }
       }
       else
       {
         this->gbump(-1);
-        __ret = traits_type::not_eof(__c);
+        ret = traits_type::not_eof(c);
       }
     }
-    return __ret;
+    return ret;
   }
 
 private:
@@ -180,10 +178,10 @@ private:
 
   void _update_egptr()
   {
-    const bool __testin = m_mode & std::ios_base::in;
+    const bool testin = m_mode & std::ios_base::in;
     if (this->pptr() && this->pptr() > this->egptr())
     {
-      if (__testin) {
+      if (testin) {
         this->setg(this->eback(), this->gptr(), this->pptr());
       }
       else {
@@ -192,16 +190,16 @@ private:
     }
   }
 
-  void _pbump(off_type __off)
+  void _pbump(off_type off)
   {
     this->setp(this->pbase(), this->epptr());
 
-    while (__off > std::numeric_limits<int>::max())
+    while (off > std::numeric_limits<int>::max())
     {
       this->pbump(std::numeric_limits<int>::max());
-      __off -= std::numeric_limits<int>::max();
+      off -= std::numeric_limits<int>::max();
     }
-    this->pbump(static_cast<int>(__off));
+    this->pbump(static_cast<int>(off));
   }
 
   std::ios_base::openmode m_mode;
@@ -210,6 +208,7 @@ private:
 typedef basic_membuf<char> membuf;
 typedef basic_membuf<wchar_t> wmembuf;
 
+}
 }
 
 #endif

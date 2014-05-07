@@ -6,6 +6,7 @@
 #include <vector>
 
 namespace falcon {
+namespace iostreams {
 
 template<typename CharT, typename Traits>
 class basic_streambuf_generator
@@ -247,6 +248,7 @@ private:
 typedef basic_multibuf<char> multistreambuf;
 typedef basic_multibuf<wchar_t> wmultistreambuf;
 
+}
 }
 
 #endif

@@ -6,6 +6,7 @@
 #include <string>
 
 namespace falcon {
+namespace iostreams {
 
 class filename_generator
 {
@@ -88,58 +89,58 @@ template<typename CharT, typename Traits, typename Generator>
 class basic_mfilebuf
 : public std::basic_filebuf<CharT, Traits>
 {
-  typedef std::basic_filebuf<CharT, Traits> __filebuf_type;
+  typedef std::basic_filebuf<CharT, Traits> filebuf_type;
 
 public:
   typedef CharT char_type;
   typedef Traits traits_type;
-  typedef typename __filebuf_type::int_type int_type;
-  typedef typename __filebuf_type::pos_type pos_type;
-  typedef typename __filebuf_type::off_type off_type;
+  typedef typename filebuf_type::int_type int_type;
+  typedef typename filebuf_type::pos_type pos_type;
+  typedef typename filebuf_type::off_type off_type;
   typedef Generator filename_generator;
 
 public:
   basic_mfilebuf()
-  : __filebuf_type()
+  : filebuf_type()
   , m_gen()
   {}
 
-  basic_mfilebuf(std::ios_base::openmode __mode)
-  : __filebuf_type()
+  basic_mfilebuf(std::ios_base::openmode mode)
+  : filebuf_type()
   , m_gen()
-  { this->_M_mode = __mode; }
+  { this->_M_mode = mode; }
 
   basic_mfilebuf(const filename_generator& gen)
-  : __filebuf_type()
+  : filebuf_type()
   , m_gen(gen)
   { }
 
-  basic_mfilebuf(const filename_generator& gen, std::ios_base::openmode __mode)
-  : __filebuf_type()
+  basic_mfilebuf(const filename_generator& gen, std::ios_base::openmode mode)
+  : filebuf_type()
   , m_gen(gen)
-  { this->_M_mode = __mode; }
+  { this->_M_mode = mode; }
 
 #if __cplusplus >= 201103L
   basic_mfilebuf(filename_generator&& gen)
-  : __filebuf_type()
+  : filebuf_type()
   , m_gen(std::forward<filename_generator>(gen))
   { }
 
-  basic_mfilebuf(filename_generator&& gen, std::ios_base::openmode __mode)
-  : __filebuf_type()
+  basic_mfilebuf(filename_generator&& gen, std::ios_base::openmode mode)
+  : filebuf_type()
   , m_gen(std::forward<filename_generator>(gen))
-  { this->_M_mode = __mode; }
+  { this->_M_mode = mode; }
 #endif
 
   virtual
   ~basic_mfilebuf()
   {}
 
-  bool mode(std::ios_base::openmode __mode)
+  bool mode(std::ios_base::openmode mode)
   {
     if (this->is_open())
       return false;
-    this->_M_mode = __mode;
+    this->_M_mode = mode;
     return true;
   }
 
@@ -160,27 +161,27 @@ public:
   { m_gen = std::move(gen); }
 #endif
 
-  bool opennext(std::ios_base::openmode __mode)
+  bool opennext(std::ios_base::openmode mode)
   {
     const char * filename = m_gen();
-    return filename && newopen(filename, __mode);
+    return filename && newopen(filename, mode);
   }
 
   bool opennext()
   { return opennext(this->_M_mode); }
 
   virtual bool
-  newopen(const char* s, std::ios_base::openmode __mode)
-  { return this->open(s, __mode); }
+  newopen(const char* s, std::ios_base::openmode mode)
+  { return this->open(s, mode); }
 
 protected:
-  bool _M_opennext()
+  bool _opennext()
   {
     if (!this->is_open())
       return false;
-    std::ios_base::openmode __mode = this->_M_mode;
+    std::ios_base::openmode mode = this->_M_mode;
     this->close();
-    return opennext(__mode);
+    return opennext(mode);
   }
 
   virtual int_type
@@ -189,35 +190,35 @@ protected:
     int_type ret = traits_type::eof();
     if (this->_M_mode & std::ios_base::in)
     {
-      ret = __filebuf_type::underflow();
-      while (traits_type::eq_int_type(ret, traits_type::eof()) && _M_opennext())
+      ret = filebuf_type::underflow();
+      while (traits_type::eq_int_type(ret, traits_type::eof()) && _opennext())
       {
         if (this->gptr() < this->egptr())
           ret = traits_type::to_int_type(*this->gptr());
         else
-          ret = __filebuf_type::underflow();
+          ret = filebuf_type::underflow();
       }
     }
     return ret;
   }
 
   virtual int_type
-  overflow(int_type __c = traits_type::eof())
+  overflow(int_type c = traits_type::eof())
   {
     int_type ret = traits_type::eof();
     if (this->_M_mode & std::ios_base::out)
     {
-      ret = __filebuf_type::overflow(__c);
-      while (traits_type::eq_int_type(ret, traits_type::eof()) && _M_opennext())
+      ret = filebuf_type::overflow(c);
+      while (traits_type::eq_int_type(ret, traits_type::eof()) && _opennext())
       {
           if (this->pptr() < this->epptr())
           {
-           *this->pptr() = traits_type::to_char_type(__c);
+           *this->pptr() = traits_type::to_char_type(c);
             this->pbump(1);
-            ret = traits_type::not_eof(__c);
+            ret = traits_type::not_eof(c);
           }
           else
-            ret = __filebuf_type::overflow(__c);
+            ret = filebuf_type::overflow(c);
         }
     }
       return ret;
@@ -241,11 +242,11 @@ public:
   typedef typename traits_type::off_type off_type;
 
 private:
-  typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
-  typedef std::basic_istream<char_type, traits_type> __istream_type;
+  typedef basic_mfilebuf<char_type, traits_type, Generator> mfilebuf_type;
+  typedef std::basic_istream<char_type, traits_type> istream_type;
 
 public:
-  typedef typename __mfilebuf_type::filename_generator filename_generator;
+  typedef typename mfilebuf_type::filename_generator filename_generator;
 
 public:
   // Constructors/Destructors:
@@ -257,7 +258,7 @@ public:
    *  (you haven't given it a filename to open).
    */
   basic_mifstream()
-  : __istream_type()
+  : istream_type()
   , m_mfilebuf()
   { this->init(&m_mfilebuf); }
 
@@ -272,12 +273,12 @@ public:
    *  .c_str() before passing it to this constructor.
    */
   explicit
-  basic_mifstream(const char* s, std::ios_base::openmode __mode = std::ios_base::in)
-  : __istream_type()
+  basic_mifstream(const char* s, std::ios_base::openmode mode = std::ios_base::in)
+  : istream_type()
   , m_mfilebuf()
   {
     this->init(&m_mfilebuf);
-    this->open(s, __mode);
+    this->open(s, mode);
   }
 
 #if __cplusplus >= 201103L
@@ -290,12 +291,12 @@ public:
    */
   explicit
   basic_mifstream(const std::string& s,
-                  std::ios_base::openmode __mode = std::ios_base::in)
-  : __istream_type()
+                  std::ios_base::openmode mode = std::ios_base::in)
+  : istream_type()
   , m_mfilebuf()
   {
     this->init(&m_mfilebuf);
-    this->open(s, __mode);
+    this->open(s, mode);
   }
 #endif
 
@@ -308,12 +309,12 @@ public:
    */
   explicit
   basic_mifstream(const filename_generator& gen,
-                  std::ios_base::openmode __mode = std::ios_base::in)
-  : __istream_type()
+                  std::ios_base::openmode mode = std::ios_base::in)
+  : istream_type()
   , m_mfilebuf(gen)
   {
     this->init(&m_mfilebuf);
-    m_mfilebuf.opennext(__mode | std::ios_base::in);
+    m_mfilebuf.opennext(mode | std::ios_base::in);
   }
 
 #if __cplusplus >= 201103L
@@ -326,12 +327,12 @@ public:
    */
   explicit
   basic_mifstream(filename_generator&& gen,
-                  std::ios_base::openmode __mode = std::ios_base::in)
-  : __istream_type()
+                  std::ios_base::openmode mode = std::ios_base::in)
+  : istream_type()
   , m_mfilebuf(std::move(gen))
   {
     this->init(&m_mfilebuf);
-    m_mfilebuf.opennext(__mode | std::ios_base::in);
+    m_mfilebuf.opennext(mode | std::ios_base::in);
   }
 #endif
 
@@ -345,12 +346,12 @@ public:
    */
   template<typename _InputIterator>
   basic_mifstream(_InputIterator first, _InputIterator last,
-                  std::ios_base::openmode __mode = std::ios_base::in)
-  : __istream_type()
+                  std::ios_base::openmode mode = std::ios_base::in)
+  : istream_type()
   , m_mfilebuf(filename_generator(first, last))
   {
     this->init(&m_mfilebuf);
-    m_mfilebuf.opennext(__mode | std::ios_base::in);
+    m_mfilebuf.opennext(mode | std::ios_base::in);
   }
 
   /**
@@ -369,9 +370,9 @@ public:
    *
    *  This hides both signatures of std::basic_ios::rdbuf().
    */
-  __mfilebuf_type*
+  mfilebuf_type*
   rdbuf() const
-  { return const_cast<__mfilebuf_type*>(&m_mfilebuf); }
+  { return const_cast<mfilebuf_type*>(&m_mfilebuf); }
 
   filename_generator& generator_filename()
   { return m_mfilebuf.generator_filename(); }
@@ -411,9 +412,9 @@ public:
    *  .c_str() before passing it to this constructor.
    */
   void
-  open(const char* s, std::ios_base::openmode __mode = std::ios_base::in)
+  open(const char* s, std::ios_base::openmode mode = std::ios_base::in)
   {
-    if (!m_mfilebuf.open(s, __mode | std::ios_base::in))
+    if (!m_mfilebuf.open(s, mode | std::ios_base::in))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -429,9 +430,9 @@ public:
    *  fails, @c failbit is set in the stream's error state.
    */
   void
-  open(const std::string& s, std::ios_base::openmode __mode = std::ios_base::in)
+  open(const std::string& s, std::ios_base::openmode mode = std::ios_base::in)
   {
-    if (!m_mfilebuf.open(s, __mode | std::ios_base::in))
+    if (!m_mfilebuf.open(s, mode | std::ios_base::in))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -446,9 +447,9 @@ public:
    *  fails, @c failbit is set in the stream's error state.
    */
   void
-  open_next(std::ios_base::openmode __mode = std::ios_base::in)
+  open_next(std::ios_base::openmode mode = std::ios_base::in)
   {
-    if (!m_mfilebuf.opennext(__mode | std::ios_base::in))
+    if (!m_mfilebuf.opennext(mode | std::ios_base::in))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -468,7 +469,7 @@ public:
   }
 
 private:
-  __mfilebuf_type m_mfilebuf;
+  mfilebuf_type m_mfilebuf;
 };
 
 
@@ -485,11 +486,11 @@ public:
   typedef typename traits_type::off_type off_type;
 
 private:
-  typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
-  typedef std::basic_ostream<char_type, traits_type> __ostream_type;
+  typedef basic_mfilebuf<char_type, traits_type, Generator> mfilebuf_type;
+  typedef std::basic_ostream<char_type, traits_type> ostream_type;
 
 public:
-  typedef typename __mfilebuf_type::filename_generator filename_generator;
+  typedef typename mfilebuf_type::filename_generator filename_generator;
 
 public:
   // Constructors:
@@ -501,7 +502,7 @@ public:
    *  (you haven't given it a filename to open).
    */
   basic_mofstream()
-  : __ostream_type()
+  : ostream_type()
   , m_mfilebuf()
   { this->init(&m_mfilebuf); }
 
@@ -518,12 +519,12 @@ public:
    */
   explicit
   basic_mofstream(const char* s,
-                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-  : __ostream_type()
+                  std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
+  : ostream_type()
   , m_mfilebuf()
   {
     this->init(&m_mfilebuf);
-    this->open(s, __mode);
+    this->open(s, mode);
   }
 
 #if __cplusplus >= 201103L
@@ -537,12 +538,12 @@ public:
    */
   explicit
   basic_mofstream(const std::string& s,
-                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-  : __ostream_type()
+                  std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
+  : ostream_type()
   , m_mfilebuf()
   {
     this->init(&m_mfilebuf);
-    this->open(s, __mode);
+    this->open(s, mode);
   }
 #endif
 
@@ -556,12 +557,12 @@ public:
    */
   explicit
   basic_mofstream(const filename_generator& gen,
-                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-  : __ostream_type()
+                  std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
+  : ostream_type()
   , m_mfilebuf(gen)
   {
     this->init(&m_mfilebuf);
-    m_mfilebuf.opennext(__mode | std::ios_base::out);
+    m_mfilebuf.opennext(mode | std::ios_base::out);
   }
 
 #if __cplusplus >= 201103L
@@ -575,12 +576,12 @@ public:
    */
   explicit
   basic_mofstream(filename_generator&& gen,
-                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-  : __ostream_type()
+                  std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
+  : ostream_type()
   , m_mfilebuf(std::move(gen))
   {
       this->init(&m_mfilebuf);
-      m_mfilebuf.opennext(__mode | std::ios_base::out);
+      m_mfilebuf.opennext(mode | std::ios_base::out);
   }
   #endif
 
@@ -594,12 +595,12 @@ public:
    */
   template<typename _InputIterator>
   basic_mofstream(_InputIterator first, _InputIterator last,
-                  std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
-  : __ostream_type()
+                  std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
+  : ostream_type()
   , m_mfilebuf(filename_generator(first, last))
   {
     this->init(&m_mfilebuf);
-    m_mfilebuf.opennext(__mode | std::ios_base::out);
+    m_mfilebuf.opennext(mode | std::ios_base::out);
   }
 
   /**
@@ -618,9 +619,9 @@ public:
    *
    *  This hides both signatures of std::basic_ios::rdbuf().
    */
-  __mfilebuf_type*
+  mfilebuf_type*
   rdbuf() const
-  { return const_cast<__mfilebuf_type*>(&m_mfilebuf); }
+  { return const_cast<mfilebuf_type*>(&m_mfilebuf); }
 
   filename_generator& generator_filename()
   { return m_mfilebuf.generator_filename(); }
@@ -663,9 +664,9 @@ public:
    */
   void
   open(const char* s,
-       std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+       std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
   {
-    if (!m_mfilebuf.open(s, __mode | std::ios_base::out))
+    if (!m_mfilebuf.open(s, mode | std::ios_base::out))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -682,9 +683,9 @@ public:
    */
   void
   open(const std::string& s,
-       std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+       std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
   {
-    if (!m_mfilebuf.open(s, __mode | std::ios_base::out))
+    if (!m_mfilebuf.open(s, mode | std::ios_base::out))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -699,9 +700,9 @@ public:
    *  fails, @c failbit is set in the stream's error state.
    */
   void
-  open_next(std::ios_base::openmode __mode = std::ios_base::out | std::ios_base::trunc)
+  open_next(std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc)
   {
-    if (!m_mfilebuf.opennext(__mode | std::ios_base::out))
+    if (!m_mfilebuf.opennext(mode | std::ios_base::out))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -722,7 +723,7 @@ public:
 
 
 private:
-  __mfilebuf_type m_mfilebuf;
+  mfilebuf_type m_mfilebuf;
 };
 
 
@@ -748,12 +749,12 @@ public:
   typedef typename traits_type::off_type off_type;
 
 private:
-  typedef basic_mfilebuf<char_type, traits_type, Generator> __mfilebuf_type;
+  typedef basic_mfilebuf<char_type, traits_type, Generator> mfilebuf_type;
   typedef std::basic_ios<char_type, traits_type> __ios_type;
-  typedef std::basic_iostream<char_type, traits_type> __iostream_type;
+  typedef std::basic_iostream<char_type, traits_type> iostream_type;
 
 public:
-  typedef typename __mfilebuf_type::filename_generator filename_generator;
+  typedef typename mfilebuf_type::filename_generator filename_generator;
 
 public:
   // Constructors/destructor:
@@ -765,7 +766,7 @@ public:
    *  (you haven't given it a filename to open).
    */
   basic_mfstream()
-  : __iostream_type()
+  : iostream_type()
   , m_mfilebuf()
   { this->init(&m_mfilebuf); }
 
@@ -779,12 +780,12 @@ public:
    */
   explicit
   basic_mfstream(const char* s,
-                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-  : __iostream_type(0)
+                 std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  : iostream_type(0)
   , m_mfilebuf()
   {
     this->init(&m_mfilebuf);
-    this->open(s, __mode);
+    this->open(s, mode);
   }
 
 #if __cplusplus >= 201103L
@@ -795,12 +796,12 @@ public:
    */
   explicit
   basic_mfstream(const std::string& s,
-                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-  : __iostream_type(0)
+                 std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  : iostream_type(0)
   , m_mfilebuf()
   {
     this->init(&m_mfilebuf);
-    this->open(s, __mode);
+    this->open(s, mode);
   }
 #endif
 
@@ -811,12 +812,12 @@ public:
    */
   explicit
   basic_mfstream(const filename_generator& gen,
-                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-  : __iostream_type()
+                 std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  : iostream_type()
   , m_mfilebuf(gen)
   {
     this->init(&m_mfilebuf);
-    m_mfilebuf.opennext(__mode);
+    m_mfilebuf.opennext(mode);
   }
 
 #if __cplusplus >= 201103L
@@ -827,12 +828,12 @@ public:
    */
   explicit
   basic_mfstream(filename_generator&& gen,
-                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-  : __iostream_type()
+                 std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  : iostream_type()
   , m_mfilebuf(std::move(gen))
   {
       this->init(&m_mfilebuf);
-      m_mfilebuf.opennext(__mode);
+      m_mfilebuf.opennext(mode);
   }
 #endif
 
@@ -844,12 +845,12 @@ public:
    */
   template<typename _InputIterator>
   basic_mfstream(_InputIterator first, _InputIterator last,
-                 std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
-  : __iostream_type()
+                 std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  : iostream_type()
   , m_mfilebuf(filename_generator(first, last))
   {
       this->init(&m_mfilebuf);
-      m_mfilebuf.opennext(__mode);
+      m_mfilebuf.opennext(mode);
   }
 
   /**
@@ -868,9 +869,9 @@ public:
    *
    *  This hides both signatures of std::basic_ios::rdbuf().
    */
-  __mfilebuf_type*
+  mfilebuf_type*
   rdbuf() const
-  { return const_cast<__mfilebuf_type*>(&m_mfilebuf); }
+  { return const_cast<mfilebuf_type*>(&m_mfilebuf); }
 
   filename_generator& generator_filename()
   { return m_mfilebuf.generator_filename(); }
@@ -913,9 +914,9 @@ public:
    */
   void
   open(const char* s,
-       std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+       std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
   {
-    if (!m_mfilebuf.open(s, __mode))
+    if (!m_mfilebuf.open(s, mode))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -932,9 +933,9 @@ public:
    */
   void
   open(const std::string& s,
-       std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+       std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
   {
-    if (!m_mfilebuf.open(s, __mode))
+    if (!m_mfilebuf.open(s, mode))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -949,9 +950,9 @@ public:
    *  fails, @c failbit is set in the stream's error state.
    */
   void
-  open_next(std::ios_base::openmode __mode = std::ios_base::in | std::ios_base::out)
+  open_next(std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
   {
-    if (!m_mfilebuf.opennext(__mode))
+    if (!m_mfilebuf.opennext(mode))
       this->setstate(std::ios_base::failbit);
     else
       this->clear();
@@ -971,7 +972,7 @@ public:
   }
 
 private:
-  __mfilebuf_type m_mfilebuf;
+  mfilebuf_type m_mfilebuf;
 };
 
 typedef basic_mfilebuf<char> mfilebuf;
@@ -985,6 +986,7 @@ typedef basic_mfstream<wchar_t> wmfstream;
 typedef basic_mifstream<wchar_t> wmifstream;
 typedef basic_mofstream<wchar_t> wmofstream;
 
+}
 }
 
 #endif
