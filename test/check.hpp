@@ -1,12 +1,16 @@
 #ifndef FALCON_TEST_CHECK_HPP
 #define FALCON_TEST_CHECK_HPP
 
+#include <falcon/config.hpp>
+#include <falcon/preprocessor/stringize_line.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <type_traits>
+
 #include <boost/static_assert.hpp>
-#include <falcon/preprocessor/stringize_line.hpp>
+
 
 #define STATIC_ASSERT(...) BOOST_STATIC_ASSERT((__VA_ARGS__))
 

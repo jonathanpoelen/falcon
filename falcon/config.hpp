@@ -7,6 +7,7 @@
 
 #if defined(IN_IDE_PARSER)
 # define __cplusplus 201103L
+# define __VA_ARGS__ 0
 #endif
 
 #endif

@@ -9,7 +9,7 @@
 namespace falcon {
 namespace iostreams {
 
-template<typename CharT, typename Traits, typename... Args>
+template<class CharT, class Traits, class... Args>
 std::basic_ostream<CharT, Traits>&
 put(std::basic_ostream<CharT, Traits>& os, const Args&... args)
 {
@@ -20,7 +20,7 @@ put(std::basic_ostream<CharT, Traits>& os, const Args&... args)
 /**
  * \brief Functor for @p falcon::put()
  */
-template<typename CharT, typename Traits = std::char_traits<CharT>>
+template<class CharT, class Traits = std::char_traits<CharT>>
 struct basic_ostream_function
 {
   typedef std::basic_ostream<CharT, Traits> ostream_type;
@@ -36,7 +36,7 @@ struct basic_ostream_function
     return *this;
   }
 
-  template<typename... Args>
+  template<class... Args>
   ostream_type& operator()(const Args&... args) const
   { return put(*m_os, args...); }
 
@@ -50,7 +50,7 @@ private:
 typedef basic_ostream_function<char> ostream_function;
 typedef basic_ostream_function<wchar_t> wostream_function;
 
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 basic_ostream_function<CharT, Traits>
 make_ostream_function(std::basic_ostream<CharT, Traits>& os) noexcept
 { return basic_ostream_function<CharT, Traits>(os); }

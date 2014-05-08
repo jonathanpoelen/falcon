@@ -4,7 +4,7 @@
 #include <falcon/utility/unpack.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 #include <falcon/string/cstring.hpp>
-#include <falcon/istream/ignore.hpp>
+#include <falcon/iostreams/ignore.hpp>
 
 #include <iosfwd>
 

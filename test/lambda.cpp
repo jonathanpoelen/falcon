@@ -4,7 +4,7 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <test/test.hpp>
 #include <falcon/lambda.hpp>
-#include <falcon/ostream/resolve_manipulator.hpp>
+#include <falcon/iostreams/resolve_manipulator.hpp>
 #include "A.h"
 #include "lambda.hpp"
 
@@ -165,7 +165,7 @@ void lambda_test() {
 	{
 		std::stringstream ss;
 		std::wstringstream wss;
-		using falcon::ostream::resolve_manipulator;
+		using falcon::iostreams::resolve_manipulator;
 		(ss << phr::_1 << resolve_manipulator<char>(std::endl))(4);
 		(wss << phr::_1 << resolve_manipulator<wchar_t>(std::endl))(4);
 		(ss << phr::_1 << resolve_manipulator<>(ss, std::endl))(4);

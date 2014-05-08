@@ -1,12 +1,12 @@
-#ifndef FALCON_OSTREAM_INSERT_HPP
-#define FALCON_OSTREAM_INSERT_HPP
+#ifndef FALCON_IOSTREAM_INSERT_HPP
+#define FALCON_IOSTREAM_INSERT_HPP
 
 #include <ios>
-# include <string>
+#include <string>
 
 namespace falcon {
 
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_ostream<CharT, Traits>&
 ostream_write(std::basic_ostream<CharT, Traits>& out,
 							const CharT* s, std::streamsize n)
@@ -20,19 +20,19 @@ ostream_write(std::basic_ostream<CharT, Traits>& out,
 	return out;
 }
 
-template<typename CharT, typename Traits, std::size_t N>
+template<class CharT, class Traits, std::size_t N>
 std::basic_ostream<CharT, Traits>&
 ostream_write(std::basic_ostream<CharT, Traits>& out,
 							const CharT (&s)[N])
 { return ostream_write(out, s, static_cast<std::streamsize>(N)); }
 
-template<typename CharT, typename Traits, typename Alloc>
+template<class CharT, class Traits, class Alloc>
 std::basic_ostream<CharT, Traits>&
 ostream_write(std::basic_ostream<CharT, Traits>& out,
 							const std::basic_string<CharT, Traits, Alloc>& s)
 { return ostream_write(out, s.data(), s.size()); }
 
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_ostream<CharT, Traits>&
 ostream_fill(std::basic_ostream<CharT, Traits>& out, std::streamsize n, CharT c)
 {
@@ -51,12 +51,12 @@ ostream_fill(std::basic_ostream<CharT, Traits>& out, std::streamsize n, CharT c)
 	return out;
 }
 
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_ostream<CharT, Traits>&
 ostream_fill(std::basic_ostream<CharT, Traits>& out, std::streamsize n)
 { return ostream_fill(out, n, out.fill()); }
 
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_ostream<CharT, Traits>&
 ostream_insert(std::basic_ostream<CharT, Traits>& out,
 							 const CharT* s, std::streamsize n)
@@ -64,7 +64,7 @@ ostream_insert(std::basic_ostream<CharT, Traits>& out,
 	typedef std::basic_ostream<CharT, Traits> ostream_type;
 	typedef typename ostream_type::ios_base ios_base;
 
-	typename ostream_type::sentry cerb(out);
+	class ostream_type::sentry cerb(out);
 	if (cerb)
 	{
 		const std::streamsize w = out.width();
@@ -85,12 +85,12 @@ ostream_insert(std::basic_ostream<CharT, Traits>& out,
 	return out;
 }
 
-template<typename CharT, typename Traits, std::size_t N>
+template<class CharT, class Traits, std::size_t N>
 std::basic_ostream<CharT, Traits>&
 ostream_insert(std::basic_ostream<CharT, Traits>& out, const CharT(&s)[N])
 { return ostream_insert(out, s, static_cast<std::streamsize>(N)); }
 
-template<typename CharT, typename Traits, typename Alloc>
+template<class CharT, class Traits, class Alloc>
 std::basic_ostream<CharT, Traits>&
 ostream_insert(std::basic_ostream<CharT, Traits>& out,
                const std::basic_string<CharT, Traits, Alloc>& s)

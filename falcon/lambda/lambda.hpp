@@ -1,6 +1,7 @@
 #ifndef _FALCON_LAMBDA_LAMBDA_HPP
 #define _FALCON_LAMBDA_LAMBDA_HPP
 
+#include <falcon/config.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/functional/call.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
@@ -72,7 +73,13 @@ struct placeholder
 	}
 
 	template<typename _T, typename _Class>
-	inline constexpr ___lambda<decltype(std::mem_fn(std::declval<_T _Class::*>())), placeholder<_Num>, __force_placearg> operator FALCON_PP_NOT_IDE_PARSER(->*)(_T _Class::* mem)
+	constexpr ___lambda<
+   decltype(std::mem_fn(std::declval<_T _Class::*>())), placeholder<_Num>
+#ifdef IN_IDE_PARSER
+ , __force_placearg> operator ->(_T _Class::* mem)
+#else
+ , __force_placearg> operator ->*(_T _Class::* mem)
+#endif
 	{
 		return CPP1X(std::mem_fn(mem));
 	}
@@ -246,7 +253,7 @@ struct ___lambda<void, _T, __placearg>
 	_T val;
 
 	template<typename... _Args>
-	_T& operator()(_Args&&... FALCON_PP_NOT_IDE_PARSER())
+	_T& operator()(_Args&&...)
 	{
 		return val;
 	}

@@ -38,7 +38,7 @@ public:
   {}
 #endif
 
-  template<typename InputIterator>
+  template<class InputIterator>
   filename_generator(InputIterator first, InputIterator last)
   : vector(first, last)
   , position(0)
@@ -63,29 +63,29 @@ public:
   { vector.emplace_back(std::move(filename)); }
 #endif
 
-  template<typename InputIterator>
+  template<class InputIterator>
   void push(InputIterator first, InputIterator last)
   { vector.insert(vector.end(), first, last); }
 };
 
-template<typename CharT, typename Traits = std::char_traits<CharT>,
+template<class CharT, class Traits = std::char_traits<CharT>,
   typename Generator = filename_generator>
 class basic_mfilebuf;
 
-template<typename CharT, typename Traits = std::char_traits<CharT>,
+template<class CharT, class Traits = std::char_traits<CharT>,
   typename Generator = filename_generator>
 class basic_mifstream;
 
-template<typename CharT, typename Traits = std::char_traits<CharT>,
+template<class CharT, class Traits = std::char_traits<CharT>,
   typename Generator = filename_generator>
 class basic_mofstream;
 
-template<typename CharT, typename Traits = std::char_traits<CharT>,
+template<class CharT, class Traits = std::char_traits<CharT>,
   typename Generator = filename_generator>
 class basic_mfstream;
 
 
-template<typename CharT, typename Traits, typename Generator>
+template<class CharT, class Traits, class Generator>
 class basic_mfilebuf
 : public std::basic_filebuf<CharT, Traits>
 {
@@ -230,7 +230,7 @@ private:
 };
 
 
-template<typename CharT, typename Traits, typename Generator>
+template<class CharT, class Traits, class Generator>
 class basic_mifstream
 : public std::basic_istream<CharT, Traits>
 {
@@ -473,7 +473,7 @@ private:
 };
 
 
-template<typename CharT, typename Traits, typename Generator>
+template<class CharT, class Traits, class Generator>
 class basic_mofstream
 : public std::basic_ostream<CharT,Traits>
 {
@@ -737,7 +737,7 @@ private:
 *  associated sequence, an instance of std::basic_filebuf is used, which
 *  this page refers to as @c sb.
 */
-template<typename CharT, typename Traits, typename Generator>
+template<class CharT, class Traits, class Generator>
 class basic_mfstream
 : public std::basic_iostream<CharT, Traits>
 {
@@ -750,7 +750,6 @@ public:
 
 private:
   typedef basic_mfilebuf<char_type, traits_type, Generator> mfilebuf_type;
-  typedef std::basic_ios<char_type, traits_type> __ios_type;
   typedef std::basic_iostream<char_type, traits_type> iostream_type;
 
 public:

@@ -8,7 +8,7 @@
 namespace falcon {
 namespace iostreams {
 
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 class basic_streambuf_generator
 {
 public:
@@ -40,7 +40,7 @@ public:
   {}
 #endif
 
-  template<typename InputIterator>
+  template<class InputIterator>
   basic_streambuf_generator(InputIterator first, InputIterator last)
   : vector(first, last)
   , position(0)

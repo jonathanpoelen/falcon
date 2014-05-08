@@ -14,7 +14,6 @@ flag           :)
 functional     :)
 helper         :)
 iostreams      :)
-istream        :)
 iterator       :)
 java_iterator  :|
 lambda         :|
@@ -24,7 +23,6 @@ math           :|
 memory         :)
 mpl            :|
 node           :(
-ostream        :)
 parameter      :|
 preprocessor   :|
 range          :)

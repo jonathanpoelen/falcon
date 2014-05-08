@@ -1,15 +1,15 @@
-#ifndef FALCON_ISTREAM_IGNORE_HPP
-#define FALCON_ISTREAM_IGNORE_HPP
+#ifndef FALCON_IOSTREAM_IGNORE_HPP
+#define FALCON_IOSTREAM_IGNORE_HPP
 
 #include <ios>
 #include <utility>
 #include <type_traits>
 
 namespace falcon {
-namespace istream {
+namespace iostreams {
 
 ///\brief This function calls @c ignore() for that stream object.
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_istream<CharT, Traits>&
 ignore(std::basic_istream<CharT, Traits>& is)
 { return is.ignore(); }
@@ -17,6 +17,11 @@ ignore(std::basic_istream<CharT, Traits>& is)
 namespace _aux {
   struct ignore_stream
   {};
+
+  template<class CharT, class Traits>
+  std::basic_istream<CharT, Traits>&
+  operator>>(std::basic_istream<CharT, Traits>& is, _aux::ignore_stream)
+  { return is.ignore(); }
 }
 
 /**
@@ -29,14 +34,9 @@ namespace _aux {
 _aux::ignore_stream ignore()
 { return {}; }
 
-template<typename CharT, typename Traits>
-std::basic_istream<CharT, Traits>&
-operator>>(std::basic_istream<CharT, Traits>& is, _aux::ignore_stream)
-{ return is.ignore(); }
-
 
 namespace _aux {
-  template<bool Lax, typename CharT, typename Traits, typename Compare>
+  template<bool Lax, class CharT, class Traits, class Compare>
   std::basic_istream<CharT, Traits>&
   ignore_fn(std::basic_istream<CharT, Traits>& is, Compare& comp)
   {
@@ -71,7 +71,7 @@ namespace _aux {
     return is;
   }
 
-  template<typename CharT, typename Traits, typename Compare>
+  template<class CharT, class Traits, class Compare>
   std::basic_istream<CharT, Traits>&
   ignore(
     std::basic_istream<CharT, Traits>& is
@@ -79,7 +79,7 @@ namespace _aux {
   , std::false_type)
   { return ignore_fn<false>(is, f); }
 
-  template<typename CharT, typename Traits>
+  template<class CharT, class Traits>
   std::basic_istream<CharT, Traits>&
   ignore(
     std::basic_istream<CharT, Traits>& is
@@ -92,7 +92,7 @@ namespace _aux {
  * @brief This function calls @c ignore(n) for that stream object.
  * @param n  Number of characters to discard.
  */
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_istream<CharT, Traits>&
 ignore(std::basic_istream<CharT, Traits>& is, std::streamsize n)
 { return is.ignore(n); }
@@ -104,7 +104,7 @@ ignore(std::basic_istream<CharT, Traits>& is, std::streamsize n)
  * If @c comp() and the stream object have @c Traits::eof()
  * so @c std::badbit is set in the stream.
  */
-template<typename CharT, typename Traits, typename Compare>
+template<class CharT, class Traits, class Compare>
 std::basic_istream<CharT, Traits>&
 ignore(std::basic_istream<CharT, Traits>& is, Compare comp)
 { return _aux::ignore(is, comp, std::is_integral<Compare>()); }
@@ -113,7 +113,7 @@ ignore(std::basic_istream<CharT, Traits>& is, Compare comp)
  * @brief Discarding characters for which a predicate is false
  * @param comp A comparison functor.
  */
-template<typename CharT, typename Traits, typename Compare>
+template<class CharT, class Traits, class Compare>
 std::basic_istream<CharT, Traits>&
 laxignore(std::basic_istream<CharT, Traits>& is, Compare f)
 { return _aux::ignore_fn<true>(is, f); }
@@ -122,9 +122,23 @@ namespace _aux {
   struct ignore_size_stream
   { std::streamsize size;};
 
-  template<typename Compare, bool Lax>
+  template<class Compare, bool Lax>
   struct ignore_functor_stream
   { Compare f; };
+
+  template<class CharT, class Traits, class Compare, bool Lax>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_functor_stream<Compare, Lax> func)
+  { return _aux::ignore_fn<Lax>(is, func.f); }
+
+  template<class CharT, class Traits>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_size_stream n)
+  { return is.ignore(n.size); }
 }
 
 /**
@@ -144,8 +158,8 @@ ignore(std::streamsize n)
  * Sent to a stream object, this manipulator calls
  * @c ignore(n) for that object.
  */
-template<typename Compare>
-typename std::conditional<
+template<class Compare>
+class std::conditional<
   std::is_integral<Compare>::value
 , _aux::ignore_size_stream
 , _aux::ignore_functor_stream<Compare, false>
@@ -160,24 +174,10 @@ ignore(Compare comp)
  * Sent to a stream object, this manipulator calls
  * @c ignore(n) for that object.
  */
-template<typename Compare>
+template<class Compare>
 _aux::ignore_functor_stream<Compare, true>
 laxignore(Compare f)
 { return {f}; }
-
-template<typename CharT, typename Traits>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_size_stream n)
-{ return is.ignore(n.size); }
-
-template<typename CharT, typename Traits, typename Compare, bool Lax>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_functor_stream<Compare, Lax> func)
-{ return _aux::ignore_fn<Lax>(is, func.f); }
 
 
 /**
@@ -185,22 +185,29 @@ operator>>(
  * @param n  Number of characters to discard.
  * @param delim  A "stop" character.
  */
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_istream<CharT, Traits>&
 ignore(
   std::basic_istream<CharT, Traits>& is
 , std::streamsize n
-, typename std::basic_istream<CharT, Traits>::int_type delim)
+, class std::basic_istream<CharT, Traits>::int_type delim)
 { return is.ignore(n, delim); }
 
 
 namespace _aux {
-  template<typename IntType>
+  template<class IntType>
   struct ignore_size_delimiter_stream
   {
     std::streamsize size;
     IntType delim;
   };
+
+  template<class CharT, class Traits, class IntType>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_size_delimiter_stream<IntType> n)
+  { return is.ignore(n.size, n.delim); }
 }
 
 /**
@@ -211,21 +218,14 @@ namespace _aux {
  * Sent to a stream object, this manipulator calls
  * @c ignore(n, delim) for that object.
  */
-template<typename IntType>
+template<class IntType>
 _aux::ignore_size_delimiter_stream<IntType>
 ignore(std::streamsize n, IntType delim)
 { return {n, delim}; }
 
-template<typename CharT, typename Traits, typename IntType>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_size_delimiter_stream<IntType> n)
-{ return is.ignore(n.size, n.delim); }
-
 
 namespace _aux {
-  template <typename InputIterator>
+  template <class InputIterator>
   struct ignore_range
   {
     InputIterator &first, &last;
@@ -235,17 +235,17 @@ namespace _aux {
     { ++first; }
   };
 
-  template<typename CharT>
+  template<class CharT>
   CharT
   ignore_get_char(const CharT * s)
   { return *s; }
 
-  template<typename InputIterator>
+  template<class InputIterator>
   typename std::iterator_traits<InputIterator>::value_type
   ignore_get_char(const ignore_range<InputIterator>& r)
   { return *r.first; }
 
-  template<bool Lax, typename CharT, typename Traits, typename StringOrRange>
+  template<bool Lax, class CharT, class Traits, class StringOrRange>
   std::basic_istream<CharT, Traits>&
   ignore(std::basic_istream<CharT, Traits>& is, StringOrRange s)
   {
@@ -288,7 +288,7 @@ namespace _aux {
  *
  * If the stream object have @c Traits::eof() so @c std::badbit is set in the stream.
  */
-template<typename CharT, typename Traits, typename InputIterator>
+template<class CharT, class Traits, class InputIterator>
 std::basic_istream<CharT, Traits>&
 ignore(
   std::basic_istream<CharT, Traits>& is
@@ -303,7 +303,7 @@ ignore(
  * @param first An input iterator.
  * @param last  An input iterator.
  */
-template<typename CharT, typename Traits, typename InputIterator>
+template<class CharT, class Traits, class InputIterator>
 std::basic_istream<CharT, Traits>&
 laxignore(
   std::basic_istream<CharT, Traits>& is
@@ -315,12 +315,24 @@ laxignore(
 
 
 namespace _aux {
-  template<typename InputIterator, typename InputIterator2, bool Lax>
+  template<class InputIterator, class InputIterator2, bool Lax>
   struct ignore_iterator_stream
   {
     InputIterator first;
     InputIterator2 last;
   };
+
+  template<
+    class CharT, class Traits
+  , class InputIterator, class InputIterator2
+  , bool Lax>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_iterator_stream<InputIterator, InputIterator2, Lax> range)
+  { return _aux::ignore<Lax>(
+    is
+  , _aux::ignore_range<InputIterator>{range.first, range.last}); }
 }
 
 /**
@@ -331,7 +343,7 @@ namespace _aux {
  * Sent to a stream object, this manipulator calls
  * @c ignore(stream, @a first, @a last) for that object.
  */
-template<typename InputIterator>
+template<class InputIterator>
 _aux::ignore_iterator_stream<InputIterator, InputIterator, false>
 ignore(InputIterator first, InputIterator last)
 { return {first, last}; }
@@ -344,7 +356,7 @@ ignore(InputIterator first, InputIterator last)
  * Sent to a stream object, this manipulator calls
  * @c ignore(stream, @a first, @a last) for that object.
  */
-template<typename InputIterator>
+template<class InputIterator>
 _aux::ignore_iterator_stream<InputIterator, InputIterator, true>
 laxignore(InputIterator first, InputIterator last)
 { return {first, last}; }
@@ -358,7 +370,7 @@ laxignore(InputIterator first, InputIterator last)
  * @c ignore(stream, @a first, @a last) for that object.
  * The @a first iterator advance
  */
-template<typename InputIterator>
+template<class InputIterator>
 _aux::ignore_iterator_stream<InputIterator&, InputIterator, false>
 advance_ignore(InputIterator& first, InputIterator last)
 { return {first, last}; }
@@ -372,22 +384,10 @@ advance_ignore(InputIterator& first, InputIterator last)
  * @c ignore(stream, @a first, @a last) for that object.
  * The @a first iterator advance
  */
-template<typename InputIterator>
+template<class InputIterator>
 _aux::ignore_iterator_stream<InputIterator&, InputIterator, true>
 advance_laxignore(InputIterator first, InputIterator last)
 { return {first, last}; }
-
-template<
-  typename CharT, typename Traits
-, typename InputIterator, typename InputIterator2
-, bool Lax>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_iterator_stream<InputIterator, InputIterator2, Lax> range)
-{ return _aux::ignore<Lax>(
-  is
-, _aux::ignore_range<InputIterator>{range.first, range.last}); }
 
 
 /**
@@ -397,7 +397,7 @@ operator>>(
  * If the stream object have @c Traits::eof() so @c std::badbit
  * is set in the stream.
  */
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_istream<CharT, Traits>&
 ignore(std::basic_istream<CharT, Traits>& is, const CharT * s)
 { return _aux::ignore<false>(is, s); }
@@ -406,22 +406,29 @@ ignore(std::basic_istream<CharT, Traits>& is, const CharT * s)
  * @brief Discarding a string.
  * @param s A string.
  */
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_istream<CharT, Traits>&
 laxignore(std::basic_istream<CharT, Traits>& is, const CharT * s)
 { return _aux::ignore<true>(is, s); }
 
 namespace _aux {
-  template<typename CharT, bool Lax>
+  template<class CharT, bool Lax>
   struct ignore_char_stream
   { const CharT * str; };
+
+  template<class CharT, class Traits, bool Lax>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_char_stream<CharT, Lax> s)
+  { return _aux::ignore<Lax>(is, s.str); }
 }
 
 /**
  * @brief Manipulator for @c ignore().
  * @param s A string.
  */
-template<typename CharT>
+template<class CharT>
 _aux::ignore_char_stream<CharT, false>
 ignore(const CharT *s)
 { return {s}; }
@@ -430,29 +437,29 @@ ignore(const CharT *s)
  * @brief Manipulator for @c laxignore().
  * @param s A string.
  */
-template<typename CharT>
+template<class CharT>
 _aux::ignore_char_stream<CharT, true>
 laxignore(const CharT *s)
 { return {s}; }
 
-template<typename CharT, typename Traits, bool Lax>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_char_stream<CharT, Lax> s)
-{ return _aux::ignore<Lax>(is, s.str); }
-
 namespace _aux {
-  template<typename CharT, bool Lax>
+  template<class CharT, bool Lax>
   struct ignore_reference_char_stream
   { const CharT *& str; };
+
+  template<class CharT, class Traits, bool Lax>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_reference_char_stream<CharT, Lax> s)
+  { return _aux::ignore<Lax>(is, s.str); }
 }
 
 /**
  * @brief Manipulator for @c advance_ignore().
  * @param s A string.
  */
-template<typename CharT>
+template<class CharT>
 _aux::ignore_reference_char_stream<CharT, false>
 advance_ignore(const CharT *& s)
 { return {s}; }
@@ -461,17 +468,10 @@ advance_ignore(const CharT *& s)
  * @brief Manipulator for @c advance_laxignore().
  * @param s A string.
  */
-template<typename CharT>
+template<class CharT>
 _aux::ignore_reference_char_stream<CharT, true>
 advance_laxignore(const CharT *& s)
 { return {s}; }
-
-template<typename CharT, typename Traits, bool Lax>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_reference_char_stream<CharT, Lax> s)
-{ return _aux::ignore<Lax>(is, s.str); }
 
 
 /**
@@ -482,8 +482,8 @@ operator>>(
  * is set in the stream.
  */
 template<
-  typename CharT, typename Traits
-, typename StringTraits, typename Alloc>
+  class CharT, class Traits
+, class StringTraits, class Alloc>
 std::basic_istream<CharT, Traits>&
 ignore(
   std::basic_istream<CharT, Traits>& is
@@ -495,8 +495,8 @@ ignore(
  * @param s A string.
  */
 template<
-  typename CharT, typename Traits
-, typename StringTraits, typename Alloc>
+  class CharT, class Traits
+, class StringTraits, class Alloc>
 std::basic_istream<CharT, Traits>&
 laxignore(
   std::basic_istream<CharT, Traits>& is
@@ -504,16 +504,30 @@ laxignore(
 { return laxignore(is, s.begin(), s.end()); }
 
 namespace _aux {
-  template<typename CharT, typename Traits, typename Alloc, bool Lax>
+  template<class CharT, class Traits, class Alloc, bool Lax>
   struct ignore_string_stream
   { std::basic_string<CharT, Traits, Alloc> str; };
+
+  template<
+    class CharT, class Traits
+  , class StringTraits, class Alloc
+  , bool Lax>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_string_stream<CharT, StringTraits, Alloc, Lax> s)
+  {
+    return Lax
+    ? laxignore(is, s.str.begin(), s.str.end())
+    : ignore(is, s.str.begin(), s.str.end());
+  }
 }
 
 /**
  * @brief Manipulator for @c ignore().
  * @param s A string.
  */
-template<typename CharT, typename Traits, typename Alloc>
+template<class CharT, class Traits, class Alloc>
 _aux::ignore_string_stream<CharT, Traits, Alloc, false>
 ignore(const std::basic_string<CharT, Traits, Alloc>&s)
 { return {s}; }
@@ -522,31 +536,17 @@ ignore(const std::basic_string<CharT, Traits, Alloc>&s)
  * @brief Manipulator for @c laxignore().
  * @param s A string.
  */
-template<typename CharT, typename Traits, typename Alloc>
+template<class CharT, class Traits, class Alloc>
 _aux::ignore_string_stream<CharT, Traits, Alloc, true>
 laxignore(const std::basic_string<CharT, Traits, Alloc>&s)
 { return {s}; }
-
-template<
-  typename CharT, typename Traits
-, typename StringTraits, typename Alloc
-, bool Lax>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_string_stream<CharT, StringTraits, Alloc, Lax> s)
-{
-  return Lax
-  ? laxignore(is, s.str.begin(), s.str.end())
-  : ignore(is, s.str.begin(), s.str.end());
-}
 
 
 /**
  * @brief Discarding characters of string.
  * @param s A string.
  */
-template<typename CharT, typename Traits>
+template<class CharT, class Traits>
 std::basic_istream<CharT, Traits>&
 ignore_of(std::basic_istream<CharT, Traits>& is, const CharT * s)
 {
@@ -564,8 +564,8 @@ ignore_of(std::basic_istream<CharT, Traits>& is, const CharT * s)
  * @param s A string.
  */
 template<
-  typename CharT, typename Traits
-, typename StringTraits, typename Alloc>
+  class CharT, class Traits
+, class StringTraits, class Alloc>
 std::basic_istream<CharT, Traits>&
 ignore_of(
   std::basic_istream<CharT, Traits>& is
@@ -582,51 +582,51 @@ ignore_of(
 
 
 namespace _aux {
-  template<typename CharT>
+  template<class CharT>
   struct ignore_of_char_stream
   { const CharT * str; };
+
+  template<class CharT, class Traits>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_of_char_stream<CharT> s)
+  { return ignore_of(is, s.str); }
 }
 
 /**
  * @brief Manipulator for @c ignore_of().
  * @param s A string.
  */
-template<typename CharT>
+template<class CharT>
 _aux::ignore_of_char_stream<CharT>
 ignore_of(const CharT *s)
 { return {s}; }
 
-template<typename CharT, typename Traits>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_of_char_stream<CharT> s)
-{ return ignore_of(is, s.str); }
-
 
 namespace _aux {
-  template<typename CharT, typename Traits, typename Alloc>
+  template<class CharT, class Traits, class Alloc>
   struct ignore_of_string_stream
   { const std::basic_string<CharT, Traits, Alloc> & str; };
+
+  template<
+    class CharT, class Traits
+  , class StringTraits, class Alloc>
+  std::basic_istream<CharT, Traits>&
+  operator>>(
+    std::basic_istream<CharT, Traits>& is
+  , _aux::ignore_of_string_stream<CharT, StringTraits, Alloc> s)
+  { return ignore_of(is, s.str); }
 }
 
 /**
  * @brief Manipulator for @c ignore().
  * @param s A string.
  */
-template<typename CharT, typename Traits, typename Alloc>
+template<class CharT, class Traits, class Alloc>
 _aux::ignore_of_string_stream<CharT, Traits, Alloc>
 ignore_of(const std::basic_string<CharT, Traits, Alloc>&s)
 { return {s}; }
-
-template<
-  typename CharT, typename Traits
-, typename StringTraits, typename Alloc>
-std::basic_istream<CharT, Traits>&
-operator>>(
-  std::basic_istream<CharT, Traits>& is
-, _aux::ignore_of_string_stream<CharT, StringTraits, Alloc> s)
-{ return ignore_of(is, s.str); }
 
 }
 }

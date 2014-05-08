@@ -7,7 +7,7 @@
 namespace falcon {
 namespace iostreams {
 
-template<typename CharT, typename Traits = std::char_traits<CharT> >
+template<class CharT, class Traits = std::char_traits<CharT> >
 class basic_membuf
 : public std::basic_streambuf<CharT, Traits>
 {

@@ -559,7 +559,7 @@ public:
     if (n >= bit::size<_T>::value * _N)
       return set_null();
     std::size_t d = n / (bit::size<_T>::value);
-    n %= bit::size<_T>::value;
+    n %= unsigned(bit::size<_T>::value);
     for (std::size_t i = _N-1; i != _N-1-d; --i)
     {
       _M_flag[i] = _M_flag[i-d] >> n;
