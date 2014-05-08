@@ -8,7 +8,7 @@
 
 namespace falcon {
 
-namespace ostream {
+namespace iostreams {
 
 template<typename _CharT, typename _Traits, typename _ForwardIterator>
 std::basic_ostream<_CharT, _Traits>& join(std::basic_ostream<_CharT, _Traits>& os, _ForwardIterator first, _ForwardIterator last, const _CharT* glue, std::streamsize n)
@@ -214,13 +214,17 @@ join_wrapper<char, char, _Container> join(const _Container& container)
 }
 
 template<typename _CharT, typename _Container>
-typename enable_if<!is_ostream<_Container>::value,
+  typename enable_if<!is_ostream<_Container>::value,
 	join_wrapper<_CharT, const _CharT*, _Container, true> >::type
 join(const _Container& container, const _CharT* glue, std::streamsize size)
 {
 	return join_wrapper<_CharT, const _CharT*, _Container, true>(container, glue, size);
 }
 
+}
+
+namespace ostream {
+  using ::falcon::iostreams::join;
 }
 
 }

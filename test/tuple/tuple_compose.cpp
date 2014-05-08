@@ -20,8 +20,8 @@ void tuple_compose_test()
 	falcon::tuple_compose(
 		unless_functor(),
 		std::make_tuple(
-			falcon::make_ostream_function(os),
-			falcon::make_ostream_function(os)
+			falcon::iostreams::make_ostream_function(os),
+			falcon::iostreams::make_ostream_function(os)
 		),
 		std::make_tuple(5, ' ', 55)
 	);
@@ -33,8 +33,8 @@ void tuple_compose_test()
     falcon::parameter_index<0,1,2>(),
     unless_functor(),
     std::make_tuple(
-      falcon::make_ostream_function(os),
-      falcon::make_ostream_function(os)
+      falcon::iostreams::make_ostream_function(os),
+      falcon::iostreams::make_ostream_function(os)
     ),
     std::make_tuple(5, ' ', 55)
   );
@@ -43,7 +43,7 @@ void tuple_compose_test()
 
 	{
 		os.str("");
-		auto fos = falcon::make_ostream_function(os);
+		auto fos = falcon::iostreams::make_ostream_function(os);
 		auto tuple = std::make_tuple(5, ' ', 55);
 		unless_functor f;
 		falcon::tuple_compose(

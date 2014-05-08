@@ -8,7 +8,7 @@ void tuple_for_each_test()
 {
 	std::ostringstream os;
 	falcon::tuple_for_each(std::make_tuple(5, ' ', 55),
-                         falcon::make_ostream_function(os));
+                         falcon::iostreams::make_ostream_function(os));
 	CHECK_EQUAL_VALUE(os.str(), "5 55");
 }
 

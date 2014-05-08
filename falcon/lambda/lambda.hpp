@@ -656,9 +656,9 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 namespace operators {
 
 template<typename _T,
-bool = is_istream<_T>::value,
-bool = is_ostream<_T>::value,
-bool = is_ios<_T>::value>
+bool = iostreams::is_istream<_T>::value,
+bool = iostreams::is_ostream<_T>::value,
+bool = iostreams::is_ios<_T>::value>
 struct __deduce_iostream_lambda
 {
 	static const bool __value = false;
@@ -723,7 +723,7 @@ struct __is_ostream_lambda
 
 template<typename _T>
 struct __is_ostream_lambda<___lambda<void, _T&>>
-: __deduce_iostream_lambda<_T, false, is_ostream<_T>::value>
+: __deduce_iostream_lambda<_T, false, iostreams::is_ostream<_T>::value>
 {};
 
 template<typename _Lambda1, typename _Lambda2>
@@ -739,7 +739,7 @@ struct __is_istream_lambda
 
 template<typename _T>
 struct __is_istream_lambda<___lambda<void, _T&>>
-: __deduce_iostream_lambda<_T, is_istream<_T>::value, false>
+: __deduce_iostream_lambda<_T, iostreams::is_istream<_T>::value, false>
 {};
 
 template<typename _Lambda1, typename _Lambda2>
