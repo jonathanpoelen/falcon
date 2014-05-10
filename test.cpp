@@ -64,11 +64,22 @@
 //   }
 // };
 
+#include <falcon/iterator/filter_iterator.hpp>
+// #include <falcon/iterator/iterator_afilter_iterator.hpp>
+#include <iostream>
 
 int main()
 {
-
-
+  auto f = [](int x) { return x % 2; };
+  int a[]{0,1,2,3,4,5,6,7,8,9,10};
+  using std::begin;
+  using std::end;
+  auto first = falcon::iterator::make_filter_iterator(begin(a), f);
+  auto last = falcon::iterator::make_filter_iterator(end(a), f);
+  auto ff(first);
+  for (; first != last; ++first) {
+    std::cout << *first << "\n";
+  }
 
 
 

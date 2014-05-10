@@ -305,3 +305,13 @@ array_view / bounds / index peuvent remplacer totalement coordinates ?
 synchroniser: une vue
 
 un objet transaction qui dans son destructeur fait un commit si aucune exception n'est lancée, sinon un rollback (std::uncaught_exception())
+
+class_maker (renommage de late_maker)
+
+comment le type interne des bucket des containers std::unordered_* ?
+
+classe pour de la composition de fonction compose<X>(function_variadic) ou compose(f)
+
+iterator: pas de construction explicite (induit une réduction de code dans enumerator.hpp)
+iterator: posibilité de compararer avec l'itérateur interne
+

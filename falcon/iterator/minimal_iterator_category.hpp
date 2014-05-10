@@ -57,6 +57,15 @@ struct minimal_iterator_category
 	>::__type type;
 };
 
+template<typename Iterator, typename _MinimalCategory>
+struct minimal_iterator_category_for
+{
+  typedef typename minimal_iterator_category<
+    typename std::iterator_traits<Iterator>::iterator_category
+  , _MinimalCategory
+  >::type type;
+};
+
 }
 }
 
