@@ -1,12 +1,12 @@
 #ifndef FALCON_ITERATOR_COUNTING_ITERATOR_HPP
 #define FALCON_ITERATOR_COUNTING_ITERATOR_HPP
 
+#include <falcon/iterator/iterator_handler.hpp>
 #if __cplusplus >= 201103L
 # include <type_traits>
 #else
 # include <boost/type_traits/remove_pointer.hpp>
 #endif
-#include <falcon/iterator/iterator_handler.hpp>
 
 namespace falcon {
 namespace iterator {
@@ -14,174 +14,134 @@ namespace iterator {
 struct count_comparison_tag {};
 struct count_and_iterator_comparison_tag {};
 
-template <typename _Iterator, typename _ComparisonTag = count_comparison_tag,
-	typename _Tp = use_default,
-	typename _Category = use_default,
-	typename _Reference = use_default,
-	typename _Distance = use_default,
-	typename _Pointer = use_default>
+template <
+  class Iterator
+, class ComparisonTag = count_comparison_tag>
 class counting_iterator;
 
 namespace detail {
 
-	template <typename _Iterator, typename _ComparisonTag,
-		typename _Tp,
-		typename _Category,
-		typename _Reference,
-		typename _Distance,
-		typename _Pointer>
-	struct __counting_base
-	{
-		typedef typename iterator_handler_types<
-			counting_iterator<_Iterator, _ComparisonTag, _Tp,
-				_Category, _Reference, _Distance, _Pointer>,
-			_Iterator,
-			_Category,
-			_Tp,
-			_Distance,
-			_Pointer,
-			_Reference
-		>::base base;
-	};
+  template <class Iterator, class ComparisonTag>
+  struct counting_iterator_base
+  {
+    typedef typename iterator_handler_types<
+      counting_iterator<Iterator, ComparisonTag>
+    , Iterator
+    >::type type;
+  };
 
 }
 
-template <typename _Iterator, typename _ComparisonTag,
-	typename _Tp,
-	typename _Category,
-	typename _Reference,
-	typename _Distance,
-	typename _Pointer
->
+template <class Iterator, class ComparisonTag>
 class counting_iterator
-: public detail::__counting_base<_Iterator, _ComparisonTag, _Tp, _Category, _Reference, _Distance, _Pointer>::base
+: public detail::counting_iterator_base<Iterator, ComparisonTag>::type
 {
-	friend class iterator_core_access;
+  friend class iterator_core_access;
 
-	typedef typename detail::__counting_base<
-		_Iterator, _ComparisonTag, _Tp, _Category, _Reference, _Distance, _Pointer
-	>::base __base;
-
-public:
-	typedef typename __base::iterator_type iterator_type;
-	typedef typename __base::difference_type difference_type;
-
-private:
-	int _count;
+  typedef typename detail::counting_iterator_base<
+    Iterator, ComparisonTag>::type inherit_type;
 
 public:
-	explicit counting_iterator(int __count = 0)
-	: __base()
-	, _count(__count)
-	{}
-
-	explicit counting_iterator(iterator_type x, int __count = 0)
-	: __base(x)
-	, _count(__count)
-	{}
-
-	counting_iterator(int __count, iterator_type x)
-	: __base(x)
-	, _count(__count)
-	{}
-
-	counting_iterator(const counting_iterator& other)
-	: __base(other)
-	, _count(other._count)
-	{}
-
-	using __base::operator=;
-#if __cplusplus >= 201103L
-	counting_iterator& operator=(const counting_iterator&) = default;
-#else
-	counting_iterator& operator=(const counting_iterator& other)
-	{
-		this->base_reference() = other.base_reference();
-		_count = other._count;
-		return *this;
-	}
-#endif
-
-	void count(int __count)
-	{ _count = __count; }
-
-	int count() const
-	{ return _count; }
+  typedef typename inherit_type::iterator_type iterator_type;
+  typedef typename inherit_type::difference_type difference_type;
 
 private:
-	void increment()
-	{
-		__base::increment();
-		++_count;
-	}
+  int count_;
 
-	void decrement()
-	{
-		__base::decrement();
-		--_count;
-	}
+public:
+  counting_iterator(int count__ = 0)
+  : count_(count__)
+  {}
 
-	difference_type _dispath_difference(const counting_iterator& other,
-																			count_comparison_tag) const
-	{ return other._count - _count; }
+  counting_iterator(iterator_type x, int count__ = 0)
+  : inherit_type(x)
+  , count_(count__)
+  {}
 
-	difference_type _dispath_difference(const counting_iterator& other,
-																			count_and_iterator_comparison_tag) const
-	{ return std::min(other._count - _count, __base::difference(other)); }
+  counting_iterator(int count__, iterator_type x)
+  : inherit_type(x)
+  , count_(count__)
+  {}
 
-	difference_type difference(const counting_iterator& other) const
-	{ return _dispath_difference(other, _ComparisonTag()); }
+  using inherit_type::operator=;
 
-	bool _dispath_equal(const counting_iterator&, count_comparison_tag) const
-	{ return false; }
+  int count() const
+  { return count_; }
 
-	bool _dispath_equal(const counting_iterator& other,
-											count_and_iterator_comparison_tag) const
-	{ return __base::equal(other); }
+private:
+  void increment()
+  {
+    inherit_type::increment();
+    ++count_;
+  }
 
-	bool equal(const counting_iterator& other) const
-	{ return _count == other._count || _dispath_equal(other, _ComparisonTag()); }
+  void decrement()
+  {
+    inherit_type::decrement();
+    --count_;
+  }
 
-	bool _dispath_less(const counting_iterator&, count_comparison_tag) const
-	{ return true; }
+  difference_type _dispath_difference(const counting_iterator& other,
+                                      count_comparison_tag) const
+  { return other.count_ - count_; }
 
-	bool _dispath_less(const counting_iterator& other, count_and_iterator_comparison_tag) const
-	{ return __base::less(other); }
+  difference_type _dispath_difference(const counting_iterator& other,
+                                      count_and_iterator_comparison_tag) const
+  { return std::min(other.count_ - count_, inherit_type::difference(other)); }
 
-	bool less(const counting_iterator& other) const
-	{ return _count < other._count && _dispath_less(other, _ComparisonTag()); }
+  difference_type difference(const counting_iterator& other) const
+  { return _dispath_difference(other, ComparisonTag()); }
+
+  bool _dispath_equal(const counting_iterator&, count_comparison_tag) const
+  { return false; }
+
+  bool _dispath_equal(const counting_iterator& other,
+                      count_and_iterator_comparison_tag) const
+  { return inherit_type::equal(other); }
+
+  bool equal(const counting_iterator& other) const
+  { return count_ == other.count_ || _dispath_equal(other, ComparisonTag()); }
+
+  bool _dispath_less(const counting_iterator&, count_comparison_tag) const
+  { return true; }
+
+  bool _dispath_less(const counting_iterator& other, count_and_iterator_comparison_tag) const
+  { return inherit_type::less(other); }
+
+  bool less(const counting_iterator& other) const
+  { return count_ < other.count_ && _dispath_less(other, ComparisonTag()); }
 };
 
 
-template <typename _Iterator>
-counting_iterator<_Iterator>
-make_counting_iterator(int count, _Iterator x)
-{ return counting_iterator<_Iterator>(x, count); }
+template <class Iterator>
+counting_iterator<Iterator>
+make_counting_iterator(int count, Iterator x)
+{ return counting_iterator<Iterator>(x, count); }
 
-template <typename _Iterator>
-counting_iterator<_Iterator>
-make_counting_iterator(_Iterator x, int count = 0)
-{ return counting_iterator<_Iterator>(x, count); }
+template <class Iterator>
+counting_iterator<Iterator>
+make_counting_iterator(Iterator x, int count = 0)
+{ return counting_iterator<Iterator>(x, count); }
 
-template <typename _Iterator, typename _ComparisonTag>
-counting_iterator<_Iterator>
-make_counting_iterator(int count, _Iterator x, _ComparisonTag)
-{ return counting_iterator<_Iterator, _ComparisonTag>(x, count); }
+template <class Iterator, class ComparisonTag>
+counting_iterator<Iterator>
+make_counting_iterator(int count, Iterator x, ComparisonTag)
+{ return counting_iterator<Iterator, ComparisonTag>(x, count); }
 
-template <typename _Iterator, typename _ComparisonTag>
-counting_iterator<_Iterator>
-make_counting_iterator(_Iterator x, int count, _ComparisonTag)
-{ return counting_iterator<_Iterator, _ComparisonTag>(x, count); }
+template <class Iterator, class ComparisonTag>
+counting_iterator<Iterator>
+make_counting_iterator(Iterator x, int count, ComparisonTag)
+{ return counting_iterator<Iterator, ComparisonTag>(x, count); }
 
-template <typename _Iterator>
-counting_iterator<_Iterator, count_comparison_tag>
-make_counting_iterator(_Iterator x, count_comparison_tag)
-{ return counting_iterator<_Iterator, count_comparison_tag>(x); }
+template <class Iterator>
+counting_iterator<Iterator, count_comparison_tag>
+make_counting_iterator(Iterator x, count_comparison_tag)
+{ return counting_iterator<Iterator, count_comparison_tag>(x); }
 
-template <typename _Iterator>
-counting_iterator<_Iterator, count_and_iterator_comparison_tag>
-make_counting_iterator(_Iterator x, count_and_iterator_comparison_tag)
-{ return counting_iterator<_Iterator, count_and_iterator_comparison_tag>(x); }
+template <class Iterator>
+counting_iterator<Iterator, count_and_iterator_comparison_tag>
+make_counting_iterator(Iterator x, count_and_iterator_comparison_tag)
+{ return counting_iterator<Iterator, count_and_iterator_comparison_tag>(x); }
 
 }}
 

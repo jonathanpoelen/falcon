@@ -6,86 +6,65 @@
 namespace falcon {
 namespace iterator {
 
-template <typename _T,
-	typename _Tp = use_default,
-	typename _Category = use_default,
-	typename _Reference = use_default,
-	typename _Distance = use_default,
-	typename _Pointer = use_default
->
+template <class Iterator>
 class opposite_direction_iterator;
 
 namespace detail {
-
-	template <typename _Iterator, typename _Tp, typename _Category,
-		typename _Reference, typename _Distance, typename _Pointer>
-	struct opposite_direction_base
-	{
-		typedef typename iterator_handler_types<
-			opposite_direction_iterator<_Iterator, _Tp,
-				_Category, _Reference, _Distance, _Pointer>,
-			_Iterator,
-			_Category,
-			_Tp,
-			_Distance,
-			_Pointer,
-			_Reference
-		>::base base;
-	};
-
+  template <class Iterator>
+  struct opposite_direction_base
+  {
+    typedef typename iterator_handler_types<
+      opposite_direction_iterator<Iterator>
+    , Iterator
+    >::type type;
+  };
 }
 
-template <typename _Iterator, typename _Tp, typename _Category,
-	typename _Reference, typename _Distance, typename _Pointer
->
+template <class Iterator>
 class opposite_direction_iterator
-: public detail::opposite_direction_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base
+: public detail::opposite_direction_base<Iterator>::type
 {
-	friend class iterator_core_access;
+  friend class iterator_core_access;
 
-	typedef typename detail::opposite_direction_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
-
-public:
-	typedef typename __base::iterator_type iterator_type;
-	typedef typename __base::difference_type difference_type;
-
+  typedef typename detail::opposite_direction_base<Iterator>::type inherit_type;
 
 public:
-	opposite_direction_iterator()
-	: __base()
-	{}
+  typedef typename inherit_type::iterator_type iterator_type;
+  typedef typename inherit_type::difference_type difference_type;
 
-	explicit opposite_direction_iterator(iterator_type __x)
-	: __base(__x)
-	{}
 
-	opposite_direction_iterator(const opposite_direction_iterator& __x)
-	: __base(__x)
-	{}
+public:
+  opposite_direction_iterator()
+  : inherit_type()
+  {}
 
-	using __base::operator=;
+  opposite_direction_iterator(iterator_type x)
+  : inherit_type(x)
+  {}
+
+  using inherit_type::operator=;
 
 protected:
-	void increment()
-	{ __base::decrement(); }
+  void increment()
+  { --this->base_reference(); }
 
-	void decrement()
-	{ __base::increment(); }
+  void decrement()
+  { ++this->base_reference(); }
 
-	difference_type difference(const opposite_direction_iterator& x) const
-	{ return x.__base::difference(*this); }
+  difference_type difference(const opposite_direction_iterator& x) const
+  { return x.inherit_type::difference(*this); }
 
-	void advance(difference_type n)
-	{ __base::recoil(n); }
+  void advance(difference_type n)
+  { this->base_reference() -= n; }
 
-	void recoil(difference_type n)
-	{ __base::advance(n); }
+  void recoil(difference_type n)
+  { this->base_reference() += n; }
 };
 
-template <typename _Iterator>
-opposite_direction_iterator<_Iterator>
-make_opposite_direction_iterator(_Iterator x)
-{ return opposite_direction_iterator<_Iterator>(x); }
+template <class Iterator>
+opposite_direction_iterator<Iterator>
+make_opposite_direction_iterator(Iterator x)
+{ return opposite_direction_iterator<Iterator>(x); }
 
 }
 }

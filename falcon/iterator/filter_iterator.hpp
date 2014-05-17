@@ -16,27 +16,28 @@ class filter_iterator;
 namespace detail
 {
   template<class Iterator, class Predicate, class Category>
-  struct filter_base
+  struct filter_iterator_base
   {
     typedef typename iterator_handler_types<
       filter_iterator<Iterator, Predicate, Category>
     , Iterator
     , typename minimal_iterator_category_for<Iterator, Category>::type
-    >::base base;
+    >::type type;
   };
 }
 
 template<class Iterator, class Predicate, class Category>
 class filter_iterator
-: public detail::filter_base<Iterator, Predicate, Category>::base
+: public detail::filter_iterator_base<Iterator, Predicate, Category>::type
 {
   friend class iterator_core_access;
 
-  typedef typename detail::filter_base<Iterator, Predicate, Category>::base base_t;
+  typedef typename detail::filter_iterator_base<
+    Iterator, Predicate, Category>::type inherit_type;
 
 public:
   typedef Predicate predicate_type;
-  typedef typename base_t::iterator_type iterator_type;
+  typedef typename inherit_type::iterator_type iterator_type;
 
 private:
   predicate_type predicate_;
@@ -46,21 +47,21 @@ public:
   filter_iterator()
   {}
 
-  explicit filter_iterator(iterator_type x)
-  : base_t(x)
+  filter_iterator(iterator_type x)
+  : inherit_type(x)
   {
     satisfy_predicate();
   }
 
   filter_iterator(iterator_type x, iterator_type xend)
-  : base_t(x)
+  : inherit_type(x)
   , end_(xend)
   {
     satisfy_predicate();
   }
 
   filter_iterator(iterator_type x, iterator_type xend, Predicate pred)
-  : base_t(x)
+  : inherit_type(x)
   , end_(xend)
   , predicate_(pred)
   {
@@ -68,21 +69,13 @@ public:
   }
 
   filter_iterator(iterator_type x, Predicate pred)
-  : base_t(x)
+  : inherit_type(x)
   , predicate_(pred)
   {
     satisfy_predicate();
   }
 
-//   template<class OtherIterator>
-//   filter_iterator(
-//     filter_iterator<Predicate, OtherIterator> const& t
-//     , typename enable_if_convertible<OtherIterator, Iterator>::type* = 0
-//     )
-//   : base_t(t.base())
-//   , predicate_(t.predicate())
-//   , end_(t.end())
-//   {}
+  using inherit_type::operator=;
 
   predicate_type predicate() const
   { return predicate_; }

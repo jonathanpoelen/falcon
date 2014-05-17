@@ -80,7 +80,7 @@ namespace detail {
 			typename __traits::difference_type,
 			typename __traits::pointer,
 			typename __traits::reference
-		>::base base;
+		>::type type;
 	};
 
 }
@@ -247,7 +247,7 @@ struct __recursive_iterator_to_tuple_const_reference_type<
 
 template <typename... Iterators, typename ComparisonParameterTag>
 class basic_recursive_iterator<parameter_pack<Iterators...>, ComparisonParameterTag>
-: public detail::recursive_iterator_base<ComparisonParameterTag, Iterators...>::base
+: public detail::recursive_iterator_base<ComparisonParameterTag, Iterators...>::type
 {
 	friend class iterator_core_access;
 
@@ -257,7 +257,7 @@ class basic_recursive_iterator<parameter_pack<Iterators...>, ComparisonParameter
 	typedef typename __detail::__parameter_tuple __parameter_tuple;
 	typedef typename __detail::__parameter_pair_iterator __parameter_pair_iterator;
 
-	typedef typename __detail::base __base;
+	typedef typename __detail::type __base;
 
 public:
 	typedef typename __base::iterator_type iterator_type;

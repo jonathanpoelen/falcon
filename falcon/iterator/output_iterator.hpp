@@ -1,98 +1,107 @@
 #ifndef FALCON_ITERATOR_OUTPUT_ITERATOR_HPP
 #define FALCON_ITERATOR_OUTPUT_ITERATOR_HPP
 
+#include <falcon/c++/reference.hpp>
 #include <falcon/c++/pack.hpp>
 #include <falcon/utility/move.hpp>
-#include <boost/typeof/typeof.hpp>
+#include <falcon/helper/use_argument_type.hpp>
+#include <falcon/type_traits/use_if.hpp>
+#if __cplusplus < 201103L
+# include <boost/typeof/typeof.hpp>
+#endif
 #include <iterator>
 
 namespace falcon {
 namespace iterator {
 
-template<typename _Iterator>
+template<class Iterator>
 class output_iterator_base
 : public std::iterator<std::output_iterator_tag, void, void, void, void>
 {
-	_Iterator& downcast()
-	{ return static_cast<_Iterator&>(*this); }
+  Iterator& downcast()
+  { return static_cast<Iterator&>(*this); }
 
 public:
-	output_iterator_base()
-	{}
+  output_iterator_base()
+  {}
 
-	/// Simply returns *this.
-	_Iterator& operator*()
-	{ return downcast(); }
+  /// Simply returns *this.
+  Iterator& operator*()
+  { return downcast(); }
 
-	/// Simply returns *this.  (This %iterator does not @a move.)
-	_Iterator& operator++()
-	{ return downcast(); }
+  /// Simply returns *this.  (This %iterator does not @a move.)
+  Iterator& operator++()
+  { return downcast(); }
 
-	/// Simply returns *this.  (This %iterator does not @a move.)
-	_Iterator& operator++(int)
-	{ return downcast(); }
+  /// Simply returns *this.  (This %iterator does not @a move.)
+  Iterator& operator++(int)
+  { return downcast(); }
 };
 
-template<typename>
-struct __argument_obj;
+namespace _aux {
+  template<class>
+  struct get_argument_type_dispatch2;
 
-template<typename _Result, typename _Functor, typename _FirstArg
-	CPP_OPTIONAL_PACK(_Args)>
-struct __argument_obj<_Result(_Functor::*)(_FirstArg
-	CPP_USE_OPTIONAL_PACK(_Args))>
-{ typedef _FirstArg type; };
+  template<class Result, class F, class Arg CPP_OPTIONAL_PACK(Args)>
+  struct get_argument_type_dispatch2<Result(F::*)(Arg CPP_USE_OPTIONAL_PACK(Args))>
+  { typedef Arg type; };
 
-template<typename _Result, typename _Functor, typename _FirstArg
-	CPP_OPTIONAL_PACK(_Args)>
-struct __argument_obj<_Result(_Functor::*)(_FirstArg
-	CPP_USE_OPTIONAL_PACK(_Args)) const>
-{ typedef _FirstArg type; };
+  template<class Result, class F, class Arg CPP_OPTIONAL_PACK(Args)>
+  struct get_argument_type_dispatch2<Result(F::*)(Arg CPP_USE_OPTIONAL_PACK(Args)) const>
+  { typedef Arg type; };
 
-template<typename _Functor>
-struct __argument_type
-: __argument_obj<BOOST_TYPEOF(&_Functor::operator())>
-{};
+  template<class F>
+  struct get_argument_type_dispatch
+#if __cplusplus >= 201103L
+  : get_argument_type_dispatch2<decltype(&F::operator())>
+#else
+  : get_argument_type_dispatch2<BOOST_TYPEOF(&F::operator())>
+#endif
+  {};
 
-template<typename _Return, typename _FirstArg>
-struct __argument_type<_Return(*)(_FirstArg)>
-{ typedef _FirstArg type; };
+  template<class F>
+  struct get_argument_type
+  : use_if<use_argument_type<F>, get_argument_type_dispatch<F> >::type
+  {};
+}
 
-template<typename _Functor, typename _T = typename __argument_type<_Functor>::type>
+template<class Functor, class T = typename _aux::get_argument_type<Functor>::type>
 struct output_iterator
-: output_iterator_base<output_iterator<_Functor, _T> >
+: output_iterator_base<output_iterator<Functor, T> >
 {
-	_Functor m_functor;
+    Functor functor_;
 
 public:
-	output_iterator()
-	: m_functor()
-	{}
+  output_iterator()
+  : functor_()
+  {}
 
-	output_iterator(_Functor func)
-	: m_functor(func)
-	{}
+  output_iterator(Functor func)
+  : functor_(func)
+  {}
 
-	template<typename _U>
-	output_iterator(const _U& func)
-	: m_functor(func)
-	{}
+  template<class Func>
+  output_iterator(const Func& func)
+  : functor_(func)
+  {}
 
-	output_iterator& operator=(_T& x)
-	{
-		m_functor(x);
-		return *this;
-	}
+  output_iterator& operator=(T CPP_RVALUE_OR_REFERENCE x)
+  {
+    functor_(FALCON_MOVE(x));
+    return *this;
+  }
 
-	output_iterator& operator=(const _T& x)
-	{
-		m_functor(x);
-		return *this;
-	}
+  output_iterator& operator=(const T& x)
+  {
+    functor_(x);
+    return *this;
+  }
 };
 
-template<typename _Functor>
-output_iterator<_Functor> make_output_iterator(_Functor func)
-{ return output_iterator<_Functor>(FALCON_MOVE(func)); }
+template<class F>
+output_iterator<F>
+make_output_iterator(F func)
+{ return output_iterator<F>(FALCON_MOVE(func)); }
 
 }}
 

@@ -1,9 +1,9 @@
 #ifndef FALCON_ITERATOR_GET_ACCESSOR_ITERATOR_HPP
 #define FALCON_ITERATOR_GET_ACCESSOR_ITERATOR_HPP
 
-#include <iterator>
-#include <falcon/accessors/get.hpp>
 #include <falcon/iterator/indirect_iterator.hpp>
+#include <falcon/accessors/get.hpp>
+#include <iterator>
 
 namespace falcon {
 namespace iterator {
@@ -11,12 +11,12 @@ namespace iterator {
 template<typename Iterator>
 class build_get_accessor_iterator
 {
-	typedef typename std::iterator_traits<Iterator>::value_type __value_type;
+	typedef typename std::iterator_traits<Iterator>::value_type x_value_type;
 public:
 	typedef falcon::iterator::indirect_iterator<
 		Iterator,
-		falcon::accessors::get<__value_type>,
-		typename __value_type::type
+		falcon::accessors::get<x_value_type>,
+		typename x_value_type::type
 	> type;
 };
 

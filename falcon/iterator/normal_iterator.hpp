@@ -6,78 +6,72 @@
 namespace falcon {
 namespace iterator {
 
-template <typename Iterator,
-    typename Tp = use_default, typename Category = use_default,
-    typename Reference = use_default, typename Distance = use_default,
-    typename Pointer = use_default
+template<
+  class Iterator
+, class T = use_default
+, class Category = use_default
+, class Reference = use_default
+, class Distance = use_default
+, class Pointer = use_default
 >
 class normal_iterator;
 
 namespace detail {
-
-    template <typename Iterator, typename Tp, typename Category,
-      typename Reference, typename Distance, typename Pointer>
-    struct normal_base
-    {
-        typedef typename iterator_handler_types<
-            normal_iterator<Iterator, Tp, Category, Reference, Distance, Pointer>,
-            Iterator,
-            Category,
-            Tp,
-            Distance,
-            Pointer,
-            Reference
-        >::base base;
-    };
-
+  template<
+    class Iterator
+  , class T
+  , class Category
+  , class Reference
+  , class Distance
+  , class Pointer
+  >
+  struct normal_iterator_base
+  {
+    typedef typename iterator_handler_types<
+      normal_iterator<Iterator, T, Category, Reference, Distance, Pointer>
+    , Iterator
+    , Category
+    , T
+    , Distance
+    , Pointer
+    , Reference
+    >::type type;
+  };
 }
 
-template <typename Iterator,
-    typename Tp,
-    typename Category,
-    typename Reference,
-    typename Distance,
-    typename Pointer
+template<
+  class Iterator
+, class T
+, class Category
+, class Reference
+, class Distance
+, class Pointer
 >
 class normal_iterator
-: public detail::normal_base<Iterator, Tp, Category, Reference, Distance, Pointer>::base
+: public detail::normal_iterator_base<
+  Iterator, T, Category, Reference, Distance, Pointer>::type
 {
   friend class iterator_core_access;
 
-  typedef detail::normal_base<Iterator, Tp, Category, Reference, Distance, Pointer> __detail;
-  typedef typename __detail::base __base;
+  typedef typename detail::normal_iterator_base<
+    Iterator, T, Category, Reference, Distance, Pointer>::type inherit_type;
 
 public:
-  typedef typename __base::iterator_type iterator_type;
-  typedef typename __base::difference_type difference_type;
-  typedef typename __base::reference reference;
+  typedef typename inherit_type::iterator_type iterator_type;
 
-public:
+
   normal_iterator()
-  : __base()
+  : inherit_type()
   {}
 
-  explicit normal_iterator(iterator_type __x)
-  : __base(__x)
+  normal_iterator(iterator_type x)
+  : inherit_type(x)
   {}
 
-  normal_iterator(const normal_iterator& __x)
-  : __base(__x)
-  {}
-
-  using __base::operator=;
-#if __cplusplus >= 201103L
-  normal_iterator& operator=(const normal_iterator&) = default;
-#else
-  normal_iterator& operator=(const normal_iterator& other)
-  {
-    __base::operator=(other);
-    return *this;
-  }
-#endif
+  using inherit_type::operator=;
 };
 
-template <typename Iterator>
+template<class Iterator>
 normal_iterator<Iterator>
 make_normal_iterator(Iterator x)
 { return normal_iterator<Iterator>(x); }

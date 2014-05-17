@@ -1,161 +1,147 @@
-#ifndef _FALCON_ITERATOR_INFINITE_ITERATOR_HPP
-#define _FALCON_ITERATOR_INFINITE_ITERATOR_HPP
+#ifndef FALCON_ITERATOR_INFINITE_ITERATOR_HPP
+#define FALCON_ITERATOR_INFINITE_ITERATOR_HPP
 
 #include <falcon/infinite.hpp>
 #include <falcon/container/range_access.hpp>
+#include <falcon/container/range_access_traits.hpp>
 #include <falcon/iterator/iterator_handler.hpp>
 
 namespace falcon {
 namespace iterator {
 
-template <typename _Iterator,
-	typename _Category = typename std::iterator_traits<_Iterator>::iterator_category
+template <class Iterator,
+  class Category = typename std::iterator_traits<Iterator>::iterator_category
 > class infinite_iterator;
 
 namespace detail {
 
-	template <typename _Iterator, typename _Category>
-	struct infinite_base
-	{
-		typedef typename iterator_handler_types<
-			infinite_iterator<_Iterator, _Category>,
-			_Iterator,
-			_Category
-		>::base base;
-	};
+  template <class Iterator, class Category>
+  struct infinite_iterator_base
+  {
+    typedef typename iterator_handler_types<
+      infinite_iterator<Iterator, Category>
+    , Iterator
+    , Category
+    >::type type;
+  };
 
 }
 
-template <typename _Iterator, typename _Category>
+template <class Iterator, class Category>
 struct infinite_iterator
-: detail::infinite_base<_Iterator, _Category>::base
+: detail::infinite_iterator_base<Iterator, Category>::type
 {
-	friend class iterator_core_access;
+  friend class iterator_core_access;
 
-	typedef typename detail::infinite_base<_Iterator, _Category>::base __base;
-
-public:
-	typedef typename __base::iterator_type iterator_type;
-	typedef typename __base::difference_type difference_type;
-	typedef typename __base::iterator_category iterator_category;
-
-private:
-	iterator_type _first;
-	iterator_type _last;
+  typedef typename detail::infinite_iterator_base<Iterator, Category>::type inherit_type;
 
 public:
-	infinite_iterator()
-	: __base()
-	, _first()
-	, _last()
-	{}
-
-	infinite_iterator(iterator_type begin, iterator_type it)
-	: __base(it)
-	, _first(begin)
-	, _last()
-	{}
-
-	infinite_iterator(iterator_type begin, iterator_type it, iterator_type end)
-	: __base(it)
-	, _first(begin)
-	, _last(end)
-	{}
-
-	template <typename _Container>
-	explicit infinite_iterator(_Container& container)
-	: __base(falcon::begin(container))
-	, _first(this->base_reference())
-	, _last(falcon::end(container))
-	{}
-
-	template <typename _Container>
-	infinite_iterator(_Container& container, iterator_type it)
-	: __base(falcon::begin(container))
-	, _first(it)
-	, _last(falcon::end(container))
-	{}
-
-	infinite_iterator(const infinite_iterator& other)
-	: __base(other)
-	, _first(other._first)
-	, _last(other._last)
-	{}
-
-	using __base::operator=;
-#if __cplusplus >= 201103L
-	infinite_iterator& operator=(const infinite_iterator&) = default;
-#else
-	infinite_iterator& operator=(const infinite_iterator& other)
-	{
-		this->base_reference() = other.base_reference();
-		_first = other._first;
-		_last = other._last;
-		return *this;
-	}
-#endif
+  typedef typename inherit_type::iterator_type iterator_type;
+  typedef typename inherit_type::difference_type difference_type;
+  typedef typename inherit_type::iterator_category iterator_category;
 
 private:
-	void increment()
-	{
-		if (++this->base_reference() == _last)
-			this->base_reference() = _first;
-	}
+  iterator_type first_;
+  iterator_type last_;
 
-	void decrement()
-	{
-		if (this->base_reference() == _first)
-			this->base_reference() = _last;
-		--this->base_reference();
-	}
+public:
+  infinite_iterator()
+  {}
 
-	void difference(infinite_iterator);
+  infinite_iterator(iterator_type begin, iterator_type end)
+  : inherit_type(begin)
+  , first_(begin)
+  , last_(end)
+  {}
 
-	void advance(difference_type n)
-	{
-		if (n < 0)
-			recoil(-n);
-		difference_type diff = _last - this->base_reference();
-		if (diff < n)
-			this->base_reference() = _first + (n - diff) % (_last - _first);
-		else
-			this->base_reference() += n;
-	}
+  infinite_iterator(iterator_type begin, iterator_type end, iterator_type it)
+  : inherit_type(it)
+  , first_(begin)
+  , last_(end)
+  {}
 
-	void recoil(difference_type n)
-	{
-		if (n < 0)
-			advance(-n);
-		difference_type diff = this->base_reference() - _first;
-		if (diff < n)
-			this->base_reference() = _last - (n - diff) % (_last - _first);
-		else
-			this->base_reference() -= n;
-	}
+  template <class Container>
+  infinite_iterator(Container& container)
+  : inherit_type(range_access_traits<Container>::begin(container))
+  , first_(this->base_reference())
+  , last_(range_access_traits<Container>::end(container))
+  {}
 
-	bool equal(const infinite_iterator&) const
-	{ return false; }
+  template <class Container>
+  infinite_iterator(Container& container, iterator_type it)
+  : inherit_type(range_access_traits<Container>::begin(container))
+  , first_(it)
+  , last_(range_access_traits<Container>::end(container))
+  {}
 
-	bool less(const infinite_iterator&) const
-	{ return true; }
+  using inherit_type::operator=;
+
+private:
+  void increment()
+  {
+    if (++this->base_reference() == last_) {
+      this->base_reference() = first_;
+    }
+  }
+
+  void decrement()
+  {
+    if (this->base_reference() == first_) {
+      this->base_reference() = last_;
+    }
+    --this->base_reference();
+  }
+
+  void difference(infinite_iterator);
+
+  void advance(difference_type n)
+  {
+    if (n < 0)
+      recoil(-n);
+    difference_type diff = last_ - this->base_reference();
+    if (diff < n)
+      this->base_reference() = first_ + (n - diff) % (last_ - first_);
+    else
+      this->base_reference() += n;
+  }
+
+  void recoil(difference_type n)
+  {
+    if (n < 0)
+      advance(-n);
+    difference_type diff = this->base_reference() - first_;
+    if (diff < n)
+      this->base_reference() = last_ - (n - diff) % (last_ - first_);
+    else
+      this->base_reference() -= n;
+  }
+
+  bool equal(const infinite_iterator&) const
+  { return false; }
+
+  bool less(const infinite_iterator&) const
+  { return true; }
 };
 
-template <typename _Container>
-infinite_iterator<typename range_access_iterator<_Container>::type>
-make_infinite_iterator(_Container& c)
-{ return infinite_iterator<typename range_access_iterator<_Container>::type>(c); }
+template <class Container>
+infinite_iterator<typename range_access_iterator<Container>::type>
+make_infinite_iterator(Container& c)
+{ return infinite_iterator<typename range_access_iterator<Container>::type>(c); }
 
-template <typename _Container, typename _Iterator>
-infinite_iterator<_Iterator> make_infinite_iterator(_Container& c, _Iterator it)
-{ return infinite_iterator<_Iterator>(c, it); }
+template <class Container, class Iterator>
+infinite_iterator<Iterator>
+make_infinite_iterator(Container& c, Iterator it)
+{ return infinite_iterator<Iterator>(c, it); }
 
-template <typename _Iterator>
-infinite_iterator<_Iterator> make_infinite_iterator(_Iterator begin, _Iterator it)
-{ return infinite_iterator<_Iterator>(begin, it); }
+template <class Iterator>
+infinite_iterator<Iterator>
+make_infinite_iterator(Iterator begin, Iterator end)
+{ return infinite_iterator<Iterator>(begin, end); }
 
-template <typename _Iterator>
-infinite_iterator<_Iterator> make_infinite_iterator(_Iterator begin, _Iterator it, _Iterator end)
-{ return infinite_iterator<_Iterator>(begin, it, end); }
+template <class Iterator>
+infinite_iterator<Iterator>
+make_infinite_iterator(Iterator begin, Iterator end, Iterator it)
+{ return infinite_iterator<Iterator>(begin, end, it); }
 
 }}
 

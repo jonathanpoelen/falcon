@@ -1,5 +1,5 @@
-#ifndef _FALCON_ITERATOR_NEXTER_ITERATOR_HPP
-#define _FALCON_ITERATOR_NEXTER_ITERATOR_HPP
+#ifndef FALCON_ITERATOR_NEXTER_ITERATOR_HPP
+#define FALCON_ITERATOR_NEXTER_ITERATOR_HPP
 
 #include <falcon/iterator/iterator_handler.hpp>
 #include <falcon/iterator/minimal_iterator_category.hpp>
@@ -7,113 +7,81 @@
 namespace falcon {
 namespace iterator {
 
-template <typename _Iterator, typename _Nexter, bool _ContentsDistance = false,
-	typename _Tp = use_default, typename _Category = use_default,
-	typename _Reference = use_default, typename _Distance = use_default,
-	typename _Pointer = use_default
->
+template<class Iterator, class Nexter, bool ContentsDistance = false>
 class nexter_iterator;
 
 namespace detail
 {
-	template <typename _Iterator, typename _Nexter, bool _ContentsDistance, typename _Tp,
-		typename _Category, typename _Reference, typename _Distance, typename _Pointer>
-	struct nexter_base
-	{
-		typedef typename iterator_handler_types<
-			nexter_iterator<_Iterator, _Nexter, _ContentsDistance, _Tp,
-				_Category, _Reference, _Distance, _Pointer>,
-			_Iterator,
-			typename default_or_type<
-				minimal_iterator_category<
-					typename std::iterator_traits<_Iterator>::iterator_category,
-					std::forward_iterator_tag
-				>,
-				_Category
-			>::type,
-			_Tp,
-			_Distance,
-			_Pointer,
-			_Reference
-		>::base base;
-	};
+  template<class Iterator, class Nexter, bool ContentsDistance>
+  struct nexter_iterator_base
+  {
+    typedef typename iterator_handler_types<
+      nexter_iterator<Iterator, Nexter, ContentsDistance>
+    , Iterator
+    >::type type;
+  };
 }
 
-template <typename _Iterator, typename _Nexter, bool _ContentsDistance, typename _Tp,
-	typename _Category, typename _Reference, typename _Distance, typename _Pointer>
+template<class Iterator, class Nexter, bool ContentsDistance>
 class nexter_iterator
-: public detail::nexter_base<_Iterator, _Nexter, _ContentsDistance, _Tp, _Category, _Reference, _Distance, _Pointer>::base
+: public detail::nexter_iterator_base<Iterator, Nexter, ContentsDistance>::type
 {
-	friend class iterator_core_access;
+  friend class iterator_core_access;
 
-	typedef typename detail::nexter_base<_Iterator, _Nexter, _ContentsDistance, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
-
-public:
-	typedef _Nexter nexter_type;
-	typedef typename __base::iterator_type iterator_type;
-	typedef typename __base::difference_type difference_type;
-
-private:
-	nexter_type _nexter;
+  typedef typename detail::nexter_iterator_base<
+    Iterator, Nexter, ContentsDistance>::type inherit_iterator;
 
 public:
-	explicit nexter_iterator(nexter_type fn)
-	: __base()
-	, _nexter(fn)
-	{}
-
-	explicit nexter_iterator(iterator_type x)
-	: __base(x)
-	, _nexter()
-	{}
-
-	nexter_iterator(iterator_type x, nexter_type fn)
-	: __base(x)
-	, _nexter(fn)
-	{}
-
-	nexter_iterator(const nexter_iterator& other)
-	: __base(other)
-	, _nexter(other._nexter)
-	{}
-
-	using __base::operator=;
-#if __cplusplus >= 201103L
-	nexter_iterator& operator=(const nexter_iterator&) = default;
-#else
-	nexter_iterator& operator=(const nexter_iterator& other)
-	{
-		this->base_reference() = other.base_reference();
-		_nexter = other._nexter;
-		return *this;
-	}
-#endif
-
-	const nexter_type& nexter() const
-	{ return _nexter; }
-	nexter_type& nexter()
-	{ return _nexter; }
+  typedef Nexter nexter_type;
+  typedef typename inherit_iterator::iterator_type iterator_type;
+  typedef typename inherit_iterator::difference_type difference_type;
 
 private:
-	void increment()
-	{ _nexter(this->base_reference()); }
+  nexter_type nexter_;
 
-	void advance(difference_type n)
-	{ _nexter(this->base_reference(), n); }
+public:
+  nexter_iterator(nexter_type fn)
+  : nexter_(fn)
+  {}
 
-	difference_type difference(const nexter_iterator& other, true_type) const
-	{ return _nexter(this->base_reference(), other.base_reference()); }
+  nexter_iterator(iterator_type x)
+  : inherit_iterator(x)
+  {}
 
-	difference_type difference(const nexter_iterator& other, false_type) const
-	{ return __base::difference(other); }
+  nexter_iterator(iterator_type x, nexter_type fn)
+  : inherit_iterator(x)
+  , nexter_(fn)
+  {}
 
-	difference_type difference(const nexter_iterator& other) const
-	{ return difference(other, integral_constant<bool, _ContentsDistance>()); }
+  using inherit_iterator::operator=;
+
+  nexter_type nexter() const
+  { return nexter_; }
+
+private:
+  void increment()
+  { nexter_(this->base_reference()); }
+
+  void decrement()
+  { nexter_(this->base_reference(), -1); }
+
+  void advance(difference_type n)
+  { nexter_(this->base_reference(), n); }
+
+  difference_type difference(const nexter_iterator& other, true_type) const
+  { return nexter_(this->base_reference(), other.base_reference()); }
+
+  difference_type difference(const nexter_iterator& other, false_type) const
+  { return inherit_iterator::difference(other); }
+
+  difference_type difference(const nexter_iterator& other) const
+  { return difference(other, integral_constant<bool, ContentsDistance>()); }
 };
 
-template <typename _Iterator, typename _Nexter>
-nexter_iterator<_Iterator, _Nexter> make_nexter_iterator(_Iterator x, const _Nexter& fn)
-{ return nexter_iterator<_Iterator, _Nexter>(x, fn); }
+template<class Iterator, class Nexter>
+nexter_iterator<Iterator, Nexter>
+make_nexter_iterator(Iterator x, Nexter fn)
+{ return nexter_iterator<Iterator, Nexter>(x, fn); }
 
 }}
 

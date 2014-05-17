@@ -308,26 +308,22 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 
 ///TODO utiliser un integer_iterator<const enum_t> ?
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_default(rule)\
-  ::falcon::detail::enum_class::enum_iterator<enum_t, \
-    ::falcon::iterator::nexter_iterator<\
-      ::falcon::iterator::integer_iterator<enum_t>,\
-      ::falcon::unary_compose<\
-        ::falcon::increment_emulation<enum_t>,\
-        ::falcon::pointer<falcon::iterator::integer_iterator<enum_t> >\
-      >\
+  ::falcon::iterator::nexter_iterator<\
+    ::falcon::iterator::integer_iterator<enum_t>,\
+    ::falcon::unary_compose<\
+      ::falcon::increment_emulation<enum_t>,\
+      ::falcon::pointer<falcon::iterator::integer_iterator<enum_t> >\
     >\
   >
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_linear(n)\
 	__FALCON_PP_ENUMERATOR_CONTAINER_RULE_default
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step(n) __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step_I
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step_I(rule)\
-  ::falcon::detail::enum_class::enum_iterator<enum_t, \
-    ::falcon::iterator::nexter_iterator<\
+  ::falcon::iterator::nexter_iterator<\
+    ::falcon::iterator::integer_iterator<enum_t>,\
+    ::falcon::detail::enum_class::__nexter_step<\
       ::falcon::iterator::integer_iterator<enum_t>,\
-      ::falcon::detail::enum_class::__nexter_step<\
-        ::falcon::iterator::integer_iterator<enum_t>,\
-        __FALCON_PP_LIST_ENUM_RULE_STEP_ ## rule\
-      >\
+      __FALCON_PP_LIST_ENUM_RULE_STEP_ ## rule\
     >\
 	>
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_linear_step(start, step)\

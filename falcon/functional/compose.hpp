@@ -3,14 +3,14 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/reference.hpp>
-#include <falcon/c++1x/syntax.hpp>
 #include <falcon/utility/move.hpp>
 #if __cplusplus >= 201103L
 # include <falcon/arg/arg.hpp>
-# include <falcon/helper/has_argument_type.hpp>
-# include <falcon/helper/has_result_type.hpp>
-# include <falcon/tuple/detail/is_tuple.hpp>
+# include <falcon/c++1x/syntax.hpp>
 # include <falcon/tuple/tuple_compose.hpp>
+# include <falcon/tuple/detail/is_tuple.hpp>
+# include <falcon/helper/has_result_type.hpp>
+# include <falcon/helper/has_argument_type.hpp>
 # include <tuple>
 #endif
 #include <functional>
@@ -31,30 +31,29 @@ namespace falcon {
  */
 #if __cplusplus < 201103L
 template <class Operation1, class Operation2>
-struct unary_compose
+class unary_compose
 : public std::unary_function<
 	typename Operation2::argument_type
 , typename Operation1::result_type
 >
 {
-protected:
-	Operation1 _M_fn1;
-	Operation2 _M_fn2;
+	Operation1 fn1;
+	Operation2 fn2;
 
 public:
 	unary_compose(const Operation1& x, const Operation2& y)
-	: _M_fn1(x)
-	, _M_fn2(y)
+	: fn1(x)
+	, fn2(y)
 	{}
 
 	unary_compose()
-	: _M_fn1()
-	, _M_fn2()
+	: fn1()
+	, fn2()
 	{}
 
 	typename Operation1::result_type
 	operator()(typename Operation2::argument_type& x) const
-	{ return _M_fn1(_M_fn2(x)); }
+	{ return fn1(fn2(x)); }
 };
 
 #else
@@ -138,49 +137,36 @@ compose1(Operation1 CPP_RVALUE_OR_CONST_REFERENCE fn1,
 /** The @c binary_compose is constructed from three functors, @c f, @c g1,
  * and @c g2.  Its @c operator() returns @c f(g1(x),g2(x)).  The function
  * @c compose2 takes f, g1 and g2, and constructs the @c binary_compose
- * instance for you.  For example, if @c f returns an int, then
- * \code
- * int answer = (compose2(f,g1,g2))(x);
- * \endcode
- * is equivalent to
- * \code
- * int temp1 = g1(x);
- * int temp2 = g2(x);
- * int answer = f(temp1,temp2);
- * \endcode
- * But the first form is more compact, and can be passed around as a
- * functor to other algorithms.
+ * instance for you.
  * @{
  */
 #if __cplusplus < 201103L
 template <class Operation1, class Operation2, class Operation3 = Operation2>
-struct binary_compose
+class binary_compose
 : public std::unary_function<
 	typename Operation2::argument_type
 , typename Operation1::result_type
 > {
-protected:
-	Operation1 _M_fn1;
-	Operation2 _M_fn2;
-	Operation3 _M_fn3;
+	Operation1 fn1;
+	Operation2 fn2;
+	Operation3 fn3;
 
 public:
-	binary_compose(const Operation1& x, const Operation2& y,
-				   const Operation3& z)
-	: _M_fn1(x)
-	, _M_fn2(y)
-	, _M_fn3(z)
+	binary_compose(const Operation1& x, const Operation2& y, const Operation3& z)
+	: fn1(x)
+	, fn2(y)
+	, fn3(z)
 	{}
 
 	binary_compose()
-	: _M_fn1()
-	, _M_fn2()
-	, _M_fn3()
+	: fn1()
+	, fn2()
+	, fn3()
 	{}
 
 	typename Operation1::result_type
 	operator()(typename Operation2::argument_type& x) const
-	{ return _M_fn1(_M_fn2(x), _M_fn3(x)); }
+	{ return fn1(fn2(x), fn3(x)); }
 };
 
 #else

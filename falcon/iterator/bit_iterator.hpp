@@ -1,5 +1,5 @@
-#ifndef _FALCON_ITERATOR_BIT_ITERATOR_HPP
-#define _FALCON_ITERATOR_BIT_ITERATOR_HPP
+#ifndef FALCON_ITERATOR_BIT_ITERATOR_HPP
+#define FALCON_ITERATOR_BIT_ITERATOR_HPP
 
 #include <falcon/iterator/iterator_handler.hpp>
 #include <falcon/bit/size.hpp>
@@ -11,163 +11,166 @@
 namespace falcon {
 namespace iterator {
 
-template <typename _Iterator, typename _T = typename std::iterator_traits<_Iterator>::pointer>
-struct __bit_iterator_is_const
-: false_type
-{};
+namespace _aux {
+  template <
+    class Iterator
+  , class T = typename std::iterator_traits<Iterator>::pointer>
+  struct bit_iterator_is_const
+  : false_type
+  {};
 
-template <typename _Iterator, typename _T>
-struct __bit_iterator_is_const<_Iterator, const _T *>
-: true_type
-{};
+  template <class Iterator, class T>
+  struct bit_iterator_is_const<Iterator, const T *>
+  : true_type
+  {};
 
-template <typename _Iterator>
-struct __bit_iterator_is_const<_Iterator, void>
-: true_type
-{};
+  template <class Iterator>
+  struct bit_iterator_is_const<Iterator, void>
+  : true_type
+  {};
+}
 
-template<typename _Iterator, bool _IsConst = __bit_iterator_is_const<_Iterator>::value>
+
+template<class Iterator, bool IsConst = _aux::bit_iterator_is_const<Iterator>::value>
 class bit_iterator;
 
 namespace detail
 {
-	template <typename _Iterator, bool _IsConst>
-	struct bit_base
-	{
-		struct __bit_reference_type {
-			typedef falcon::bit_reference<
-				typename std::iterator_traits<_Iterator>::value_type
-			> type;
-		};
+  template <class Iterator, bool IsConst>
+  struct bit_iterator_base
+  {
+    struct bit_reference_type {
+      typedef falcon::bit_reference<
+        class std::iterator_traits<Iterator>::value_type
+      > type;
+    };
 
-		typedef typename iterator_handler_types<
-			bit_iterator<_Iterator, _IsConst>,
-			_Iterator,
-			use_default,
-			bool,
-			use_default,
-			void,
-			typename eval_if<_IsConst, use<bool>, __bit_reference_type>::type
-		>::base base;
-	};
+    typedef typename iterator_handler_types<
+      bit_iterator<Iterator, IsConst>
+    , Iterator
+    , use_default
+    , bool
+    , use_default
+    , void
+    , class eval_if<IsConst, use<bool>, bit_reference_type>::type
+    >::type type;
+  };
 }
 
-template<typename _Iterator, bool _IsConst>
+template<class Iterator, bool IsConst>
 class bit_iterator
-: public detail::bit_base<_Iterator, _IsConst>::base
+: public detail::bit_iterator_base<Iterator, IsConst>::type
 {
-	typedef typename detail::bit_base<_Iterator, _IsConst>::base __base;
+  typedef typename detail::bit_iterator_base<Iterator, IsConst>::type inherit_type;
 
-	friend class iterator_core_access;
+  friend class iterator_core_access;
 
-	unsigned _M_offset;
+  unsigned offset_;
 
 public:
-	typedef typename __base::iterator_type iterator_type;
-	typedef typename __base::reference reference;
-	typedef typename __base::difference_type difference_type;
+  typedef typename inherit_type::iterator_type iterator_type;
+  typedef typename inherit_type::reference reference;
+  typedef typename inherit_type::difference_type difference_type;
 
 
-	bit_iterator(iterator_type __x, unsigned __offset)
-	: __base(__x), _M_offset(__offset)
-	{}
+  bit_iterator()
+  : inherit_type()
+  , offset_(0)
+  {}
 
-	bit_iterator()
-	: __base(), _M_offset(0)
-	{}
+  bit_iterator(iterator_type x, unsigned offset__)
+  : inherit_type(x)
+  , offset_(offset__)
+  {}
 
-	bit_iterator(const bit_iterator& __x)
-	: __base(__x), _M_offset(__x._M_offset)
-	{}
-
-	unsigned int offset() const
-	{ return _M_offset; }
-
-	void offset(unsigned int __offset)
-	{ _M_offset = __offset; }
+  unsigned offset() const
+  { return offset_; }
 
 private:
-	typedef typename std::iterator_traits<_Iterator>::value_type __mask_t;
-	static const unsigned _S_word_bit = bit::size<__mask_t>::value;
+  typedef typename std::iterator_traits<Iterator>::value_type mask_t;
+  static const unsigned s_word_bit = bit::size<mask_t>::value;
 
-	__mask_t mask() const
-	{ return static_cast<__mask_t>(1UL << _M_offset); }
+  mask_t mask() const
+  { return static_cast<mask_t>(1ul << offset_); }
 
-	reference dereference(false_type)
-	{ return reference(&*this->base_reference(), mask()); }
+  reference dereference(false_type)
+  { return reference(&*this->base_reference(), mask()); }
 
-	reference dereference(false_type) const
-	{ return reference(&*this->base_reference(), mask()); }
+  reference dereference(false_type) const
+  { return reference(&*this->base_reference(), mask()); }
 
-	reference dereference(true_type) const
-	{ return !!(*this->base_reference() & mask()); }
+  reference dereference(true_type) const
+  { return !!(*this->base_reference() & mask()); }
 
-	reference dereference()
-	{ return dereference(falcon::integral_constant<bool, _IsConst>()); }
+  reference dereference()
+  { return dereference(falcon::integral_constant<bool, IsConst>()); }
 
-	reference dereference() const
-	{ return dereference(falcon::integral_constant<bool, _IsConst>()); }
+  reference dereference() const
+  { return dereference(falcon::integral_constant<bool, IsConst>()); }
 
-	void increment()
-	{
-		if (_M_offset++ == _S_word_bit - 1u)
-		{
-			_M_offset = 0;
-			++this->base_reference();
-		}
-	}
+  void increment()
+  {
+    if (offset_++ == s_word_bit - 1u)
+    {
+      offset_ = 0;
+      ++this->base_reference();
+    }
+  }
 
-	void decrement()
-	{
-		if (_M_offset-- == 0)
-		{
-			_M_offset = _S_word_bit - 1u;
-			--this->base_reference();
-		}
-	}
+  void decrement()
+  {
+    if (offset_-- == 0)
+    {
+      offset_ = s_word_bit - 1u;
+      --this->base_reference();
+    }
+  }
 
-	void advance(difference_type __i)
-	{ move(__i); }
+  void advance(difference_type i)
+  {
+    difference_type n = i + offset_;
+    this->base_reference() += n / int(s_word_bit);
+    n = n % int(s_word_bit);
+    if (n < 0)
+    {
+      n += int(s_word_bit);
+      --this->base_reference();
+    }
+    offset_ = static_cast<unsigned>(n);
+  }
 
-	void recoil(difference_type __i)
-	{ move(-__i); }
+  difference_type difference(const bit_iterator& x) const
+  {
+    return difference_type(
+      (this->base_reference() - this->base_reference(x))
+      * s_word_bit + offset_
+      - x.offset_
+    );
+  }
 
-	void move(difference_type __i)
-	{
-		difference_type __n = __i + _M_offset;
-		this->base_reference() += __n / int(_S_word_bit);
-		__n = __n % int(_S_word_bit);
-		if (__n < 0)
-		{
-			__n += int(_S_word_bit);
-			--this->base_reference();
-		}
-		_M_offset = static_cast<unsigned>(__n);
-	}
+  bool equal(const bit_iterator& other) const
+  { return offset_ == other.offset_
+  && this->base_reference() == other.base_reference(); }
 
-	bool equal(const bit_iterator& other) const
-	{ return _M_offset == other._M_offset
-	&& this->base_reference() == other.base_reference(); }
-
-	bool less(const bit_iterator& other) const
-	{ return this->base_reference() < other.base_reference()
-	|| (_M_offset < other._M_offset
-	&& this->base_reference() == other.base_reference()); }
+  bool less(const bit_iterator& other) const
+  { return this->base_reference() < other.base_reference()
+  || (offset_ < other.offset_
+  && this->base_reference() == other.base_reference()); }
 };
 
 #if __cplusplus >= 201103L
-template <typename _Iterator>
-using const_bit_iterator = bit_iterator<_Iterator, true>;
+template <class Iterator>
+using const_bit_iterator = bit_iterator<Iterator, true>;
 #endif
 
 
-template <typename _Iterator>
-bit_iterator<_Iterator> make_bit_iterator(_Iterator x, unsigned offset)
-{ return bit_iterator<_Iterator>(x, offset); }
+template <class Iterator>
+bit_iterator<Iterator> make_bit_iterator(Iterator x, unsigned offset)
+{ return bit_iterator<Iterator>(x, offset); }
 
-template <typename _Iterator>
-bit_iterator<_Iterator, true> make_const_bit_iterator(_Iterator x, unsigned offset)
-{ return bit_iterator<_Iterator, true>(x, offset); }
+template <class Iterator>
+bit_iterator<Iterator, true> make_const_bit_iterator(Iterator x, unsigned offset)
+{ return bit_iterator<Iterator, true>(x, offset); }
 
 }}
 

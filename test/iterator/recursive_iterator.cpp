@@ -17,7 +17,7 @@ void recursive_iterator_test()
 			{4,5,6,7}
 		});
 
-		auto first = falcon::iterator::recursive_iterator<>(v);
+		auto first = falcon::iterator::recursive_iterator(v);
 		auto last = std::end(v[1]);
 
 		{
@@ -37,8 +37,8 @@ void recursive_iterator_test()
 		);
 
 		recursive_iterator random(true, std::begin(v[1])+2);
-		first = falcon::iterator::recursive_iterator<>(v);
-		std::advance<>(first, 6);
+		first = falcon::iterator::recursive_iterator(v);
+		std::advance(first, 6);
 		CHECK(first == random);
 	}
 
@@ -59,7 +59,7 @@ void recursive_iterator_test()
 		auto last1 = std::end(array);
 		auto last2 = std::end(*(last1-1));
 		recursive_iterator lastrec(true, std::begin(*(last2-1)));
-		auto rec = falcon::iterator::recursive_iterator<>(array);
+		auto rec = falcon::iterator::recursive_iterator(array);
 		CHECK_NOTYPENAME_TYPE(decltype(rec), recursive_iterator);
 		recursive_iterator tmp = rec;
 		(void)tmp;
@@ -94,7 +94,7 @@ void recursive_iterator_test()
 
 		v3_t cont{{{7}}};
 
-		auto rec = falcon::iterator::recursive_iterator<>(cont);
+		auto rec = falcon::iterator::recursive_iterator(cont);
 		decltype(rec) last;
 		CHECK_EQUAL_VALUE(7, *rec);
 		CHECK(rec != last);

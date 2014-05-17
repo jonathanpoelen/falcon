@@ -6,63 +6,65 @@
 namespace falcon {
 namespace iterator {
 
-template<typename _Category>
-struct __rank_category
-{ static const int __rank = 0; };
+namespace _aux {
+  template<class Category>
+  struct rank_category
+  { static const int rank = 0; };
 
-template<>
-struct __rank_category<std::output_iterator_tag>
-{ static const int __rank = 1; };
+  template<>
+  struct rank_category<std::output_iterator_tag>
+  { static const int rank = 1; };
 
-template<>
-struct __rank_category<std::forward_iterator_tag>
-{ static const int __rank = 2; };
+  template<>
+  struct rank_category<std::forward_iterator_tag>
+  { static const int rank = 2; };
 
-template<>
-struct __rank_category<std::bidirectional_iterator_tag>
-{ static const int __rank = 3; };
+  template<>
+  struct rank_category<std::bidirectional_iterator_tag>
+  { static const int rank = 3; };
 
-template<>
-struct __rank_category<std::random_access_iterator_tag>
-{ static const int __rank = 4; };
+  template<>
+  struct rank_category<std::random_access_iterator_tag>
+  { static const int rank = 4; };
 
-template<int _Rank>
-struct __rank_to_category
-{ typedef std::input_iterator_tag __type; };
+  template<int _Rank>
+  struct rank_to_category
+  { typedef std::input_iterator_tag type; };
 
-template<>
-struct __rank_to_category<1>
-{ typedef std::output_iterator_tag __type; };
+  template<>
+  struct rank_to_category<1>
+  { typedef std::output_iterator_tag type; };
 
-template<>
-struct __rank_to_category<2>
-{ typedef std::forward_iterator_tag __type; };
+  template<>
+  struct rank_to_category<2>
+  { typedef std::forward_iterator_tag type; };
 
-template<>
-struct __rank_to_category<3>
-{ typedef std::bidirectional_iterator_tag __type; };
+  template<>
+  struct rank_to_category<3>
+  { typedef std::bidirectional_iterator_tag type; };
 
-template<>
-struct __rank_to_category<4>
-{ typedef std::random_access_iterator_tag __type; };
+  template<>
+  struct rank_to_category<4>
+  { typedef std::random_access_iterator_tag type; };
+}
 
-template<typename _Category, typename _MinimalCategory>
+template<class Category, class MinimalCategory>
 struct minimal_iterator_category
 {
-	typedef typename __rank_to_category<(
-		(__rank_category<_Category>::__rank
-		< __rank_category<_MinimalCategory>::__rank)
-		? __rank_category<_Category>::__rank
-		: __rank_category<_MinimalCategory>::__rank)
-	>::__type type;
+  typedef typename _aux::rank_to_category<(
+		( _aux::rank_category<Category>::rank
+		< _aux::rank_category<MinimalCategory>::rank)
+		? _aux::rank_category<Category>::rank
+		: _aux::rank_category<MinimalCategory>::rank)
+	>::type type;
 };
 
-template<typename Iterator, typename _MinimalCategory>
+template<class Iterator, class MinimalCategory>
 struct minimal_iterator_category_for
 {
   typedef typename minimal_iterator_category<
     typename std::iterator_traits<Iterator>::iterator_category
-  , _MinimalCategory
+  , MinimalCategory
   >::type type;
 };
 

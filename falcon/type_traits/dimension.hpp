@@ -1,7 +1,7 @@
 #ifndef _FALCON_TYPE_TRAITS_DIMENSION_HPP
 #define _FALCON_TYPE_TRAITS_DIMENSION_HPP
 
-#include <falcon/iterator/contain_range_access.hpp>
+#include <falcon/container/contains_range_access.hpp>
 
 namespace falcon {
 
@@ -21,7 +21,7 @@ class dimension
 	};
 
 public:
-	static const std::size_t value = dimension_child<contain_range_access_iterator<_T>::value>::value;
+	static const std::size_t value = dimension_child<contains_range_access_iterator<_T>::value>::value;
 };
 
 }

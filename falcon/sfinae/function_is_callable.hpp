@@ -26,7 +26,7 @@
   \
   template<typename... Falcon_Args>\
   struct _Name : __falcon_##_Name##__is_callable_test<\
-    ::falcon::parameter_pack<Falcon_Args...>>::type {};
+    ::falcon::parameter_pack<Falcon_Args...>> {};
 
 
 # define FALCON_FUNCTION_IS_CALLABLE_AND_CONVERTIBLE_TRAIT_NAMED_DEF(_Name, _FuncName)\

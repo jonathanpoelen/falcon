@@ -40,7 +40,7 @@ namespace detail {
 			typename __handler_types::difference_type,
 			typename __handler_types::pointer,
 			typename __handler_types::reference
-		>::base base;
+		>::type type;
 	};
 
 }
@@ -53,11 +53,11 @@ template <typename _Iterator,
 	typename _Pointer
 >
 class iterator_iterator
-: public detail::iterators_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base
+: public detail::iterators_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::type
 {
 	friend class iterator_core_access;
 
-	typedef typename detail::iterators_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::base __base;
+	typedef typename detail::iterators_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::type __base;
 
 private:
 	std::size_t _pos;
