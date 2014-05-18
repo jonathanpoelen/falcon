@@ -64,10 +64,17 @@
 //   }
 // };
 
+#include <falcon/lambda2/lambda.hpp>
+#include <iostream>
 
 int main()
 {
 
+using namespace falcon::lambda2;
+
+int i = 2;
+(placeholders::_1 = 5)(i);
+  (std::cout << falcon::lambda2::placeholders::_1 << "\n")(i);
 
 
 

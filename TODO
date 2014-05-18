@@ -302,24 +302,23 @@ or_c and and_c (dans type_traits) à optimisé (ne fait pas ::value)
 
 array_view / bounds / index peuvent remplacer totalement coordinates ?
 
-synchroniser: une vue
+synchronizer: une vue
 
 un objet transaction qui dans son destructeur fait un commit si aucune exception n'est lancée, sinon un rollback (std::uncaught_exception())
 
-class_maker (renommage de late_maker)
+class_maker (renommage de late_maker) (différence avec build_class ?)
 
 comment le type interne des bucket des containers std::unordered_* ?
 
-classe pour de la composition de fonction compose<X>(function_variadic) ou compose(f)
-
-iterator: pas de construction explicite (induit une réduction de code dans enumerator.hpp)
 iterator: posibilité de compararer avec l'itérateur interne
 
-les sfinae prennent en parametre un namespace pour y mettre les classes dependante sans pourrir le namespace d'orgine
+les sfinae prennent en parametre un namespace pour y mettre les classes dependante sans pourrir le namespace d'origine
 
-iterator_iterator (changer le nom): It,ContIts=vector<range<It>>,Cat=forward. Abstraction haut niveau du contenaire d'oterateur. La comparaison se fait comment ? sur l'ensemble des elements ou uniquement sur le dernier si le premier est vide ?
+iterator_iterator (changer le nom): It,ContIts=vector<range<It>>,Cat=forward. Abstraction haut niveau du contenaire d'iterateur. La comparaison se fait comment ? sur l'ensemble des elements ou uniquement sur le dernier si le premier est vide ?
 
 compose1, compose2, composex -> make_compose (pour le C++11). Viré les constructeurs par defaut inutil
-compose.hpp: unary_check et std::unary_function utilisés lorsaue des binary sont attendus
+compose.hpp: unary_check et std::unary_function utilisés lorsque binary est attendu
+
+variable fonction pour les algorithmes, manipulateurs de flux, fonctions utilitaires (autre ?)
 
 

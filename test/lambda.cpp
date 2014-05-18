@@ -168,8 +168,8 @@ void lambda_test() {
 		using falcon::iostreams::resolve_manipulator;
 		(ss << phr::_1 << resolve_manipulator<char>(std::endl))(4);
 		(wss << phr::_1 << resolve_manipulator<wchar_t>(std::endl))(4);
-		(ss << phr::_1 << resolve_manipulator<>(ss, std::endl))(4);
-		(wss << phr::_1 << resolve_manipulator<>(wss, std::endl))(4);
+		(ss << phr::_1 << resolve_manipulator(ss, std::endl))(4);
+		(wss << phr::_1 << resolve_manipulator(wss, std::endl))(4);
 		CHECK_EQUAL_VALUE(ss.str(), "4\n4\n");
 		if (wss.str() != L"4\n4\n")
 			throw std::runtime_error(BOOST_PP_STRINGIZE(__LINE__));
