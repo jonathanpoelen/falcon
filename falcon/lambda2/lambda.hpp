@@ -19,7 +19,7 @@ template<class Op, class T = void, class U = void>
 struct lambda;
 
 template<class F>
-struct func_t {};
+struct func_t;
 
 template<
   class T
@@ -66,25 +66,40 @@ struct lambda_operators
   { return {std::mem_fn(mem), static_cast<const L&>(*this)}; }
 };
 
+template<class... Elements>
+struct lambda_with_tuple {
+  std::tuple<Elements...> t;
+
+  template<class... Args>
+  constexpr lambda_with_tuple(Args&&... args)
+  : t(std::forward<Args>(args)...)
+  {}
+
+  template<class T>
+  constexpr lambda_with_tuple(T&& x)
+  : t(std::move(x.t))
+  {}
+
+  template<class T>
+  constexpr lambda_with_tuple(T const & x)
+  : t(x.t)
+  {}
+};
+
 template<class Op, class T, class U>
 struct lambda
 : lambda_operators<lambda<Op, T, U>>
+, lambda_with_tuple<Op, T, U>
 {
-  std::tuple<Op, T, U> x;
-
-  template<class... Args>
-  constexpr lambda(Args&&... args)
-  : x(std::forward<Args>(args)...)
-  {}
-
+  using lambda_with_tuple<Op, T, U>::lambda_with_tuple;
   using lambda_operators<lambda<Op, T, U>>::operator=;
 
   template<class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION(
     operator()(Args&&... args) const
-  , std::get<0>(x)(
-      std::get<1>(x)(std::forward<Args>(args)...)
-    , std::get<2>(x)(std::forward<Args>(args)...)
+  , std::get<0>(this->t)(
+      std::get<1>(this->t)(std::forward<Args>(args)...)
+    , std::get<2>(this->t)(std::forward<Args>(args)...)
     )
   )
 };
@@ -92,21 +107,16 @@ struct lambda
 template<class Op, class T>
 struct lambda<Op, T, void>
 : lambda_operators<lambda<Op, T>>
+, lambda_with_tuple<Op, T>
 {
-  std::tuple<Op, T> x;
-
-  template<class... Args>
-  constexpr lambda(Args&&... args)
-  : x(std::forward<Args>(args)...)
-  {}
-
+  using lambda_with_tuple<Op, T>::lambda_with_tuple;
   using lambda_operators<lambda<Op, T>>::operator=;
 
   template<class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION(
     operator()(Args&&... args) const
-  , std::get<0>(x)(
-      std::get<1>(x)(std::forward<Args>(args)...)
+  , std::get<0>(this->t)(
+      std::get<1>(this->t)(std::forward<Args>(args)...)
     )
   )
 };
