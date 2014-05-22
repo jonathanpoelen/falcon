@@ -4,18 +4,22 @@
 #include <falcon/c++/constexpr.hpp>
 
 namespace falcon {
-#if __cplusplus >= 201103L
-template<typename... Args>
-constexpr inline void unused_variables(const Args&...)
-{}
-#else
-inline void unused_variables(...)
-{}
-#endif
 
-template<typename T>
-CPP_CONSTEXPR inline void unused_variable(const T&)
-{}
+CPP_GLOBAL_CONSTEXPR struct unused_variable_t
+{
+#if __cplusplus >= 201103L
+  template<class... Args>
+  constexpr void unused_variables(const Args&...) noexcept
+  {}
+#else
+  template<class T>
+  void unused_variable(const T&)
+  {}
+
+  void unused_variables(...)
+  {}
+#endif
+} unused_variable;
 
 }
 

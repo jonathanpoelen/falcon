@@ -307,9 +307,6 @@ operator >> ( std::basic_istream<CharT, Traits> & l
 
 }
 
-namespace detail {
-
-}
 
 template<int N>
 using placeholder = _aux::lambda<std::integral_constant<int, N>>;

@@ -321,4 +321,6 @@ compose.hpp: unary_check et std::unary_function utilisés lorsque binary est att
 
 variable fonction pour les algorithmes, manipulateurs de flux, fonctions utilitaires (autre ?)
 
+passer par des tuples quand les type interne peuvent être des structure vide
+
 

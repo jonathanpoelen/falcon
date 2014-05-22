@@ -116,8 +116,10 @@ constexpr _aux::lambda<
   _aux::condition_t<typename std::remove_reference<Condition>::type>
 , typename std::remove_reference<ThenPart>::type>
 if_(Condition && cond, ThenPart && then_part)
-{ return {std::forward<Condition>(cond)
-, std::forward<ThenPart>(then_part)}; }
+{ return {
+  std::forward<Condition>(cond)
+, std::forward<ThenPart>(then_part)
+}; }
 
 template<class Condition, class ThenPart, class ElsePart>
 constexpr _aux::lambda<
@@ -125,9 +127,11 @@ constexpr _aux::lambda<
 , typename std::remove_reference<ThenPart>::type
 , typename std::remove_reference<ElsePart>::type>
 if_(Condition && cond, ThenPart && then_part, ElsePart && else_part)
-{ return {std::forward<Condition>(cond)
+{ return {
+  std::forward<Condition>(cond)
 , std::forward<ThenPart>(then_part)
-, std::forward<ElsePart>(else_part)}; }
+, std::forward<ElsePart>(else_part)
+}; }
 
 template<class Condition, class ThenPart, class ElsePart>
 constexpr _aux::lambda<
@@ -135,9 +139,11 @@ constexpr _aux::lambda<
 , typename std::remove_reference<ThenPart>::type
 , typename std::remove_reference<ElsePart>::type>
 if_else(Condition && cond, ThenPart && then_part, ElsePart && else_part)
-{ return {std::forward<Condition>(cond)
+{ return {
+  std::forward<Condition>(cond)
 , std::forward<ThenPart>(then_part)
-, std::forward<ElsePart>(else_part)}; }
+, std::forward<ElsePart>(else_part)
+}; }
 
 template<class Condition, class ThenPart, class ElsePart>
 constexpr _aux::lambda<
@@ -145,9 +151,11 @@ constexpr _aux::lambda<
 , typename std::remove_reference<ThenPart>::type
 , typename std::remove_reference<ElsePart>::type>
 if_else_return(Condition && cond, ThenPart && then_part, ElsePart && else_part)
-{ return {std::forward<Condition>(cond)
+{ return {
+  std::forward<Condition>(cond)
 , std::forward<ThenPart>(then_part)
-, std::forward<ElsePart>(else_part)}; }
+, std::forward<ElsePart>(else_part)
+}; }
 
 }
 }
