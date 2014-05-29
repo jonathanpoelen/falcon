@@ -32,8 +32,7 @@ class filter_iterator
 {
   friend class iterator_core_access;
 
-  typedef typename detail::filter_iterator_base<
-    Iterator, Predicate, Category>::type inherit_type;
+  typedef typename filter_iterator::handler_type inherit_type;
 
 public:
   typedef Predicate predicate_type;

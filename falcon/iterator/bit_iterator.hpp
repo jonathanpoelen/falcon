@@ -61,7 +61,7 @@ template<class Iterator, bool IsConst>
 class bit_iterator
 : public detail::bit_iterator_base<Iterator, IsConst>::type
 {
-  typedef typename detail::bit_iterator_base<Iterator, IsConst>::type inherit_type;
+  typedef typename bit_iterator::handler_type inherit_type;
 
   friend class iterator_core_access;
 

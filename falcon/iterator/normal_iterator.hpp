@@ -53,8 +53,7 @@ class normal_iterator
 {
   friend class iterator_core_access;
 
-  typedef typename detail::normal_iterator_base<
-    Iterator, T, Category, Reference, Distance, Pointer>::type inherit_type;
+  typedef typename normal_iterator::handler_type inherit_type;
 
 public:
   typedef typename inherit_type::iterator_type iterator_type;

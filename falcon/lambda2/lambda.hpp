@@ -43,6 +43,8 @@ using to_lambda = typename to_lambda_impl<T>::type;
 template<class L>
 struct lambda_operators
 {
+  typedef lambda_operators operators_type;
+
   template<class I>
   constexpr lambda<arrow<>, L, I>
   operator[](I pos) const noexcept
@@ -67,7 +69,10 @@ struct lambda_operators
 };
 
 template<class... Elements>
-struct lambda_with_tuple {
+struct lambda_with_tuple
+{
+  typedef lambda_with_tuple with_tuple_type;
+
   std::tuple<Elements...> t;
 
   template<class... Args>
@@ -91,8 +96,8 @@ struct lambda
 : lambda_operators<lambda<Op, T, U>>
 , lambda_with_tuple<Op, T, U>
 {
-  using lambda_with_tuple<Op, T, U>::lambda_with_tuple;
-  using lambda_operators<lambda<Op, T, U>>::operator=;
+  using lambda::with_tuple_type::lambda_with_tuple;
+  using lambda::operators_type::operator=;
 
   template<class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION(
@@ -109,8 +114,8 @@ struct lambda<Op, T, void>
 : lambda_operators<lambda<Op, T>>
 , lambda_with_tuple<Op, T>
 {
-  using lambda_with_tuple<Op, T>::lambda_with_tuple;
-  using lambda_operators<lambda<Op, T>>::operator=;
+  using lambda::with_tuple_type::lambda_with_tuple;
+  using lambda::operators_type::operator=;
 
   template<class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION(
@@ -127,7 +132,7 @@ struct lambda<T, void, void>
 {
   T x;
 
-  using lambda_operators<lambda<T>>::operator=;
+  using lambda::operators_type::operator=;
 
   template<class U>
   constexpr lambda(U && xx)
@@ -143,7 +148,7 @@ template<int N>
 struct lambda<std::integral_constant<int, N>, void, void>
 : lambda_operators<lambda<std::integral_constant<int, N>>>
 {
-  using lambda_operators<lambda<std::integral_constant<int, N>>>::operator=;
+  using lambda::operators_type::operator=;
 
   template<class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION(

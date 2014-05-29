@@ -15,7 +15,7 @@ namespace _aux {
   struct lambda<condition_t<Condition>, ThenPart, void>
   : lambda_with_tuple<Condition, ThenPart>
   {
-    using lambda_with_tuple<Condition, ThenPart>::lambda_with_tuple;
+    using lambda::with_tuple_type::lambda_with_tuple;
 
     template<class... Args>
     constexpr void operator()(Args&&... args) const {
@@ -29,7 +29,7 @@ namespace _aux {
   struct lambda<condition_t<Condition>, ThenPart, ElsePart>
   : lambda_with_tuple<Condition, ThenPart, ElsePart>
   {
-    using lambda_with_tuple<Condition, ThenPart, ElsePart>::lambda_with_tuple;
+    using lambda::with_tuple_type::lambda_with_tuple;
 
     template<class... Args>
     constexpr void operator()(Args&&... args) const {
@@ -48,8 +48,10 @@ namespace _aux {
   template<class Condition, class ThenPart, class ElsePart>
   struct lambda<condition_return_t<Condition>, ThenPart, ElsePart>
   : lambda_with_tuple<Condition, ThenPart, ElsePart>
+  , lambda_operators<lambda<condition_return_t<Condition>, ThenPart, ElsePart>>
   {
-    using lambda_with_tuple<Condition, ThenPart, ElsePart>::lambda_with_tuple;
+    using lambda::with_tuple_type::lambda_with_tuple;
+    using lambda::operators_type::operator=;
 
     template<class... Args>
     constexpr CPP1X_DELEGATE_FUNCTION(

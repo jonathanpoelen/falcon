@@ -71,8 +71,7 @@ template<class T, class ComparisonTag, class Category>
 class integer_iterator
 : public detail::integer_iterator_base<T, ComparisonTag, Category>::type
 {
-  typedef typename detail::integer_iterator_base<
-    T, ComparisonTag, Category>::type inherit_type;
+  typedef typename integer_iterator::handler_type inherit_type;
 
   friend class iterator_core_access;
 
@@ -161,8 +160,7 @@ template<class T, class ComparisonTag, class Category>
 class reverse_integer_iterator
 : public detail::reverse_integer_iterator_base<T, ComparisonTag, Category>::type
 {
-  typedef typename detail::reverse_integer_iterator_base<
-    T, ComparisonTag, Category>::type inherit_type;
+  typedef typename reverse_integer_iterator::handler_type inherit_type;
 
   friend class iterator_core_access;
 
@@ -266,10 +264,7 @@ class integer_iterator_with_step
   integer_iterator_with_step
 , T, ComparisonTag, Category>::type
 {
-  typedef typename detail::integer_iterator_base_impl<
-    integer_iterator_with_step
-  , T, ComparisonTag, Category
-  >::type inherit_type;
+  typedef typename integer_iterator_with_step::handler_type inherit_type;
 
   friend class iterator_core_access;
 
@@ -379,11 +374,7 @@ class reverse_integer_iterator_with_step
 , integer_iterator<T, ComparisonTag, Category>
 , ComparisonTag, Category>::type
 {
-  typedef typename detail::integer_iterator_base_impl<
-    reverse_integer_iterator_with_step
-  , integer_iterator<T, ComparisonTag, Category>
-  , ComparisonTag, Category
-  >::type inherit_type;
+  typedef typename reverse_integer_iterator_with_step::handler_type inherit_type;
 
   friend class iterator_core_access;
 

@@ -8,11 +8,14 @@ namespace lambda2 {
 
 namespace _aux {
 
+  template<class...>
+  class for_t;
+
   template<class Init, class Condition, class Increment, class Part>
-  struct for_
+  struct lambda<for_t<Init, Condition, Increment, Part>>
   : lambda_with_tuple<Init, Condition, Increment, Part>
   {
-    using lambda_with_tuple<Init, Condition, Increment, Part>::lambda_with_tuple;
+    using lambda::with_tuple_type::lambda_with_tuple;
 
     template<class... Args>
     constexpr void operator()(Args&&... args) const {
@@ -24,11 +27,14 @@ namespace _aux {
     }
   };
 
+  template<class>
+  class while_t;
+
   template<class Condition, class Increment>
-  struct while_
+  struct lambda<while_t<Condition>, Increment>
   : lambda_with_tuple<Condition, Increment>
   {
-    using lambda_with_tuple<Condition, Increment>::lambda_with_tuple;
+    using lambda::with_tuple_type::lambda_with_tuple;
 
     template<class... Args>
     constexpr void operator()(Args&&... args) const {
@@ -38,11 +44,14 @@ namespace _aux {
     }
   };
 
+  template<class>
+  class do_while_t;
+
   template<class Condition, class Increment>
-  struct do_while
+  struct lambda<do_while_t<Condition>, Increment>
   : lambda_with_tuple<Condition, Increment>
   {
-    using lambda_with_tuple<Condition, Increment>::lambda_with_tuple;
+    using lambda::with_tuple_type::lambda_with_tuple;
 
     template<class... Args>
     constexpr void operator()(Args&&... args) const {
@@ -56,7 +65,7 @@ namespace _aux {
 
 template<class Init, class Condition, class Increment, class Part>
 constexpr
-_aux::for_<Init, Condition, Increment, Part>
+_aux::lambda<_aux::for_t<Init, Condition, Increment, Part>>
 for_(Init && x, Condition && c, Increment && next, Part && part)
 { return {
   std::forward<Init>(x)
@@ -67,7 +76,7 @@ for_(Init && x, Condition && c, Increment && next, Part && part)
 
 template<class Condition, class Part>
 constexpr
-_aux::while_<Condition, Part>
+_aux::lambda<_aux::while_t<Condition>, Part>
 while_(Condition && c, Part && part)
 { return {
   std::forward<Condition>(c)
@@ -76,7 +85,7 @@ while_(Condition && c, Part && part)
 
 template<class Condition, class Part>
 constexpr
-_aux::do_while<Condition, Part>
+_aux::lambda<_aux::do_while_t<Condition>, Part>
 do_while(Condition && c, Part && part)
 { return {
   std::forward<Condition>(c)

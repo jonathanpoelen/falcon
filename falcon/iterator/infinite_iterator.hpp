@@ -33,7 +33,7 @@ struct infinite_iterator
 {
   friend class iterator_core_access;
 
-  typedef typename detail::infinite_iterator_base<Iterator, Category>::type inherit_type;
+  typedef typename infinite_iterator::handler_type inherit_type;
 
 public:
   typedef typename inherit_type::iterator_type iterator_type;

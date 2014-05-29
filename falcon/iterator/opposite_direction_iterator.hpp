@@ -26,7 +26,7 @@ class opposite_direction_iterator
 {
   friend class iterator_core_access;
 
-  typedef typename detail::opposite_direction_base<Iterator>::type inherit_type;
+  typedef typename opposite_direction_iterator::handler_type inherit_type;
 
 public:
   typedef typename inherit_type::iterator_type iterator_type;

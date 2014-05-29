@@ -84,7 +84,7 @@ public:
   typedef typename inherit_type::difference_type difference_type;
   typedef typename inherit_type::reference reference;
 
-  typedef typename detail_type::proxy  proxy_type;
+  typedef typename detail_type::proxy proxy_type;
 
 private:
   proxy_type proxy_;

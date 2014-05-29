@@ -28,8 +28,7 @@ class nexter_iterator
 {
   friend class iterator_core_access;
 
-  typedef typename detail::nexter_iterator_base<
-    Iterator, Nexter, ContentsDistance>::type inherit_iterator;
+  typedef typename nexter_iterator::handler_type inherit_iterator;
 
 public:
   typedef Nexter nexter_type;

@@ -57,7 +57,7 @@ class iterator_iterator
 {
 	friend class iterator_core_access;
 
-	typedef typename detail::iterators_base<_Iterator, _Tp, _Category, _Reference, _Distance, _Pointer>::type __base;
+  typedef typename iterator_iterator::handler_type __base;
 
 private:
 	std::size_t _pos;

@@ -27,7 +27,7 @@ class zone_iterator
 {
   friend class iterator_core_access;
 
-  typedef typename detail::zone_base<Iterator>::type inherit_type;
+  typedef typename zone_iterator::handler_type inherit_type;
 
 public:
   typedef typename inherit_type::iterator_type iterator_type;

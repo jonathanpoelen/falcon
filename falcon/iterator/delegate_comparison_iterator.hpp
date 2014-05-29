@@ -28,8 +28,7 @@ class delegate_comparison_iterator
 {
   friend class iterator_core_access;
 
-  typedef typename detail::delegate_comparison_iterator_base<
-    Iterator, ComparisonIterator>::type inherit_type;
+  typedef typename delegate_comparison_iterator::handler_type inherit_type;
 
   ComparisonIterator cmp_iterator_;
 

@@ -180,6 +180,9 @@ class iterator_handler
 
   typedef std::iterator<Category, T, Distance, Pointer, Reference> inherit_type;
 
+protected:
+  typedef iterator_handler handler_type;
+
 
 public:
   typedef IteratorBase iterator_type;
