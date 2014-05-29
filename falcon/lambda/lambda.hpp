@@ -55,21 +55,21 @@ struct placeholder
 	inline CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), arg<_Num-1>(args...))
 
 	template<typename _T>
-	inline constexpr ___lambda<affect<>, placeholder<_Num>, const _T&> operator=(const _T& v)
+	inline constexpr ___lambda<assign<>, placeholder<_Num>, const _T&> operator=(const _T& v)
 	{
-		return CPP1X(affect<>{}, v);
+		return CPP1X(assign<>{}, v);
 	}
 
 	template<typename _T>
-	inline constexpr ___lambda<affect<>, placeholder<_Num>, _T> operator=(_T&& v)
+	inline constexpr ___lambda<assign<>, placeholder<_Num>, _T> operator=(_T&& v)
 	{
-		return CPP1X(affect<>{}, v);
+		return CPP1X(assign<>{}, v);
 	}
 
 	template<int _Num2>
-	inline constexpr ___lambda<affect<>, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
+	inline constexpr ___lambda<assign<>, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
 	{
-		return CPP1X(affect<>{});
+		return CPP1X(assign<>{});
 	}
 
 	template<typename _T, typename _Class>

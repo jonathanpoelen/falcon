@@ -2,6 +2,7 @@
 #define FALCON_LAMBDA2_LAMBDA_HPP
 
 #include <falcon/c++1x/syntax.hpp>
+#include <falcon/iostreams/is_ios.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/preprocessor/d_punctuation.hpp>
 
@@ -46,15 +47,25 @@ struct lambda_operators
   typedef lambda_operators operators_type;
 
   template<class I>
-  constexpr lambda<arrow<>, L, I>
+  constexpr lambda<index<>, L, to_lambda<I>>
   operator[](I pos) const noexcept
-  { return {arrow<>(), static_cast<const L&>(*this), std::move(pos)}; }
+  { return {index<>(), static_cast<const L&>(*this), to_lambda<I>{std::move(pos)}}; }
 
-  template<class T2>
-  constexpr lambda<affect<>, L, to_lambda<T2>>
-  operator=(T2 && x) const noexcept
-  { return {affect<>(), static_cast<const L&>(*this)
-  , to_lambda<T2>{std::forward<T2>(x)}}; }
+  template<class Op, class T, class U>
+  constexpr lambda<index<>, L, lambda<Op, T, U>>
+  operator[](lambda<Op, T, U> pos) const noexcept
+  { return {index<>(), static_cast<const L&>(*this), std::move(pos)}; }
+
+  template<class T>
+  constexpr lambda<assign<>, L, to_lambda<T>>
+  operator=(T && x) const noexcept
+  { return {assign<>(), static_cast<const L&>(*this)
+  , to_lambda<T>{std::forward<T>(x)}}; }
+
+  template<class Op, class T, class U>
+  constexpr lambda<assign<>, L, lambda<Op, T, U>>
+  operator=(lambda<Op, T, U> x) const noexcept
+  { return {assign<>(), static_cast<const L&>(*this), std::move(x)}; }
 
   template<class T2, class Class>
   constexpr auto
@@ -221,8 +232,6 @@ FALCON_MAKE_OPERATOR(-,  minus)
 FALCON_MAKE_OPERATOR(*,  multiplies)
 FALCON_MAKE_OPERATOR(/,  divides)
 FALCON_MAKE_OPERATOR(%,  modulus)
-FALCON_MAKE_OPERATOR(<<, left_shift)
-FALCON_MAKE_OPERATOR(>>, right_shift)
 FALCON_MAKE_OPERATOR(&,  bit_and)
 FALCON_MAKE_OPERATOR(|,  bit_or)
 FALCON_MAKE_OPERATOR(^,  bit_xor)
@@ -236,6 +245,11 @@ FALCON_MAKE_OPERATOR(<=, less_equal)
 FALCON_MAKE_OPERATOR(&&, logical_and)
 FALCON_MAKE_OPERATOR(||, logical_or)
 
+template<class = void>
+struct comma {
+  template<typename T, typename U>
+  constexpr CPP1X_DELEGATE_FUNCTION(operator()(T& a, U& b) const, (void(a) , b))
+};
 FALCON_MAKE_OPERATOR(FALCON_PP_D_COMMA, comma)
 
 #define FALCON_MAKE_OPERATOR_EQUAL(op, func_op)                      \
@@ -288,14 +302,63 @@ operator--(lambda<Op, T, U> x, int) noexcept
 { return {post_decrement<>(), std::move(x) }; }
 
 
-template<class CharT, class Traits, class Op1, class T1, class U1>
-constexpr lambda<left_shift<>
-, lambda<std::basic_ostream<CharT, Traits>&>
-, lambda<Op1, T1, U1>>
-operator << ( std::basic_ostream<CharT, Traits> & l
-            , lambda<Op1, T1, U1> r) noexcept
-{ return {left_shift<>()
-, lambda<std::basic_ostream<CharT, Traits>&>{l}
+#define FALCON_MAKE_OPERATOR(op, func_op)                                   \
+  template<class Op1, class T1, class U1, class Op2, class T2, class U2>    \
+  constexpr lambda<func_op<>, lambda<Op1, T1, U1>, lambda<Op2, T2, U2>>     \
+  operator op (lambda<Op1, T1, U1> l, lambda<Op2, T2, U2> r) noexcept       \
+  { return {func_op<>(), std::move(l), std::move(r)}; }                     \
+                                                                            \
+  template<class Op1, class T1, class U1, class T>                          \
+  constexpr lambda<func_op<>, lambda<Op1, T1, U1>, to_lambda<T>>            \
+  operator op (lambda<Op1, T1, U1> l, T && r) noexcept                      \
+  { return {func_op<>(), std::move(l), to_lambda<T>{std::forward<T>(r)}}; }
+
+FALCON_MAKE_OPERATOR(<<, left_shift)
+FALCON_MAKE_OPERATOR(>>, right_shift)
+
+#undef FALCON_MAKE_OPERATOR
+
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  iostreams::is_ostream<T>::value
+, lambda<left_shift<>, lambda<T&>, lambda<Op1, T1, U1>>
+>::type
+operator << (T & l, lambda<Op1, T1, U1> r) noexcept
+{ return {left_shift_f
+, lambda<T&>{l}
+, std::move(r)
+}; }
+
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  !iostreams::is_ostream<T>::value
+, lambda<left_shift<>, lambda<T>, lambda<Op1, T1, U1>>
+>::type
+operator << (T && l, lambda<Op1, T1, U1> r) noexcept
+{ return {left_shift_f
+, lambda<T>{std::forward<T>(l)}
+, std::move(r)
+}; }
+
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  iostreams::is_istream<T>::value
+, lambda<right_shift<>, lambda<T&>, lambda<Op1, T1, U1>>
+>::type
+operator >> (T & l, lambda<Op1, T1, U1> r) noexcept
+{ return {right_shift_f
+, lambda<T&>{l}
+, std::move(r)
+}; }
+
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  !iostreams::is_istream<T>::value
+, lambda<right_shift<>, lambda<T>, lambda<Op1, T1, U1>>
+>::type
+operator >> (T && l, lambda<Op1, T1, U1> r) noexcept
+{ return {right_shift_f
+, lambda<T>{std::forward<T>(l)}
 , std::move(r)
 }; }
 

@@ -1,14 +1,14 @@
 #include <array>
 #include <test/test.hpp>
 #include <falcon/logical.hpp>
-#include <falcon/logical/between_minmax.hpp>
+#include <falcon/math/clamp.hpp>
 #include "logical.hpp"
 
 void logical_test()
 {
-	CHECK_EQUAL_VALUE(0,  falcon::between_minmax(-5,0,5));
-	CHECK_EQUAL_VALUE(-5, falcon::between_minmax(-5,-10,5));
-	CHECK_EQUAL_VALUE(5,  falcon::between_minmax(-5,10,5));
+	CHECK_EQUAL_VALUE(0,  falcon::clamp(-5,0,5));
+	CHECK_EQUAL_VALUE(-5, falcon::clamp(-5,-10,5));
+	CHECK_EQUAL_VALUE(5,  falcon::clamp(-5,10,5));
 
 	STATIC_ASSERT(-1 == falcon::compare(0,1));
 	STATIC_ASSERT(1 == falcon::compare(1,0));

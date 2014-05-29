@@ -11,7 +11,7 @@ namespace _aux {
   struct switch_action_default
   {
     template<class... Args>
-    constexpr void operator()(Args const &...) const noexcept {
+    void operator()(Args const &...) const noexcept {
     }
   };
 
@@ -24,7 +24,7 @@ namespace _aux {
     Func act;
 
     template<class... Args>
-    constexpr void operator()(Args && ... args) const {
+    void operator()(Args && ... args) const {
       act(std::forward<Args...>(args...));
     }
   };
@@ -35,7 +35,7 @@ namespace _aux {
     Func act;
 
     template<class... Args>
-    constexpr void operator()(Args && ... args) const {
+    void operator()(Args && ... args) const {
       act(std::forward<Args...>(args...));
     }
   };
@@ -50,7 +50,7 @@ namespace _aux {
     using lambda::with_tuple_type::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         default :
           std::get<1>(this->t)(std::forward<Args>(args)...);
@@ -65,7 +65,7 @@ namespace _aux {
     using lambda::with_tuple_type::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -83,7 +83,7 @@ namespace _aux {
     using lambda_with_tuple<Condition, Default, Case1, Case2>::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -106,7 +106,7 @@ namespace _aux {
     >::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -133,7 +133,7 @@ namespace _aux {
     >::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -164,7 +164,7 @@ namespace _aux {
     >::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -199,7 +199,7 @@ namespace _aux {
     >::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -237,7 +237,7 @@ namespace _aux {
     >::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -278,7 +278,7 @@ namespace _aux {
     >::lambda_with_tuple;
 
     template<class... Args>
-    constexpr void operator()(Args&&... args) const {
+    void operator()(Args&&... args) const {
       switch (std::get<0>(this->t)(std::forward<Args>(args)...)) {
         case Case1::value :
           std::get<2>(this->t)(std::forward<Args>(args)...);
@@ -677,7 +677,7 @@ switch_statement(Condition && cond, Action1 && act1, Action2 && act2)
 }; }
 
 template<class Condition, class Action1, class Default>
-constexpr _aux::lambda<Condition, _aux::switch_action<Default, Action1>>
+_aux::lambda<Condition, _aux::switch_action<Default, Action1>>
 switch_statement(Condition && cond, Action1 && act1, _aux::case_default<Default> && def)
 { return {
   std::forward<Condition>(cond)
@@ -686,7 +686,7 @@ switch_statement(Condition && cond, Action1 && act1, _aux::case_default<Default>
 }; }
 
 template<class Condition, class Action1, class Default>
-constexpr _aux::lambda<Condition, _aux::switch_action<Default, Action1>>
+_aux::lambda<Condition, _aux::switch_action<Default, Action1>>
 switch_statement(Condition && cond, Action1 && act1, _aux::case_default<Default> def)
 { return {
   std::forward<Condition>(cond)
@@ -705,7 +705,7 @@ switch_statement(Condition && cond, Action1 && act1)
 }; }
 
 template<class Condition, class Default>
-constexpr _aux::lambda<Condition, _aux::switch_action<Default>>
+_aux::lambda<Condition, _aux::switch_action<Default>>
 switch_statement(Condition && cond, _aux::case_default<Default> && def)
 { return {
   std::forward<Condition>(cond)
@@ -713,7 +713,7 @@ switch_statement(Condition && cond, _aux::case_default<Default> && def)
 }; }
 
 template<class Condition, class Default>
-constexpr _aux::lambda<Condition, _aux::switch_action<Default>>
+_aux::lambda<Condition, _aux::switch_action<Default>>
 switch_statement(Condition && cond, _aux::case_default<Default> def)
 { return {
   std::forward<Condition>(cond)
@@ -721,12 +721,12 @@ switch_statement(Condition && cond, _aux::case_default<Default> def)
 }; }
 
 template<long long Label, class Function>
-constexpr _aux::case_action<Label, Function>
+_aux::case_action<Label, Function>
 case_statement(Function && f)
 { return {std::forward<Function>(f)}; }
 
 template<class Function>
-constexpr _aux::case_default<Function>
+_aux::case_default<Function>
 default_statement(Function && f)
 { return {std::forward<Function>(f)}; }
 

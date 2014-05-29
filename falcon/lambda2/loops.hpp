@@ -30,9 +30,9 @@ namespace _aux {
   template<class>
   class while_t;
 
-  template<class Condition, class Increment>
-  struct lambda<while_t<Condition>, Increment>
-  : lambda_with_tuple<Condition, Increment>
+  template<class Condition, class Part>
+  struct lambda<while_t<Condition>, Part>
+  : lambda_with_tuple<Condition, Part>
   {
     using lambda::with_tuple_type::lambda_with_tuple;
 
@@ -47,9 +47,9 @@ namespace _aux {
   template<class>
   class do_while_t;
 
-  template<class Condition, class Increment>
-  struct lambda<do_while_t<Condition>, Increment>
-  : lambda_with_tuple<Condition, Increment>
+  template<class Condition, class Part>
+  struct lambda<do_while_t<Condition>, Part>
+  : lambda_with_tuple<Condition, Part>
   {
     using lambda::with_tuple_type::lambda_with_tuple;
 
