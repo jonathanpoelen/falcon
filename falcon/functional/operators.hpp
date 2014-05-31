@@ -151,7 +151,7 @@ struct index_emulation;
  * @{
  */
 template<typename T = void, typename U = T>
-struct affect;
+struct assign;
 //@}
 
 /**
@@ -227,7 +227,7 @@ FALCON_CREATE_OPERATORS(bit_or    , |)
 FALCON_CREATE_OPERATORS(bit_xor   , ^)
 
 template<typename T, typename U>
-struct affect
+struct assign
 {
   typedef T argument_type;
   typedef T result_type;
@@ -236,7 +236,7 @@ struct affect
   { return a = FALCON_FORWARD(U, b); }
 };
 
-FALCON_CREATE_OPERATOR_VOID(affect, =, noop)
+FALCON_CREATE_OPERATOR_VOID(assign, =, noop)
 
 FALCON_CREATE_OPERATOR2(left_shift , <<)
 FALCON_CREATE_OPERATOR2(right_shift, >>)
@@ -802,7 +802,7 @@ CPP_GLOBAL_CONSTEXPR index_emulation<> index_emulation_f;
  * Affectation
  * @{
  */
-CPP_GLOBAL_CONSTEXPR affect<> affect_f;
+CPP_GLOBAL_CONSTEXPR assign<> assign_f;
 //@}
 
 /**

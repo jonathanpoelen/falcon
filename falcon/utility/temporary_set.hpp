@@ -12,7 +12,7 @@
 namespace falcon {
 
 ///\brief Modifies the value passed during the lifetime of the object
-template<class T, class Assigner = affect<T, T> >
+template<class T, class Assigner = assign<T, T> >
 class temporary_set
 {
   T * _value;

@@ -19,7 +19,7 @@
 
 namespace falcon {
 
-template<typename T, typename Alloc = std::allocator<T> >
+template<class T, class Alloc = std::allocator<T> >
 class free_list
 {
   struct Node
@@ -29,9 +29,9 @@ class free_list
   };
 
 public:
-  static const std::size_t _S_align
+  static const std::size_t s_align
     = FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<T>::value;
-  static const std::size_t _S_heap = (_S_align > sizeof(Node)) ? _S_align : sizeof(Node);
+  static const std::size_t s_heap = (s_align > sizeof(Node)) ? s_align : sizeof(Node);
 
 public:
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc>
@@ -48,49 +48,50 @@ public:
 
 public:
   explicit free_list(size_type size_alloc) CPP_NOEXCEPT_OPERATOR2(allocator_type())
-  : m_node(0)
-  , m_size_alloc(size_alloc)
-  , m_allocator()
+  : node_(0)
+  , size_alloc_(size_alloc)
+  , allocator_()
   {}
 
   free_list(size_type size_alloc, const allocator_type& allocator)
   CPP_NOEXCEPT_OPERATOR2(allocator_type(allocator))
-  : m_node(0)
-  , m_size_alloc(size_alloc)
-  , m_allocator(allocator)
+  : node_(0)
+  , size_alloc_(size_alloc)
+  , allocator_(allocator)
   {}
 
-  template<typename CPP_PACK Args>
+  template<class CPP_PACK Args>
   free_list(size_type size_alloc, Args CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK args)
   CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_PACK))
-  : m_node(0)
-  , m_size_alloc(size_alloc)
-  , m_allocator(FALCON_FORWARD(Args, args)CPP_PACK)
+  : node_(0)
+  , size_alloc_(size_alloc)
+  , allocator_(FALCON_FORWARD(Args, args)CPP_PACK)
   {}
 
 #if __cplusplus >= 201103L
   free_list(size_type size_alloc, allocator_type&& allocator)
   CPP_NOEXCEPT_OPERATOR2(allocator_type(std::forward<allocator_type>(allocator)))
-  : m_node(0)
-  , m_size_alloc(size_alloc)
-  , m_allocator(std::forward<allocator_type>(allocator))
+  : node_(0)
+  , size_alloc_(size_alloc)
+  , allocator_(std::forward<allocator_type>(allocator))
   {}
 
   free_list(free_list&& other)
-  CPP_NOEXCEPT_OPERATOR2(std::forward<allocator_type>(other.m_allocator))
-  : m_node(other.m_node)
-  , m_size_alloc(other.m_size_alloc)
-  , m_allocator(std::forward<allocator_type>(other.m_allocator))
-  { other.m_node = 0; }
+  CPP_NOEXCEPT_OPERATOR2(std::forward<allocator_type>(other.allocator_))
+  : node_(other.node_)
+  , size_alloc_(other.size_alloc_)
+  , allocator_(std::forward<allocator_type>(other.allocator_))
+  { other.node_ = 0; }
 
   free_list& operator=(free_list&& other)
-  CPP_NOEXCEPT_OPERATOR2(other.m_allocator = std::forward<allocator_type>(other.m_allocator))
+  CPP_NOEXCEPT_OPERATOR2(
+    other.allocator_ = std::forward<allocator_type>(other.allocator_))
   {
     clear();
-    m_node = other.m_node;
-    m_size_alloc = other.m_size_alloc;
-    m_allocator = std::forward<allocator_type>(other.m_allocator);
-    other.m_node = 0;
+    node_ = other.node_;
+    size_alloc_ = other.size_alloc_;
+    allocator_ = std::forward<allocator_type>(other.allocator_);
+    other.node_ = 0;
   }
 
   free_list(const free_list&) = delete;
@@ -109,67 +110,69 @@ public:
 
   pointer alloc()
   {
-    if ( ! m_node) {
+    if ( ! node_) {
       return reinterpret_cast<pointer>(
-        allocator_traits::allocate(m_allocator,
-                                   _S_heap + m_size_alloc * sizeof(T)) + _S_heap
+        allocator_traits::allocate(
+          allocator_
+        , s_heap + size_alloc_ * sizeof(T)) + s_heap
       );
     }
-    pointer ret = reinterpret_cast<pointer>(m_node->data);
-    m_node = m_node->next;
+    pointer ret = reinterpret_cast<pointer>(node_->data);
+    node_ = node_->next;
     return ret;
   }
 
   void free(pointer p)
   {
-    Node * tmp = m_node;
-    m_node = reinterpret_cast<Node*>(byte_cast(p) - _S_heap);
-    m_node->next = tmp;
+    Node * tmp = node_;
+    node_ = reinterpret_cast<Node*>(byte_cast(p) - s_heap);
+    node_->next = tmp;
   }
 
   void clear() CPP_NOEXCEPT
   {
-    while (m_node) {
-      Node * node = m_node->next;
-      allocator_traits::deallocate(m_allocator, byte_cast(m_node),
-                                   _S_heap + m_size_alloc * sizeof(T));
-      m_node = node;
+    while (node_) {
+      Node * node = node_->next;
+      allocator_traits::deallocate(
+        allocator_, byte_cast(node_)
+      , s_heap + size_alloc_ * sizeof(T));
+      node_ = node;
     }
   }
 
   size_type count_by_alloc() const
-  { return m_size_alloc; }
+  { return size_alloc_; }
 
   void merge(free_list& other)
   {
-    if (other.m_size_alloc < m_size_alloc) {
+    if (other.size_alloc_ < size_alloc_) {
       throw std::underflow_error("free_list::merge");
     }
 
-    if (m_node) {
-      Node * node = m_node;
+    if (node_) {
+      Node * node = node_;
       while (node->next) {
         node = node->next;
       }
-      node->next = other.m_node;
+      node->next = other.node_;
     }
     else {
-      m_node = other.m_node;
+      node_ = other.node_;
     }
 
-    other.m_node = 0;
+    other.node_ = 0;
   }
 
   bool operator==(const free_list& rhs) const
-  { return m_size_alloc == rhs.m_size_alloc && m_allocator == rhs.m_allocator; }
+  { return size_alloc_ == rhs.size_alloc_ && allocator_ == rhs.allocator_; }
 
   bool operator!=(const free_list& rhs) const
   { return !operator==(rhs); }
 
 private:
-  Node * m_node;
-  size_type m_size_alloc;
-  allocator_type m_allocator;
+  Node * node_;
+  size_type size_alloc_;
+  allocator_type allocator_;
 };
 
 }

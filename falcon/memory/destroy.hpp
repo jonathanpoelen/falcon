@@ -18,15 +18,15 @@ namespace falcon {
  * Destroy the object pointed to by a pointer type.
  */
 CPP_GLOBAL_CONSTEXPR struct destroy_t {
-  template<typename T>
+  template<class T>
   void operator()(T * p) const
   { p->~T(); }
 
-  template<typename T, std::size_t N>
+  template<class T, std::size_t N>
   void operator()(T (* p)[N]) const
   { operator()(*p, N); }
 
-  template<typename T>
+  template<class T>
   void operator()(T * p, std::size_t n) const
   {
     for (T * ep = p + n; p != ep; ++p) {
@@ -34,24 +34,34 @@ CPP_GLOBAL_CONSTEXPR struct destroy_t {
     }
   }
 
+  template<class T>
+  void operator()(T & p) const
+  { p.~T(); }
+
+  template<class T, std::size_t N>
+  void operator()(T (& p)[N]) const
+  { operator()(p, N); }
+
   /**
   * Destroy a range of objects. If the value_type of the object has
   * a trivial destructor, the compiler should optimize all of this
   * away, otherwise the objects' destructors must be invoked.
   */
-  template<typename ForwardIterator>
+  template<class ForwardIterator>
   void operator()(ForwardIterator first, ForwardIterator last) const
   {
     destroy_aux(integral_constant<bool,
 #if __cplusplus >= 201103L
-      std::is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>::value
+      std::is_trivially_destructible<
+        typename std::iterator_traits<ForwardIterator>::value_type
+      >::value
 #else
       false
 #endif
     >(), first, last);
   }
 
-  template<typename ForwardIterator, typename Allocator>
+  template<class ForwardIterator, class Allocator>
   void operator()(ForwardIterator first, ForwardIterator last, Allocator& alloc) const
   {
     for (; first != last; ++first) {
@@ -60,16 +70,18 @@ CPP_GLOBAL_CONSTEXPR struct destroy_t {
   }
 
 private:
-  template<typename ForwardIterator>
-  void destroy_aux(integral_constant<bool, false>, ForwardIterator first, ForwardIterator last) const
+  template<class ForwardIterator>
+  void destroy_aux(
+    integral_constant<bool, false>, ForwardIterator first, ForwardIterator last) const
   {
     for (; first != last; ++first) {
       operator()(falcon::addressof(*first));
     }
   }
 
-  template<typename ForwardIterator>
-  void destroy_aux(integral_constant<bool, true>, ForwardIterator, ForwardIterator) const CPP_NOEXCEPT
+  template<class ForwardIterator>
+  void destroy_aux(integral_constant<bool, true>, ForwardIterator, ForwardIterator)
+  const CPP_NOEXCEPT
   {}
 } destroy;
 

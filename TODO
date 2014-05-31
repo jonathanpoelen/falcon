@@ -323,4 +323,5 @@ variable fonction pour les algorithmes, manipulateurs de flux, fonctions utilita
 
 passer par des tuples quand les type interne peuvent être des structure vide
 
+constructor<T>, destructor(pa|a), new_ptr<T>, new_array<T>(sz|arg_list...), delete_ptr, delete_array,
 

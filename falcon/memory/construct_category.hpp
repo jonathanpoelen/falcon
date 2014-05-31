@@ -6,7 +6,7 @@
 #if __cplusplus <= 201103L
 #include <type_traits>
 namespace std {
-	template<typename, std::size_t>
+	template<class, std::size_t>
 	class array;
 }
 
@@ -17,31 +17,35 @@ struct brace_init_tag {};
 struct double_brace_init_tag {};
 struct dispatch_index_tag {};
 
-template<typename T>
+template<class T>
 struct construct_category
-: std::conditional<std::has_trivial_default_constructor<T>::value, brace_init_tag, normal_ctor_tag>
+: std::conditional<
+  std::has_trivial_default_constructor<T>::value,
+  brace_init_tag,
+  normal_ctor_tag
+>
 {};
 
-template<typename T, std::size_t N>
+template<class T, std::size_t N>
 struct construct_category<std::array<T, N>>
 {
 	typedef double_brace_init_tag type;
 };
 
-template<typename T, std::size_t N>
+template<class T, std::size_t N>
 struct construct_category<T[N]>
 {
 	typedef dispatch_index_tag type;
 };
 
-template<typename T>
+template<class T>
 using construct_category_t = typename construct_category<T>::type;
 
 }
 #else
 namespace falcon {
 	struct normal_ctor_tag {};
-	template<typename T>
+	template<class T>
 	struct construct_category
 	{
 		typedef normal_ctor_tag type;

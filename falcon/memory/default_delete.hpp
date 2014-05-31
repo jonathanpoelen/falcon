@@ -1,6 +1,7 @@
 #ifndef FALCON_MEMORY_DEFAULT_DELETE_HPP
 #define FALCON_MEMORY_DEFAULT_DELETE_HPP
 
+#include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 
 #if __cplusplus >= 201103L
@@ -15,19 +16,19 @@
 namespace falcon {
 
 #if __cplusplus >= 201103L
-template<typename T>
+template<class T>
 struct default_delete
 : std::default_delete<T>
 {};
 #else
-template<typename T>
+template<class T>
 struct default_delete
 {
   void operator()(T* p) const
   { delete p; }
 };
 
-template<typename T>
+template<class T>
 struct default_delete<T[]>
 {
   void operator()(T* p) const
@@ -35,13 +36,8 @@ struct default_delete<T[]>
 };
 #endif
 
-template<typename T, std::size_t N>
-struct default_delete<T[N]>
-: default_delete<T[]>
-{};
 
-
-template<typename T>
+template<class T>
 struct default_delete_then_zero
 {
   void operator()(typename FALCON_BOOST_OR_STD_NAMESPACE::remove_extent<T>::type * & p) const
@@ -52,28 +48,45 @@ struct default_delete_then_zero
 };
 
 
-template<typename ForwardIterator>
+CPP_GLOBAL_CONSTEXPR struct delete_ptr_t {
+  template<class T>
+  void operator()(T * p) const
+  { default_delete<T>()(p); }
+} delete_ptr;
+
+CPP_GLOBAL_CONSTEXPR struct delete_array_t {
+  template<class T>
+  void operator()(T * p) const
+  { default_delete<T[]>()(p); }
+} delete_array;
+
+
+CPP_GLOBAL_CONSTEXPR struct delete_ptr_then_zero_t {
+  template<class T>
+  void operator()(T * & p) const
+  { default_delete_then_zero<T>()(p); }
+} delete_ptr_then_zero;
+
+CPP_GLOBAL_CONSTEXPR struct delete_array_then_zero_t {
+  template<class T>
+  void operator()(T * & p) const
+  { default_delete_then_zero<T[]>()(p); }
+} delete_array_then_zero;
+
+
+template<class ForwardIterator>
 void default_deleter(ForwardIterator first, ForwardIterator last)
 {
-  typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_pointer<
-    typename std::iterator_traits<ForwardIterator>::value_type
-  >::type pointer;
-  default_delete<pointer> deleter;
   for (; first != last; ++first) {
-    deleter(*first);
+    delete_ptr(*first);
   }
 }
 
-template<typename ForwardIterator>
+template<class ForwardIterator>
 void default_deleter_then_zero(ForwardIterator first, ForwardIterator last)
 {
-  typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_pointer<
-    typename std::iterator_traits<ForwardIterator>::value_type
-  >::type pointer;
-  default_delete_then_zero<pointer> deleter;
   for (; first != last; ++first) {
-    deleter(*first);
-    *first = 0;
+    delete_ptr_then_zero(*first);
   }
 }
 

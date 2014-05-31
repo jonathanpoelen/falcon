@@ -11,166 +11,174 @@ namespace falcon {
 template <class T, class Dp = std::default_delete<T>, class Cp = default_new<T>>
 struct deep_ptr
 {
-public:
   using pointer = typename std::unique_ptr<T, Dp>::pointer;
   using element_type = T;
   using deleter_type = Dp;
   using copier_type = Cp;
 
 private:
-  struct Copier
-  {
-    Copier() noexcept = default;
-    Copier(Copier const &) noexcept = default;
-
-    Copier(typename std::conditional<std::is_reference<Cp>::value,
-      Cp, const Cp&>::type c) noexcept
-    : copier_(c)
-    { }
-
-    Copier(typename std::remove_reference<Cp>::type&& c) noexcept
-    : copier_(std::move(c))
-    { static_assert(!std::is_reference<Cp>::value,
-      "rvalue copier bound to reference"); }
-
-    template<class U, class Ep, class Fp, class = typename std::enable_if<
+  template<class U, class Ep, class Fp>
+  struct IsEnable
+  : std::integral_constant<
+    bool,
     (std::is_convertible<typename deep_ptr<U, Ep, Fp>::pointer, pointer>::value
-      && !std::is_array<U>::value
-      && std::conditional<std::is_reference<Cp>::value,
+    && !std::is_array<U>::value
+    && std::conditional<std::is_reference<Cp>::value,
       std::is_same<Fp, Cp>,
       std::is_convertible<Fp, Cp>
-      >::type::value)>::type>
-    Copier(deep_ptr<U, Ep, Fp>&& u) noexcept
-    : copier_(std::forward<Fp>(u.get_copier()))
-    { }
+    >::type::value)
+  > {};
 
-    pointer operator()(pointer const & p) noexcept(noexcept(std::declval<Cp>()(*p)))
-    { return copier_(*p); }
+  template<class U, class Ep, class Fp, bool b = true>
+  struct EnableIf
+  : std::enable_if<b == IsEnable<U, Ep, Fp>::value>
+  {};
 
-    Cp copier_;
-  };
+  using unique_ptr = std::unique_ptr<T, Dp>;
 
 public:
-  constexpr deep_ptr(std::nullptr_t) noexcept : deep_ptr() { }
+  constexpr deep_ptr() noexcept
+  { static_assert(!std::is_pointer<copier_type>::value,
+    "constructed with null function pointer copier"); }
+
+  explicit deep_ptr(pointer p)
+  :t(unique_ptr(p), copier_type())
+  { static_assert(!std::is_pointer<copier_type>::value,
+    "constructed with null function pointer copier"); }
 
   deep_ptr(deep_ptr const & other)
-  : copier_(other.copier_)
-  , ptr_{other ? copier_(other.get()) : nullptr} {}
+  : t(unique_ptr{other
+    ? other.get_copier()(*other.get())
+    : pointer(), other.get_deleter()}, other.get_copier())
+  {}
 
-  constexpr deep_ptr() noexcept
-  : copier_()
+  deep_ptr(deep_ptr && other)
+  : t(std::move(std::get<0>(other.t)), std::forward<copier_type>(other.get_copier()))
+  {}
+
+  template<class U, class Dp2, class Cp2, class = typename EnableIf<T, Dp2, Cp2>::type>
+  deep_ptr(const deep_ptr<U, Dp2, Cp2> & other)
+  : t(unique_ptr{other
+    ? other.get_copier()(*other.get())
+    : pointer(), other.get_deleter()}, other.get_copier())
+  {}
+
+  template<class U, class Dp2, class Cp2, class = typename EnableIf<U, Dp2, Cp2>::type>
+  deep_ptr(deep_ptr<U, Dp2, Cp2> && other)
+  : t(std::move(std::get<0>(other.t)), std::forward<copier_type>(other.get_copier()))
+  {}
+
+private:
+  template<class Cp2>
+  deep_ptr(pointer p, Cp2 && c, std::true_type)
+  : t(unique_ptr(p), std::forward<Cp2>(c))
+  {}
+
+  template<class Dp2>
+  deep_ptr(pointer p, Dp2 && d, std::false_type)
+  : t({unique_ptr(p), std::forward<Dp2>(d)}, copier_type())
   { static_assert(!std::is_pointer<copier_type>::value,
     "constructed with null function pointer copier"); }
 
-  explicit
-  deep_ptr(pointer p) noexcept
-  : ptr_(p)
+  template<class Dp2, class Cp2>
+  deep_ptr(pointer p, Dp2 && d, Cp2 && c, std::true_type)
+  : t({p, std::forward<Dp2>(d)}, std::forward<Cp2>(c))
+  {}
+
+  template<class Cp2, class Dp2>
+  deep_ptr(pointer p, Cp2 && c, Dp2 && d, std::false_type)
+  : t({p, std::forward<Dp2>(d)}, std::forward<Cp2>(c))
+  {}
+
+public:
+  template<class Cp2>
+  deep_ptr(pointer p, Cp2 && c)
+  : deep_ptr(p, std::forward<Cp2>(c), IsEnable<T, Dp, Cp2>())
+  {}
+
+  template<class Dp2, class Cp2, class = typename EnableIf<T, Dp, Cp2>::type>
+  deep_ptr(pointer p, Dp2 && d, Cp2 && c)
+  : deep_ptr(p, std::forward<Dp2>(d), std::forward<Cp2>(c), IsEnable<T, Dp, Cp2>())
+  {}
+
+  template<class U, class Dp2>
+  deep_ptr(std::unique_ptr<U, Dp2> p)
+  : t(std::move(p), copier_type())
   { static_assert(!std::is_pointer<copier_type>::value,
     "constructed with null function pointer copier"); }
 
-  deep_ptr(pointer p, Cp && c) noexcept
-  : copier_(std::forward<Cp>(c))
-  , ptr_(p)
-  { }
+  template<class U, class Dp2, class Cp2, class = typename EnableIf<T, Dp, Cp2>::type>
+  deep_ptr(std::unique_ptr<U, Dp2> p, Cp2 && c)
+  : t(std::move(p), std::forward<Cp2>(c))
+  {}
 
-  deep_ptr(pointer p, Dp && d) noexcept
-  : ptr_(p, std::forward<Dp>(d))
-  { }
+  deep_ptr& operator=(deep_ptr&& other)
+  {
+    std::get<0>(t) = std::move(std::get<0>(other.t));
+    std::get<1>(t) = std::forward<copier_type>(other.get_copier());
+    return *this;
+  }
 
-  deep_ptr(pointer p, Dp && d, Cp && c) noexcept
-  : copier_(std::forward<Cp>(c))
-  , ptr_(p, std::forward<Dp>(d))
-  { }
-
-  deep_ptr(pointer p, Cp && c, Dp && d) noexcept
-  : copier_(std::forward<Cp>(c))
-  , ptr_(p, std::forward<Dp>(d))
-  { }
-
-  deep_ptr(deep_ptr&& other) noexcept
-  : copier_(std::move(other))
-  , ptr_(std::move(other.ptr_))
-  { }
-
-  template<class U, class _Dp, class _Cp>
-  deep_ptr(deep_ptr<U, _Dp, _Cp>&& other) noexcept
-  : copier_(std::forward<std::unique_ptr<U, _Dp>>(other))
-  , ptr_(std::forward<_Cp>(other.ptr_))
-  { }
-
-  template<class U, class _Dp>
-  deep_ptr(std::unique_ptr<U, _Dp> p) noexcept
-  : ptr_(std::move(p))
-  { }
-
-  template<class U, class _Dp>
-  deep_ptr(std::unique_ptr<U, _Dp> p, Cp && c) noexcept
-  : copier_(std::forward<Cp>(c))
-  , ptr_(std::move(p))
-  { }
-
-  deep_ptr& operator=(deep_ptr&& other) noexcept = default;
-
-  template<class U, class _Dp, class _Cp>
+  template<class U, class Dp2, class Cp2>
   typename std::enable_if<
-    (std::is_convertible<typename deep_ptr<U, _Dp, _Cp>::pointer, pointer>::value
+    (std::is_convertible<typename deep_ptr<U, Dp2, Cp2>::pointer, pointer>::value
     && !std::is_array<U>::value),
-    deep_ptr&>::type
-  operator=(deep_ptr<U, _Dp, _Cp>&& other) noexcept
+    deep_ptr&
+  >::type
+  operator=(deep_ptr<U, Dp2, Cp2>&& other)
   {
-    ptr_ = std::forward<std::unique_ptr<T, Dp>>(other.ptr_);
-    get_copier() = std::forward<_Cp>(other.get_copier());
+    std::get<0>(t) = std::move(std::get<0>(other.t));
+    std::get<1>(t) = std::forward<copier_type>(other.get_copier());
     return *this;
   }
 
-  deep_ptr& operator=(std::nullptr_t) noexcept
+  deep_ptr& operator=(std::nullptr_t)
   {
-    ptr_ = nullptr;
+    reset(nullptr);
     return *this;
   }
 
-  deep_ptr& operator=(deep_ptr const & other) noexcept(noexcept(std::declval<Cp>()(other.get())))
+  deep_ptr& operator=(deep_ptr const & other)
   {
-    if (&other != this && other) {
+    if (&other != this) {
       get_deleter() = other.get_deleter();
       get_copier() = other.get_copier();
-      ptr_.reset(copier_(other.get()));
+      if (other) {
+        reset(nullptr);
+      }
+      else {
+        reset(other.get_copier()(*other.get()));
+      }
     }
     return *this;
   }
 
-  pointer release()  noexcept { return ptr_.release(); }
+  pointer release() { return std::get<0>(t).release(); }
 
-  void swap(deep_ptr& other) noexcept
-  {
-    using std::swap;
-    swap(copier_.copier_, other.copier_.copier_);
-    ptr_.swap(other.ptr_);
-  }
+  void swap(deep_ptr& other) { std::swap(t, other.t); }
 
-  void reset(pointer ptr = pointer()) noexcept { ptr_.reset(ptr); }
-  void reset(std::nullptr_t) noexcept { ptr_.reset(nullptr); }
-  template<class U> void reset(U p) noexcept { ptr_.reset(p); }
+  void reset(pointer ptr = pointer()) { std::get<0>(t).reset(ptr); }
+  void reset(std::nullptr_t) { std::get<0>(t).reset(nullptr); }
+  template<class U> void reset(U p) { std::get<0>(t).reset(p); }
 
-  pointer get() const noexcept { return ptr_.get(); }
+  pointer get() const { return std::get<0>(t).get(); }
 
   typename std::add_lvalue_reference<element_type>::type
-  operator*() const { return *ptr_; }
+  operator*() const { return *std::get<0>(t); }
 
-  pointer operator->() const noexcept { return ptr_.get(); }
-  explicit operator bool() const noexcept { return bool(ptr_); }
+  pointer operator->() const { return std::get<0>(t).get(); }
+  explicit operator bool() const { return bool(std::get<0>(t)); }
 
-  deleter_type& get_deleter() noexcept { return ptr_.get_deleter(); }
-  const deleter_type& get_deleter() const noexcept { return ptr_.get_deleter(); }
+  deleter_type& get_deleter() noexcept { return std::get<0>(t).get_deleter(); }
+  const deleter_type& get_deleter() const noexcept { return std::get<0>(t).get_deleter(); }
 
-  copier_type& get_copier() noexcept { return copier_.copier_; }
-  const copier_type& get_copier() const noexcept { return copier_.copier_; }
+  copier_type& get_copier() noexcept { return std::get<1>(t); }
+  const copier_type& get_copier() const noexcept { return std::get<1>(t); }
 
-  T& operator[](size_t i) const { return ptr_[i]; }
+  T& operator[](size_t i) const { return std::get<0>(t)[i]; }
 
 private:
-  Copier copier_;
-  std::unique_ptr<T, Dp> ptr_;
+  std::tuple<std::unique_ptr<T, Dp>, copier_type> t;
 };
 
 template<class T, class Deleter, class Copier>
@@ -197,15 +205,15 @@ bool operator<(const deep_ptr<T1, D1, C1>& x, const deep_ptr<T2, D2, C2>& y) noe
 }
 
 template<class T1, class D1, class C1, class T2, class D2, class C2>
-bool operator<=(const deep_ptr<T1, D1, C1>& x, const deep_ptr<T2, D2, C2>& y) noexcept
+bool operator<=(const deep_ptr<T1, D1, C1>& x, const deep_ptr<T2, D2, C2>& y)
 { return !(y < x); }
 
 template<class T1, class D1, class C1, class T2, class D2, class C2>
-bool operator>(const deep_ptr<T1, D1, C1>& x, const deep_ptr<T2, D2, C2>& y) noexcept
+bool operator>(const deep_ptr<T1, D1, C1>& x, const deep_ptr<T2, D2, C2>& y)
 { return y < x; }
 
 template<class T1, class D1, class C1, class T2, class D2, class C2>
-bool operator>=(const deep_ptr<T1, D1, C1>& x, const deep_ptr<T2, D2, C2>& y) noexcept
+bool operator>=(const deep_ptr<T1, D1, C1>& x, const deep_ptr<T2, D2, C2>& y)
 { return !(x < y); }
 
 template <class T, class D, class C>
@@ -225,7 +233,7 @@ bool operator!=(std::nullptr_t, const deep_ptr<T, D, C>& x) noexcept
 { return static_cast<bool>(x); }
 
 template <class T, class D, class C>
-bool operator<(const deep_ptr<T, D, C>& x, std::nullptr_t) noexcept
+bool operator<(const deep_ptr<T, D, C>& x, std::nullptr_t)
 { return std::less<typename deep_ptr<T, D, C>::pointer>()(x.get(), nullptr); }
 
 template <class T, class D, class C>
@@ -233,27 +241,27 @@ bool operator<(std::nullptr_t, const deep_ptr<T, D, C>& y)
 { return std::less<typename deep_ptr<T, D, C>::pointer>()(nullptr, y.get()); }
 
 template <class T, class D, class C>
-bool operator<=(const deep_ptr<T, D, C>& x, std::nullptr_t) noexcept
+bool operator<=(const deep_ptr<T, D, C>& x, std::nullptr_t)
 { return nullptr < x; }
 
 template <class T, class D, class C>
-bool operator<=(std::nullptr_t, const deep_ptr<T, D, C>& y) noexcept
+bool operator<=(std::nullptr_t, const deep_ptr<T, D, C>& y)
 { return y < nullptr; }
 
 template <class T, class D, class C>
-bool operator>(const deep_ptr<T, D, C>& x, std::nullptr_t) noexcept
+bool operator>(const deep_ptr<T, D, C>& x, std::nullptr_t)
 { return !(nullptr < x); }
 
 template <class T, class D, class C>
-bool operator>(std::nullptr_t, const deep_ptr<T, D, C>& y) noexcept
+bool operator>(std::nullptr_t, const deep_ptr<T, D, C>& y)
 { return !(y < nullptr); }
 
 template <class T, class D, class C>
-bool operator>=(const deep_ptr<T, D, C>& x, std::nullptr_t) noexcept
+bool operator>=(const deep_ptr<T, D, C>& x, std::nullptr_t)
 { return !(x < nullptr); }
 
 template <class T, class D, class C>
-bool operator>=(std::nullptr_t, const deep_ptr<T, D, C>& y) noexcept
+bool operator>=(std::nullptr_t, const deep_ptr<T, D, C>& y)
 { return !(nullptr < y); }
 
 template<class T, class... Ts>
@@ -268,9 +276,11 @@ template<class T, class Dp, class Cp>
 struct hash< ::falcon::deep_ptr<T, Dp, Cp>>
 : public hash<typename ::falcon::deep_ptr<T, Dp, Cp>::pointer>
 {
-  typename hash<typename ::falcon::deep_ptr<T, Dp, Cp>::pointer>::result_type
-  operator()(const ::falcon::deep_ptr<T, Dp, Cp>& p) const noexcept
-  { return std::hash<typename ::falcon::deep_ptr<T, Dp, Cp>::pointer>()(p.get()); }
+  typedef ::falcon::deep_ptr<T, Dp, Cp> argument_type;
+
+  typename hash<typename argument_type::pointer>::result_type
+  operator()(const argument_type& p) const noexcept
+  { return std::hash<typename argument_type::pointer>()(p.get()); }
 };
 
 }

@@ -10,11 +10,11 @@ namespace falcon
 
 CPP_GLOBAL_CONSTEXPR struct delete_all_t
 {
-  template<typename ForwardIterator>
+  template<class ForwardIterator>
   void operator()(ForwardIterator first, ForwardIterator last) const
   { default_deleter(first, last); }
 
-  template<typename Container>
+  template<class Container>
   void operator()(Container& container) const
   { default_deleter(begin(container), end(container)); }
 } delete_all;

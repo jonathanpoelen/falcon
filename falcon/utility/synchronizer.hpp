@@ -238,7 +238,7 @@ private:
   {
     tuple_for_each(
       this->tuple(),
-      std::bind(affect<>(), std::placeholders::_1, std::ref(x))
+      std::bind(assign<>(), std::placeholders::_1, std::ref(x))
     );
     return *this;
   }

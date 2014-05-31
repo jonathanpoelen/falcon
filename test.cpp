@@ -64,31 +64,9 @@
 //   }
 // };
 
-#include <falcon/lambda2/lambda.hpp>
-#include <falcon/lambda2/loops.hpp>
-#include <falcon/lambda2/if.hpp>
-#include <falcon/lambda2/switch.hpp>
-#include <iostream>
 
 int main()
 {
-
-using namespace falcon::lambda2;
-using namespace falcon::lambda2::placeholders;
-
-int i = 2;
-(placeholders::_1 = 5)(i);
-  (std::cout << falcon::lambda2::placeholders::_1 << "\n")(i);
-
-switch_statement(_1
-, case_statement<5>(_1)
-);
-
-  while_(_1 < 7, _1 += 2)(i);
-
-  return if_(!_1)[_1].else_return[_1+1](i) + 2;
-//   return if_(!_1)[_1].else_return[_1+1](i);
-//   return if_else_return(!_1, _1, _1+1)(i);
 
 
 
