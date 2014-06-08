@@ -6,6 +6,7 @@
 
 #if __cplusplus >= 201103L
 # include <type_traits>
+# include <memory>
 #else
 # include <boost/type_traits/remove_extent.hpp>
 # include <boost/type_traits/remove_pointer.hpp>

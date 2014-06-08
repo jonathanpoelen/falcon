@@ -170,7 +170,8 @@ public:
   explicit operator bool() const { return bool(std::get<0>(t)); }
 
   deleter_type& get_deleter() noexcept { return std::get<0>(t).get_deleter(); }
-  const deleter_type& get_deleter() const noexcept { return std::get<0>(t).get_deleter(); }
+  const deleter_type& get_deleter() const noexcept
+  { return std::get<0>(t).get_deleter(); }
 
   copier_type& get_copier() noexcept { return std::get<1>(t); }
   const copier_type& get_copier() const noexcept { return std::get<1>(t); }
@@ -264,9 +265,33 @@ template <class T, class D, class C>
 bool operator>=(std::nullptr_t, const deep_ptr<T, D, C>& y)
 { return !(nullptr < y); }
 
+namespace _aux {
+  template<class T>
+  struct MakeDeep
+  { typedef deep_ptr<T> single_object; };
+
+  template<class T>
+  struct MakeDeep<T[]>
+  { typedef deep_ptr<T[]> array; };
+
+  template<class T, size_t Bound>
+  struct MakeDeep<T[Bound]>
+  { struct invalid_type { }; };
+}
+
 template<class T, class... Ts>
-deep_ptr<T> make_deep(Ts&&... args)
-{ return deep_ptr<T>(std::forward<Ts>(args)...); }
+typename _aux::MakeDeep<T>::single_object
+make_deep(Ts&&... args)
+{ return deep_ptr<T>(new T(std::forward<Ts>(args)...)); }
+
+template<class T>
+typename _aux::MakeDeep<T>::array
+make_deep(std::size_t sz)
+{ return deep_ptr<T>(new typename std::remove_extent<T>::type[sz]); }
+
+template<class T, class... Ts>
+typename _aux::MakeDeep<T>::invalid_type
+make_deep(Ts&&... args) = delete;
 
 }
 

@@ -43,11 +43,11 @@ CPP_GLOBAL_CONSTEXPR struct deallocate_ptr_t {
   { deallocate<T>()(p); }
 } deallocate_ptr;
 
-CPP_GLOBAL_CONSTEXPR struct delete_array_t {
+CPP_GLOBAL_CONSTEXPR struct deallocate_array_t {
   template<class T>
   void operator()(T * p, std::size_t = 1) const
   { deallocate<T[]>()(p); }
-} delete_array;
+} deallocate_array;
 
 
 CPP_GLOBAL_CONSTEXPR struct deallocate_ptr_then_zero_t {
@@ -56,11 +56,11 @@ CPP_GLOBAL_CONSTEXPR struct deallocate_ptr_then_zero_t {
   { deallocate_then_zero<T>()(p); }
 } deallocate_ptr_then_zero;
 
-CPP_GLOBAL_CONSTEXPR struct delete_array_then_zero_t {
+CPP_GLOBAL_CONSTEXPR struct deallocate_array_then_zero_t {
   template<class T>
   void operator()(T * & p, std::size_t = 1) const
   { deallocate_then_zero<T[]>()(p); }
-} delete_array_then_zero;
+} deallocate_array_then_zero;
 
 
 template<class ForwardIterator>

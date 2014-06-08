@@ -64,10 +64,18 @@
 //   }
 // };
 
+#include <falcon/memory/free_list.hpp>
+#include <test/A.h>
 
 int main()
 {
 
+  falcon::free_list<A> alloc(1);
+
+  A * a1 = alloc.alloc();
+  alloc.free(a1);
+
+  alloc.get_allocator();
 
 
 

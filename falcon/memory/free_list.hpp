@@ -7,7 +7,8 @@
 #include <falcon/c++/pack.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/utility/move.hpp>
-#include FALCON_BOOST_OR_STD_TRAITS(aligned_storage)
+#include <falcon/memory/aligned_buffer.hpp>
+#include <falcon/memory/addressof.hpp>
 
 #include <memory>
 #if __cplusplus >= 201103L
@@ -19,79 +20,129 @@
 
 namespace falcon {
 
+namespace _aux {
+  struct free_list_node_base
+  {
+#if __cplusplus >= 201103L
+    free_list_node_base * next = nullptr;
+#else
+    free_list_node_base * next;
+
+    free_list_node_base()
+    : next(0)
+    {}
+#endif
+  };
+
+  template<class T>
+  struct free_list_node
+  : free_list_node_base
+  {
+    aligned_buffer<T> storage;
+
+    T* valptr() CPP_NOEXCEPT
+    { return storage.ptr(); }
+
+    const T* valptr() const CPP_NOEXCEPT
+    { return storage.ptr(); }
+  };
+}
+
 template<class T, class Alloc = std::allocator<T> >
 class free_list
 {
-  struct Node
-  {
-    Node * next;
-    unsigned char data[1];
-  };
-
-public:
-  static const std::size_t s_align
-    = FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<T>::value;
-  static const std::size_t s_heap = (s_align > sizeof(Node)) ? s_align : sizeof(Node);
-
-public:
-  typedef typename FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc>
-    ::template rebind_alloc<byte_t>::type allocator_type;
-
-private:
-  typedef typename FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc>
-    ::template rebind_alloc<T>::type allocator_traits;
+  typedef _aux::free_list_node<T> Node;
+  typedef FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc> alloc_traits;
+  typedef typename alloc_traits::template rebind_alloc<Node> node_alloc_type;
+  typedef FALCON_BOOST_OR_STD_NAMESPACE
+    ::allocator_traits<node_alloc_type> node_alloc_traits;
+  typedef typename alloc_traits::template rebind_alloc<T> tp_alloc_type;
+  typedef FALCON_BOOST_OR_STD_NAMESPACE
+    ::allocator_traits<tp_alloc_type>  allocator_traits;
 
 public:
   typedef typename allocator_traits::value_type value_type;
   typedef typename allocator_traits::pointer pointer;
   typedef typename allocator_traits::size_type size_type;
+  typedef Alloc allocator_type;
+
+private:
+  struct list_impl
+  : public node_alloc_type
+  {
+    _aux::free_list_node_base * head;
+
+    list_impl()
+    : node_alloc_type()
+    , head(0)
+    { }
+
+    list_impl(const node_alloc_type& a)
+    : node_alloc_type(a)
+    , head(0)
+    { }
+
+    template<class CPP_PACK Args>
+    list_impl(Args CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK args)
+    : node_alloc_type(FALCON_FORWARD(Args, args)CPP_PACK)
+    , head(0)
+    { }
+
+    Node * get_node() const CPP_NOEXCEPT
+    { return reinterpret_cast<Node*>(head); }
+
+    Node * to_node(pointer p) const CPP_NOEXCEPT
+    {
+      return reinterpret_cast<Node*>(reinterpret_cast<char*>(
+#if __cplusplus >= 201103L
+        std::pointer_traits<pointer>::pointer_to(*p)
+#else
+        p
+#endif
+      ) - (sizeof(Node) - sizeof(_aux::free_list_node_base)));
+    }
+  };
 
 public:
-  explicit free_list(size_type size_alloc) CPP_NOEXCEPT_OPERATOR2(allocator_type())
-  : node_(0)
+  explicit free_list(size_type size_alloc)
+  CPP_NOEXCEPT_OPERATOR2(allocator_type())
+  : impl()
   , size_alloc_(size_alloc)
-  , allocator_()
   {}
 
   free_list(size_type size_alloc, const allocator_type& allocator)
   CPP_NOEXCEPT_OPERATOR2(allocator_type(allocator))
-  : node_(0)
+  : impl(node_alloc_type(allocator))
   , size_alloc_(size_alloc)
-  , allocator_(allocator)
   {}
 
   template<class CPP_PACK Args>
   free_list(size_type size_alloc, Args CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK args)
   CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_PACK))
-  : node_(0)
+  : impl(node_alloc_type(FALCON_FORWARD(Args, args)CPP_PACK))
   , size_alloc_(size_alloc)
-  , allocator_(FALCON_FORWARD(Args, args)CPP_PACK)
   {}
 
 #if __cplusplus >= 201103L
   free_list(size_type size_alloc, allocator_type&& allocator)
-  CPP_NOEXCEPT_OPERATOR2(allocator_type(std::forward<allocator_type>(allocator)))
-  : node_(0)
+  CPP_NOEXCEPT_OPERATOR2(allocator_node_type(std::forward<allocator_type>(allocator)))
+  : impl(node_alloc_type(std::forward<allocator_type>(allocator)))
   , size_alloc_(size_alloc)
-  , allocator_(std::forward<allocator_type>(allocator))
   {}
 
   free_list(free_list&& other)
-  CPP_NOEXCEPT_OPERATOR2(std::forward<allocator_type>(other.allocator_))
-  : node_(other.node_)
+  CPP_NOEXCEPT_OPERATOR2(std::move(other.allocator_))
+  : impl(std::move(other.impl))
   , size_alloc_(other.size_alloc_)
-  , allocator_(std::forward<allocator_type>(other.allocator_))
-  { other.node_ = 0; }
+  { impl.head = 0; }
 
   free_list& operator=(free_list&& other)
-  CPP_NOEXCEPT_OPERATOR2(
-    other.allocator_ = std::forward<allocator_type>(other.allocator_))
+  CPP_NOEXCEPT_OPERATOR2(other.allocator_ = std::move(other.allocator_))
   {
     clear();
-    node_ = other.node_;
+    impl = std::move(other.impl);
     size_alloc_ = other.size_alloc_;
-    allocator_ = std::forward<allocator_type>(other.allocator_);
-    other.node_ = 0;
+    other.impl.head = 0;
   }
 
   free_list(const free_list&) = delete;
@@ -108,35 +159,46 @@ public:
     clear();
   }
 
-  pointer alloc()
+  allocator_type get_allocator() const
+  { return allocator_type(*static_cast<node_alloc_type const *>(&this->impl)); }
+
+private:
+  node_alloc_type&
+  get_Node_allocator() noexcept
+  { return *static_cast<node_alloc_type*>(&this->impl); }
+
+  Node*
+  get_node()
   {
-    if ( ! node_) {
-      return reinterpret_cast<pointer>(
-        allocator_traits::allocate(
-          allocator_
-        , s_heap + size_alloc_ * sizeof(T)) + s_heap
-      );
-    }
-    pointer ret = reinterpret_cast<pointer>(node_->data);
-    node_ = node_->next;
-    return ret;
+    auto ptr = node_alloc_traits::allocate(get_Node_allocator(), size_alloc_);
+    return addressof(*ptr);
   }
 
-  void free(pointer p)
+public:
+  pointer alloc()
   {
-    Node * tmp = node_;
-    node_ = reinterpret_cast<Node*>(byte_cast(p) - s_heap);
-    node_->next = tmp;
+    if ( ! impl.head ) {
+      Node * node = get_node();
+      return pointer(node->valptr());
+    }
+    Node * node = impl.get_node();
+    impl.head = impl.head->next;
+    return pointer(node->valptr());
+  }
+
+  void free(pointer p) CPP_NOEXCEPT
+  {
+    Node * node = impl.to_node(p);
+    node->next = impl.head;
+    impl.head = node;
   }
 
   void clear() CPP_NOEXCEPT
   {
-    while (node_) {
-      Node * node = node_->next;
-      allocator_traits::deallocate(
-        allocator_, byte_cast(node_)
-      , s_heap + size_alloc_ * sizeof(T));
-      node_ = node;
+    while (impl.head) {
+      Node * node = impl.get_node();
+      impl.head = node->next;
+      node_alloc_traits::deallocate(get_Node_allocator(), node, size_alloc_);
     }
   }
 
@@ -149,30 +211,32 @@ public:
       throw std::underflow_error("free_list::merge");
     }
 
-    if (node_) {
-      Node * node = node_;
+    if (impl.head) {
+      Node * node = impl.head;
       while (node->next) {
         node = node->next;
       }
-      node->next = other.node_;
+      node->next = other.impl.head;
     }
     else {
-      node_ = other.node_;
+      impl.head = other.impl.head;
     }
 
-    other.node_ = 0;
+    other.impl.head = 0;
   }
 
   bool operator==(const free_list& rhs) const
-  { return size_alloc_ == rhs.size_alloc_ && allocator_ == rhs.allocator_; }
+  {
+    return size_alloc_ == rhs.size_alloc_
+      && get_Node_allocator() == rhs.get_Node_allocator();
+  }
 
   bool operator!=(const free_list& rhs) const
   { return !operator==(rhs); }
 
 private:
-  Node * node_;
+  list_impl impl;
   size_type size_alloc_;
-  allocator_type allocator_;
 };
 
 }
