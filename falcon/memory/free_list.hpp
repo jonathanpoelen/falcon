@@ -16,29 +16,26 @@
 #else
 # include <boost/container/allocator_traits.hpp>
 #endif
-#include <stdexcept>
+
+#include <cassert>
 
 namespace falcon {
 
-namespace _aux {
-  struct free_list_node_base
+template<class T, class Alloc = std::allocator<T> >
+class free_list
+{
+  struct list_node
   {
+    aligned_buffer<T> storage;
 #if __cplusplus >= 201103L
-    free_list_node_base * next = nullptr;
+    list_node * next = nullptr;
 #else
-    free_list_node_base * next;
+    list_node * next;
 
-    free_list_node_base()
+    list_node()
     : next(0)
     {}
 #endif
-  };
-
-  template<class T>
-  struct free_list_node
-  : free_list_node_base
-  {
-    aligned_buffer<T> storage;
 
     T* valptr() CPP_NOEXCEPT
     { return storage.ptr(); }
@@ -46,31 +43,29 @@ namespace _aux {
     const T* valptr() const CPP_NOEXCEPT
     { return storage.ptr(); }
   };
-}
 
-template<class T, class Alloc = std::allocator<T> >
-class free_list
-{
-  typedef _aux::free_list_node<T> Node;
   typedef FALCON_BOOST_OR_STD_NAMESPACE::allocator_traits<Alloc> alloc_traits;
-  typedef typename alloc_traits::template rebind_alloc<Node> node_alloc_type;
+  typedef typename alloc_traits::template rebind_alloc<list_node> node_alloc_type;
   typedef FALCON_BOOST_OR_STD_NAMESPACE
     ::allocator_traits<node_alloc_type> node_alloc_traits;
   typedef typename alloc_traits::template rebind_alloc<T> tp_alloc_type;
   typedef FALCON_BOOST_OR_STD_NAMESPACE
-    ::allocator_traits<tp_alloc_type>  allocator_traits;
+    ::allocator_traits<tp_alloc_type> allocator_traits;
 
 public:
   typedef typename allocator_traits::value_type value_type;
   typedef typename allocator_traits::pointer pointer;
   typedef typename allocator_traits::size_type size_type;
+  typedef typename allocator_traits::difference_type difference_type;
+  typedef typename allocator_traits::const_pointer const_pointer;
   typedef Alloc allocator_type;
+  typedef free_list free_list_type;
 
 private:
   struct list_impl
   : public node_alloc_type
   {
-    _aux::free_list_node_base * head;
+    list_node * head;
 
     list_impl()
     : node_alloc_type()
@@ -87,21 +82,22 @@ private:
     : node_alloc_type(FALCON_FORWARD(Args, args)CPP_PACK)
     , head(0)
     { }
-
-    Node * get_node() const CPP_NOEXCEPT
-    { return reinterpret_cast<Node*>(head); }
-
-    Node * to_node(pointer p) const CPP_NOEXCEPT
-    {
-      return reinterpret_cast<Node*>(reinterpret_cast<char*>(
-#if __cplusplus >= 201103L
-        std::pointer_traits<pointer>::pointer_to(*p)
-#else
-        p
-#endif
-      ) - (sizeof(Node) - sizeof(_aux::free_list_node_base)));
-    }
   };
+
+  node_alloc_type&
+  get_node_allocator() CPP_NOEXCEPT
+  { return static_cast<node_alloc_type&>(this->impl); }
+
+  const node_alloc_type&
+  get_node_allocator() const CPP_NOEXCEPT
+  { return static_cast<node_alloc_type const &>(this->impl); }
+
+  list_node*
+  get_node()
+  {
+    auto ptr = node_alloc_traits::allocate(get_node_allocator(), size_alloc_);
+    return addressof(*ptr);
+  }
 
 public:
   explicit free_list(size_type size_alloc)
@@ -136,13 +132,13 @@ public:
   , size_alloc_(other.size_alloc_)
   { impl.head = 0; }
 
-  free_list& operator=(free_list&& other)
-  CPP_NOEXCEPT_OPERATOR2(other.allocator_ = std::move(other.allocator_))
+  /**
+  * \sa merge
+  */
+  free_list& operator=(free_list && other) CPP_NOEXCEPT
   {
-    clear();
-    impl = std::move(other.impl);
-    size_alloc_ = other.size_alloc_;
-    other.impl.head = 0;
+    merge(other);
+    return *this;
   }
 
   free_list(const free_list&) = delete;
@@ -160,78 +156,75 @@ public:
   }
 
   allocator_type get_allocator() const
-  { return allocator_type(*static_cast<node_alloc_type const *>(&this->impl)); }
+  CPP_NOEXCEPT_OPERATOR2(allocator_type(std::declval<free_list>().get_node_allocator()))
+  { return allocator_type(get_node_allocator()); }
 
-private:
-  node_alloc_type&
-  get_Node_allocator() noexcept
-  { return *static_cast<node_alloc_type*>(&this->impl); }
-
-  Node*
-  get_node()
-  {
-    auto ptr = node_alloc_traits::allocate(get_Node_allocator(), size_alloc_);
-    return addressof(*ptr);
-  }
-
-public:
   pointer alloc()
   {
-    if ( ! impl.head ) {
-      Node * node = get_node();
+    if ( empty() ) {
+      list_node * node = get_node();
       return pointer(node->valptr());
     }
-    Node * node = impl.get_node();
+    list_node * node = impl.head;
     impl.head = impl.head->next;
     return pointer(node->valptr());
   }
 
   void free(pointer p) CPP_NOEXCEPT
   {
-    Node * node = impl.to_node(p);
+    list_node * node = reinterpret_cast<list_node*>(p);
     node->next = impl.head;
     impl.head = node;
   }
 
+  /**
+   * \post \p empty() == true
+   */
   void clear() CPP_NOEXCEPT
   {
     while (impl.head) {
-      Node * node = impl.get_node();
+      list_node * node = impl.head;
       impl.head = node->next;
-      node_alloc_traits::deallocate(get_Node_allocator(), node, size_alloc_);
+      node_alloc_traits::deallocate(get_node_allocator(), node, size_alloc_);
     }
   }
 
-  size_type count_by_alloc() const
+  bool empty() const CPP_NOEXCEPT
+  { return !impl.head; }
+
+  size_type count_by_alloc() const CPP_NOEXCEPT
   { return size_alloc_; }
 
-  void merge(free_list& other)
+  /**
+   * \pre \a *this == \a other
+   * \post \p other.empty == true
+   */
+  void merge(free_list& other) CPP_NOEXCEPT
   {
-    if (other.size_alloc_ < size_alloc_) {
-      throw std::underflow_error("free_list::merge");
-    }
+    assert(other == *this);
 
-    if (impl.head) {
-      Node * node = impl.head;
+    list_node * head = other.impl.head;
+    other.impl.head = 0;
+
+    if (empty()) {
+      impl.head = head;
+    }
+    else if (head) {
+      list_node * node = impl.head;
       while (node->next) {
         node = node->next;
       }
-      node->next = other.impl.head;
+      node->next = head;
     }
-    else {
-      impl.head = other.impl.head;
-    }
-
-    other.impl.head = 0;
   }
 
-  bool operator==(const free_list& rhs) const
-  {
-    return size_alloc_ == rhs.size_alloc_
-      && get_Node_allocator() == rhs.get_Node_allocator();
-  }
+  /**
+   * \return true \p rhs.count_by_alloc and \p rhd.get_allocator are the same
+   */
+  bool operator==(const free_list& rhs) const CPP_NOEXCEPT
+  { return size_alloc_ == rhs.size_alloc_ && get_allocator() == rhs.get_allocator(); }
 
-  bool operator!=(const free_list& rhs) const
+  bool operator!=(const free_list& rhs) const CPP_NOEXCEPT
   { return !operator==(rhs); }
 
 private:

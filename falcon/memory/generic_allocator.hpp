@@ -2,6 +2,7 @@
 #define FALCON_MEMORY_GENERIC_ALLOCATOR_HPP
 
 #include <falcon/parameter/parameter_index.hpp>
+#include <falcon/memory/allocator_rebind.hpp>
 #include <falcon/memory/construct.hpp>
 #include <falcon/memory/destroy.hpp>
 
@@ -9,11 +10,11 @@
 
 namespace falcon {
 
-template<typename T, typename AllocBase = std::allocator<T> >
+template<class T, class AllocBase = std::allocator<T> >
 class generic_allocator
-: public std::allocator_traits<AllocBase>::template rebind_alloc<T>
+: public allocator_rebind_t<AllocBase, T>
 {
-	typedef typename std::allocator_traits<AllocBase>::template rebind_alloc<T> allocator_base;
+  typedef allocator_rebind_t<AllocBase, T> allocator_base;
 
 public:
 	typedef typename allocator_base::pointer pointer;
@@ -21,20 +22,21 @@ public:
 	typedef typename allocator_base::const_pointer const_pointer;
 	typedef typename allocator_base::const_reference const_reference;
 
-	template<typename U, typename NewAllocBase = AllocBase>
+	template<class U, class NewAllocBase = AllocBase>
 	struct rebind
 	{ typedef generic_allocator<U, NewAllocBase> other; };
 
-	generic_allocator() noexcept(noexcept(allocator_base())) = default;
+	generic_allocator() = default;
 
-	generic_allocator(const generic_allocator& other) noexcept(noexcept(allocator_base(other))) = default;
+	generic_allocator(const generic_allocator& other) = default;
 
-	template<typename U>
-	generic_allocator(const generic_allocator<U>& other) noexcept(noexcept(allocator_base(other)))
+	template<class U>
+	generic_allocator(const generic_allocator<U>& other)
+	noexcept(noexcept(allocator_base(other)))
 	: allocator_base(other)
 	{}
 
-	template<typename U, typename... Args>
+	template<class U, class... Args>
 	void construct(U* p, Args&&... args)
 	{ ::falcon::construct(p, std::forward<Args>(args)...); }
 

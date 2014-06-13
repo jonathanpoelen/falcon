@@ -3,7 +3,11 @@
 
 #include <falcon/parameter/optimal_index_pack.hpp>
 #include <falcon/parameter/parameter_pack.hpp>
+#include <falcon/parameter/pack_element.hpp>
+#include <falcon/parameter/manip.hpp>
+#include <falcon/tuple/parameter_pack.hpp>
 #include <falcon/memory/construct.hpp>
+#include <falcon/memory/align.hpp>
 #include <falcon/utility/maker.hpp>
 #include <falcon/arg/arg.hpp>
 
@@ -11,30 +15,6 @@
 #include <tuple>
 
 namespace falcon {
-
-///TODO memory/align.hpp
-#if defined(__GNUC__)
-inline void* align(size_t alignment, size_t size, void*& ptr, size_t& space)
-{
-  void* r = nullptr;
-  if (size <= space)
-  {
-    char* p1 = static_cast<char*>(ptr);
-    char* p2 = reinterpret_cast<char*>(reinterpret_cast<std::size_t>(p1 + (alignment - 1)) & -alignment);
-    size_t d = static_cast<size_t>(p2 - p1);
-    if (d <= space - size)
-    {
-      r = p2;
-      ptr = r;
-      space -= d;
-    }
-  }
-  return r;
-}
-#else
-using std::align;
-#endif
-
 
 template<std::size_t I, std::size_t N, std::size_t Idx, std::size_t... Indexes>
 struct __initialize_optimal_grouping_allocate_tuple
@@ -64,7 +44,7 @@ __optimal_grouping_allocate(parameter_index<Indexes...>, parameter_pack<Elements
 {
   typedef parameter_pack<Elements...> pack_t;
   typedef std::array<std::size_t, sizeof...(Indexes)> array_t;
-  constexpr array_t a{{alignof(typename parameter_element<Indexes, pack_t>::type)...}};
+  constexpr array_t a{{(alignof(typename parameter_element<Indexes, pack_t>::type))...}};
   constexpr array_t szt{{sizeof(typename parameter_element<Indexes, pack_t>::type)...}};
 
   std::tuple<void*, Elements*...> ret(nullptr, maker<Elements*>()(nullptr)...);
@@ -96,9 +76,9 @@ struct __grouping_allocate_result
 {
   typedef parameter_pack<Elements*...> pack;
   typedef typename optimal_index_pack<pack>::type indexes;
-  typedef typename parameter::pack_element<pack, indexes>::type optimal_parameter_pack;
+  typedef typename pack_element<pack, indexes>::type optimal_parameter_pack;
   typedef typename parameter_pack_to_tuple<
-    typename parameter::pack_add_left<optimal_parameter_pack, void*>::type
+    typename parameter::push_front<optimal_parameter_pack, void*>::type
   >::type tuple;
 };
 
@@ -172,56 +152,52 @@ grouping_allocate(Allocate allocate, S... sizes)
   return ret;
 }
 
-template <typename... Elements, typename... S>
-std::tuple<Elements*...> grouping_allocate(S... sizes)
-{ return grouping_allocate(allocate_wrapper<char>(), sizes...); }
-
 //TODO
 // template <typename... Elements, typename... S>
 // CPP1X_DELEGATE_FUNCTION(grouping_allocate(S... sizes),
 //                         grouping_allocate(allocate_wrapper<char>(), sizes...))
 
 
-
-template <typename T>
-struct new_element
-{
-  typedef T type;
-  std::size_t size;
-  operator std::size_t () const
-  { return size; }
-};
-
-
-template <typename T, typename... Elements>
-CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(new_element<T> e, Elements... elems),
-                        optimal_grouping_allocate<
-                          typename T::type,
-                          typename Elements::type...
-                        >(e.size, static_cast<std::size_t>(elems)...))
-
-template <typename Allocate, typename T, typename... Elements>
-CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(Allocate allocate,
-                                                  new_element<T> e, Elements... elems),
-                        optimal_grouping_allocate<
-                          typename T::type,
-                          typename Elements::type...
-                        >(e.size, static_cast<std::size_t>(elems)...))
-
-template <typename T, typename... Elements>
-CPP1X_DELEGATE_FUNCTION(grouping_allocate(new_element<T> e, Elements... elems),
-                        grouping_allocate<
-                          typename T::type,
-                          typename Elements::type...
-                        >(e.size, static_cast<std::size_t>(elems)...))
-
-template <typename Allocate, typename T, typename... Elements>
-CPP1X_DELEGATE_FUNCTION(grouping_allocate(Allocate allocate,
-                                          new_element<T> e, Elements... elems),
-                        grouping_allocate<
-                          typename T::type,
-                          typename Elements::type...
-                        >(e.size, static_cast<std::size_t>(elems)...))
+// TODO
+// template <typename T>
+// struct new_element
+// {
+//   typedef T type;
+//   std::size_t size;
+//   operator std::size_t () const
+//   { return size; }
+// };
+//
+//
+// template <typename T, typename... Elements>
+// CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(new_element<T> e, Elements... elems),
+//                         optimal_grouping_allocate<
+//                           typename T::type,
+//                           typename Elements::type...
+//                         >(e.size, static_cast<std::size_t>(elems)...))
+//
+// template <typename Allocate, typename T, typename... Elements>
+// CPP1X_DELEGATE_FUNCTION(optimal_grouping_allocate(Allocate allocate,
+//                                                   new_element<T> e, Elements... elems),
+//                         optimal_grouping_allocate<
+//                           typename T::type,
+//                           typename Elements::type...
+//                         >(e.size, static_cast<std::size_t>(elems)...))
+//
+// template <typename T, typename... Elements>
+// CPP1X_DELEGATE_FUNCTION(grouping_allocate(new_element<T> e, Elements... elems),
+//                         grouping_allocate<
+//                           typename T::type,
+//                           typename Elements::type...
+//                         >(e.size, static_cast<std::size_t>(elems)...))
+//
+// template <typename Allocate, typename T, typename... Elements>
+// CPP1X_DELEGATE_FUNCTION(grouping_allocate(Allocate allocate,
+//                                           new_element<T> e, Elements... elems),
+//                         grouping_allocate<
+//                           typename T::type,
+//                           typename Elements::type...
+//                         >(e.size, static_cast<std::size_t>(elems)...))
 
 }
 

@@ -9,14 +9,18 @@
 
 namespace falcon {
 
-template<typename T, typename AllocBase = std::allocator<T> >
+template<class T, class AllocBase = std::allocator<T> >
 class free_list_allocator
-: public free_list<T, AllocBase>::allocator_type
 {
 public:
-  typedef free_list<T, AllocBase> free_list_type;
+  typedef typename ::falcon::free_list<T, AllocBase> free_list_type;
+  typedef typename free_list_type::value_type value_type;
   typedef typename free_list_type::pointer pointer;
   typedef typename free_list_type::size_type size_type;
+  typedef typename free_list_type::difference_type difference_type;
+  typedef typename free_list_type::const_pointer const_pointer;
+  typedef value_type & reference;
+  typedef const value_type & const_reference;
 
 #if __cplusplus >= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
@@ -24,73 +28,92 @@ public:
   using propagate_on_container_swap = std::false_type;
 #endif
 
-  template<typename U, typename AllocBase2 = AllocBase>
+  template<class U, class AllocBase2 = AllocBase>
   struct rebind
   { typedef free_list_allocator<U, AllocBase2> other; };
 
+  explicit free_list_allocator(free_list_type const & flist)
+  CPP_NOEXCEPT_OPERATOR2(free_list_type(flist))
+  : free_list_(flist)
+  {}
+
   explicit free_list_allocator(size_type size)
   CPP_NOEXCEPT_OPERATOR2(free_list_type(size))
-  : m_list(size)
+  : free_list_(size)
   {}
 
-  free_list_allocator(const free_list_allocator& other)
+  explicit free_list_allocator(const free_list_allocator& other)
   CPP_NOEXCEPT_OPERATOR2(free_list_type(other.count_by_alloc(), other.m_allocator))
-  : m_list(other.count_by_alloc(), other.m_allocator)
+  : free_list_(other.count_by_alloc(), other.m_allocator)
   {}
 
-  template<typename CPP_PACK Args>
-  free_list_allocator(size_type size,
-                      Args CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK args)
-  CPP_NOEXCEPT_OPERATOR2(allocator_type(FALCON_FORWARD(Args, args)CPP_PACK))
-  : m_list(size, FALCON_FORWARD(Args, args)CPP_PACK)
+  template<class CPP_PACK Args>
+  free_list_allocator(size_type size, Args CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK args)
+  CPP_NOEXCEPT_OPERATOR2(free_list_type(size, FALCON_FORWARD(Args, args)CPP_PACK))
+  : free_list_(size, FALCON_FORWARD(Args, args)CPP_PACK)
   {}
 
 #if __cplusplus >= 201103L
-  free_list_allocator(free_list_allocator&& other)
-  CPP_NOEXCEPT_OPERATOR2(free_list_type(std::forward<free_list<T>>(other.m_list)))
-  : m_list(std::forward<free_list<T>>(other.m_list))
+  explicit free_list_allocator(free_list_allocator&& other)
+  CPP_NOEXCEPT_OPERATOR2(free_list_type(std::move(other.free_list_)))
+  : free_list_(std::move(other.free_list_))
+  {}
+
+  explicit free_list_allocator(free_list_type && flist)
+  CPP_NOEXCEPT_OPERATOR2(free_list_type(std::move(flist)))
+  : free_list_(std::move(flist))
   {}
 #endif
 
-  template<typename U, typename AllocBase2>
-  free_list_allocator(const free_list_allocator<U, AllocBase2>& other)
+  template<class U, class AllocBase2>
+  explicit free_list_allocator(const free_list_allocator<U, AllocBase2>& other)
   CPP_NOEXCEPT_OPERATOR2(free_list_type(other.count_by_alloc(), other.m_allocator))
-  : m_list(other.count_by_alloc(), other.m_allocator)
+  : free_list_(other.count_by_alloc(), other.m_allocator)
   {}
 
   free_list_allocator& operator=(const free_list_allocator& other) CPP_NOEXCEPT
   { return *this; }
 
   pointer allocate(const void * = 0)
-  { return m_list.alloc(); }
+  { return free_list_.alloc(); }
 
-  pointer allocate(size_type /*n*/, const void * = 0)
-  { return m_list.alloc(); }
+  pointer allocate(size_type n, const void * = 0)
+  {
+    (void)n;
+    assert(free_list_.count_by_alloc() ==  n);
+    return free_list_.alloc();
+  }
 
   void deallocate(pointer p)
-  { return m_list.free(p); }
+  { return free_list_.free(p); }
 
-  void deallocate(pointer p, size_type /*n*/)
-  { return m_list.free(p); }
+  void deallocate(pointer p, size_type n)
+  {
+    (void)n;
+    assert(free_list_.count_by_alloc() ==  n);
+    return free_list_.free(p);
+  }
 
   free_list_type& freelist() CPP_NOEXCEPT
-  { return m_list; }
+  { return free_list_; }
 
   const free_list_type& freelist() const CPP_NOEXCEPT
-  { return m_list; }
+  { return free_list_; }
 
 private:
-  free_list_type m_list;
+  free_list_type free_list_;
 };
 
-template<typename T, typename AllocBase>
-bool operator==(const free_list_allocator<T, AllocBase>& a,
-                const free_list_allocator<T, AllocBase>& b)
+template<class T, class AllocBase>
+bool operator==(
+  const free_list_allocator<T, AllocBase>& a
+, const free_list_allocator<T, AllocBase>& b) CPP_NOEXCEPT
 { return a.free_list() == b.free_list(); }
 
-template<typename T, typename AllocBase>
-bool operator!=(const free_list_allocator<T, AllocBase>& a,
-                const free_list_allocator<T, AllocBase>& b)
+template<class T, class AllocBase>
+bool operator!=(
+  const free_list_allocator<T, AllocBase>& a
+, const free_list_allocator<T, AllocBase>& b) CPP_NOEXCEPT
 { return a.free_list() == b.free_list(); }
 
 }

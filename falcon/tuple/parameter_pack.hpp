@@ -5,6 +5,8 @@
 #include <falcon/parameter/pack_element.hpp>
 #include <falcon/type_traits/build_class.hpp>
 
+#include <tuple>
+
 namespace falcon {
 
 template<typename _T, typename _Indexes>

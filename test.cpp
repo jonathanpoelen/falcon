@@ -64,18 +64,33 @@
 //   }
 // };
 
-#include <falcon/memory/free_list.hpp>
+#include <falcon/memory/allocate.hpp>
+#include <falcon/memory/grouping_new.hpp>
 #include <test/A.h>
 
 int main()
 {
+  using std::get;
 
-  falcon::free_list<A> alloc(1);
+  auto t = falcon::optimal_grouping_allocate<char, int>(falcon::allocate<char>(),
+                                                        size_t(12), size_t(32));
+  get<1>(t) = const_cast<char*>("plop");
+  std::cout
+  << (get<0>(t)) << "\n"
+  << (get<1>(t)) << "\n"
+  << (get<2>(t)) << "\n"
+  ;
 
-  A * a1 = alloc.alloc();
-  alloc.free(a1);
+  auto t2 = falcon::grouping_allocate<char, int>(falcon::allocate<char>(),
+                                                 size_t(12), size_t(32));
+  get<0>(t2) = const_cast<char*>("plop");
+  std::cout
+  << (get<0>(t2)) << "\n"
+  << (get<1>(t2)) << "\n"
+  ;
 
-  alloc.get_allocator();
+//   falcon::grouping_new<int, char>(2, 4);
+//   falcon::grouping_new(falcon::new_element<int>{2}, falcon::new_element<char>{4});
 
 
 
@@ -147,25 +162,5 @@ int main()
 //   >::type max_element_iter;
 //   return max_element_iter::type::value;
 
-
-//   auto t = falcon::optimal_grouping_allocate<char, int>(falcon::allocate_wrapper<char>(),
-//                                                         size_t(12), size_t(32));
-//   get<1>(t) = const_cast<char*>("plop");
-//   std::cout
-//   << (get<0>(t)) << "\n"
-//   << (get<1>(t)) << "\n"
-//   << (get<2>(t)) << "\n"
-//   ;
-//
-//   auto t2 = falcon::grouping_allocate<char, int>(falcon::allocate_wrapper<char>(),
-//                                                  size_t(12), size_t(32));
-//   get<0>(t2) = const_cast<char*>("plop");
-//   std::cout
-//   << (get<0>(t2)) << "\n"
-//   << (get<1>(t2)) << "\n"
-//   ;
-
-//   falcon::grouping_new<int, char>(2, 4);
-//   falcon::grouping_new(falcon::new_element<int>{2}, falcon::new_element<char>{4});
 }
 

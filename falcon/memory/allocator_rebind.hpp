@@ -10,7 +10,7 @@ namespace falcon {
 template<class Alloc, class T>
 struct allocator_rebind
 {
-  typedef typename 
+  typedef typename
 #if __cplusplus <= 201103L
 		std::allocator_traits<Alloc>::template rebind_alloc<T>
 #else
@@ -18,6 +18,11 @@ struct allocator_rebind
 #endif
 	type;
 };
+
+#if __cplusplus >= 201103L
+template<class Alloc, class T>
+using allocator_rebind_t = typename allocator_rebind<Alloc, T>::type;
+#endif
 
 }
 
