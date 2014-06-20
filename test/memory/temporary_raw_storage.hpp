@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_MEMORY_TEMPORARY_RAW_STORAGE_HPP
+#define FALCON_TEST_MEMORY_TEMPORARY_RAW_STORAGE_HPP
+
+void temporary_raw_storage_test();
+
+#endif

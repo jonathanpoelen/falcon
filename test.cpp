@@ -64,30 +64,39 @@
 //   }
 // };
 
+#include <iostream>
+
 #include <falcon/memory/allocate.hpp>
-#include <falcon/memory/grouping_new.hpp>
+#include <falcon/memory/temporary_raw_storage.hpp>
+#include <falcon/tuple/optimal_tuple.hpp>
 #include <test/A.h>
 
 int main()
 {
   using std::get;
 
-  auto t = falcon::optimal_grouping_allocate<char, int>(falcon::allocate<char>(),
-                                                        size_t(12), size_t(32));
-  get<1>(t) = const_cast<char*>("plop");
+  auto trs = falcon::make_temporary_raw_storage<char, int>(12, 32);
+//   using falcon::raw_element;
+//   auto trs = falcon::make_temporary_raw_storage(raw_element<char>{12}, raw_element<int>{32});
+
+  auto t = trs.get_tuple();
+
+
+//   char * s = get<1>(t);
+//   std::copy(std::begin("plop"), std::end("plop"), s);
+  typedef void * ptr_t;
   std::cout
-  << (get<0>(t)) << "\n"
-  << (get<1>(t)) << "\n"
-  << (get<2>(t)) << "\n"
+  << ptr_t(get<0>(t)) << "\n"
+  << ptr_t(get<1>(t)) << "\n"
   ;
 
-  auto t2 = falcon::grouping_allocate<char, int>(falcon::allocate<char>(),
-                                                 size_t(12), size_t(32));
-  get<0>(t2) = const_cast<char*>("plop");
-  std::cout
-  << (get<0>(t2)) << "\n"
-  << (get<1>(t2)) << "\n"
-  ;
+//   auto t2 = falcon::grouping_allocate<char, int>(falcon::allocate<char>(),
+//                                                  size_t(12), size_t(32));
+// //   get<0>(t2) = const_cast<char*>("plop");
+//   std::cout
+//   << ptr_t(get<0>(t2)) << "\n"
+//   << ptr_t(get<1>(t2)) << "\n"
+//   ;
 
 //   falcon::grouping_new<int, char>(2, 4);
 //   falcon::grouping_new(falcon::new_element<int>{2}, falcon::new_element<char>{4});

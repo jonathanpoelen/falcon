@@ -318,6 +318,7 @@ iterator_iterator (changer le nom): It,ContIts=vector<range<It>>,Cat=forward. Ab
 
 compose1, compose2, composex -> make_compose (pour le C++11). Viré les constructeurs par defaut inutil
 compose.hpp: unary_check et std::unary_function utilisés lorsque binary est attendu
+forward ou pas pour l'utilisation de binary_compose et autres ? Stategie variable en fonction du type de retour des foncteurs et de la posibilité d'elision (ça va être lourd ><)
 
 variable fonction pour les algorithmes, manipulateurs de flux, fonctions utilitaires (autre ?)
 
@@ -325,3 +326,8 @@ passer par des tuples quand les type interne peuvent être des structure vide
 
 constructor<T>, destructor(pa|a), new_ptr<T>, new_array<T>(sz|arg_list...), delete_ptr, delete_array,
 
+filter_type<int, float>
+filter_type<???<is_integral>>
+filter_type<...>::template fiter<T>::value
+
+temporary_initialized: initialize de la memoire non initiliasée (non copiable)

@@ -63,5 +63,6 @@ if (!(tmp_CHECK_VALUE op tmp_CHECK_VALUE2)){\
 } __END_CHECK;}while(0)
 
 #define CHECK_EQUAL_VALUE(a, ...) CHECK_VALUE(==, a, __VA_ARGS__)
+#define CHECK_EQUAL(a, ...) CHECK_VALUE(==, a, __VA_ARGS__)
 
 #endif
