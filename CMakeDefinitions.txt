@@ -10,14 +10,12 @@ endfunction(create_exec_test)
 add_definitions(
     -Wall
     -Wextra
+    -Wundef
     -Wcast-align
-    -Wchar-subscripts
     -Wformat-security
     -Wunreachable-code
-    -Wformat
     -Wformat=2
     -Werror-implicit-function-declaration
-    -Wsequence-point
     -Wfloat-equal
 #     -Wshadow
     -Wpointer-arith
@@ -28,10 +26,8 @@ add_definitions(
     -Wpacked
     -Wredundant-decls
     -Winline
-    -Wdouble-promotion
     -Winit-self
     -Wcast-qual
-
     -Wnon-virtual-dtor
     -Wno-long-long
 #   -fno-exceptions
@@ -44,7 +40,6 @@ add_definitions(
     -Wold-style-cast
     -Wmain
     -Wparentheses
-    -Wtrampolines
     -fstrict-overflow
     -Wstrict-overflow=5
 #   -Wno-overflow
@@ -57,3 +52,18 @@ add_definitions(
 
 #   -Wfatal-errors
 )
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  add_definitions(
+    -Wno-mismatched-tags
+  )
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  add_definitions(
+    -Wtrampolines
+    -Wdouble-promotion
+  )
+#elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+#  # using Intel C++
+#elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+#  # using Visual Studio C++
+endif()

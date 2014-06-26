@@ -93,13 +93,13 @@ tuple_compose(Function&& func, Operations&& t)
                           build_tuple_index_t<Operations>(),
                           std::forward<Function>(func),
                           std::forward<Operations>(t),
-                          std::tuple<>()))
+                          detail::tuple_void()))
 {
   return tuple_compose(parameter_index<>(),
                        build_tuple_index_t<Operations>(),
                        std::forward<Function>(func),
                        std::forward<Operations>(t),
-                       std::tuple<>());
+                       detail::tuple_void());
 }
 //@}
 

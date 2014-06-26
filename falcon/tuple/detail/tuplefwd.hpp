@@ -8,16 +8,23 @@ namespace std {
   class tuple_element;
   template <class T>
   class tuple_size;
+  template<class...>
+  class tuple;
 }
 
 namespace falcon {
 
-namespace __detail {
+namespace detail {
   struct _not_declared;
   template<std::size_t I>
   _not_declared get(_not_declared);
+
+  class tuple_void {};
+  template<std::size_t>
+  void get(tuple_void)
+  {}
 }
-using __detail::get;
+using detail::get;
 
 }
 

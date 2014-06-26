@@ -66,29 +66,14 @@
 
 #include <iostream>
 
-#include <falcon/memory/allocate.hpp>
-#include <falcon/memory/temporary_raw_storage.hpp>
-#include <falcon/tuple/optimal_tuple.hpp>
+#include <falcon/memory/lifo_allocator.hpp>
 #include <test/A.h>
 
 int main()
 {
-  using std::get;
-
-  auto trs = falcon::make_temporary_raw_storage<char, int>(12, 32);
-//   using falcon::raw_element;
-//   auto trs = falcon::make_temporary_raw_storage(raw_element<char>{12}, raw_element<int>{32});
-
-  auto t = trs.get_tuple();
-
-
-//   char * s = get<1>(t);
-//   std::copy(std::begin("plop"), std::end("plop"), s);
-  typedef void * ptr_t;
-  std::cout
-  << ptr_t(get<0>(t)) << "\n"
-  << ptr_t(get<1>(t)) << "\n"
-  ;
+  int data[10];
+  falcon::lifo_allocator<int> l(std::begin(data), std::end(data));
+  l.deallocate(l.allocate(2), 2);
 
 //   auto t2 = falcon::grouping_allocate<char, int>(falcon::allocate<char>(),
 //                                                  size_t(12), size_t(32));
