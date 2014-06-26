@@ -23,7 +23,7 @@ namespace _aux {
 }
 
 /**
- * Allocates storage containing Elements types
+ * Allocates storage containing \a Elements types
  */
 template<class Allocator, class... Elements>
 class temporary_raw_storage_with_allocator
@@ -166,7 +166,7 @@ private:
 
 
 /**
- * Allocates storage containing Elements types
+ * Allocates storage containing \a Elements types
  */
 template<class... Elements>
 using temporary_raw_storage = temporary_raw_storage_with_allocator<std::allocator<char>, Elements...>;

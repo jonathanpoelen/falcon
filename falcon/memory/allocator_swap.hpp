@@ -44,7 +44,10 @@ namespace _aux {
   struct allocator_swap_impl
   {
     static void swap(Allocator&, Allocator&)
-    {}
+    {
+      using std::swap;
+      swap(a, b);
+    }
   };
 
   template<class Allocator>
