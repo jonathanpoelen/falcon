@@ -18,6 +18,9 @@ namespace falcon {
  * Destroy the object pointed to by a pointer type.
  */
 CPP_GLOBAL_CONSTEXPR struct destroy_t {
+
+  CPP_CONSTEXPR destroy_t() {}
+
   template<class T>
   void operator()(T * p) const
   { p->~T(); }

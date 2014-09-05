@@ -22,13 +22,13 @@ struct first_parameter_index_tag {};
 template<std::size_t Keep = 1>
 struct last_parameter_index_tag {};
 
-template<std::size_t Start, std::size_t Len = 1>
+template<std::size_t Start, std::size_t Len = 1u>
 struct range_parameter_index_tag {};
 
-template<std::size_t Start, std::size_t Len = 1>
+template<std::size_t Start, std::size_t Len = 1u>
 struct ignore_parameter_index_tag {};
 
-template<std::size_t Start, std::size_t Len = -1>
+template<std::size_t Start, std::size_t Len = -1u>
 struct reverse_parameter_index_tag {};
 
 struct full_parameter_index_tag {};
@@ -149,13 +149,13 @@ namespace parameter {
   template<std::size_t Keep = 1>
   using last_index_tag = last_parameter_index_tag<Keep>;
 
-  template<std::size_t Start, std::size_t Len = 1>
+  template<std::size_t Start, std::size_t Len = 1u>
   using range_index_tag = range_parameter_index_tag<Start, Len>;
 
-  template<std::size_t Start, std::size_t Len = 1>
+  template<std::size_t Start, std::size_t Len = 1u>
   using ignore_index_tag = ignore_parameter_index_tag<Start, Len>;
 
-  template<std::size_t Start, std::size_t Len = -1>
+  template<std::size_t Start, std::size_t Len = -1u>
   using reverse_index_tag = reverse_parameter_index_tag<Start, Len>;
 
   using full_index_tag = full_parameter_index_tag;

@@ -5,8 +5,12 @@
 #include <falcon/memory/mutation_allocator.hpp>
 
 namespace falcon {
-	template<typename _T, typename _Alloc = std::allocator<_T>>
-	using reference_wrapper_allocator = mutation_allocator<std::reference_wrapper<_T>, typename _Alloc::template rebind<std::reference_wrapper<_T>>::other>;
+	template<class T, class Alloc = std::allocator<T>>
+	using reference_wrapper_allocator =
+    mutation_allocator<
+      std::reference_wrapper<T>,
+      typename Alloc::template rebind<std::reference_wrapper<T>>::other
+    >;
 }
 
 #endif
