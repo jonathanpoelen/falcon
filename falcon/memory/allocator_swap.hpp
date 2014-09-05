@@ -7,23 +7,21 @@
 
 namespace falcon {
 
-namespace _aux {
-  template<class Allocator>
-  void allocator_swap_impl(Allocator&, Allocator&, std::false_type)
-  {}
-
-  template<class Allocator>
-  void allocator_swap_impl(Allocator& a, Allocator& b, std::true_type)
-  {
-    using std::swap;
-    swap(a, b);
-  }
-}
-
 template<class Allocator>
 void allocator_swap(Allocator& a, Allocator& b)
 {
-  ::falcon::_aux::allocator_swap_impl(
+  struct Impl {
+    static void swap_impl(Allocator&, Allocator&, std::false_type)
+    {}
+
+    static void swap_impl(Allocator& a, Allocator& b, std::true_type)
+    {
+      using std::swap;
+      swap(a, b);
+    }
+  };
+
+  Impl::swap_impl(
     a, b, typename std::allocator_traits<Allocator>::propagate_on_container_swap()
   );
 }

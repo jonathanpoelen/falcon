@@ -21,6 +21,8 @@ namespace falcon {
  * object's constructor with an initializer.
  */
 CPP_GLOBAL_CONSTEXPR struct construct_t {
+  CPP_CONSTEXPR construct_t(){}
+
   template<class T>
   void operator()(T* p) const
   { new(p) T(); }

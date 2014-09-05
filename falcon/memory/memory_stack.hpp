@@ -1,311 +1,325 @@
-#ifndef _FALCON_MEMORY_MEMORY_STACK_HPP
-#define _FALCON_MEMORY_MEMORY_STACK_HPP
+#ifndef FALCON_MEMORY_MEMORY_STACK_HPP
+#define FALCON_MEMORY_MEMORY_STACK_HPP
 
 #include <utility>
 
+#include <falcon/c++/pack.hpp>
+#include <falcon/c++/noexcept.hpp>
+#include <falcon/c++/reference.hpp>
 #include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/empty_class.hpp>
 #include <falcon/c++/boost_or_std.hpp>
+#include <falcon/utility/move.hpp>
 #if __cplusplus <= 201103L
 # include <type_traits>
 #else
 #include <boost/type_traits/aligned_storage.hpp>
 #include <boost/type_traits/alignment_of.hpp>
+#include <boost/type_traits/remove_extent.hpp>
+#include <boost/type_traits/is_integral.hpp>
 #endif
 
 namespace falcon {
 
-template<typename _T, std::size_t _N>
-struct __memory_stack_type
-{
-	typedef _T type[_N];
-	typedef typename __memory_stack_type<_T, -1u>::memory_type memory_type[_N];
-};
+namespace aux_ {
 
-template<typename _T>
-struct __memory_stack_type<_T, std::size_t(-1u)>
-{
-	typedef _T type;
-	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::aligned_storage<
-		sizeof(_T),
-		FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<_T>::value
-	>::type memory_type;
-};
+  template<class T>
+  struct memory_stack_type
+  {
+    typedef T type;
+    typedef T base_type;
+    typedef typename FALCON_BOOST_OR_STD_NAMESPACE::aligned_storage<
+      sizeof(T),
+      FALCON_BOOST_OR_STD_NAMESPACE::alignment_of<T>::value
+    >::type memory_type;
+  };
 
-template<typename _T, std::size_t _N = std::size_t(-1u)>
-class __memory_stack_base
-{
-public:
-	typedef typename __memory_stack_type<_T, _N>::type type;
-	typedef typename __memory_stack_type<_T, _N>::memory_type memory_type;
-	typedef _T * pointer;
-	typedef const _T * const_pointer;
+  template<class T, std::size_t N>
+  struct memory_stack_type<T[N]>
+  {
+    typedef T type[N];
+    typedef T base_type;
+    typedef typename memory_stack_type<T>::memory_type memory_type[N];
+  };
 
-private:
-	memory_type m_data;
+  template<class T>
+  struct memory_stack_base
+  {
+    typedef typename memory_stack_type<T>::type type;
+    typedef typename memory_stack_type<T>::memory_type memory_type;
+    typedef typename memory_stack_type<T>::base_type * pointer;
+    typedef typename memory_stack_type<T>::base_type const * const_pointer;
 
-public:
-	__memory_stack_base()
-	{}
+  private:
+    memory_type m_data;
 
-	const memory_type& data() const
-	{
-		return m_data;
-	}
+  public:
+    CPP_CONSTEXPR_NOT_CONST const memory_type& data() const
+    {
+      return m_data;
+    }
 
-	type& get()
-	{
-		return reinterpret_cast<type&>(m_data);
-	}
+    CPP_CONSTEXPR_NOT_CONST type& get()
+    {
+      return reinterpret_cast<type&>(m_data);
+    }
 
-	const type& get() const
-	{
-		return reinterpret_cast<const type&>(m_data);
-	}
+    CPP_CONSTEXPR_NOT_CONST const type& get() const
+    {
+      return reinterpret_cast<const type&>(m_data);
+    }
 
-	memory_type& data()
-	{
-		return m_data;
-	}
+    CPP_CONSTEXPR_NOT_CONST memory_type& data()
+    {
+      return m_data;
+    }
 
-	pointer address()
-	{
-		return reinterpret_cast<_T*>(&m_data);
-	}
+    CPP_CONSTEXPR_NOT_CONST pointer address()
+    {
+      return reinterpret_cast<T*>(&m_data);
+    }
 
-	const_pointer address() const
-	{
-		return reinterpret_cast<const _T*>(&m_data);
-	}
+    CPP_CONSTEXPR_NOT_CONST const_pointer address() const
+    {
+      return reinterpret_cast<const T*>(&m_data);
+    }
 
-	CPP_CONSTEXPR std::size_t size() const
-	{
-		return sizeof(memory_type);
-	}
-};
+    CPP_CONSTEXPR std::size_t size() const
+    {
+      return sizeof(memory_type);
+    }
+  };
 
-template <typename _T,
-bool = std::is_trivial<typename std::remove_extent<_T>::type>::value>
-class __memory_stack
-: public __memory_stack_base<_T>
-{
-public:
-	typedef typename __memory_stack_base<_T>::type type;
-	typedef typename __memory_stack_base<_T>::memory_type memory_type;
+  template <typename T,
+  #if __cplusplus >= 201103L
+    bool = std::is_trivial<typename std::remove_extent<T>::type>::value>
+  #else
+    bool = boost::is_integral<typename boost::remove_extent<T>::type>::value>
+  #endif
+  struct memory_stack
+  : memory_stack_base<T>
+  {
+    typedef typename memory_stack_base<T>::type type;
+    typedef typename memory_stack_base<T>::memory_type memory_type;
 
-public:
-	__memory_stack()
-	: __memory_stack_base<_T>()
-	{}
 
-	template<typename... _Args>
-	void construct(_Args&&... args)
-	{
-		new (this->address()) _T(std::forward<_Args>(args)...);
-	}
+    template<class CPP_PACK Args>
+    void construct(Args CPP_RVALUE CPP_PACK args)
+    CPP_NOEXCEPT_OPERATOR2(T(std::declval<Args>()...))
+    {
+      new (this->address()) T(FALCON_FORWARD(Args, args)CPP_PACK);
+    }
 
-	void destroy()
-	{
-		this->get().~_T();
-	}
-};
+    void destroy() CPP_NOEXCEPT
+    {
+      this->get().~T();
+    }
+  };
 
-template <typename _T>
-class __memory_stack<_T, true>
-: public __memory_stack_base<_T>
-{
-public:
-	typedef typename __memory_stack_base<_T>::type type;
-	typedef typename __memory_stack_base<_T>::memory_type memory_type;
+  template <typename T>
+  struct memory_stack<T, true>
+  : memory_stack_base<T>
+  {
+    typedef typename memory_stack_base<T>::type type;
+    typedef typename memory_stack_base<T>::memory_type memory_type;
 
-public:
-	__memory_stack()
-	: __memory_stack_base<_T>()
-	{}
 
-	template<typename... _Args>
-	void construct(_Args&&... args)
-	{
-		this->get() = {std::forward<_Args>(args)...};
-	}
+  #if __cplusplus >= 201103L
+    template<class... Args>
+    void construct(Args&&... args) noexcept
+    {
+      this->get() = {std::forward<Args>(args)...};
+    }
 
-	template<typename _U>
-	void construct(const _U& value)
-	{
-		this->get() = value;
-	}
+    void construct(T&& value) noexcept
+    {
+      this->get() = std::forward<T>(value);
+    }
+  #endif
 
-	void construct(_T&& value)
-	{
-		this->get() = std::forward<_T>(value);
-	}
+    template<class U>
+    void construct(const U& value) CPP_NOEXCEPT
+    {
+      this->get() = value;
+    }
 
-	void destroy()
-	{}
-};
+    void destroy() CPP_NOEXCEPT
+    {}
+  };
 
-#if __cplusplus >= 201103L
-constexpr struct emplace_t {} emplace;
-#else
-struct emplace_t {};
-const emplace_t emplace;
-#endif
+  #if __cplusplus >= 201103L
+  CPP_GLOBAL_CONSTEXPR CPP_EMPTY_CLASS(emplace_t) emplace;
+  #endif
 
-template <typename _T, std::size_t _N>
-class __memory_stack<_T[_N], false>
-: public __memory_stack_base<_T, _N>
-{
-public:
-	typedef typename __memory_stack_base<_T, _N>::type type;
-	typedef typename __memory_stack_base<_T, _N>::memory_type memory_type;
+  template <typename T, std::size_t N>
+  struct memory_stack<T[N], false>
+  : memory_stack_base<T[N]>
+  {
+    typedef typename memory_stack_base<T[N]>::type type;
+    typedef typename memory_stack_base<T[N]>::memory_type memory_type;
 
-public:
-	__memory_stack()
-	: __memory_stack_base<_T, _N>()
-	{}
 
-public:
-	template<typename... _Args>
-	void construct(_Args&&... args)
-	{
-		std::size_t i = 0;
-		try
-		{
-			_T * p = this->address();
-			for (; i != _N; ++i, ++p)
-				new (p) _T(std::forward<_Args>(args)...);
-		}
-		catch (...)
-		{
-			__destroy_n(i);
-			throw;
-		}
-	}
+    template<class CPP_PACK Args>
+    void construct(Args CPP_RVALUE CPP_PACK args)
+    CPP_NOEXCEPT_OPERATOR2(T(std::declval<Args>()...))
+    {
+      std::size_t i = 0;
+      try
+      {
+        T * p = this->address();
+        for (; i != N; ++i, ++p)
+          new (p) T(FALCON_FORWARD(Args, args)CPP_PACK);
+      }
+      catch (...)
+      {
+        destroy_n(i);
+        throw;
+      }
+    }
 
-	void construct(const emplace_t&)
-	{
-		construct();
-	}
+  #if __cplusplus >= 201103L
+    void construct(const emplace_t&)
+    CPP_NOEXCEPT_OPERATOR2(construct())
+    {
+      construct();
+    }
+  #endif
 
-	void __destroy_n(std::size_t i)
-	{
-		_T * p = this->address();
-		while (i)
-			p[--i].~_T();
-	}
+  private:
+    void destroy_n(std::size_t i) CPP_NOEXCEPT
+    {
+      T * p = this->address();
+      while (i)
+        p[--i].~T();
+    }
 
-private:
-	template<typename _U, typename... _Args>
-	void __construct(std::size_t& n, _T * p, _U&& a, _Args&&... args)
-	{
-		new (p) _T(std::forward<_U>(a));
-		__construct(++n, p+1, std::forward<_U>(args)...);
-	}
+  #if __cplusplus >= 201103L
+    template<class U, typename... Args>
+    void priv_construct(std::size_t& n, T * p, U&& a, Args&&... args)
+    CPP_NOEXCEPT_OPERATOR2(
+      void(T(std::forward<U>(a))),
+      priv_construct(std::declval<std::size_t&>(), nullptr, std::declval<Args>()...)
+    )
+    {
+      new (p) T(std::forward<U>(a));
+      priv_construct(++n, p+1, std::forward<Args>(args)...);
+    }
 
-	void __construct(std::size_t& n, _T * p)
-	{
-		for (; n != _N; ++n, ++p)
-			new (p) _T();
-	}
+    void priv_construct(std::size_t& n, T * p)
+    CPP_NOEXCEPT_OPERATOR2(T())
+    {
+      for (; n != N; ++n, ++p)
+        new (p) T();
+    }
 
-public:
-	template<typename... _Args>
-	void construct(const emplace_t&, _Args&&... args)
-	{
-		std::size_t i = 0;
-		try
-		{
-			__construct(i, this->address(), std::forward<_Args>(args)...);
-		}
-		catch (...)
-		{
-			__destroy_n(i);
-			throw;
-		}
-	}
+  public:
+    template<class... Args>
+    void construct(const emplace_t&, Args&&... args)
+    CPP_NOEXCEPT_OPERATOR2(priv_construct(
+      std::declval<std::size_t&>(), nullptr, std::declval<Args>()...
+    ))
+    {
+      std::size_t i = 0;
+      try
+      {
+        priv_construct(i, this->address(), std::forward<Args>(args)...);
+      }
+      catch (...)
+      {
+        destroy_n(i);
+        throw;
+      }
+    }
+  #else
+  public:
+  #endif
 
-	void destroy()
-	{
-		__destroy_n(_N);
-	}
-};
+    void destroy() CPP_NOEXCEPT
+    {
+      destroy_n(N);
+    }
+  };
 
-template <typename _T, std::size_t _N>
-class __memory_stack<_T[_N], true>
-: public __memory_stack_base<_T, _N>
-{
-public:
-	typedef typename __memory_stack_base<_T, _N>::type type;
-	typedef typename __memory_stack_base<_T, _N>::memory_type memory_type;
+  template <typename T, std::size_t N>
+  struct memory_stack<T[N], true>
+  : memory_stack_base<T[N]>
+  {
+  public:
+    typedef typename memory_stack_base<T[N]>::type type;
+    typedef typename memory_stack_base<T[N]>::memory_type memory_type;
 
-public:
-	__memory_stack()
-	: __memory_stack_base<_T, _N>()
-	{}
 
-	template<typename... _Args>
-	void construct(_Args&&... args)
-	{
-		_T* p = this->address();
-		for (std::size_t i = 0; i != _N; ++i, ++p)
-			new (p) _T{std::forward<_Args>(args)...};
-	}
+  #if __cplusplus >= 201103L
+    template<class... Args>
+    void construct(Args&&... args)
+    noexcept(noexcept(T(std::forward<Args>(args)...)))
+    {
+      T* p = this->address();
+      for (std::size_t i = 0; i != N; ++i, ++p)
+        new (p) T{std::forward<Args>(args)...};
+    }
+  #endif
 
-	template<typename _U>
-	void construct(const _U& value)
-	{
-		for (std::size_t i = 0; i != _N; ++i)
-			this->get()[i] = value;
-	}
+    template<class U>
+    void construct(const U& value)
+    CPP_NOEXCEPT_OPERATOR2(this->get()[0] = value)
+    {
+      for (std::size_t i = 0; i != N; ++i)
+        this->get()[i] = value;
+    }
 
-private:
-	template<typename _U, typename... _Args>
-	void __construct(std::size_t n, _T* p, _U&& a, _Args&&... args)
-	{
-		new (p) _T(std::forward<_U>(a));
-		__construct(n+1, p+1, std::forward<_U>(args)...);
-	}
+  #if __cplusplus >= 201103L
+  private:
+    template<class U, typename... Args>
+    void priv_construct(std::size_t n, T* p, U&& a, Args&&... args)
+    CPP_NOEXCEPT_OPERATOR2(
+      void(T(std::forward<U>(a))),
+      priv_construct(0, nullptr, std::declval<Args>()...)
+    )
+    {
+      new (p) T(std::forward<U>(a));
+      priv_construct(n+1, p+1, std::forward<Args>(args)...);
+    }
 
-	void __construct(std::size_t n, _T* p = 0)
-	{
-		for (; n != _N; ++n, ++p)
-			new (p) _T();
-	}
+    void priv_construct(std::size_t n, T* p = 0)
+    CPP_NOEXCEPT_OPERATOR2(T())
+    {
+      for (; n != N; ++n, ++p)
+        new (p) T();
+    }
 
-public:
-	template<typename... _Args>
-	void construct(const emplace_t&, _Args&&... args)
-	{
-		__construct(0, this->address(), std::forward<_Args>(args)...);
-	}
+  public:
+    template<class... Args>
+    void construct(const emplace_t&, Args&&... args)
+    CPP_NOEXCEPT_OPERATOR2(priv_construct(0, nullptr, std::declval<Args>()...))
+    {
+      priv_construct(0, this->address(), std::forward<Args>(args)...);
+    }
+  #endif
 
-	void destroy()
-	{}
-};
+    void destroy() CPP_NOEXCEPT
+    {}
+  };
+}
 
 /**
  * \brief Reserve memory in the stack.
  * \attention The internal object is not automatically destroy.
  */
-template<typename _T>
-class memory_stack
-: __memory_stack<_T>
+template<class T>
+struct memory_stack
+: aux_::memory_stack<T>
 {
-public:
-	typedef typename __memory_stack<_T>::type type;
-	typedef typename __memory_stack<_T>::memory_type memory_type;
-	typedef typename __memory_stack<_T>::pointer pointer;
-	typedef typename __memory_stack<_T>::const_pointer const_pointer;
+	typedef typename aux_::memory_stack<T>::type type;
+	typedef typename aux_::memory_stack<T>::memory_type memory_type;
+	typedef typename aux_::memory_stack<T>::pointer pointer;
+	typedef typename aux_::memory_stack<T>::const_pointer const_pointer;
 
-public:
-	memory_stack()
-	: __memory_stack<_T>()
-	{}
-
-	using __memory_stack<_T>::get;
-	using __memory_stack<_T>::data;
-	using __memory_stack<_T>::address;
-	using __memory_stack<_T>::construct;
-	using __memory_stack<_T>::destroy;
+	using aux_::memory_stack<T>::get;
+	using aux_::memory_stack<T>::data;
+	using aux_::memory_stack<T>::address;
+	using aux_::memory_stack<T>::construct;
+	using aux_::memory_stack<T>::destroy;
 };
 
 }
