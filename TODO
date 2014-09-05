@@ -333,3 +333,5 @@ filter_type<...>::template fiter<T>::value
 temporary_initialized: initialize de la memoire non initiliasée (non copiable)
 
 allocator_adapter: rebind ne change pas l'allocateur internet mais modifier les tailles demandé par allocate. Permettra d'utilisé lifo_allocator de façon simple avec un container ?
+
+mettre des noexcept pour les fichiers dans memory

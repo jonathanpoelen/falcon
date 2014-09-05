@@ -8,7 +8,6 @@ namespace falcon {
 template <class T>
 struct non_owner_ptr
 {
-public:
   using pointer = T*;
   using element_type = T;
 

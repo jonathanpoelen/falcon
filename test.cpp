@@ -66,7 +66,7 @@
 
 #include <iostream>
 
-#include <falcon/memory/memory_stack.hpp>
+#include <falcon/memory/static_new.hpp>
 // #include <falcon/memory/lifo_allocator.hpp>
 #include <test/A.h>
 
