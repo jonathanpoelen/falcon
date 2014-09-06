@@ -4,6 +4,7 @@
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/memory/allocator_rebind.hpp>
 #include <falcon/memory/allocator_swap.hpp>
+#include <falcon/memory/non_owner_ptr.hpp>
 
 #include <memory>
 #if __cplusplus >= 201103L
@@ -99,8 +100,8 @@ public:
   { return !(this == &other); }
 
 private:
-  T * m_current;
-  T * m_finish;
+  non_owner_ptr<T> m_current;
+  non_owner_ptr<T> m_finish;
 
   allocator_base & base() const noexcept
   { return *this; }

@@ -12,6 +12,8 @@ namespace falcon {
 template<class T>
 struct deallocate
 {
+  CPP_CONSTEXPR deallocate() {}
+
   void operator()(T* p, std::size_t = 1) const
   { ::operator delete(p); }
 };
@@ -19,6 +21,8 @@ struct deallocate
 template<class T>
 struct deallocate<T[]>
 {
+  CPP_CONSTEXPR deallocate() {}
+
   void operator()(T* p, std::size_t = 1) const
   { ::operator delete[](p); }
 };
@@ -27,6 +31,8 @@ struct deallocate<T[]>
 template<class T>
 struct deallocate_then_zero
 {
+  CPP_CONSTEXPR deallocate_then_zero() {}
+
   void operator()(
     typename FALCON_BOOST_OR_STD_NAMESPACE::remove_extent<T>::type * & p,
     std::size_t = 1) const
@@ -38,12 +44,16 @@ struct deallocate_then_zero
 
 
 CPP_GLOBAL_CONSTEXPR struct deallocate_ptr_t {
+  CPP_CONSTEXPR deallocate_ptr_t() {}
+
   template<class T>
   void operator()(T * p, std::size_t = 1) const
   { deallocate<T>()(p); }
 } deallocate_ptr;
 
 CPP_GLOBAL_CONSTEXPR struct deallocate_array_t {
+  CPP_CONSTEXPR deallocate_array_t() {}
+
   template<class T>
   void operator()(T * p, std::size_t = 1) const
   { deallocate<T[]>()(p); }
@@ -51,12 +61,16 @@ CPP_GLOBAL_CONSTEXPR struct deallocate_array_t {
 
 
 CPP_GLOBAL_CONSTEXPR struct deallocate_ptr_then_zero_t {
+  CPP_CONSTEXPR deallocate_ptr_then_zero_t() {}
+
   template<class T>
   void operator()(T * & p, std::size_t = 1) const
   { deallocate_then_zero<T>()(p); }
 } deallocate_ptr_then_zero;
 
 CPP_GLOBAL_CONSTEXPR struct deallocate_array_then_zero_t {
+  CPP_CONSTEXPR deallocate_array_then_zero_t() {}
+
   template<class T>
   void operator()(T * & p, std::size_t = 1) const
   { deallocate_then_zero<T[]>()(p); }

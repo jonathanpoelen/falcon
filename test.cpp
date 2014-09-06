@@ -66,14 +66,17 @@
 
 #include <iostream>
 
-#include <falcon/memory/lifo_allocator.hpp>
+#include <falcon/memory/retain_free_object_allocator.hpp>
 #include <test/A.h>
 
 int main()
 {
-  int data[10];
-  falcon::lifo_allocator<int> l(std::begin(data), std::end(data));
-  l.deallocate(l.allocate(2), 2);
+  falcon::retain_free_object_allocator<int> allocator;
+  allocator.deallocate(allocator.allocate(2), 2);
+
+//   int data[10];
+//   falcon::lifo_allocator<int> l(std::begin(data), std::end(data));
+//   l.deallocate(l.allocate(2), 2);
 
 //   auto t2 = falcon::grouping_allocate<char, int>(falcon::allocate<char>(),
 //                                                  size_t(12), size_t(32));
