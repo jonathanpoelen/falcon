@@ -27,7 +27,7 @@ public:
   typedef typename allocator_traits::size_type size_type;
   typedef typename allocator_traits::difference_type difference_type;
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
 	using propagate_on_container_copy_assignment = std::true_type;
 	using propagate_on_container_move_assignment = std::true_type;
 	using propagate_on_container_swap = std::true_type;
@@ -61,7 +61,7 @@ public:
 	ptr_allocator& operator=(const ptr_allocator& other) CPP_NOEXCEPT
 	{ m_alloc = other.m_alloc; }
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
 	ptr_allocator(ptr_allocator&& other) CPP_NOEXCEPT
 	: m_alloc(other.m_alloc)
 	{
@@ -74,9 +74,6 @@ public:
 		other.m_alloc = nullptr;
 	}
 #endif
-
-	~allocator() CPP_NOEXCEPT
-	{}
 
 	pointer address(reference x) const
 	{ return m_alloc->address(x); }
@@ -96,7 +93,7 @@ public:
 	size_type max_size() const
   { return allocator_traits::max_size(m_alloc); }
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
 	template<class U, class... Args>
 	void construct(U* p, Args&&... args)
   { allocator_traits::construct(m_alloc, p, std::forward<Args>(args)...); }
@@ -124,7 +121,6 @@ public:
   {
     using std::swap;
     swap(m_alloc, other.m_alloc);
-		allocator_swap<__allocator_base>(*this, other);
 	}
 
 	void set(Alloc& other)

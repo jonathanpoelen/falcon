@@ -3,7 +3,7 @@
 
 #include <falcon/config.hpp>
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
 #include <type_traits>
 namespace std {
 	template<class, std::size_t>

@@ -10,7 +10,7 @@
 #include <falcon/c++/empty_class.hpp>
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/utility/move.hpp>
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
 # include <type_traits>
 #else
 #include <boost/type_traits/aligned_storage.hpp>

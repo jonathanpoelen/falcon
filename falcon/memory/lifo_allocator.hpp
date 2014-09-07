@@ -63,9 +63,6 @@ private:
 public:
 #endif
 
-  ~lifo_allocator() CPP_NOEXCEPT
-  {}
-
   pointer allocate(size_type n, const void * = 0)
   {
     if (m_current + n > m_finish)

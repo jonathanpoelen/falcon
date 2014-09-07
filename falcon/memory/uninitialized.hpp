@@ -1,5 +1,5 @@
-#ifndef _FALCON_MEMORY_UNINITIALIZED_HPP
-#define _FALCON_MEMORY_UNINITIALIZED_HPP
+#ifndef FALCON_MEMORY_UNINITIALIZED_HPP
+#define FALCON_MEMORY_UNINITIALIZED_HPP
 
 #include <falcon/memory/construct.hpp>
 #include <falcon/memory/destroy.hpp>
@@ -8,36 +8,40 @@
 
 namespace falcon {
 
-template<bool _TrivialValueType>
-struct __uninitialized_emplace
-{
-	template<class ForwardIterator, class... Args>
-	static void __uninit_emplace(ForwardIterator first, ForwardIterator last, Args&&... args)
-	{
-		ForwardIterator cur = first;
-		try
-		{
-			for (; cur != last; ++cur)
-				construct(std::addressof(*cur), args...);
-		}
-		catch(...)
-		{
-			destroy(first, cur);
-			throw;
-		}
-	}
-};
+namespace aux_ {
 
-template<>
-struct __uninitialized_emplace<true>
-{
-	template<class ForwardIterator, class T>
-	static void __uninit_emplace(ForwardIterator first, ForwardIterator last, T && x)
+	template<bool TrivialValueType>
+	struct uninitialized_emplace
 	{
-		for (; first != last; ++first)
-			*first = x;
-	}
-};
+		template<class ForwardIterator, class... Args>
+		static void uninit_emplace(ForwardIterator first, ForwardIterator last, Args&&... args)
+		{
+			ForwardIterator cur = first;
+			try
+			{
+				for (; cur != last; ++cur)
+					construct(std::addressof(*cur), args...);
+			}
+			catch(...)
+			{
+				destroy(first, cur);
+				throw;
+			}
+		}
+	};
+
+	template<>
+	struct uninitialized_emplace<true>
+	{
+		template<class ForwardIterator, class... Args>
+		static void uninit_emplace(ForwardIterator first, ForwardIterator last, Args&&...args)
+		{
+			for (; first != last; ++first) {
+				construct(std::addressof(*first), args...);
+			}
+		}
+	};
+}
 
 /**
  *  @brief Emplace values args into the range [first,last).
@@ -51,9 +55,9 @@ inline void uninitialized_emplace(ForwardIterator first, ForwardIterator last, A
 {
 	typedef typename std::iterator_traits<ForwardIterator>::value_type ValueType;
 
-	__uninitialized_emplace<
+	aux_::uninitialized_emplace<
 		std::has_trivial_default_constructor<ValueType>::value
-	>::__uninit_emplace(first, last, std::forward<Args>(args)...);
+	>::uninit_emplace(first, last, std::forward<Args>(args)...);
 }
 
 }

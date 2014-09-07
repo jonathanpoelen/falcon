@@ -46,10 +46,6 @@ public:
 	CPP_NOEXCEPT_OPERATOR2(allocator_base_(other))
 	: allocator_base_(other)
 	{}
-
-	~mutation_allocator()
-	CPP_NOEXCEPT_OPERATOR2(allocator_base_().~allocator_base_())
-	{}
 };
 
 }

@@ -130,7 +130,7 @@ public:
   typedef typename allocator_base_::pointer pointer;
   typedef typename allocator_base_::size_type size_type;
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
   using propagate_on_container_copy_assignment = std::false_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::true_type;
@@ -152,7 +152,7 @@ public:
   , ptrs_()
   {}
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
   retain_free_object_allocator(retain_free_object_allocator&& other)
   : allocator_base_(std::forward<allocator_base_>(other))
   , ptrs_(std::forward<std::vector<pointer>>(other.ptrs_))
@@ -170,7 +170,7 @@ public:
     return *this;
   }
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
   retain_free_object_allocator& operator=(retain_free_object_allocator&& other)
   {
     allocator_base_::operator=(std::forward<allocator_base_>(other));

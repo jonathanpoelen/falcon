@@ -1,5 +1,5 @@
-#ifndef _FALCON_MEMORY_RECONSTRUCT_HPP
-#define _FALCON_MEMORY_RECONSTRUCT_HPP
+#ifndef FALCON_MEMORY_RECONSTRUCT_HPP
+#define FALCON_MEMORY_RECONSTRUCT_HPP
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/memory/destroy.hpp>
