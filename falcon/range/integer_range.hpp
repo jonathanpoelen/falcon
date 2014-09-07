@@ -10,12 +10,12 @@ template<typename Integer>
 class integer_range
 : public iterator_range< iterator::integer_iterator<Integer> >
 {
-  typedef iterator::integer_iterator<Integer> __iterator;
-  typedef iterator_range<__iterator> __base;
+  typedef iterator::integer_iterator<Integer> iterator_;
+  typedef iterator_range<iterator_> base_;
 
 public:
-  integer_range(Integer first, Integer last)
-  : __base(__iterator(first), __iterator(last))
+  CPP_CONSTEXPR integer_range(Integer first, Integer last)
+  : base_(iterator_(first), iterator_(last))
   {}
 };
 
@@ -23,14 +23,14 @@ template<typename Integer>
 class strided_integer_range
 : public iterator_range< iterator::integer_iterator_with_step<Integer> >
 {
-  typedef iterator::integer_iterator_with_step<Integer> __iterator;
-  typedef iterator_range<__iterator> __base;
+  typedef iterator::integer_iterator_with_step<Integer> iterator_;
+  typedef iterator_range<iterator_> base_;
 
 public:
-  typedef typename __base::difference_type difference_type;
+  typedef typename base_::difference_type difference_type;
 
-  strided_integer_range(Integer first, Integer last, difference_type step)
-  : __base(__iterator(first, step), __iterator(last, step))
+  CPP_CONSTEXPR strided_integer_range(Integer first, Integer last, difference_type step)
+  : base_(iterator_(first, step), iterator_(last, step))
   {}
 };
 

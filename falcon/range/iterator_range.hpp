@@ -51,6 +51,7 @@ struct iterator_range
 
 #if __cplusplus >= 201103L
   iterator_range& operator=(const iterator_range & r) = default;
+  iterator_range& operator=(const iterator_range && r) = default;
 #else
   iterator_range & operator=(const iterator_range & r)
   {
@@ -86,15 +87,15 @@ struct iterator_range
     return m_end;
   }
 
-	CPP_CONSTEXPR bool empty() const
-	{
-		return m_begin == m_end;
-	}
+  CPP_CONSTEXPR bool empty() const
+  {
+    return m_begin == m_end;
+  }
 
-	CPP_CONSTEXPR difference_type size() const
-	{
-		return m_end - m_begin;
-	}
+  CPP_CONSTEXPR difference_type size() const
+  {
+    return m_end - m_begin;
+  }
 
   CPP_CONSTEXPR reference front() const
   {
@@ -182,8 +183,8 @@ private:
 };
 
 
-template< class Iterator1T, class Iterator2T >
-bool operator==( const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
+template<class Iterator1T, class Iterator2T >
+bool operator==(const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
 {
   return l.size() == r.size() && std::equal(l.begin(), l.end(), r.begin(), r.end());
 }
@@ -201,8 +202,8 @@ bool operator==(const ForwardRange& l, const iterator_range<Iterator>& r)
 }
 
 
-template< class Iterator1T, class Iterator2T >
-bool operator!=( const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
+template<class Iterator1T, class Iterator2T >
+bool operator!=(const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
 {
   return !(l == r);
 }
@@ -220,30 +221,30 @@ bool operator!=(const ForwardRange& l, const iterator_range<Iterator>& r)
 }
 
 
-template< class Iterator1T, class Iterator2T >
-bool operator<( const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
+template<class Iterator1T, class Iterator2T >
+bool operator<(const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
 {
-  return std::lexicographical_compare(::falcon::begin(l), ::falcon::end(l),
-                                      r.begin(), r.end());
+  return std::lexicographical_compare(
+    ::falcon::begin(l), ::falcon::end(l), r.begin(), r.end());
 }
 
 template<class Iterator, class ForwardRange>
 bool operator<(const iterator_range<Iterator>& l, const ForwardRange& r)
 {
-  return std::lexicographical_compare(::falcon::begin(l), ::falcon::end(l),
-                                      r.begin(), r.end());
+  return std::lexicographical_compare(
+    ::falcon::begin(l), ::falcon::end(l), r.begin(), r.end());
 }
 
 template<class Iterator, class ForwardRange>
 bool operator<(const ForwardRange& l, const iterator_range<Iterator>& r)
 {
-  return std::lexicographical_compare(::falcon::begin(l), ::falcon::end(l),
-                                      r.begin(), r.end());
+  return std::lexicographical_compare(
+    ::falcon::begin(l), ::falcon::end(l), r.begin(), r.end());
 }
 
 
-template< class Iterator1T, class Iterator2T >
-bool operator<=( const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
+template<class Iterator1T, class Iterator2T >
+bool operator<=(const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
 {
   return !(r < l);
 }
@@ -261,8 +262,8 @@ bool operator<=( const ForwardRange& l, const iterator_range<Iterator>& r)
 }
 
 
-template< class Iterator1T, class Iterator2T >
-bool operator>( const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
+template<class Iterator1T, class Iterator2T >
+bool operator>(const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
 {
   return (r < l);
 }
@@ -274,14 +275,14 @@ bool operator>(const iterator_range<Iterator>& l, const ForwardRange& r)
 }
 
 template<class Iterator, class ForwardRange>
-bool operator>( const ForwardRange& l, const iterator_range<Iterator>& r)
+bool operator>(const ForwardRange& l, const iterator_range<Iterator>& r)
 {
   return (r < l);
 }
 
 
-template< class Iterator1T, class Iterator2T >
-bool operator>=( const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
+template<class Iterator1T, class Iterator2T >
+bool operator>=(const iterator_range<Iterator1T>& l, const iterator_range<Iterator2T>& r )
 {
   return !(l < r);
 }
@@ -303,8 +304,8 @@ template<class T>
 constexpr iterator_range<typename decay_and_strip<T>::type>
 make_iterator_range(T CPP_RVALUE x, T CPP_RVALUE y)
 {
-	typedef iterator_range<typename decay_and_strip<T>::type> __iterator_range_type;
-  return __iterator_range_type(FALCON_FORWARD(T, x), FALCON_FORWARD(T, y));
+  typedef iterator_range<typename decay_and_strip<T>::type> iterator_range_type;
+  return iterator_range_type(FALCON_FORWARD(T, x), FALCON_FORWARD(T, y));
 }
 
 }

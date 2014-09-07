@@ -337,3 +337,5 @@ allocator_adapter: rebind ne change pas l'allocateur internet mais modifier les 
 mettre des noexcept pour les fichiers dans memory
 
 non_owner_ptr : le faire avec unique_ptr + destructeur qui ne fait rien ? (le nommer et le mettre dans fonctionnal)
+
+faire pour begin/end et les autres la même méthode que pour swap
