@@ -1,27 +1,33 @@
 #ifndef FALCON_MEMORY_ALLOCATOR_SWAP_HPP
 #define FALCON_MEMORY_ALLOCATOR_SWAP_HPP
 
-#if __cplusplus <= 201103L
+#if __cplusplus >= 201103L
+
+#include <falcon/utility/swap.hpp>
 
 #include <memory>
 
 namespace falcon {
 
+namespace aux_ {
+
+	template<class Allocator>
+  void allocator_swap_impl(Allocator&, Allocator&, std::false_type) noexcept
+	{}
+
+	template<class Allocator>
+  void allocator_swap_impl(Allocator& a, Allocator& b, std::true_type)
+	noexcept(noexcept(::falcon::swap(a, b)))
+	{ ::falcon::swap(a, b); }
+}
+
 template<class Allocator>
 void allocator_swap(Allocator& a, Allocator& b)
+noexcept(noexcept(aux_::allocator_swap_impl(
+	a, b, typename std::allocator_traits<Allocator>::propagate_on_container_swap()
+)))
 {
-  struct Impl {
-    static void swap_impl(Allocator&, Allocator&, std::false_type)
-    {}
-
-    static void swap_impl(Allocator& a, Allocator& b, std::true_type)
-    {
-      using std::swap;
-      swap(a, b);
-    }
-  };
-
-  Impl::swap_impl(
+  aux_::allocator_swap_impl(
     a, b, typename std::allocator_traits<Allocator>::propagate_on_container_swap()
   );
 }
