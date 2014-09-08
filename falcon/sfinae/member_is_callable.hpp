@@ -21,8 +21,8 @@
   template<typename Falcon_T, typename... Falcon_Args>\
   struct __falcon_##_Name##__is_callable_test<Falcon_T\
   , ::falcon::parameter_pack<Falcon_Args...>\
-  , typename ::falcon::detail::enable_val<\
-    sizeof(::std::declval<Falcon_T>()._FuncName(::std::declval<Falcon_Args>()...),0)\
+  , typename ::falcon::enable_type<\
+    decltype(::std::declval<Falcon_T>()._FuncName(::std::declval<Falcon_Args>()...))\
   >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T, typename... Falcon_Args>\
@@ -38,16 +38,16 @@
   template<typename Falcon_T, typename Falcon_Result, typename... Falcon_Args>\
   struct __falcon_##_Name##__is_callable_and_conv_test<Falcon_T, Falcon_Result\
   , ::falcon::parameter_pack<Falcon_Args...>\
-  , typename ::falcon::detail::enable_val<\
-    sizeof(::falcon::detail::returnval<Falcon_Result>(\
+  , typename ::falcon::enable_type<\
+    decltype(::falcon::detail::returnval<Falcon_Result>(\
       ::std::declval<Falcon_T>()._FuncName(::std::declval<Falcon_Args>()...)))\
   >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T, typename... Falcon_Args>\
   struct __falcon_##_Name##__is_callable_and_conv_test<Falcon_T, void\
   , ::falcon::parameter_pack<Falcon_Args...>\
-  , typename ::falcon::detail::enable_val<\
-    sizeof(::std::declval<Falcon_T>()._FuncName(::std::declval<Falcon_Args>()...),0)\
+  , typename ::falcon::enable_type<\
+    decltype(::std::declval<Falcon_T>()._FuncName(::std::declval<Falcon_Args>()...))\
   >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T, typename Falcon_Result, typename... Falcon_Args>\

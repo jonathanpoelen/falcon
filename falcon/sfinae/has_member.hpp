@@ -3,115 +3,98 @@
 
 #include <falcon/c++/boost_or_std.hpp>
 #include <falcon/type_traits/yes_no_type.hpp>
+#include <falcon/type_traits/enable_type.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
-#include <falcon/sfinae/detail/is_callable.hpp>
+#include <falcon/preprocessor/concat.hpp>
 
 #include FALCON_BOOST_OR_STD_TRAITS(is_class)
 
 
-#define FALCON_HAS_ATTRIBUTE_TRAIT_NAMED_DEF(_Name, _AttrName)\
+#define FALCON_HAS_MEMBER_DATA_TRAIT_NAMED_DEF(trait, name)\
   template<typename Falcon_T, class = void>\
-  struct __falcon_##_Name##__has_member_attribute_test\
+  struct FALCON_CONCAT(trait,_impl)\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T>\
-  struct __falcon_##_Name##__has_member_attribute_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_AttrName)>::type>\
-  : ::falcon::true_type {};\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T\
+  , typename ::std::enable_if<(\
+    !std::is_function<decltype(Falcon_T::name)>::value\
+  )>::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
-  struct _Name : __falcon_##_Name##__has_member_attribute_test<Falcon_T>::type {}
+  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T>::type {}
 
 
-#define FALCON_HAS_FUNCTION_TRAIT_NAMED_DEF(_Name, _FuncName)\
-  template<typename Falcon_T, class = void, class = void>\
-  struct __falcon_##_Name##__has_function_test\
+#define FALCON_HAS_FUNCTION_TRAIT_NAMED_DEF(trait, name)\
+  template<typename Falcon_T, class = void>\
+  struct FALCON_CONCAT(trait,_impl)\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T>\
-  struct __falcon_##_Name##__has_function_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_FuncName)>::type\
-  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_FuncName)>::type\
-  > : ::falcon::false_type {};\
-  \
-  template<typename Falcon_T, typename Falcon_U>\
-  struct __falcon_##_Name##__has_function_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_FuncName)>::type\
-  , Falcon_U> : ::falcon::true_type {};\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T\
+  , typename ::std::enable_if<\
+    std::is_member_function_pointer<decltype(&Falcon_T::name)>::value\
+  >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
-  struct _Name : __falcon_##_Name##__has_function_test<Falcon_T>::type {}
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T\
+  , typename ::std::enable_if<\
+    std::is_function<decltype(Falcon_T::name)>::value\
+  >::type> : ::falcon::true_type {};\
+  \
+  template<typename Falcon_T>\
+  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T>::type {}
 
 
-#define FALCON_HAS_MEMBER_FUNCTION_TRAIT_NAMED_DEF(_Name, _FuncName)\
-  template<typename Falcon_T, class = void, class = void>\
-  struct __falcon_##_Name##__has_memfunction_test\
+#define FALCON_HAS_MEMBER_FUNCTION_TRAIT_NAMED_DEF(trait, name)\
+  template<typename Falcon_T, class = void>\
+  struct FALCON_CONCAT(trait,_impl)\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T>\
-  struct __falcon_##_Name##__has_memfunction_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_FuncName)>::type\
-  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_FuncName)>::type\
-  > : ::falcon::false_type {};\
-  \
-  template<typename T, typename U>\
-  struct __falcon_##_Name##__has_memfunction_test<T\
-  , typename ::falcon::detail::enable_val<sizeof(&T::_FuncName)>::type , U>\
-  {\
-    template<typename R, typename TT>\
-    static ::falcon::yes_type test(R TT::*);\
-    static ::falcon::no_type test(...);\
-    static const bool value = sizeof(test(&T::_FuncName)) == sizeof(::falcon::yes_type);\
-  };\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T\
+  , typename ::std::enable_if<\
+    std::is_member_function_pointer<decltype(&Falcon_T::name)>::value\
+  >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
-  struct _Name\
+  struct trait\
   : ::falcon::integral_constant<bool\
-  , __falcon_##_Name##__has_memfunction_test<Falcon_T>::value\
+  , FALCON_CONCAT(trait,_impl)<Falcon_T>::value\
   > {}
 
 
-#define FALCON_HAS_STATIC_FUNCTION_TRAIT_NAMED_DEF(_Name, _FuncName)\
-  template<typename Falcon_T, class = void, class = void>\
-  struct __falcon_##_Name##__has_sfunction_test\
+#define FALCON_HAS_STATIC_FUNCTION_TRAIT_NAMED_DEF(trait, name)\
+  template<typename Falcon_T, class = void>\
+  struct FALCON_CONCAT(trait,_impl)\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T>\
-  struct __falcon_##_Name##__has_sfunction_test<Falcon_T\
-  , typename ::falcon::detail::enable_val<sizeof(&Falcon_T::_FuncName)>::type\
-  , typename ::falcon::detail::enable_val<sizeof(Falcon_T::_FuncName)>::type\
-  > : ::falcon::false_type {};\
-  \
-  template<typename T, typename U>\
-  struct __falcon_##_Name##__has_sfunction_test<T\
-  , typename ::falcon::detail::enable_val<sizeof(&T::_FuncName)>::type , U>\
-  {\
-    template<typename R, typename TT>\
-    static ::falcon::yes_type test(R TT::*);\
-    static ::falcon::no_type test(...);\
-    static const bool value = sizeof(test(&T::_FuncName)) != sizeof(::falcon::yes_type);\
-  };\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T\
+  , typename ::std::enable_if<\
+    std::is_function<decltype(Falcon_T::name)>::value\
+  >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T>\
-  struct _Name\
+  struct trait\
   : ::falcon::integral_constant<bool\
-  , __falcon_##_Name##__has_sfunction_test<Falcon_T>::value\
+  , FALCON_CONCAT(trait,_impl)<Falcon_T>::value\
   > {}
 
 
-#define FALCON_HAS_MEMBER_TRAIT_NAMED_DEF(_Name, _FuncName)\
+#define FALCON_HAS_MEMBER_TRAIT_NAMED_DEF(trait, name)\
 	template <typename Falcon_T\
 	, bool = FALCON_BOOST_OR_STD_NAMESPACE::is_class<Falcon_T>::value>\
-	struct __falcon_##_Name##__has_member_test\
+	struct FALCON_CONCAT(trait,_impl)\
 	{\
     template<typename U, U>\
     struct helper{};\
-		struct base { void _FuncName(); };\
+		struct base { void name(); };\
 		struct derived : public Falcon_T, public base {};\
 		\
 		template <typename U>\
 		static ::falcon::no_type test(U*\
-		, helper<void(base::*)(), &U::_FuncName>* = 0);\
+		, helper<void(base::*)(), &U::name>* = 0);\
 		static ::falcon::yes_type test(...);\
 		\
 		static const bool value = sizeof(test(static_cast<derived*>(0)))\
@@ -119,49 +102,70 @@
 	};\
   \
   template <typename Falcon_T>\
-  struct __falcon_##_Name##__has_member_test<Falcon_T, false>\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T, false>\
   { static const bool value = false; };\
 	\
 	template <typename Falcon_T>\
-	struct _Name\
+	struct trait\
 	: ::falcon::integral_constant<bool\
-	, __falcon_##_Name##__has_member_test<Falcon_T>::value\
+	, FALCON_CONCAT(trait,_impl)<Falcon_T>::value\
 	> {}
 
 
-# define FALCON_HAS_SIGNATURE_TRAIT_NAMED_DEF(_Name, _FuncName)\
+# define FALCON_HAS_SIGNATURE_TRAIT_NAMED_DEF(trait, name)\
   template<typename Falcon_T, typename Signature, class = void>\
-  struct __falcon_##_Name##__has_signature_test\
+  struct FALCON_CONCAT(trait,_impl)\
   : ::falcon::false_type {};\
   \
   template<typename Falcon_T, typename Signature>\
-  struct __falcon_##_Name##__has_signature_test<Falcon_T, Signature\
-  , typename ::falcon::detail::enable_val<\
-    sizeof(static_cast<Signature>(&Falcon_T::_FuncName))>::type\
-  > : ::falcon::true_type {};\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T, Signature\
+  , typename ::falcon::enable_type<\
+    decltype(static_cast<Signature>(&Falcon_T::name))\
+  >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_T, typename Signature>\
-  struct _Name : __falcon_##_Name##__has_signature_test<Falcon_T, Signature>::type {};
+  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T, Signature>::type {};
 
 
-#define FALCON_HAS_ATTRIBUTE_TRAIT_DEF(_AttrName)\
-  FALCON_HAS_ATTRIBUTE_TRAIT_NAMED_DEF(has_##_AttrName##_attribute, _AttrName)
+#define FALCON_HAS_MEMBER_DATA_NAME(name) \
+  FALCON_CONCAT(FALCON_CONCAT(has_,name),_attribute)
 
-#define FALCON_HAS_FUNCTION_TRAIT_DEF(_FuncName)\
-  FALCON_HAS_FUNCTION_TRAIT_NAMED_DEF(has_##_FuncName##_function, _FuncName)
+#define FALCON_HAS_MEMBER_DATA_TRAIT_DEF(name)\
+  FALCON_HAS_MEMBER_DATA_TRAIT_NAMED_DEF(FALCON_HAS_MEMBER_DATA_NAME(name), name)
 
-#define FALCON_HAS_MEMBER_FUNCTION_TRAIT_DEF(_FuncName)\
-  FALCON_HAS_MEMBER_FUNCTION_TRAIT_NAMED_DEF(has_##_FuncName##_member_function\
-  , _FuncName)
 
-#define FALCON_HAS_STATIC_FUNCTION_TRAIT_DEF(_FuncName)\
-  FALCON_HAS_STATIC_FUNCTION_TRAIT_NAMED_DEF(has_##_FuncName##_static_function\
-  , _FuncName)
+#define FALCON_HAS_FUNCTION_NAME(name) \
+  FALCON_CONCAT(FALCON_CONCAT(has_,name),_function)
 
-#define FALCON_HAS_MEMBER_TRAIT_DEF(_Name)\
-  FALCON_HAS_MEMBER_TRAIT_NAMED_DEF(has_##_Name##_member, _Name)
+#define FALCON_HAS_FUNCTION_TRAIT_DEF(name)\
+  FALCON_HAS_FUNCTION_TRAIT_NAMED_DEF(FALCON_HAS_FUNCTION_NAME(name), name)
 
-#define FALCON_HAS_SIGNATURE_TRAIT_DEF(_Name)\
-  FALCON_HAS_SIGNATURE_TRAIT_NAMED_DEF(has_##_Name##_signature, _Name)
+
+#define FALCON_HAS_MEMBER_FUNCTION_NAME(name) \
+  FALCON_CONCAT(FALCON_CONCAT(has_,name),_member_function)
+
+#define FALCON_HAS_MEMBER_FUNCTION_TRAIT_DEF(name)\
+  FALCON_HAS_MEMBER_FUNCTION_TRAIT_NAMED_DEF(FALCON_HAS_MEMBER_FUNCTION_NAME(name), name)
+
+
+#define FALCON_HAS_STATIC_FUNCTION_NAME(name) \
+  FALCON_CONCAT(FALCON_CONCAT(has_,name),_static_function)
+
+#define FALCON_HAS_STATIC_FUNCTION_TRAIT_DEF(name)\
+  FALCON_HAS_STATIC_FUNCTION_TRAIT_NAMED_DEF(FALCON_HAS_STATIC_FUNCTION_NAME(name), name)
+
+
+#define FALCON_HAS_MEMBER_NAME(name) \
+  FALCON_CONCAT(FALCON_CONCAT(has_,name),_member)
+
+#define FALCON_HAS_MEMBER_TRAIT_DEF(name)\
+  FALCON_HAS_MEMBER_TRAIT_NAMED_DEF(FALCON_HAS_MEMBER_NAME(name), name)
+
+
+#define FALCON_HAS_SIGNATURE_NAME(name) \
+  FALCON_CONCAT(FALCON_CONCAT(has_,name),_signature)
+
+#define FALCON_HAS_SIGNATURE_TRAIT_DEF(name)\
+  FALCON_HAS_SIGNATURE_TRAIT_NAMED_DEF(FALCON_HAS_SIGNATURE_NAME(name), name)
 
 #endif
