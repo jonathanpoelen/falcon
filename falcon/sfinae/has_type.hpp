@@ -8,46 +8,46 @@
 
 
 #define FALCON_HAS_TYPE_TRAIT_NAMED_DEF(trait, name)\
-  template<typename Falcon_T, class = void>\
+  template<class Falcon_T, class = void>\
   struct FALCON_CONCAT(trait,_impl)\
   : ::falcon::false_type {};\
   \
-  template<typename Falcon_T>\
+  template<class Falcon_T>\
   struct FALCON_CONCAT(trait,_impl)<Falcon_T\
   , typename ::falcon::enable_type<typename Falcon_T::name>::type>\
   : ::falcon::true_type {};\
   \
-  template<typename Falcon_T>\
+  template<class Falcon_T>\
   struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T>::type {}
 
 
 #if __cplusplus >= 201103L
 # define FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF_S(trait, name)\
-  template<typename Falcon_T>\
+  template<class Falcon_T>\
   struct FALCON_CONCAT(trait,_impl)<Falcon_T\
   , typename ::falcon::enable_template<Falcon_T::template name>::type>\
   : ::falcon::true_type {};
 #else
 # define FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF_S(trait, name)\
-  template<typename Falcon_T>\
+  template<class Falcon_T>\
   struct FALCON_CONCAT(trait,_impl)<Falcon_T\
   , typename ::falcon::enable_template1<Falcon_T::template name>::type>\
   : ::falcon::true_type {};\
   \
-  template<typename Falcon_T>\
+  template<class Falcon_T>\
   struct FALCON_CONCAT(trait,_impl)<Falcon_T\
   , typename ::falcon::enable_template2<Falcon_T::template name>::type>\
   : ::falcon::true_type {};
 #endif
 
 #define FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF(trait, name)\
-	template<typename Falcon_T, class = void>\
+	template<class Falcon_T, class = void>\
 	struct FALCON_CONCAT(trait,_impl)\
 	: ::falcon::false_type {};\
   \
   FALCON_HAS_TEMPLATE_TYPE_TRAIT_NAMED_DEF_S(trait, name)\
   \
-  template<typename Falcon_T>\
+  template<class Falcon_T>\
   struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T>::type {}
 
 

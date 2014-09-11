@@ -66,13 +66,23 @@
 
 #include <iostream>
 
-#include <falcon/memory/retain_free_object_allocator.hpp>
+#include <falcon/sfinae/has_member.hpp>
 #include <test/A.h>
+
+FALCON_HAS_MEMBER_FUNCTION_TRAIT_DEF(xxx);
+// FALCON_HAS_STATIC_MEMBER_FUNCTION_TRAIT_DEF(xxx);
+
+struct S {
+  void xxx();
+};
 
 int main()
 {
-  falcon::retain_free_object_allocator<int> allocator;
-  allocator.deallocate(allocator.allocate(2), 2);
+  std::cout << has_xxx_member_function<S, void()>::value;
+
+
+//   falcon::retain_free_object_allocator<int> allocator;
+//   allocator.deallocate(allocator.allocate(2), 2);
 
 //   int data[10];
 //   falcon::lifo_allocator<int> l(std::begin(data), std::end(data));

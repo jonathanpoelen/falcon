@@ -1,7 +1,8 @@
 #ifndef FALCON_SFINAE_FUNCTION_IS_CALLABLE_HPP
 #define FALCON_SFINAE_FUNCTION_IS_CALLABLE_HPP
 
-# include <falcon/type_traits/integral_constant.hpp>
+#include <falcon/type_traits/integral_constant.hpp>
+#include <falcon/type_traits/enable_type.hpp>
 #include <falcon/sfinae/detail/is_callable.hpp>
 #if __cplusplus >= 201103L
 # include <falcon/parameter/parameter_pack.hpp>
@@ -20,8 +21,8 @@
   \
   template<typename... Falcon_Args>\
   struct __falcon_##_Name##__is_callable_test<::falcon::parameter_pack<Falcon_Args...>\
-  , typename ::falcon::detail::enable_val<\
-    sizeof(_FuncName(::std::declval<Falcon_Args>()...),0)\
+  , typename ::falcon::enable_type<\
+    decltype(_FuncName(::std::declval<Falcon_Args>()...))\
   >::type> : ::falcon::true_type {};\
   \
   template<typename... Falcon_Args>\
@@ -37,16 +38,10 @@
   template<typename Falcon_Result, typename... Falcon_Args>\
   struct __falcon_##_Name##__is_callable_and_conv_test<Falcon_Result\
   , ::falcon::parameter_pack<Falcon_Args...>\
-  , typename ::falcon::detail::enable_val<\
-    sizeof(::falcon::detail::returnval<Falcon_Result>(\
-      _FuncName(::std::declval<Falcon_Args>()...)))\
-  >::type> : ::falcon::true_type {};\
-  \
-  template<typename... Falcon_Args>\
-  struct __falcon_##_Name##__is_callable_and_conv_test<void\
-  , ::falcon::parameter_pack<Falcon_Args...>\
-  , typename ::falcon::detail::enable_val<\
-    sizeof(_FuncName(::std::declval<Falcon_Args>()...),0)\
+  , typename ::std::enable_if<\
+    std::is_convertible<\
+      decltype(_FuncName(::std::declval<Falcon_Args>()...)), Falcon_Result\
+    >::value\
   >::type> : ::falcon::true_type {};\
   \
   template<typename Falcon_Result, typename... Falcon_Args>\
@@ -148,6 +143,6 @@
 
 #define FALCON_FUNCTION_IS_CALLABLE_AND_CONVERTIBLE_TRAIT_DEF(_FuncName)\
   FALCON_FUNCTION_IS_CALLABLE_AND_CONVERTIBLE_TRAIT_NAMED_DEF(\
-    _FuncName##_member_is_callalable_and_convertible, _FuncName)
+    _FuncName##_is_callable_and_convertible, _FuncName)
 
 #endif
