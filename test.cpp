@@ -66,19 +66,21 @@
 
 #include <iostream>
 
-#include <falcon/sfinae/has_member.hpp>
+#include <falcon/sfinae/has_member_callable.hpp>
 #include <test/A.h>
 
-FALCON_HAS_MEMBER_FUNCTION_TRAIT_DEF(xxx);
+FALCON_HAS_MEMBER_TEMPLATE_TYPE_CALLABLE_TRAIT_DEF(xxx);
 // FALCON_HAS_STATIC_MEMBER_FUNCTION_TRAIT_DEF(xxx);
 
 struct S {
-  void xxx();
+  template<class T>
+  struct xxx { xxx(int) {} };
 };
 
 int main()
 {
-  std::cout << has_xxx_member_function<S, void()>::value;
+  std::cout << has_xxx_member_template_type_callable<
+    S, void(S), S>::value;
 
 
 //   falcon::retain_free_object_allocator<int> allocator;

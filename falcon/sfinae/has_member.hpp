@@ -1,15 +1,15 @@
-#ifndef FALCON_SFINAE_HAS_MEMBER_FUNCTION_HPP
-#define FALCON_SFINAE_HAS_MEMBER_FUNCTION_HPP
+#ifndef FALCON_SFINAE_HAS_MEMBER_HPP
+#define FALCON_SFINAE_HAS_MEMBER_HPP
 
+#include <falcon/parameter/parameter_pack.hpp>
 #include <falcon/type_traits/enable_type.hpp>
 #include <falcon/preprocessor/concat.hpp>
 #include <falcon/config.hpp>
+
 #include <type_traits>
 
 
 namespace falcon { namespace sfinae { namespace aux_ {
-template<class...> class tplfunc;
-
 template<class, class Signature>
 struct add_static_member_function_pointer
 { using type = Signature*; };
@@ -72,13 +72,13 @@ struct add_member_function_pointer<T, R(Args...) const volatile>
   : ::std::false_type {};\
   \
   template<class Falcon_T>\
-  struct FALCON_CONCAT(trait,_impl)<Falcon_T, void, ::falcon::sfinae::aux_::tplfunc<>\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T, void, ::falcon::parameter_pack<>\
   , typename ::std::enable_if<\
     simple_test_type ::value\
   >::type> : ::std::true_type {};\
   \
   template<class Falcon_T, class Signature>\
-  struct FALCON_CONCAT(trait,_impl)<Falcon_T, Signature, ::falcon::sfinae::aux_::tplfunc<>\
+  struct FALCON_CONCAT(trait,_impl)<Falcon_T, Signature, ::falcon::parameter_pack<>\
   , typename ::falcon::enable_type<\
     decltype(static_cast<typename mem_pointer<Falcon_T, Signature>::type>(\
       &Falcon_T::xxx))\
@@ -86,14 +86,14 @@ struct add_member_function_pointer<T, R(Args...) const volatile>
   \
   template<class Falcon_T, class Signature, class Tpl, class... TplArgs>\
   struct FALCON_CONCAT(trait,_impl)<Falcon_T, Signature\
-  , ::falcon::sfinae::aux_::tplfunc<Tpl, TplArgs...>\
+  , ::falcon::parameter_pack<Tpl, TplArgs...>\
   , typename ::falcon::enable_type<\
     decltype(static_cast<typename mem_pointer<Falcon_T, Signature>::type>(\
       &Falcon_T::template xxx<Tpl, FALCON_IF_NOT_IN_IDE_PARSER(TplArgs)...>))\
   >::type> : ::std::true_type {};\
   \
   template<class Falcon_T, class Signature = void, class... TplArgs FALCON_IF_IN_IDE_PARSER(=void)>\
-  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T, Signature, ::falcon::sfinae::aux_::tplfunc<TplArgs...>>::type {}
+  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T, Signature, ::falcon::parameter_pack<TplArgs...>>::type {}
 
 
 #define FALCON_HAS_MEMBER_FUNCTION_TRAIT_NAMED_DEF(trait, name)\

@@ -23,8 +23,7 @@ namespace n_test_sfinae {
   FALCON_HAS_DATA_MEMBER_TRAIT_DEF(xxx);
   FALCON_HAS_MEMBER_FUNCTION_TRAIT_DEF(xxx);
   FALCON_HAS_STATIC_MEMBER_FUNCTION_TRAIT_DEF(xxx);
-  FALCON_HAS_MEMBER_IS_CALLABLE_TRAIT_DEF(xxx);
-  FALCON_HAS_MEMBER_IS_CALLABLE_AND_CONVERTIBLE_TRAIT_DEF(xxx);
+  FALCON_HAS_MEMBER_CALLABLE_TRAIT_DEF(xxx);
 
   void xxx(int) {}
 
@@ -114,45 +113,42 @@ void sfinae_test()
   STATIC_CHECK_VALUE(false, has_xxx_member_function<test1, void(int)>);
   STATIC_CHECK_VALUE(true , has_xxx_member_function<test2, void()>);
   STATIC_CHECK_VALUE(true , has_xxx_member_function<test3, void()const>);
-//   STATIC_CHECK_VALUE(true , has_xxx_member_function<test4, int(test4::*)>);
   STATIC_CHECK_VALUE(true , has_xxx_static_member_function<test5, int()>);
   STATIC_CHECK_VALUE(false, has_xxx_static_member_function<test6, void(int)>);
-//   STATIC_CHECK_VALUE(false, has_xxx_member_function<test7, test7::xxx>);
   STATIC_CHECK_VALUE(false, has_xxx_static_member_function<test8, void(int)>);
   STATIC_CHECK_VALUE(false, has_xxx_static_member_function<test9, void(int)>);
-//   STATIC_CHECK_VALUE(false, has_xxx_member_function<test10, test10::xxx<int>>);
   STATIC_CHECK_VALUE(true , has_xxx_member_function<test11, void(int)>);
   STATIC_CHECK_VALUE(true , has_xxx_member_function<test12, int(int)>);
 
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test1>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable<test2>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable<test3>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test4>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable<test5>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test6>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test7>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test8>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test9>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test10>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable<test11, int>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable<test12, int>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test13>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable<test14>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test1>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test2>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test3>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test4>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test5>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test6>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test7>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test8>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test9>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test10>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test11, void(int)>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test12, void(int)>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test13>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test14>);
 
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test1, void>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable_and_convertible<test2, void>);
-  STATIC_CHECK_VALUE(true, xxx_member_is_callable_and_convertible<test3, void>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test4, int>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable_and_convertible<test5, int>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test6, int>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test7, test7::xxx>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test8, int(*)()>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test9, int>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test10, void>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable_and_convertible<test11,void, int>);
-  STATIC_CHECK_VALUE(true , xxx_member_is_callable_and_convertible<test12, int, int>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test13, void>);
-  STATIC_CHECK_VALUE(false, xxx_member_is_callable_and_convertible<test14, void>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test1, void()>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test2, void()>);
+  STATIC_CHECK_VALUE(true, has_xxx_member_callable<test3, void()>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test4, int()>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test5, int()>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test6, int()>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test7, void()>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test8, int()>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test9, int()>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test10, void()>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test11, void(int)>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test12, int(int)>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test13, void()>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test14, void()>);
 
   STATIC_CHECK_VALUE(false, xxx_is_callable<>);
   STATIC_CHECK_VALUE(true, xxx_is_callable<int>);
