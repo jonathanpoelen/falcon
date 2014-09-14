@@ -24,11 +24,7 @@ namespace n_test_sfinae {
   FALCON_HAS_MEMBER_FUNCTION_TRAIT_DEF(xxx);
   FALCON_HAS_STATIC_MEMBER_FUNCTION_TRAIT_DEF(xxx);
   FALCON_HAS_MEMBER_CALLABLE_TRAIT_DEF(xxx);
-
-  void xxx(int) {}
-
-  FALCON_FUNCTION_IS_CALLABLE_TRAIT_DEF(xxx);
-  FALCON_FUNCTION_IS_CALLABLE_AND_CONVERTIBLE_TRAIT_DEF(xxx);
+  FALCON_HAS_MEMBER_TEMPLATE_TYPE_CALLABLE_TRAIT_DEF(xxx);
 }
 
 void sfinae_test()
@@ -135,26 +131,20 @@ void sfinae_test()
   STATIC_CHECK_VALUE(false, has_xxx_member_callable<test13>);
   STATIC_CHECK_VALUE(false, has_xxx_member_callable<test14>);
 
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test1, void()>);
-  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test2, void()>);
-  STATIC_CHECK_VALUE(true, has_xxx_member_callable<test3, void()>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test4, int()>);
-  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test5, int()>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test6, int()>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test7, void()>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test8, int()>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test9, int()>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test10, void()>);
-  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test11, void(int)>);
-  STATIC_CHECK_VALUE(true , has_xxx_member_callable<test12, int(int)>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test13, void()>);
-  STATIC_CHECK_VALUE(false, has_xxx_member_callable<test14, void()>);
-
-  STATIC_CHECK_VALUE(false, xxx_is_callable<>);
-  STATIC_CHECK_VALUE(true, xxx_is_callable<int>);
-
-  STATIC_CHECK_VALUE(false, xxx_is_callable_and_convertible<void>);
-  STATIC_CHECK_VALUE(true, xxx_is_callable_and_convertible<void, int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test1, void(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test2, void(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test3, void(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test4, int(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test5, int(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test6, int(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test7, void(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test8, int(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test9, int(),  int>);
+  STATIC_CHECK_VALUE(true , has_xxx_member_template_type_callable<test10, void(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test11, void(int),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test12, int(int),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test13, void(),  int>);
+  STATIC_CHECK_VALUE(false, has_xxx_member_template_type_callable<test14, void(),  int>);
 }
 
 FALCON_TEST_TO_MAIN(sfinae_test)
