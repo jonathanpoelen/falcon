@@ -339,3 +339,9 @@ mettre des noexcept pour les fichiers dans memory
 non_owner_ptr : le faire avec unique_ptr + destructeur qui ne fait rien ? (le nommer et le mettre dans fonctionnal)
 
 faire pour begin/end et les autres la même méthode que pour swap
+
+make_reverse_iterator
+
+attention au barriere (adl) pour begin et co
+
+is_character et is_string : enlever les remove_cv ? comment et std::is_array ou std::is_*

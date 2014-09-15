@@ -3,12 +3,12 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/boost_or_std.hpp>
-#include FALCON_BOOST_OR_STD_TRAITS(is_integral)
+#include <falcon/type_traits/is_character.hpp>
 #include <iosfwd>
 
 namespace falcon { namespace aux_ { namespace string {
 
-template<typename T, bool = FALCON_BOOST_OR_STD_NAMESPACE::is_integral<T>::value>
+template<typename T, bool = ::falcon::is_character<T>::value>
 struct string_size
 {
   typedef const T& reference;
@@ -68,7 +68,13 @@ void append(T& s, const T& other, unsigned, const list_size &)
 { s += other; }
 
 template<typename T, typename U>
-void append(T& s, const U& other, unsigned, const list_size &)
+typename std::enable_if< ::falcon::is_character<U>::value>::type
+append(T& s, const U& c, unsigned, const list_size &)
+{ s += c; }
+
+template<typename T, typename U>
+typename std::enable_if<!::falcon::is_character<U>::value>::type
+append(T& s, const U& other, unsigned, const list_size &)
 { s.append(other.data(), other.size()); }
 
 template<typename T, typename U>

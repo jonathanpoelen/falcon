@@ -15,11 +15,13 @@ void append_test()
 		falcon::const_cstring("plo"),
 		"p",
 		std::string("lala"),
-		cs, ccs2
+		cs,
+		ccs2,
+		'a'
 	);
-	CHECK_EQUAL_VALUE(ret, "kploplalaii");
+	CHECK_EQUAL_VALUE(ret, "kploplalaiia");
 	falcon::append(ret, "i");
-	CHECK_EQUAL_VALUE(ret, "kploplalaiii");
+	CHECK_EQUAL_VALUE(ret, "kploplalaiiai");
 }
 
 FALCON_TEST_TO_MAIN(append_test)
