@@ -40,7 +40,7 @@ struct __dispath_cs_cons
   CPP_CONSTEXPR static CharT * begin(String & s)
   { return &*::falcon::begin(s); }
   CPP_CONSTEXPR static size_t size(String & s)
-  { return ::falcon::end(s) - ::falcon::begin(s); }
+  { return size_t(::falcon::end(s) - ::falcon::begin(s)); }
 };
 
 template<typename CharT, typename Traits, typename String>
@@ -2046,9 +2046,9 @@ public:
 
   CPP_CONSTEXPR const_reference at(size_type index) const
   {
-    if(m_begin + index >= m_size)
-        throw std::out_of_range("basic_string::at");
-    return m_begin[index];
+    return ((m_begin + index >= m_size) ?
+      throw std::out_of_range("basic_string::at") :
+      void()), m_begin[index];
   }
 
   CPP_CONSTEXPR size_type size() const CPP_NOEXCEPT
@@ -2656,9 +2656,9 @@ public:
    */
   CPP_CONSTEXPR basic_string substr(size_type pos = 0, size_type n = npos) const
   {
-    if (pos > size())
-      throw std::out_of_range("basic_string::substr");
-    return basic_string(m_begin + pos, m_begin + pos + _M_limit(pos, n));
+    return ((pos > size()) ?
+      throw std::out_of_range("basic_string::substr") :
+      void()), basic_string(m_begin + pos, m_begin + pos + _M_limit(pos, n));
   }
 
   /**

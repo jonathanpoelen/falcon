@@ -18,33 +18,33 @@ struct result_is_convertible<From, void> : std::true_type {};
 } } }
 
 #define __FALCON_HAS_MEMBER_CALLABLE_TRAIT_NAMED_DEF_I(trait, name, callable)\
-  template<class Falcon_T, class Signature, class Tpl, class = void>\
+  template<class Falcon_T, class Falcon_Signature, class Falcon_Tpl, class = void>\
   struct FALCON_CONCAT(trait,_impl)\
   : ::std::false_type {};\
   \
-  template<class Falcon_T, class R, class... Args>\
+  template<class Falcon_T, class Falcon_R, class... Falcon_Args>\
   struct FALCON_CONCAT(trait,_impl)<\
-    Falcon_T, R(Args...), ::falcon::parameter_pack<>,\
+    Falcon_T, Falcon_R(Falcon_Args...), ::falcon::parameter_pack<>,\
     typename ::std::enable_if<\
       ::falcon::sfinae::aux_::result_is_convertible<decltype(\
-        callable name(std::declval<Args>()...)\
-      ), R>::value\
+        callable name(std::declval<Falcon_Args>()...)\
+      ), Falcon_R>::value\
     >::type\
   > : ::std::true_type {};\
   \
-  template<class Falcon_T, class R, class... Args, class Tpl, class... TplArgs>\
+  template<class Falcon_T, class Falcon_R, class... Falcon_Args, class Falcon_Tpl, class... Falcon_TplArgs>\
   struct FALCON_CONCAT(trait,_impl)<\
-    Falcon_T, R(Args...), ::falcon::parameter_pack<Tpl, TplArgs...>,\
+    Falcon_T, Falcon_R(Falcon_Args...), ::falcon::parameter_pack<Falcon_Tpl, Falcon_TplArgs...>,\
     typename ::std::enable_if<\
       ::falcon::sfinae::aux_::result_is_convertible<decltype(\
-        callable template name<Tpl, FALCON_IF_NOT_IN_IDE_PARSER(TplArgs)...>\
-        (std::declval<Args>()...)\
-      ), R>::value\
+        callable template name<Falcon_Tpl, FALCON_IF_NOT_IN_IDE_PARSER(Falcon_TplArgs)...>\
+        (std::declval<Falcon_Args>()...)\
+      ), Falcon_R>::value\
     >::type\
   > : ::std::true_type {};\
   \
-  template<class Falcon_T, class Signature = void(), class... TplArgs FALCON_IF_IN_IDE_PARSER(=void)>\
-  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T, Signature, ::falcon::parameter_pack<TplArgs...>>::type {}
+  template<class Falcon_T, class Falcon_Signature = void(), class... Falcon_TplArgs FALCON_IF_IN_IDE_PARSER(=void)>\
+  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T, Falcon_Signature, ::falcon::parameter_pack<Falcon_TplArgs...>>::type {}
 
 
 #define FALCON_HAS_MEMBER_CALLABLE_TRAIT_NAMED_DEF(trait, name)\
@@ -56,24 +56,24 @@ struct result_is_convertible<From, void> : std::true_type {};
 
 
 #define FALCON_HAS_MEMBER_TEMPLATE_TYPE_CALLABLE_TRAIT_NAMED_DEF(trait, name)\
-  template<class Falcon_T, class Signature, class Tpl, class = void>\
+  template<class Falcon_T, class Falcon_Signature, class Falcon_Tpl, class = void>\
   struct FALCON_CONCAT(trait,_impl)\
   : ::std::false_type {};\
   \
-  template<class Falcon_T, class R, class... Args, class Tpl, class... TplArgs>\
+  template<class Falcon_T, class Falcon_R, class... Falcon_Args, class Falcon_Tpl, class... Falcon_TplArgs>\
   struct FALCON_CONCAT(trait,_impl)<\
-    Falcon_T, R(Args...), ::falcon::parameter_pack<Tpl, TplArgs...>,\
+    Falcon_T, Falcon_R(Falcon_Args...), ::falcon::parameter_pack<Falcon_Tpl, Falcon_TplArgs...>,\
     typename ::std::enable_if<\
       ::falcon::sfinae::aux_::result_is_convertible<decltype(\
         typename ::falcon::use<\
-          typename Falcon_T::template name<Tpl, TplArgs...>\
-        >::type(std::declval<Args>()...)\
-      ), R>::value\
+          typename Falcon_T::template name<Falcon_Tpl, Falcon_TplArgs...>\
+        >::type(std::declval<Falcon_Args>()...)\
+      ), Falcon_R>::value\
     >::type\
   > : ::std::true_type {};\
   \
-  template<class Falcon_T, class Signature = void, class... TplArgs FALCON_IF_IN_IDE_PARSER(=void)>\
-  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T, Signature, ::falcon::parameter_pack<TplArgs...>>::type {}
+  template<class Falcon_T, class Falcon_Signature = void, class... Falcon_TplArgs FALCON_IF_IN_IDE_PARSER(=void)>\
+  struct trait : FALCON_CONCAT(trait,_impl)<Falcon_T, Falcon_Signature, ::falcon::parameter_pack<Falcon_TplArgs...>>::type {}
 
 
 #define FALCON_HAS_MEMBER_CALLABLE_NAME(name) \

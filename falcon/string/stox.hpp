@@ -86,6 +86,7 @@ String to_xstring(int (*__convf) (CharT*, std::size_t, const CharT*, std::va_lis
   va_end(__args);
 
 #if __cplusplus >= 201103L
+  (void)__len;
   return ret;
 #elif defined __USE_GNU || defined __USE_BSD || defined __USE_MISC
   return String(__s, __s + __len);

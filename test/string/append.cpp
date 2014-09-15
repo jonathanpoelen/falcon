@@ -10,7 +10,7 @@ void append_test()
 	falcon::cstring cs(s);
 	falcon::const_cstring ccs2(cs);
 	std::string ret("k");
-	falcon::append<>(
+	falcon::append(
 		ret,
 		falcon::const_cstring("plo"),
 		"p",
@@ -18,7 +18,7 @@ void append_test()
 		cs, ccs2
 	);
 	CHECK_EQUAL_VALUE(ret, "kploplalaii");
-	falcon::append<>(ret, "i");
+	falcon::append(ret, "i");
 	CHECK_EQUAL_VALUE(ret, "kploplalaiii");
 }
 
