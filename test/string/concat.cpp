@@ -14,13 +14,16 @@ void concat_test()
 		falcon::const_cstring("plo"),
 		"p",
 		std::string("lala"),
-		cs, ccs2
+		cs,
+		ccs2,
+		'a'
 	);
-	CHECK_EQUAL_VALUE(ret, "ploplalaii");
+	CHECK_EQUAL_VALUE(ret, "ploplalaiia");
 	ret = falcon::concat(ret, cs);
-// 	CHECK_EQUAL_VALUE(ret, "ploplalaiii");
-// 	std::string ret2 = falcon::concat(std::move(ret), cs);
-// 	CHECK_EQUAL_VALUE(ret2, "ploplalaiiii");
+	CHECK_EQUAL_VALUE(ret, "ploplalaiiai");
+	std::string ret2 = falcon::concat(std::move(ret), cs);
+  CHECK_EQUAL_VALUE(ret2, "ploplalaiiaii");
+	CHECK_EQUAL_VALUE(ret, "");
 }
 
 FALCON_TEST_TO_MAIN(concat_test)
