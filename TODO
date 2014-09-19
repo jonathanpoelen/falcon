@@ -345,3 +345,10 @@ make_reverse_iterator
 attention au barriere (adl) pour begin et co
 
 is_character et is_string : enlever les remove_cv ? comment et std::is_array ou std::is_*
+
+fonction libre size()
+
+range(I,I), range(I,n), range(n,n) (remplacer irange et make_iterator_range)
+
+
+

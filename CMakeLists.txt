@@ -12,7 +12,7 @@ include_directories(.)
 
 add_executable(falcon-test test.cpp)
 
-# add_subdirectory(test)
+add_subdirectory(test)
 
 # add_subdirectory(falcon)
 
