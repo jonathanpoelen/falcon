@@ -11,29 +11,30 @@ struct is_tuple_impl<T[N]>
 : std::true_type
 {};
 
-namespace __private { namespace __tuple_get {
-
 template<std::size_t I, typename T, std::size_t N>
 T& get(T (&a)[N]) noexcept
-{ return a[I]; }
+{
+  static_assert(I < N, "index is out of bounds");
+  return a[I];
+}
 
 template<std::size_t I, typename T, std::size_t N>
 constexpr T&& get(T (&&a)[N]) noexcept
-{ return std::forward<T>(a[I]); }
+{
+  static_assert(I < N, "index is out of bounds");
+  return std::forward<T>(a[I]);
+}
 
 template<std::size_t I, typename T, std::size_t N>
 constexpr const T& get(const T (&a)[N]) noexcept
-{ return a[I]; }
-
-}}
-
-using __private::__tuple_get::get;
+{
+  static_assert(I < N, "index is out of bounds");
+  return a[I];
+}
 
 }
 
 namespace std {
-
-using ::falcon::__private::__tuple_get::get;
 
 template<typename T, std::size_t N>
 struct tuple_size<T[N]>
