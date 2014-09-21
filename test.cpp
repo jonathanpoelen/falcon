@@ -65,17 +65,13 @@
 // };
 
 #include <iostream>
-#include <tuple>
 // #include <test/A.h>
-#include <falcon/tuple/tuple_io.hpp>
 
-void f(falcon::const_cstring) {}
 
 int main()
 {
-  using falcon::tuple::operator<<;
-  std::tuple<int, int> t(1, 3);
-  std::cout << t;
+
+
 
 //   falcon::retain_free_object_allocator<int> allocator;
 //   allocator.deallocate(allocator.allocate(2), 2);

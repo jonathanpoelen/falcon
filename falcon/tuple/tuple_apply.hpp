@@ -2,12 +2,14 @@
 #define FALCON_TUPLE_TUPLE_APPLY_HPP
 
 #include <falcon/tuple/parameter_index.hpp>
-#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/c++1x/syntax.hpp>
 
 #include <utility>
+#include <tuple>
 
 namespace falcon {
+
+using std::get;
 
 template <typename F, typename Tuple, std::size_t... Indexes>
 constexpr CPP1X_DELEGATE_FUNCTION(
@@ -18,8 +20,8 @@ constexpr CPP1X_DELEGATE_FUNCTION(
 template <typename F, typename Tuple, std::size_t... Indexes>
 constexpr CPP1X_DELEGATE_FUNCTION(
   tuple_apply(F && func, Tuple&& t),
-  tuple_apply(build_tuple_index_t<Tuple>(),
-              std::forward<F>(func), std::forward<Tuple>(t)
+  tuple_apply(
+    build_tuple_index_t<Tuple>(), std::forward<F>(func), std::forward<Tuple>(t)
   )
 )
 

@@ -4,13 +4,15 @@
 #include <falcon/utility/unpack.hpp>
 #include <falcon/string/cstring.hpp>
 #include <falcon/string/local_const_string_optimized.hpp>
-#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/tuple/parameter_index.hpp>
 
 #include <type_traits>
 #include <iosfwd>
+#include <tuple>
 
 namespace falcon {
+
+using std::get;
 
 namespace aux_ {
   template<class Ostream, class Tuple, class Sep>

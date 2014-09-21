@@ -16,36 +16,36 @@ namespace falcon {
 template <typename Functor, typename Tag = full_parameter_index_tag>
 class tuple_applier
 {
-  typedef typename parameter_index_or_tag_to_tag<Tag>::type __tag;
+  typedef typename parameter_index_or_tag_to_tag<Tag>::type tag_;
 
 public:
   tuple_applier(Functor && func)
-  : m_func(std::forward<Functor>(func))
+  : func_(std::forward<Functor>(func))
   {}
 
   template<typename T>
   auto operator()(T&& t) const
   -> decltype(
-    tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>()
+    tuple_apply(keep_parameter_index_t<tag_, std::tuple_size<T>::value>()
   , std::declval<Functor&>(), std::forward<T>(t)))
-  { return tuple_apply(keep_parameter_index_t<__tag, std::tuple_size<T>::value>()
-  , m_func, std::forward<T>(t)); }
+  { return tuple_apply(keep_parameter_index_t<tag_, std::tuple_size<T>::value>()
+  , func_, std::forward<T>(t)); }
 
   void swap(tuple_applier& other)
   {
     using std::swap;
-    swap(m_func, other.m_func);
+    swap(func_, other.func_);
   }
 
   template<typename Tag2>
   void swap(tuple_applier<Functor, Tag2>& other)
   {
     using std::swap;
-    swap(m_func, other.m_func);
+    swap(func_, other.func_);
   }
 
 private:
-  Functor m_func;
+  Functor func_;
 };
 
 template <typename Functor>

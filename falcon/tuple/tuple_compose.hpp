@@ -1,12 +1,14 @@
 #ifndef FALCON_TUPLE_TUPLE_COMPOSE_HPP
 #define FALCON_TUPLE_TUPLE_COMPOSE_HPP
 
-#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/tuple/parameter_index.hpp>
 
 #include <utility>
+#include <tuple>
 
 namespace falcon {
+
+  using std::get;
 
 /**
  * \brief Call functors on tuple
@@ -31,11 +33,13 @@ namespace falcon {
  * \endcode
  * @{
  */
-template <typename Function, typename Operations, typename ArgElements,
-std::size_t... Indexes, std::size_t... IndexesOperation>
-constexpr auto tuple_compose(const parameter_index<Indexes...>&,
-                             const parameter_index<IndexesOperation...>&,
-                             Function&& func, Operations&& t, ArgElements&& targs)
+template <
+  class Function, class Operations, class ArgElements,
+  std::size_t... Indexes, std::size_t... IndexesOperation>
+constexpr auto tuple_compose(
+  const parameter_index<Indexes...>&,
+  const parameter_index<IndexesOperation...>&,
+  Function&& func, Operations&& t, ArgElements&& targs)
 -> decltype(std::forward<Function>(func)(
   get<IndexesOperation>(t)(get<Indexes>(
     std::forward<ArgElements>(targs)
@@ -50,56 +54,65 @@ constexpr auto tuple_compose(const parameter_index<Indexes...>&,
 }
 
 
-template <typename Function, typename Operations,
-	typename ArgElements, std::size_t... Indexes>
+template <class Function, class Operations,
+	class ArgElements, std::size_t... Indexes>
 constexpr auto
-tuple_compose(const parameter_index<Indexes...>& indexes,
-              Function&& func, Operations&& t, ArgElements&& targs)
--> decltype(tuple_compose(indexes,
-                          build_tuple_index_t<Operations>(),
-                          std::forward<Function>(func),
-                          std::forward<Operations>(t),
-                          std::forward<ArgElements>(targs)))
+tuple_compose(
+  const parameter_index<Indexes...>& indexes,
+  Function&& func,
+  Operations&& t,
+  ArgElements&& targs)
+-> decltype(tuple_compose(
+  indexes,
+  build_tuple_index_t<Operations>(),
+  std::forward<Function>(func),
+  std::forward<Operations>(t),
+  std::forward<ArgElements>(targs)))
 {
-  return tuple_compose(indexes,
-                       build_tuple_index_t<Operations>(),
-                       std::forward<Function>(func),
-                       std::forward<Operations>(t),
-                       std::forward<ArgElements>(targs));
+  return tuple_compose(
+    indexes,
+    build_tuple_index_t<Operations>(),
+    std::forward<Function>(func),
+    std::forward<Operations>(t),
+    std::forward<ArgElements>(targs));
 }
 
 
-template <typename Function, typename Operations, typename ArgElements>
+template <class Function, class Operations, class ArgElements>
 constexpr auto
 tuple_compose(Function&& func, Operations&& t, ArgElements&& targs)
--> decltype(tuple_compose(build_tuple_index_t<ArgElements>(),
-                          build_tuple_index_t<Operations>(),
-                          std::forward<Function>(func),
-                          std::forward<Operations>(t),
-                          std::forward<ArgElements>(targs)))
+-> decltype(tuple_compose(
+  build_tuple_index_t<ArgElements>(),
+  build_tuple_index_t<Operations>(),
+  std::forward<Function>(func),
+  std::forward<Operations>(t),
+  std::forward<ArgElements>(targs)))
 {
-  return tuple_compose(build_tuple_index_t<ArgElements>(),
-                       build_tuple_index_t<Operations>(),
-                       std::forward<Function>(func),
-                       std::forward<Operations>(t),
-                       std::forward<ArgElements>(targs));
+  return tuple_compose(
+    build_tuple_index_t<ArgElements>(),
+    build_tuple_index_t<Operations>(),
+    std::forward<Function>(func),
+    std::forward<Operations>(t),
+    std::forward<ArgElements>(targs));
 }
 
 
-template <typename Function, typename Operations>
+template <class Function, class Operations>
 constexpr auto
 tuple_compose(Function&& func, Operations&& t)
--> decltype(tuple_compose(parameter_index<>(),
-                          build_tuple_index_t<Operations>(),
-                          std::forward<Function>(func),
-                          std::forward<Operations>(t),
-                          detail::tuple_void()))
+-> decltype(tuple_compose(
+  parameter_index<>(),
+  build_tuple_index_t<Operations>(),
+  std::forward<Function>(func),
+  std::forward<Operations>(t),
+  std::tuple<>()))
 {
-  return tuple_compose(parameter_index<>(),
-                       build_tuple_index_t<Operations>(),
-                       std::forward<Function>(func),
-                       std::forward<Operations>(t),
-                       detail::tuple_void());
+  return tuple_compose(
+    parameter_index<>(),
+    build_tuple_index_t<Operations>(),
+    std::forward<Function>(func),
+    std::forward<Operations>(t),
+    std::tuple<>());
 }
 //@}
 

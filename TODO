@@ -352,4 +352,5 @@ range(I,I), range(I,n), range(n,n) (remplacer irange et make_iterator_range). Il
 
 faire une fonction tuple_size() pour être compatible avec les tuple_like ET initializer_list
 
+traits<template<class...>class> pour creer un parameter_index en fonction du nombre d'element
 

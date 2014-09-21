@@ -8,7 +8,7 @@
 # include <falcon/arg/arg.hpp>
 # include <falcon/c++1x/syntax.hpp>
 # include <falcon/tuple/tuple_compose.hpp>
-# include <falcon/tuple/detail/is_tuple.hpp>
+# include <falcon/tuple/is_tuple_like.hpp>
 # include <falcon/helper/has_result_type.hpp>
 # include <falcon/helper/has_argument_type.hpp>
 # include <tuple>
@@ -313,7 +313,7 @@ template<typename Operation, typename Operations>
 constexpr mulary_compose<
   Operation
 , typename std::conditional<
-    is_tuple_impl<Operations>::value
+    is_tuple_like<Operations>::value
   , Operations
   , std::tuple<Operation>
   >::type

@@ -1,7 +1,6 @@
-#ifndef _FALCON_TUPLE_PARAMETER_PACK_HPP
-#define _FALCON_TUPLE_PARAMETER_PACK_HPP
+#ifndef _FALCONTUPLE_PARAMETER_PACK_HPP
+#define _FALCONTUPLE_PARAMETER_PACK_HPP
 
-#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/parameter/pack_element.hpp>
 #include <falcon/type_traits/build_class.hpp>
 
@@ -9,62 +8,66 @@
 
 namespace falcon {
 
-template<typename _T, typename _Indexes>
+template<class T, class Indexes>
 class tuple_to_parameter_pack_with_parameter_index;
 
-template<typename _Pack, typename _T, std::size_t... _Indexes>
-struct __tuple_to_parameter_pack_with_parameter_index
-{ typedef _Pack type; };
+namespace aux_ {
+  template<class Pack, class T, std::size_t... Indexes>
+  struct tuple_to_parameter_pack_with_parameter_index
+  { typedef Pack type; };
 
-template<typename _T, typename... _Elements, std::size_t _Index, std::size_t... _Indexes>
-struct __tuple_to_parameter_pack_with_parameter_index<parameter_pack<_Elements...>, _T, _Index, _Indexes...>
+  template<
+    class T, class... Elements, std::size_t Index, std::size_t... Indexes>
+  struct tuple_to_parameter_pack_with_parameter_index
+    <parameter_pack<Elements...>, T, Index, Indexes...>
+  {
+    typedef typename tuple_to_parameter_pack_with_parameter_index<
+      parameter_pack<
+        Elements...,
+        typename std::tuple_element<Index, T>::type
+      >, T, Indexes...
+    >::type type;
+  };
+}
+
+template<class T, std::size_t... Indexes>
+struct tuple_to_parameter_pack_with_parameter_index<T, parameter_index<Indexes...>>
 {
-	typedef typename __tuple_to_parameter_pack_with_parameter_index<
-		parameter_pack<
-			_Elements...,
-			typename std::tuple_element<_Index, _T>::type
-		>, _T, _Indexes...
+	typedef typename aux_::tuple_to_parameter_pack_with_parameter_index<
+		parameter_pack<>, T, Indexes...
 	>::type type;
 };
 
-template<typename _T, std::size_t... _Indexes>
-struct tuple_to_parameter_pack_with_parameter_index<_T, parameter_index<_Indexes...>>
-{
-	typedef typename __tuple_to_parameter_pack_with_parameter_index<
-		parameter_pack<>, _T, _Indexes...
-	>::type type;
-};
 
-
-template<std::size_t _Start, std::size_t _Stop, typename _T, std::size_t _Step = 1>
+template<std::size_t Start, std::size_t Stop, class T, std::size_t Step = 1>
 class build_range_tuple_to_parameter_pack
 {
-	static const std::size_t __size = std::tuple_size<_T>::value;
-	static const std::size_t __stop = (_Stop > __size ? __size : _Stop);
-	static const std::size_t __start = (_Start < __stop ? _Start : __stop);
-	typedef typename build_range_parameter_index<__start, __stop, _Step>::type __indexes;
+	static const std::size_t size_ = std::tuple_size<T>::value;
+	static const std::size_t stop_ = (Stop > size_ ? size_ : Stop);
+	static const std::size_t start_ = (Start < stop_ ? Start : stop_);
+	typedef typename build_range_parameter_index<start_, stop_, Step>::type indexes_;
 public:
-	typedef typename tuple_to_parameter_pack_with_parameter_index<_T, __indexes>::type type;
+	typedef typename tuple_to_parameter_pack_with_parameter_index<T, indexes_>::type type;
 };
 
-template<typename _T>
+template<class T>
 struct tuple_to_parameter_pack
 {
 	typedef typename tuple_to_parameter_pack_with_parameter_index<
-		_T,
-		typename build_parameter_index<std::tuple_size<_T>::value>::type
+		T,
+		typename build_parameter_index<std::tuple_size<T>::value>::type
 	>::type type;
 };
 
-template<typename _Pack>
+template<class Pack>
 struct parameter_pack_to_tuple
-{ typedef typename build_class<std::tuple, _Pack>::type type; };
+{ typedef typename build_class<std::tuple, Pack>::type type; };
 
-template <typename _Tuple, typename _Indexes>
+template <class Tuple, class Indexes>
 struct tuple_pack_element
 {
 	typedef typename parameter_pack_to_tuple<
-		typename tuple_to_parameter_pack_with_parameter_index<_Tuple, _Indexes>::type
+		typename tuple_to_parameter_pack_with_parameter_index<Tuple, Indexes>::type
 	>::type type;
 };
 

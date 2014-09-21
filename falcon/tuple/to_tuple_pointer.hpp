@@ -3,11 +3,12 @@
 
 #include <falcon/tuple/parameter_index.hpp>
 #include <falcon/tuple/build_tuple_pointer.hpp>
-#include <falcon/tuple/detail/tuplefwd.hpp>
 
-#include <utility>
+# include <tuple>
 
 namespace falcon {
+
+using std::get;
 
 /// Pointer tuple element
 template <typename T, std::size_t... Indexes>

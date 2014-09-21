@@ -4,8 +4,8 @@
 #include <falcon/parameter/optimal_index_pack.hpp>
 #include <falcon/parameter/index_element.hpp>
 #include <falcon/parameter/pack_element.hpp>
-#include <falcon/tuple/detail/is_tuple.hpp>
 #include <falcon/tuple/parameter_pack.hpp>
+#include <falcon/tuple/is_tuple_like.hpp>
 #include <falcon/utility/unpack.hpp>
 #include <falcon/arg/arg.hpp>
 
@@ -107,62 +107,62 @@ public:
 
   template<typename Tuple2>
   optimal_tuple(Tuple2&& t)
-  : _M_impl(typename std::conditional<traits_type::size() != 1, spt, spa>::type(),
+  : impl_(typename std::conditional<traits_type::size() != 1, spt, spa>::type(),
             indexes(), std::forward<Tuple2>(t))
   {}
 
   template<typename... Args>
   optimal_tuple(Args&&... args)
-  : _M_impl(spa(), indexes(), std::forward<Args>(args)...)
+  : impl_(spa(), indexes(), std::forward<Args>(args)...)
   {}
 
   template<typename Tuple2>
   optimal_tuple(optimal_tuple<Tuple2>&& other)
-  : _M_impl(std::forward<Tuple2>(other.impl.tuple))
+  : impl_(std::forward<Tuple2>(other.impl.tuple))
   {}
 
   template<typename Tuple2>
   optimal_tuple& operator=(Tuple2&& t)
   {
-    _M_impl.assign(indexes(), std::forward<Tuple2>(t));
+    impl_.assign(indexes(), std::forward<Tuple2>(t));
     return *this;
   }
 
   template<typename Tuple2>
   optimal_tuple& operator=(optimal_tuple<Tuple2>&& other)
   {
-    _M_impl.tuple = std::forward<Tuple2>(other.impl.tuple);
+    impl_.tuple = std::forward<Tuple2>(other.impl.tuple);
     return *this;
   }
 
 public:
-  opti_impl _M_impl;
+  opti_impl impl_;
 };
 
 
 template<typename Tuple>
-struct is_tuple_impl<optimal_tuple<Tuple>>
+struct is_tuple_like<optimal_tuple<Tuple>>
 : std::true_type
 {};
 
 template<std::size_t I, typename Tuple>
 auto get(optimal_tuple<Tuple>&& t)
 -> decltype(optimal_tuple_traits<Tuple>::
-  template get<I>(std::forward<Tuple>(t._M_impl.tuple)))
+  template get<I>(std::forward<Tuple>(t.impl_.tuple)))
 {
   return optimal_tuple_traits<Tuple>::
-  template get<I>(std::forward<Tuple>(t._M_impl.tuple));
+  template get<I>(std::forward<Tuple>(t.impl_.tuple));
 }
 
 template<std::size_t I, typename Tuple>
 auto get(const optimal_tuple<Tuple>& t)
--> decltype(optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple))
-{ return optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple); }
+-> decltype(optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple))
+{ return optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple); }
 
 template<std::size_t I, typename Tuple>
 auto get(optimal_tuple<Tuple>& t)
--> decltype(optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple))
-{ return optimal_tuple_traits<Tuple>::template get<I>(t._M_impl.tuple); }
+-> decltype(optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple))
+{ return optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple); }
 
 }
 

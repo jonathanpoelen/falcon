@@ -1,6 +1,7 @@
 #ifndef FALCON_FUNCTIONAL_OPERATORS_HPP
 #define FALCON_FUNCTIONAL_OPERATORS_HPP
 
+#include <falcon/config.hpp>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/reference.hpp>
 #include <falcon/c++/boost_or_std.hpp>
@@ -174,6 +175,8 @@ struct pointer_to_member;
     typedef U second_argument_type;                     \
     typedef T result_type;                              \
                                                         \
+    CPP_CONSTEXPR name() {}                             \
+                                                        \
     CPP_CONSTEXPR R operator()(T1& a, const U& b) const \
     { return a op b; }                                  \
   };
@@ -184,6 +187,8 @@ struct pointer_to_member;
   template<>                                     \
   struct name<void, void>                        \
   {                                              \
+    constexpr name() {}                          \
+                                                 \
     template<typename T, typename U>             \
     constexpr CPP1X_DELEGATE_FUNCTION(           \
       operator()(T&& a, U&& b) const             \
@@ -196,6 +201,8 @@ struct pointer_to_member;
   template<>                                      \
   struct name<void, void>                         \
   {                                               \
+    name() {}                                     \
+                                                  \
     template<typename T, typename U>              \
     typename name<T>::result_type                 \
     operator()(T1& a, const U& b) const           \
@@ -216,6 +223,9 @@ struct pointer_to_member;
   FALCON_CREATE_OPERATOR2(name, op)       \
   FALCON_CREATE_OPERATOR_VOID2(name, op)
 
+#ifdef IN_IDE_PARSER
+FALCON_CREATE_OPERATORS(__ide_parser, +)
+#endif
 FALCON_CREATE_OPERATORS(plus      , +)
 FALCON_CREATE_OPERATORS(minus     , -)
 FALCON_CREATE_OPERATORS(multiplies, *)
@@ -231,6 +241,8 @@ struct assign
 {
   typedef T argument_type;
   typedef T result_type;
+
+  CPP_CONSTEXPR assign() {}
 
   CPP_CONSTEXPR T& operator()(T& a, U CPP_RVALUE_OR_CONST_REFERENCE b) const
   { return a = FALCON_FORWARD(U, b); }
@@ -248,6 +260,8 @@ struct left_shift<std::basic_ostream<CharT, Traits>, T>
   typedef T second_argument_type;
   typedef first_argument_type& result_type;
 
+  CPP_CONSTEXPR left_shift() {}
+
   result_type operator()(first_argument_type& os, const T& b) const
   { return os << b; }
 };
@@ -258,6 +272,8 @@ struct right_shift<std::basic_istream<CharT, Traits>, T>
   typedef std::basic_istream<CharT, Traits> first_argument_type;
   typedef T second_argument_type;
   typedef first_argument_type& result_type;
+
+  CPP_CONSTEXPR right_shift() {}
 
   result_type operator()(first_argument_type& is, const T& b) const
   { return is >> b; }
@@ -275,6 +291,8 @@ struct left_shift<void, void>
   -> decltype(a<<b)
   { return a << b; }
 
+  CPP_CONSTEXPR left_shift() {}
+
   template<typename CharT, typename Traits, typename T>
   std::basic_ostream<CharT, Traits>&
   operator()(std::basic_ostream<CharT, Traits>& os, const T& b) const
@@ -288,6 +306,8 @@ struct right_shift<void, void>
   constexpr auto operator()(const T& a, const U& b) const
   -> decltype(a>>b)
   { return a >> b; }
+
+  CPP_CONSTEXPR right_shift() {}
 
   template<typename CharT, typename Traits, typename T>
   std::basic_istream<CharT, Traits>&
@@ -329,6 +349,8 @@ FALCON_CREATE_OPERATORS(logical_or   , ||)
     typedef T argument_type;                 \
     typedef FALCON_UNARY_RETURN result_type; \
                                              \
+    CPP_CONSTEXPR name() {}                  \
+                                             \
     CPP_CONSTEXPR result_type                \
     operator()(FALCON_UNARY_PARAM & a) const \
     { return op a; }                         \
@@ -343,6 +365,8 @@ FALCON_CREATE_OPERATORS(logical_or   , ||)
   template<>                                  \
   struct name<void>                           \
   {                                           \
+    constexpr name() {}                       \
+                                              \
     template<typename T>                      \
     constexpr CPP1X_DELEGATE_FUNCTION(        \
       operator()(T && a) const                \
@@ -355,6 +379,8 @@ FALCON_CREATE_OPERATORS(logical_or   , ||)
   template<>                                  \
   struct name<void>                           \
   {                                           \
+    name() {}                                 \
+                                              \
     template<typename T>                      \
     typename name<T>::result_type             \
     operator()(FALCON_UNARY_PARAM & a) const  \
@@ -394,6 +420,8 @@ struct pointer
   typedef T argument_type;
   typedef typename T::value_type& result_type;
 
+  CPP_CONSTEXPR pointer() {}
+
   CPP_CONSTEXPR result_type
   operator()(T & a) const
   { return *a; }
@@ -405,6 +433,8 @@ struct pointer<const T>
   typedef T argument_type;
   typedef const typename T::value_type& result_type;
 
+  CPP_CONSTEXPR pointer() {}
+
   CPP_CONSTEXPR result_type
   operator()(const T & a) const
   { return *a; }
@@ -415,6 +445,8 @@ struct pointer<T*>
 {
   typedef T* argument_type;
   typedef T& result_type;
+
+  CPP_CONSTEXPR pointer() {}
 
   CPP_CONSTEXPR result_type
   operator()(T* a) const
@@ -437,6 +469,8 @@ struct equivalent
   typedef U second_argument_type;
   typedef bool result_type;
 
+  CPP_CONSTEXPR equivalent() {}
+
   CPP_CONSTEXPR bool operator()(const T& a, const U& b) const
   { return !(a < b || a > b); }
 };
@@ -444,6 +478,8 @@ struct equivalent
 template<>
 struct equivalent<void, void>
 {
+  CPP_CONSTEXPR equivalent() {}
+
   template<typename T, typename U>
   constexpr bool operator()(const T& a, const U& b) const
   { return !(a < b || a > b); }
@@ -456,6 +492,8 @@ struct post_increment
   typedef T argument_type;
   typedef T& result_type;
 
+  CPP_CONSTEXPR post_increment() {}
+
   CPP_CONSTEXPR result_type operator()(T& a) const
   { return a++; }
 };
@@ -463,6 +501,8 @@ struct post_increment
 template<>
 struct post_increment<void>
 {
+  CPP_CONSTEXPR post_increment() {}
+
   template<typename T>
   CPP_CONSTEXPR T& operator()(T& a) const
   { return a++; }
@@ -475,6 +515,8 @@ struct post_decrement
   typedef T argument_type;
   typedef T& result_type;
 
+  CPP_CONSTEXPR post_decrement() {}
+
   CPP_CONSTEXPR result_type operator()(T& a) const
   { return a--; }
 };
@@ -482,6 +524,8 @@ struct post_decrement
 template<>
 struct post_decrement<void>
 {
+  CPP_CONSTEXPR post_decrement() {}
+
   template<typename T>
   CPP_CONSTEXPR T& operator()(T& a) const
   { return a--; }
@@ -494,6 +538,8 @@ struct increment_emulation
   typedef T argument_type;
   typedef T& result_type;
 
+  CPP_CONSTEXPR increment_emulation() {}
+
   result_type operator()(T& a) const
   {
     a = static_cast<T>(a + 1);
@@ -504,6 +550,8 @@ struct increment_emulation
 template<>
 struct increment_emulation<void>
 {
+  CPP_CONSTEXPR increment_emulation() {}
+
   template<typename T>
   T& operator()(T& a) const
   {
@@ -519,6 +567,8 @@ struct decrement_emulation
   typedef T argument_type;
   typedef T& result_type;
 
+  CPP_CONSTEXPR decrement_emulation() {}
+
   result_type operator()(T& a) const
   {
     a = static_cast<T>(a - 1);
@@ -529,6 +579,8 @@ struct decrement_emulation
 template<>
 struct decrement_emulation<void>
 {
+  CPP_CONSTEXPR decrement_emulation() {}
+
   template<typename T>
   T& operator()(T& a) const
   {
@@ -545,6 +597,8 @@ struct arrow
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE
     ::remove_const<T>::type::type& result_type;
 
+  CPP_CONSTEXPR arrow() {}
+
   CPP_CONSTEXPR result_type operator()(T& a) const
   { return a.operator->(); }
 };
@@ -552,7 +606,9 @@ struct arrow
 template<>
 struct arrow<void>
 {
-#if __cplusplus >= 201103L
+  CPP_CONSTEXPR arrow() {}
+
+# if __cplusplus >= 201103L
   template<typename T>
   constexpr CPP1X_DELEGATE_FUNCTION(
     operator()(T&& a) const
@@ -574,6 +630,8 @@ struct index
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE
     ::remove_const<T>::type::value_type& result_type;
 
+  CPP_CONSTEXPR index() {}
+
   CPP_CONSTEXPR result_type operator()(T& a, second_argument_type i) const
   { return a[i]; }
 };
@@ -585,6 +643,8 @@ struct index<T*, Index>
   typedef typename default_or_type<std::size_t, Index, void>
     ::type second_argument_type;
   typedef T& result_type;
+
+  CPP_CONSTEXPR index() {}
 
   CPP_CONSTEXPR result_type operator()(T& a, second_argument_type i) const
   { return a[i]; }
@@ -603,6 +663,8 @@ struct index<T[N], Index>
 template<>
 struct index<void, void>
 {
+  CPP_CONSTEXPR index() {}
+
   template<typename T, typename Index>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(
@@ -624,6 +686,8 @@ struct index_emulation
     ::type second_argument_type;
   typedef typename FALCON_BOOST_OR_STD_NAMESPACE
     ::remove_const<T>::type::type& result_type;
+
+  CPP_CONSTEXPR index_emulation() {}
 
   CPP_CONSTEXPR result_type operator()(T& a, second_argument_type i) const
   { return *(a + i); }
@@ -647,6 +711,8 @@ struct index_emulation<T[N], Index>
 template<>
 struct index_emulation<void, void>
 {
+  CPP_CONSTEXPR index_emulation() {}
+
   template<typename T, typename Index>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(
@@ -667,6 +733,8 @@ struct comma
   typedef U second_argument_type;
   typedef T& result_type;
 
+  CPP_CONSTEXPR comma() {}
+
   constexpr result_type operator()(T& a, U& b) const
   { return (a , b); }
 };
@@ -674,6 +742,8 @@ struct comma
 template<>
 struct comma<void, void>
 {
+  CPP_CONSTEXPR comma() {}
+
   template<typename T, typename U>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(operator()(T& a, U& b) const, (a , b))
@@ -692,6 +762,8 @@ struct pointer_to_member
   typedef Member second_argument_type;
   typedef decltype(std::declval<T>().*std::declval<Member>()) result_type;
 
+  CPP_CONSTEXPR pointer_to_member() {}
+
   constexpr result_type operator()(T& a, Member m) const
   { return a.*m; };
 };
@@ -699,6 +771,8 @@ struct pointer_to_member
 template<>
 struct pointer_to_member<void, void>
 {
+  CPP_CONSTEXPR pointer_to_member() {}
+
   template<typename T, typename Member>
   constexpr CPP1X_DELEGATE_FUNCTION(operator()(T& a, Member m) const, a.*m)
 };

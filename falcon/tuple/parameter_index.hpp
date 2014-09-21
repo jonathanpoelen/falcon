@@ -1,9 +1,10 @@
 #ifndef FALCON_TUPLE_PARAMETER_INDEX_HPP
 #define FALCON_TUPLE_PARAMETER_INDEX_HPP
 
-#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 #include <falcon/type_traits/remove_cv_reference.hpp>
+
+#include <tuple>
 
 namespace falcon {
 
