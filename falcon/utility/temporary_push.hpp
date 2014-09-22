@@ -11,24 +11,24 @@ namespace falcon {
 struct pusher
 {
   template<class Container, class T>
-  void operator()(Container& cont,
-                  T CPP_RVALUE_OR_CONST_REFERENCE new_value) const
+  void operator()(
+    Container& cont, T CPP_RVALUE_OR_CONST_REFERENCE new_value) const
   { cont.push(FALCON_FORWARD(T, new_value)); }
 };
 
 struct back_pusher
 {
   template<class Container, class T>
-  void operator()(Container& cont,
-                  T CPP_RVALUE_OR_CONST_REFERENCE new_value) const
+  void operator()(
+    Container& cont, T CPP_RVALUE_OR_CONST_REFERENCE new_value) const
   { cont.push_back(FALCON_FORWARD(T, new_value)); }
 };
 
 struct front_pusher
 {
   template<class Container, class T>
-  void operator()(Container& cont,
-                  T CPP_RVALUE_OR_CONST_REFERENCE new_value) const
+  void operator()(
+    Container& cont, T CPP_RVALUE_OR_CONST_REFERENCE new_value) const
   { cont.push_front(FALCON_FORWARD(T, new_value)); }
 };
 
@@ -86,16 +86,17 @@ class temporary_push
 
 public:
   template<class CPP_PACK U>
-  temporary_push(Container & cont,
-                 U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+  temporary_push(
+    Container & cont, U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
   : x(&cont)
   {
     pusher(cont, FALCON_FORWARD(U, new_value) CPP_PACK);
   }
 
   template<class CPP_PACK U>
-  temporary_push(Container & cont, Pusher func_pusher, Poper func_poper,
-                 U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+  temporary_push(
+    Container & cont, Pusher func_pusher, Poper func_poper,
+    U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
   : x(&cont)
   , pusher(func_pusher)
   , poper(func_poper)
@@ -119,13 +120,16 @@ public:
 
 #if __cplusplus >= 201103L
 template<class Container>
-using temporary_back_insert = temporary_push<Container, back_pusher, back_poper>;
+using temporary_back_insert
+  = temporary_push<Container, back_pusher, back_poper>;
 
 template<class Container>
-using temporary_front_insert = temporary_push<Container, front_pusher, front_poper>;
+using temporary_front_insert
+  = temporary_push<Container, front_pusher, front_poper>;
 
 template<class Container>
-using temporary_emplace = temporary_push<Container, emplace_pusher, poper>;
+using temporary_emplace
+  = temporary_push<Container, emplace_pusher, poper>;
 
 template<class Container>
 using temporary_back_emplace
@@ -187,8 +191,8 @@ temporary_pusher(Container & cont, U CPP_RVALUE_OR_CONST_REFERENCE new_value)
 
 template<class Container, class CPP_PACK U>
 temporary_push<Container, front_pusher, front_poper>
-temporary_front_inserter(Container & cont,
-                         U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+temporary_front_inserter(
+  Container & cont, U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
 {
   return temporary_push<Container, front_pusher, front_poper>(
     cont
@@ -198,8 +202,8 @@ temporary_front_inserter(Container & cont,
 
 template<class Container, class CPP_PACK U>
 temporary_push<Container, back_pusher, back_poper>
-temporary_back_inserter(Container & cont,
-                        U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+temporary_back_inserter(
+  Container & cont, U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
 {
   return temporary_push<Container, back_pusher, back_poper>(
     cont
@@ -226,9 +230,9 @@ temporary_front_inserter(Container & cont, T && arg, U && ... args)
 
 template<class Container, class Pusher, class Poper, class CPP_PACK U>
 temporary_push<Container, Pusher, Poper>
-make_temporary_push(Container & cont,
-                    Pusher CPP_RVALUE func_pusher, Poper CPP_RVALUE func_poper,
-                    U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+make_temporary_push(
+  Container & cont, Pusher CPP_RVALUE func_pusher, Poper CPP_RVALUE func_poper,
+  U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
 {
   return temporary_push<Container, Pusher, Poper>(
     cont

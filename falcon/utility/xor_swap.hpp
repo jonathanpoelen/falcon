@@ -15,9 +15,7 @@ template<typename ForwardIt1, typename ForwardIt2>
 void iter_xor_swap(ForwardIt1 a, ForwardIt2 b)
 {
   for (; a != b; ++a) {
-    *a ^= *b;
-    *b ^= *a;
-    *a ^= *b;
+    xor_swap(a, b);
   }
 }
 

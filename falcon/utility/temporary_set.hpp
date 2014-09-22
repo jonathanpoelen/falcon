@@ -15,29 +15,29 @@ namespace falcon {
 template<class T, class Assigner = assign<T, T> >
 class temporary_set
 {
-  T * _value;
-  T _old_value;
-  Assigner _assign;
+  T * value_;
+  T old_value_;
+  Assigner assign_;
 
 public:
   typedef T type;
 
 public:
   template<class U>
-  temporary_set(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value)
-  : _value(&old_value)
-  , _old_value(FALCON_MOVE(old_value))
+  temporary_set(T& oldvalue_, U CPP_RVALUE_OR_CONST_REFERENCE newvalue_)
+  : value_(&oldvalue_)
+  , old_value_(FALCON_MOVE(oldvalue_))
   {
-    _assign(*_value, FALCON_FORWARD(U, new_value));
+    assign_(*value_, FALCON_FORWARD(U, newvalue_));
   }
 
   template<class U>
-  temporary_set(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner fun)
-  : _value(&old_value)
-  , _old_value(FALCON_MOVE(old_value))
-  , _assign(fun)
+  temporary_set(T& oldvalue_, U CPP_RVALUE_OR_CONST_REFERENCE newvalue_, Assigner fun)
+  : value_(&oldvalue_)
+  , old_value_(FALCON_MOVE(oldvalue_))
+  , assign_(fun)
   {
-    _assign(*_value, FALCON_FORWARD(U, new_value));
+    assign_(*value_, FALCON_FORWARD(U, newvalue_));
   }
 
 #if __cplusplus >= 201103L
@@ -49,32 +49,32 @@ public:
 
   ~temporary_set()
   {
-    _assign(*_value, FALCON_MOVE(_old_value));
+    assign_(*value_, FALCON_MOVE(old_value_));
   }
 
   const T& old() const CPP_NOEXCEPT
-  { return _old_value; }
+  { return old_value_; }
 
   void old(const T & new_old)
-  { _old_value = new_old; }
+  { old_value_ = new_old; }
 
 #if __cplusplus >= 201103L
   void old(T && new_old)
-  { _old_value = std::move(new_old); }
+  { old_value_ = std::move(new_old); }
 #endif
 };
 
 ///\brief make a temporary_set
 template<class T, class U>
 temporary_set<T>
-temporary_value(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value)
-{ return temporary_set<T>(old_value,  FALCON_FORWARD(U, new_value)); }
+temporary_value(T& oldvalue_, U CPP_RVALUE_OR_CONST_REFERENCE newvalue_)
+{ return temporary_set<T>(oldvalue_,  FALCON_FORWARD(U, newvalue_)); }
 
 template<class T, class U, class Assigner>
 temporary_set<T, Assigner>
-temporary_value(T& old_value, U CPP_RVALUE_OR_CONST_REFERENCE new_value, Assigner CPP_RVALUE fun)
-{ return temporary_set<T, Assigner>(old_value
-, FALCON_FORWARD(U, new_value), FALCON_FORWARD(Assigner, fun)); }
+temporary_value(T& oldvalue_, U CPP_RVALUE_OR_CONST_REFERENCE newvalue_, Assigner CPP_RVALUE fun)
+{ return temporary_set<T, Assigner>(oldvalue_
+, FALCON_FORWARD(U, newvalue_), FALCON_FORWARD(Assigner, fun)); }
 
 }
 

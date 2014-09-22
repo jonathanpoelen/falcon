@@ -7,23 +7,27 @@
 
 namespace falcon {
 
-namespace detail {
+namespace aux_ {
   template<class T>
   struct unpack_assigner
   {
     template<class Tuple>
     static void impl(Tuple & t, T && x)
     {
-      static_assert(std::tuple_size<Tuple>::value == std::tuple_size<T>::value,
-                    "The size must be equal.");
-      impl_(t, std::forward<T>(x), build_parameter_index_t<std::tuple_size<Tuple>::value>());
+      static_assert(
+        std::tuple_size<Tuple>::value == std::tuple_size<T>::value,
+        "The size must be equal.");
+      impl_(
+        t, std::forward<T>(x),
+        build_parameter_index_t<std::tuple_size<Tuple>::value>());
     }
 
     template<class Tuple>
     static void impl(Tuple & t, T & x)
     {
-      static_assert(std::tuple_size<Tuple>::value == std::tuple_size<T>::value,
-                    "The size must be equal.");
+      static_assert(
+        std::tuple_size<Tuple>::value == std::tuple_size<T>::value,
+        "The size must be equal.");
       impl_(t, x, build_parameter_index_t<std::tuple_size<Tuple>::value>());
     }
 
@@ -65,21 +69,27 @@ namespace detail {
     template<class Tuple, class Array>
     static void impl(Tuple t, Array&& x)
     {
-      static_assert(std::tuple_size<Tuple>::value == N, "The size must be equal.");
-      impl_(t, x, build_parameter_index_t<std::tuple_size<Tuple>::value>(),
-            std::integral_constant<bool, std::is_lvalue_reference<Array>::value>());
+      static_assert(
+        std::tuple_size<Tuple>::value == N,
+        "The size must be equal.");
+      impl_(
+        t, x, build_parameter_index_t<std::tuple_size<Tuple>::value>(),
+        std::integral_constant<bool, std::is_lvalue_reference<Array>::value>()
+      );
     }
 
   private:
     template<class Tuple, std::size_t... Indexes>
-    static void impl_(Tuple & t, T (&x)[N], parameter_index<Indexes...>, std::true_type)
+    static void impl_(
+      Tuple & t, T (&x)[N], parameter_index<Indexes...>, std::true_type)
     {
       using std::get;
       FALCON_UNPACK(get<Indexes>(t) = x[Indexes]);
     }
 
     template<class Tuple, std::size_t... Indexes>
-    static void impl_(Tuple & t, T (&x)[N], parameter_index<Indexes...>, std::false_type)
+    static void impl_(
+      Tuple & t, T (&x)[N], parameter_index<Indexes...>, std::false_type)
     {
       using std::get;
       FALCON_UNPACK(get<Indexes>(t) = std::move(x[Indexes]));
@@ -100,7 +110,7 @@ public:
   template <class T>
   void operator=(T&& x) const
   {
-    detail::unpack_assigner<typename std::remove_reference<T>::type>
+    aux_::unpack_assigner<typename std::remove_reference<T>::type>
     ::impl(t, std::forward<T>(x));
   }
 };

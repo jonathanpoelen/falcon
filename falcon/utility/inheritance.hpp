@@ -6,25 +6,25 @@
 namespace falcon
 {
 
-template<typename _Inherit, typename... _Inherits>
+template<typename Inherit, typename... Inherits>
 struct inheritance
-: _Inherit
-, inheritance<_Inherits...>
+: Inherit
+, inheritance<Inherits...>
 {
-	template<typename _T, typename... _Args>
-	inheritance(_T&& v, _Args&&... args)
-	: _Inherit(std::forward<_T>(v))
-	, inheritance<_Inherits...>(std::forward<_Args>(args)...)
+	template<typename _T, typename... Args>
+	inheritance(_T&& v, Args&&... args)
+	: Inherit(std::forward<_T>(v))
+	, inheritance<Inherits...>(std::forward<Args>(args)...)
 	{}
 };
 
-template<typename _Inherit>
-struct inheritance<_Inherit>
-: _Inherit
+template<typename Inherit>
+struct inheritance<Inherit>
+: Inherit
 {
-	template<typename... _Args>
-	inheritance(_Args&&... args)
-	: _Inherit(std::forward<_Args>(args)...)
+	template<typename... Args>
+	inheritance(Args&&... args)
+	: Inherit(std::forward<Args>(args)...)
 	{}
 };
 

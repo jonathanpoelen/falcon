@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <iosfwd>
 
-namespace falcon { namespace tuple {
+namespace falcon { namespace tuple { namespace iostreams {
 
 namespace aux_ {
   template<typename Tuple, typename Sep>
@@ -33,7 +33,7 @@ septuple(const Tuple& t, const Sep& sep)
 template<typename CharT, typename Traits, typename Tuple>
 typename std::enable_if<
   is_tuple_like<Tuple>::value, std::basic_istream<CharT, Traits>&>::type
-operator>>(std::basic_istream<CharT, Traits>& is, Tuple&& t)
+operator>>(std::basic_istream<CharT, Traits>& is, Tuple& t)
 { return is >> ::falcon::get_tuple(t); }
 
 template<typename CharT, typename Traits, typename Tuple, typename Sep>
@@ -53,6 +53,6 @@ std::basic_ostream<CharT, Traits>&
 operator<<(std::basic_ostream<CharT, Traits>& os, aux_::iotuple<Tuple,Sep> t)
 { return os << ::falcon::put_tuple(t.tuple, t.sep); }
 
-} }
+} } }
 
 #endif

@@ -35,12 +35,12 @@ template <typename Functor>
 struct finally
 {
 	finally()
-	: _M_functor()
+	: functor_()
 	{}
 
 #if __cplusplus >= 201103L
 	finally(Functor&& func)
-	: _M_functor(std::forward<Functor>(func))
+	: functor_(std::forward<Functor>(func))
 	{}
 
   finally(finally&&)=default;
@@ -49,28 +49,28 @@ struct finally
 
   finally& operator=(Functor && func)
   {
-    _M_functor = std::forward<Functor>(func);
+    functor_ = std::forward<Functor>(func);
     return *this;
   }
 #else
 	finally(Functor func)
-	: _M_functor(func)
+	: functor_(func)
   {}
 
   finally& operator=(Functor func)
   {
-    _M_functor = func;
+    functor_ = func;
     return *this;
   }
 #endif
 
 	~finally()
 	{
-		_M_functor();
+		functor_();
 	}
 
 private:
-  Functor _M_functor;
+  Functor functor_;
 };
 
 #if __cplusplus >= 201103L

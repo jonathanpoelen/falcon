@@ -7,34 +7,34 @@
 namespace falcon
 {
 
-template<typename _Class, std::size_t... _ParameterIndexes>
+template<typename Class, std::size_t... ParameterIndexes>
 class inheritance_class;
 
-template<typename _Inherit, typename... _Inherits>
+template<typename Inherit, typename... Inherits>
 class inheritance_with_index;
 
-template<typename _Inherit, std::size_t... _Indexes, typename... _Inherits>
+template<typename Inherit, std::size_t... Indexes, typename... Inherits>
 struct inheritance_with_index<
-	inheritance_class<_Inherit, _Indexes...>,
-	_Inherits...
+	inheritance_class<Inherit, Indexes...>,
+	Inherits...
 >
-: _Inherit
-, inheritance_with_index<_Inherits...>
+: Inherit
+, inheritance_with_index<Inherits...>
 {
 	template<typename... _Args>
 	inheritance_with_index(_Args&&... args)
-	: _Inherit(arg<_Indexes>(args)...)
-	, inheritance_with_index<_Inherits...>(std::forward<_Args>(args)...)
+	: Inherit(arg<Indexes>(args)...)
+	, inheritance_with_index<Inherits...>(std::forward<_Args>(args)...)
 	{}
 };
 
-template<typename _Inherit, std::size_t... _Indexes>
-struct inheritance_with_index<inheritance_class<_Inherit, _Indexes...>>
-: _Inherit
+template<typename Inherit, std::size_t... Indexes>
+struct inheritance_with_index<inheritance_class<Inherit, Indexes...>>
+: Inherit
 {
 	template<typename... _Args>
 	inheritance_with_index(_Args&&... args)
-	: _Inherit(arg<_Indexes>(args)...)
+	: Inherit(arg<Indexes>(args)...)
 	{}
 };
 

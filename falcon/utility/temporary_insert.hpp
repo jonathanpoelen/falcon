@@ -5,8 +5,8 @@
 #include <falcon/c++/reference.hpp>
 #include <falcon/c++/pack.hpp>
 #include <falcon/c++/noexcept.hpp>
-#include <falcon/arg/arg.hpp>
 #include <falcon/type_traits/enable_type.hpp>
+#include <falcon/iterator/const_iterator_not_conflict.hpp>
 
 #if __cplusplus >= 201103L
 # include <initializer_list>
@@ -14,35 +14,41 @@
 
 namespace falcon {
 
-// TODO const_iterator_no_conflict
-template<class C, class = typename C::iterator, class = typename C::const_iterator>
-struct __inserter_no_conflict
-{
-  typedef typename C::const_iterator type;
-};
-
-template<class C, class I>
-class __inserter_no_conflict<C, I, I>;
-
 struct inserter
 {
   template<class Container>
   typename Container::iterator
-  operator()(Container& cont,
-             typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value) const
-  { return cont.insert(FALCON_FORWARD(typename Container::value_type, new_value)); }
+  operator()(
+    Container& cont,
+    typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value
+   ) const
+  {
+    return cont.insert(FALCON_FORWARD(
+      typename Container::value_type, new_value));
+  }
 
   template<class Container>
   typename Container::iterator
-  operator()(Container& cont, typename Container::iterator pos,
-             typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value) const
-  { return cont.insert(pos, FALCON_FORWARD(typename Container::value_type, new_value)); }
+  operator()(
+    Container& cont, typename Container::iterator pos,
+    typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value
+   ) const
+  {
+    return cont.insert(
+      pos, FALCON_FORWARD(typename Container::value_type, new_value));
+  }
 
   template<class Container>
   typename Container::iterator
-  operator()(Container& cont, typename __inserter_no_conflict<Container>::type pos,
-             typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value) const
-  { return cont.insert(pos, FALCON_FORWARD(typename Container::value_type, new_value)); }
+  operator()(
+    Container& cont,
+    typename iterator::const_iterator_not_conflict<Container>::type pos,
+    typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value
+   ) const
+  {
+    return cont.insert(
+      pos, FALCON_FORWARD(typename Container::value_type, new_value));
+  }
 
 #if __cplusplus >= 201103L
   template<class Container, class T>
@@ -71,7 +77,9 @@ struct hint_emplacement
 {
   template<class Container, class... Ts>
   typename Container::iterator
-  operator()(Container& cont, typename Container::const_iterator pos, Ts&&... args) const
+  operator()(
+    Container& cont, typename Container::const_iterator pos, Ts&&... args
+   ) const
   { return cont.hint_emplace(pos, std::forward<Ts>(args)...); }
 };
 #endif
@@ -80,13 +88,15 @@ struct associative_inserter
 {
   template<class Container>
   std::pair<typename Container::iterator, bool>
-  operator()(Container& cont, typename Container::value_type const & value) const
+  operator()(
+    Container& cont, typename Container::value_type const & value) const
   { return cont.insert(value); }
 
 #if __cplusplus >= 201103L
   template<class Container>
   std::pair<typename Container::iterator, bool>
-  operator()(Container& cont, typename Container::value_type && value) const
+  operator()(
+    Container& cont, typename Container::value_type && value) const
   { return cont.insert(std::forward<typename Container::value_type>(value)); }
 #endif
 };
@@ -94,8 +104,10 @@ struct associative_inserter
 struct eraser
 {
   template<class Container>
-  void operator()(Container& cont,
-                  typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value) const
+  void operator()(
+    Container& cont,
+    typename Container::value_type CPP_RVALUE_OR_CONST_REFERENCE new_value
+   ) const
   { cont.erase(FALCON_FORWARD(typename Container::value_type, new_value)); }
 
   template<class Container>
@@ -106,7 +118,8 @@ struct eraser
 struct associative_eraser
 {
   template<class Container>
-  void operator()(Container& cont, std::pair<typename Container::iterator, bool> pos) const
+  void operator()(
+    Container& cont, std::pair<typename Container::iterator, bool> pos) const
   {
     if (pos.second) {
       cont.erase(pos.first);
@@ -115,7 +128,8 @@ struct associative_eraser
 };
 
 
-template<class Container, class Position = typename Container::iterator,
+template<
+  class Container, class Position = typename Container::iterator,
   class Inserter = inserter, class Deleter = eraser>
 class temporary_insert
 {
@@ -126,15 +140,16 @@ class temporary_insert
 
 public:
   template<class CPP_PACK U>
-  temporary_insert(Container & cont,
-                   U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+  temporary_insert(
+    Container & cont, U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
   : x(&cont)
   , position(inserter(cont, FALCON_FORWARD(U, new_value)CPP_PACK))
   {}
 
   template<class CPP_PACK U>
-  temporary_insert(Container & cont, Inserter func_inserter, Deleter func_deleter,
-                   U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+  temporary_insert(
+    Container & cont, Inserter func_inserter, Deleter func_deleter,
+    U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
   : x(&cont)
   , inserter(func_inserter)
   , deleter(func_deleter)
@@ -157,10 +172,14 @@ public:
 
 template<class Container, class Inserter, class Deleter, class CPP_PACK U>
 temporary_insert<Container, typename Container::iterator, Inserter, Deleter>
-make_temporary_insert(Container & cont, Inserter CPP_RVALUE inserter, Deleter CPP_RVALUE deleter,
-                      U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+make_temporary_insert(
+  Container & cont, Inserter CPP_RVALUE inserter, Deleter CPP_RVALUE deleter,
+  U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
 {
-  return temporary_insert<Container, typename Container::iterator, Inserter, Deleter>(
+  return temporary_insert<
+    Container, typename Container::iterator,
+    Inserter, Deleter
+  >(
     cont
   , FALCON_FORWARD(Inserter, inserter)
   , FALCON_FORWARD(Deleter, deleter)
@@ -168,10 +187,13 @@ make_temporary_insert(Container & cont, Inserter CPP_RVALUE inserter, Deleter CP
   );
 }
 
-template<class Position, class Container, class Inserter, class Deleter, class CPP_PACK U>
+template<
+  class Position, class Container, class Inserter,
+  class Deleter, class CPP_PACK U>
 temporary_insert<Container, Position, Inserter, Deleter>
-make_temporary_insert(Container & cont, Inserter CPP_RVALUE inserter, Deleter CPP_RVALUE deleter,
-                      U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
+make_temporary_insert(
+  Container & cont, Inserter CPP_RVALUE inserter, Deleter CPP_RVALUE deleter,
+  U CPP_RVALUE_OR_CONST_REFERENCE CPP_PACK new_value)
 {
   return temporary_insert<Container, Position, Inserter, Deleter>(
     cont
@@ -182,53 +204,61 @@ make_temporary_insert(Container & cont, Inserter CPP_RVALUE inserter, Deleter CP
 }
 
 
-template<class Container, class Position = typename Container::iterator, class = void>
-struct __selector_inserter
-{
-  typedef temporary_insert<Container, Position> type;
-};
+namespace aux_ {
+  template<
+    class Container, class Position = typename Container::iterator,
+    class = void>
+  struct selector_inserter
+  { typedef temporary_insert<Container, Position> type; };
 
-template<class Container, class Position>
-struct __selector_inserter<Container, Position
-, typename enable_type<typename Container::key_type>::type>
-{
-  typedef temporary_insert<Container, std::pair<Position, bool>
+  template<class Container, class Position>
+  struct selector_inserter<
+    Container, Position
+  , typename enable_type<typename Container::key_type>::type>
+  {
+    typedef temporary_insert<
+      Container, std::pair<Position, bool>
     , associative_inserter, associative_eraser> type;
-};
+  };
+}
 
 template<class Container>
-typename __selector_inserter<Container>::type
-temporary_inserter(Container & cont, typename Container::value_type const & new_value)
+typename aux_::selector_inserter<Container>::type
+temporary_inserter(
+  Container & cont, typename Container::value_type const & new_value)
 {
-  typedef typename __selector_inserter<Container>::type result_type;
+  typedef typename aux_::selector_inserter<Container>::type result_type;
   return result_type(cont, new_value);
 }
 
 template<class Container, class T>
-typename __selector_inserter<Container>::type
+typename aux_::selector_inserter<Container>::type
 temporary_inserter(Container & cont, T CPP_RVALUE_OR_CONST_REFERENCE new_value)
 {
-  typedef typename __selector_inserter<Container>::type result_type;
+  typedef typename aux_::selector_inserter<Container>::type result_type;
   return result_type(cont, FALCON_FORWARD(T, new_value));
 }
 
 #if __cplusplus >= 201103L
-template<class Container, class Position = typename Container::iterator, class = void>
-struct __selector_emplacement
-{
-  typedef temporary_insert<Container, Position, emplacement> type;
-};
+namespace aux_ {
+  template<
+    class Container, class Position = typename Container::iterator,
+    class = void>
+  struct selector_emplacement
+  { typedef temporary_insert<Container, Position, emplacement> type; };
 
-template<class Container, class Position>
-struct __selector_emplacement<Container, Position
-, typename enable_type<typename Container::key_type>::type>
-{
-  typedef temporary_insert<Container, std::pair<Position, bool>
+  template<class Container, class Position>
+  struct selector_emplacement<
+    Container, Position
+  , typename enable_type<typename Container::key_type>::type>
+  {
+    typedef temporary_insert<Container, std::pair<Position, bool>
     , associative_emplacement, associative_eraser> type;
-};
+  };
+}
 
 template<class Container, class... Ts>
-typename __selector_emplacement<Container>::type
+typename aux_::selector_emplacement<Container>::type
 temporary_inserter(Container & cont, Ts&&... new_value)
 {
   return {cont, std::forward<Ts>(new_value)...};
@@ -237,16 +267,19 @@ temporary_inserter(Container & cont, Ts&&... new_value)
 
 template<class Container>
 temporary_insert<Container>
-temporary_inserter(Container & cont, typename Container::iterator pos,
-                   typename Container::value_type const & new_value)
+temporary_inserter(
+  Container & cont, typename Container::iterator pos,
+  typename Container::value_type const & new_value)
 {
   return temporary_insert<Container>(cont, new_value);
 }
 
 template<class Container>
 temporary_insert<Container>
-temporary_inserter(Container & cont, typename __inserter_no_conflict<Container>::type pos,
-                   typename Container::value_type const & new_value)
+temporary_inserter(
+  Container & cont,
+  typename iterator::const_iterator_not_conflict<Container>::type pos,
+  typename Container::value_type const & new_value)
 {
   return temporary_insert<Container>(cont, new_value);
 }
@@ -254,8 +287,9 @@ temporary_inserter(Container & cont, typename __inserter_no_conflict<Container>:
 #if __cplusplus >= 201103L
 template<class Container>
 temporary_insert<Container>
-temporary_inserter(Container & cont, typename Container::const_iterator pos,
-                   typename Container::value_type && new_value)
+temporary_inserter(
+  Container & cont, typename Container::const_iterator pos,
+  typename Container::value_type && new_value)
 {
   return {cont, pos, std::forward<typename Container::value_type>(new_value)};
 }

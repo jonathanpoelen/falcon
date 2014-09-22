@@ -1,91 +1,88 @@
-#ifndef _FALCON_UTILITY_STRONG_REFERENCE_WRAPPER_HPP
-#define _FALCON_UTILITY_STRONG_REFERENCE_WRAPPER_HPP
+#ifndef FALCON_UTILITY_STRONG_REFERENCE_WRAPPER_HPP
+#define FALCON_UTILITY_STRONG_REFERENCE_WRAPPER_HPP
 
 #include <falcon/functional/invoke.hpp>
 
 namespace falcon {
 
-template<typename _Tp>
+template<typename T>
 class strong_reference_wrapper
 {
-	_Tp& _M_data;
+	T& data_;
 
 public:
-	typedef _Tp type;
+	typedef T type;
 
-	strong_reference_wrapper(_Tp& __indata)
-	: _M_data(__indata)
+	strong_reference_wrapper(T& indata)
+	: data_(indata)
 	{ }
 
-	strong_reference_wrapper(_Tp&&) = delete;
+	strong_reference_wrapper(T&&) = delete;
+	strong_reference_wrapper(const strong_reference_wrapper<T>&) = default;
 
-	strong_reference_wrapper(const strong_reference_wrapper<_Tp>& __inref):
-	_M_data(__inref._M_data)
-	{ }
-
-	strong_reference_wrapper& operator=(_Tp& __inref)
+	strong_reference_wrapper& operator=(T& inref)
 	{
-		_M_data = __inref;
+		data_ = inref;
 		return *this;
 	}
 
-	operator const _Tp&() const
+	operator const T&() const
 	{ return this->get(); }
 
-	operator _Tp&()
+	operator T&()
 	{ return this->get(); }
 
-	const _Tp& get() const
-	{ return *_M_data; }
+	const T& get() const
+	{ return *data_; }
 
-	_Tp& get()
-	{ return *_M_data; }
+	T& get()
+	{ return *data_; }
 
-	template<typename... _Args>
-	typename std::result_of<_Tp&(_Args&&...)>::type
-	operator()(_Args&&... __args) const
+	template<typename... Args>
+	typename std::result_of<T&(Args&&...)>::type
+	operator()(Args&&... args) const
 	{
-		return invoke(get(), std::forward<_Args>(__args)...);
+		return invoke(get(), std::forward<Args>(args)...);
 	}
 
-	template<typename... _Args>
-	typename std::result_of<_Tp&(_Args&&...)>::type
-	operator()(_Args&&... __args)
+	template<typename... Args>
+	typename std::result_of<T&(Args&&...)>::type
+	operator()(Args&&... args)
 	{
-		return invoke(get(), std::forward<_Args>(__args)...);
+		return invoke(get(), std::forward<Args>(args)...);
 	}
 };
 
 
 /// Denotes a reference should be taken to a variable.
-template<typename _Tp>
-inline strong_reference_wrapper<_Tp>
-sref(_Tp& __t)
-{ return strong_reference_wrapper<_Tp>(__t); }
+template<typename T>
+inline strong_reference_wrapper<T>
+sref(T& t)
+{ return strong_reference_wrapper<T>(t); }
 
 /// Denotes a const reference should be taken to a variable.
-template<typename _Tp>
-inline strong_reference_wrapper<const _Tp>
-csref(const _Tp& __t)
-{ return strong_reference_wrapper<const _Tp>(__t); }
+template<typename T>
+inline strong_reference_wrapper<const T>
+csref(const T& t)
+{ return strong_reference_wrapper<const T>(t); }
 
-template<typename _Tp>
-void sref(const _Tp&&) = delete;
+template<typename T>
+void sref(const T&&) = delete;
 
-template<typename _Tp>
-void csref(const _Tp&&) = delete;
-
-/// Partial specialization.
-template<typename _Tp>
-inline strong_reference_wrapper<_Tp>
-sref(strong_reference_wrapper<_Tp> __t)
-{ return sref(__t.get()); }
+template<typename T>
+void csref(const T&&) = delete;
 
 /// Partial specialization.
-template<typename _Tp>
-inline strong_reference_wrapper<const _Tp>
-csref(strong_reference_wrapper<_Tp> __t)
-{ return csref(__t.get()); }
+template<typename T>
+inline strong_reference_wrapper<T>
+sref(strong_reference_wrapper<T> t)
+{ return sref(t.get()); }
+
+/// Partial specialization.
+template<typename T>
+inline strong_reference_wrapper<const T>
+csref(strong_reference_wrapper<T> t)
+{ return csref(t.get()); }
 
 }
 

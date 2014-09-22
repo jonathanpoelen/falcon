@@ -354,3 +354,5 @@ faire une fonction tuple_size() pour être compatible avec les tuple_like ET ini
 
 traits<template<class...>class> pour creer un parameter_index en fonction du nombre d'element
 
+mutable_pointer et store_if = bof
+

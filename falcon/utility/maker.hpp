@@ -1,7 +1,6 @@
 #ifndef FALCONUTILITY_MAKER_HPP
 #define FALCONUTILITY_MAKER_HPP
 
-#include <falcon/config.hpp>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 #if __cplusplus >= 201103L
@@ -13,67 +12,71 @@
 namespace falcon {
 
 #if __cplusplus >= 201103L
-template<typename T, typename Tag = typename construct_category<T>::type>
-struct __delegate_maker
-{
-	template<typename... Args>
-	constexpr static T __impl(Args&&... args)
-	{ return T(std::forward<Args>(args)...); }
-};
+namespace aux_ {
+  template<typename T, typename Tag = typename construct_category<T>::type>
+  struct delegate_maker
+  {
+    template<typename... Args>
+    constexpr static T impl(Args&&... args)
+    { return T(std::forward<Args>(args)...); }
+  };
 
-template<typename T>
-struct __delegate_maker<T, brace_init_tag>
-{
-	template<typename... Args>
-	constexpr static T __impl(Args&&... args)
-	{ return T{std::forward<Args>(args)...}; }
+  template<typename T>
+  struct delegate_maker<T, brace_init_tag>
+  {
+    template<typename... Args>
+    constexpr static T impl(Args&&... args)
+    { return T{std::forward<Args>(args)...}; }
 
-	constexpr static T __impl(T&& val)
-	{ return T(std::forward<T>(val)); }
+    constexpr static T impl(T&& val)
+    { return T(std::forward<T>(val)); }
 
-	constexpr static T __impl(const T& val)
-	{ return T(val); }
-};
+    constexpr static T impl(const T& val)
+    { return T(val); }
+  };
 
-template<typename T>
-struct __delegate_maker<T, double_brace_init_tag>
-{
-	template<typename... Args>
-	constexpr static T __impl(Args&&... args)
-	{ return T{{std::forward<Args>(args)...}}; }
-};
+  template<typename T>
+  struct delegate_maker<T, double_brace_init_tag>
+  {
+    template<typename... Args>
+    constexpr static T impl(Args&&... args)
+    { return T{{std::forward<Args>(args)...}}; }
+  };
 
-template<typename T>
-struct __delegate_maker<T, dispatch_index_tag>
-{
-	template<std::size_t... Indexes>
-	constexpr static T __dispatch_impl(T&& val, falcon::parameter_index<Indexes...>)
-	{ return T{get<Indexes>(std::forward<T>(val))...}; }
+  template<typename T>
+  struct delegate_maker<T, dispatch_index_tag>
+  {
+    template<std::size_t... Indexes>
+    constexpr static T dispatch_impl(
+      T&& val, falcon::parameter_index<Indexes...>)
+    { using std::get; return T{get<Indexes>(std::forward<T>(val))...}; }
 
-	constexpr static T __impl(T&& val)
-	{
-		return __dispatch_impl(
-			std::forward<T>(val),
-			typename falcon::build_parameter_index<std::tuple_size<T>::value>::type()
-		);
-	}
+    constexpr static T impl(T&& val)
+    {
+      return dispatch_impl(
+        std::forward<T>(val),
+        falcon::build_parameter_index_t<std::tuple_size<T>::value>()
+      );
+    }
 
-	template<std::size_t... Indexes>
-	constexpr static T __dispatch_impl(const T& val, falcon::parameter_index<Indexes...>)
-	{ return T{get<Indexes>(std::forward<T>(val))...}; }
+    template<std::size_t... Indexes>
+    constexpr static T dispatch_impl(
+      const T& val, falcon::parameter_index<Indexes...>)
+    { using std::get; return T{get<Indexes>(std::forward<T>(val))...}; }
 
-	constexpr static T __impl(const T& val)
-	{
-		return __dispatch_impl(
-			val,
-			typename falcon::build_parameter_index<std::tuple_size<T>::value>::type()
-		);
-	}
+    constexpr static T impl(const T& val)
+    {
+      return dispatch_impl(
+        val,
+        falcon::build_parameter_index_t<std::tuple_size<T>::value>()
+      );
+    }
 
-	template<typename... Args>
-	constexpr static T __impl(Args&&... args)
-	{ return T{std::forward<Args>(args)...}; }
-};
+    template<typename... Args>
+    constexpr static T impl(Args&&... args)
+    { return T{std::forward<Args>(args)...}; }
+  };
+}
 
 ///wrapper of construct object
 template <template<typename...> class Template>
@@ -88,37 +91,40 @@ struct late_maker
 
 	template<typename... Args>
 	constexpr Template<Args...> operator()(Args&&... args) const
-	{ return __delegate_maker<Template<Args...>>::__impl(std::forward<Args>(args)...); }
+	{
+   return aux_::delegate_maker<Template<Args...>>::impl(
+     std::forward<Args>(args)...);
+  }
 };
 #endif
 
 ///wrapper of construct object
-template<typename Tp>
+template<typename T>
 struct maker
 {
-	typedef Tp result_type;
+	typedef T result_type;
 
 	CPP_CONSTEXPR maker()
 	{}
 
-	template<typename Up>
-	CPP_CONSTEXPR maker(const maker<Up>&)
+	template<typename U>
+	CPP_CONSTEXPR maker(const maker<U>&)
 	{}
 
-	CPP_CONSTEXPR Tp operator()() const
-	{ return Tp(); }
+	CPP_CONSTEXPR T operator()() const
+	{ return T(); }
 
-	CPP_CONSTEXPR Tp operator()(const Tp& v) const
-	{ return Tp(v); }
+	CPP_CONSTEXPR T operator()(const T& v) const
+	{ return T(v); }
 
 #if __cplusplus >= 201103L
 	template<typename... Args>
-	constexpr Tp operator()(Args&&... args) const
-	{ return __delegate_maker<Tp>::__impl(std::forward<Args>(args)...); }
+	constexpr T operator()(Args&&... args) const
+	{ return aux_::delegate_maker<T>::impl(std::forward<Args>(args)...); }
 #else
 	template<typename U>
-	Tp operator()(const U& v) const
-	{ return Tp(v); }
+	T operator()(const U& v) const
+	{ return T(v); }
 #endif
 };
 

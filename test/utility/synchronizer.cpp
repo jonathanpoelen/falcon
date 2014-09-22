@@ -1,9 +1,9 @@
+#include <falcon/tuple/tuple_io.hpp>
+using namespace falcon::tuple::iostreams;
 #include <test/test.hpp>
 #include <falcon/utility/synchronizer.hpp>
-#include <falcon/tuple/ostream.hpp>
 #include "synchronizer.hpp"
 
-using namespace falcon::tuple::ostream;
 void synchronizer_test()
 {
 	{
