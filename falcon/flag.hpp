@@ -1,6 +1,7 @@
-#ifndef _FALCON_FLAG_HPP
-#define _FALCON_FLAG_HPP
+#ifndef FALCON_FLAG_HPP
+#define FALCON_FLAG_HPP
 
-#include <falcon/flag/iostream.hpp>
+#include <falcon/flag/flag.hpp>
+#include <falcon/flag/flag_io.hpp>
 
 #endif

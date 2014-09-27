@@ -1,5 +1,5 @@
-#ifndef _FALCON_FALCON_LITERAL_HPP
-#define _FALCON_FALCON_LITERAL_HPP
+#ifndef FALCON_FALCON_LITERAL_HPP
+#define FALCON_FALCON_LITERAL_HPP
 
 #include <falcon/literal/bitset.hpp>
 #include <falcon/literal/chrono.hpp>

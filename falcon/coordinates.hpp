@@ -1,5 +1,5 @@
-#ifndef _FALCON_FALCON_COORDINATES_HPP
-#define _FALCON_FALCON_COORDINATES_HPP
+#ifndef FALCON_FALCON_COORDINATES_HPP
+#define FALCON_FALCON_COORDINATES_HPP
 
 #if __cplusplus >= 201103L
 # include <falcon/coordinates/array_coord.hpp>

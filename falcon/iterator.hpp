@@ -2,7 +2,6 @@
 #define FALCON_ITERATOR_HPP
 
 #include <falcon/iterator/bit_iterator.hpp>
-#include <falcon/iterator/contain_range_access.hpp>
 #include <falcon/iterator/counting_iterator.hpp>
 #include <falcon/iterator/delegate_comparison_iterator.hpp>
 #include <falcon/iterator/integer_iterator.hpp>

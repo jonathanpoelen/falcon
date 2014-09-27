@@ -1,48 +1,54 @@
-#ifndef _FALCON_COUNTDOWN_HPP
-#define _FALCON_COUNTDOWN_HPP
+#ifndef FALCON_COUNTDOWN_HPP
+#define FALCON_COUNTDOWN_HPP
 
-#include <limits>
 #include <boost/config/select_compiler_config.hpp>
 #include <falcon/c++/constexpr.hpp>
+#include <limits>
 
 namespace falcon {
 
-template <typename _T>
+template <typename T>
 struct basic_countdown
 {
-	typedef _T value_type;
+  typedef T value_type;
 
 private:
-	value_type _value;
+  value_type n_;
 
 public:
-	CPP_CONSTEXPR basic_countdown()
-	: _value(std::numeric_limits<_T>::max())
-	{}
+  CPP_CONSTEXPR basic_countdown()
+  : n_(std::numeric_limits<T>::max())
+  {}
 
-	CPP_CONSTEXPR basic_countdown(const _T& start)
-	: _value(start)
-	{}
+  CPP_CONSTEXPR basic_countdown(const T& start)
+  : n_(start)
+  {}
 
 #if __cplusplus >= 201103L
-	operator const _T&() const
-	{ return _value; }
+  explicit operator bool() const
+  { return n_ != min_count(); }
+#else
+  operator void*() const
+  { return n_ == min_count() ? 0 : const_cast<basic_countdown*>(this); }
 #endif
 
-	void reset(const _T& start)
-	{ _value = start; }
+  void reset(const T& start)
+  { n_ = start; }
 
-	CPP_CONSTEXPR _T max_count() const
-	{ return std::numeric_limits<_T>::max(); }
+  CPP_CONSTEXPR T max_count() const
+  { return std::numeric_limits<T>::max(); }
 
-	CPP_CONSTEXPR _T min_count() const
-	{ return std::numeric_limits<_T>::min(); }
+  CPP_CONSTEXPR T min_count() const
+  { return std::numeric_limits<T>::min(); }
 
-	const _T& count() const
-	{ return _value; }
+  const T& count() const
+  { return n_; }
 
-	bool next()
-	{ return _value-- != min_count(); }
+  bool next()
+  {
+    --n_;
+    return n_ != min_count();
+  }
 };
 
 typedef basic_countdown<int> icountdown;
@@ -53,6 +59,8 @@ typedef basic_countdown<unsigned long> ulcountdown;
 typedef basic_countdown<long long> llcountdown;
 typedef basic_countdown<unsigned long long> ullcountdown;
 #endif
+
+typedef ucountdown countdown_type;
 
 }
 

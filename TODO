@@ -356,3 +356,19 @@ traits<template<class...>class> pour creer un parameter_index en fonction du nom
 
 mutable_pointer et store_if = bof
 
+limit_array
+
+retravailler (certain sont déjà listé au-dessus)
+ - flag (pas d'opérateur +,-,* sauf pour faire des op binaire, istream non fait)
+ - number (comparer avec l'implémentation de boost... ?)
+ - bits (+ bswap_32, etc)
+ - parameter
+ - template
+ - tpl
+ - math
+ - logical
+ - lambda/lambda2
+ - node
+ - tree
+ - coordinate
+

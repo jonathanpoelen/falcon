@@ -65,23 +65,11 @@
 // };
 
 #include <iostream>
-#include <falcon/tuple/tuple_io.hpp>
-#include "falcon/utility/synchronizer.hpp"
-// #include <test/A.h>
-using namespace falcon::tuple::iostreams;
-
+#include <falcon/infinite.hpp>
 
 int main()
 {
-//   int i = 2;
-  falcon::synchronizer<const char*> x("");
-  const char * s = "plop";
-  auto sync = falcon::make_synchronizer(s, s+1);
-  std::cout << sync;
-  return *std::get<0>(x.operator+(1));
-//   int i = 0;
-//   falcon::synchronizer<int*> s(&i); (void)s;
-//   *s;
+
 
 
 //   falcon::retain_free_object_allocator<int> allocator;

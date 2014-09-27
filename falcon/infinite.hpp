@@ -1,175 +1,211 @@
 #ifndef FALCON_INFINITE_HPP
 #define FALCON_INFINITE_HPP
 
-#include <cstddef>
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/preprocessor/incremental.hpp>
-#include <falcon/preprocessor/getter.hpp>
+#if __cplusplus >= 201103L
+#include <utility>
+#endif
+#include <cstddef>
+#include <cassert>
 
 namespace falcon {
 
-template <typename _T>
-struct infinite_base
+template <typename T>
+struct infinite
 {
-	typedef _T value_type;
-
-protected:
-	value_type _current, _first, _last;
+  typedef T value_type;
 
 
 public:
-	CPP_CONSTEXPR infinite_base(const value_type& x, const value_type& last)
-	: _current(x)
-	, _first()
-	, _last(last)
-	{}
+  CPP_CONSTEXPR infinite(const value_type& x, const value_type& last)
+  : current_(x)
+  , first_()
+  , last_(last)
+  {}
 
-	CPP_CONSTEXPR infinite_base(const value_type& first, const value_type& x, const value_type& last)
-	: _current(x)
-	, _first(first)
-	, _last(last)
-	{}
+  CPP_CONSTEXPR infinite(
+    const value_type& first, const value_type& x, const value_type& last)
+  : current_(x)
+  , first_(first)
+  , last_(last)
+  {}
 
-	void set(const value_type& x)
-	{ _current = x; }
+#if __cplusplus >= 201103L
+  template<class U1, class U2>
+  constexpr infinite(U1 && x, U2 && last)
+  : current_(std::forward<U1>(x))
+  , first_()
+  , last_(std::forward<U2>(last))
+  {}
 
-	const value_type& get() const
-	{ return _current; }
+  template<class U1, class U2, class U3>
+  constexpr infinite(U1 && first, U2 && x, U3 && last)
+  : current_(std::forward<U1>(first))
+  , first_(std::forward<U2>(x))
+  , last_(std::forward<U3>(last))
+  {}
 
-	const value_type& begin() const
-	{ return _first; }
+  operator const value_type & () const
+  { return current_; }
 
-	const value_type& end() const
-	{ return _last; }
+  void set(value_type && x)
+  {
+    current_ = std::move(x);
+    assert(first_ <= current_ && current_ <= last_);
+  }
 
-	void begin(const value_type& first)
-	{ _first = first; }
+  infinite& operator=(value_type && x)
+  {
+    set(std::move(x));
+    return *this;
+  }
+#endif
 
-	void end(const value_type& last)
-	{ _last = last; }
+  void set(const value_type& x)
+  {
+    current_ = x;
+    assert(first_ <= current_ && current_ <= last_);
+  }
 
-	void next()
-	{
-		if (++_current == _last)
-			_current = _first;
-	}
+  infinite& operator=(const value_type & x)
+  {
+    set(x);
+    return *this;
+  }
 
-	void prev()
-	{
-		if (_current == _first)
-			_current = _last;
-		--_current;
-	}
+  const value_type& get() const
+  { return current_; }
 
-protected:
-	const value_type& get_by_reference() const
-	{ return _current; }
+  const value_type& min() const
+  { return first_; }
 
-	value_type& get_by_reference()
-	{ return _current; }
+  const value_type& max() const
+  { return last_; }
+
+  value_type & operator-> ()
+  { return current_; }
+
+  const value_type & operator-> () const
+  { return current_; }
+
+  infinite& operator++()
+  {
+    if (++current_ == last_) {
+      current_ = first_;
+    }
+    return *this;
+  }
+
+  infinite operator++(int)
+  {
+    infinite ret = *this;
+    ++*this;
+    return ret;
+  }
+
+  infinite& operator--()
+  {
+    if (current_ == first_) {
+      current_ = last_;
+    }
+    --current_;
+    return *this;
+  }
+
+  infinite operator--(int)
+  {
+    infinite ret = *this;
+    --*this;
+    return ret;
+  }
+
+  infinite& operator+=(const T& n)
+  {
+    if (n < 0) {
+      prev_(-n);
+    }
+    if (n > 0) {
+      next_(n);
+    }
+    return *this;
+  }
+
+  infinite& operator-=(const T& n)
+  {
+    if (n < 0) {
+      next_(n);
+    }
+    if (n > 0) {
+      prev_(-n);
+    }
+    return *this;
+  }
+
+  infinite& operator+=(std::size_t n)
+  {
+    next_(n);
+    return *this;
+  }
+
+  infinite& operator-=(std::size_t n)
+  {
+    prev_(n);
+    return *this;
+  }
+
+  infinite operator+(const T& n)
+  {
+    infinite ret = *this;
+    ret += n;
+    return ret;
+  }
+
+  infinite operator-(const T& n)
+  {
+    infinite ret = *this;
+    ret -= n;
+    return ret;
+  }
+
+  infinite operator+(const std::size_t& n)
+  {
+    infinite ret = *this;
+    ret += n;
+    return ret;
+  }
+
+  infinite operator-(const std::size_t& n)
+  {
+    infinite ret = *this;
+    ret -= n;
+    return ret;
+  }
 
 private:
-	template<typename _Distance>
-	void _next(_Distance n)
-	{
-		_Distance d = _last - _current;
-		if (n < d)
-			_current += n;
-		else
-			_current = _first + (n - d) % (_last - _first);
-	}
+  template<typename Distance>
+  void next_(Distance n)
+  {
+    Distance d = last_ - current_;
+    if (n < d)
+      current_ += n;
+    else
+      current_ = first_ + (n - d) % (last_ - first_);
+  }
 
-	template<typename _Distance>
-	void _prev(_Distance n)
-	{
-		_Distance d = _current - _first;
-		if (n <= d)
-			_current -= n;
-		else
-			_current = _last - (n - d) % (_last - _first);
-	}
+  template<typename Distance>
+  void prev_(Distance n)
+  {
+    Distance d = current_ - first_;
+    if (n <= d)
+      current_ -= n;
+    else
+      current_ = last_ - (n - d) % (last_ - first_);
+  }
 
-protected:
-	template<typename _Distance>
-	void add(_Distance n)
-	{
-		if (n < 0)
-			_prev(-n);
-		if (n > 0)
-			_next(n);
-	}
-
-	template<typename _Distance>
-	void minus(_Distance n)
-	{
-		if (n < 0)
-			_next(n);
-		if (n > 0)
-			_prev(-n);
-	}
-
-	void next(std::size_t n)
-	{ _next(n); }
-
-	void prev(std::size_t n)
-	{ _prev(n); }
-};
-
-
-template <typename _T>
-struct infinite : public infinite_base<_T>
-{
 private:
-	typedef infinite_base<_T> base_type;
-
-public:
-	typedef typename base_type::value_type value_type;
-
-public:
-	CPP_CONSTEXPR infinite(const value_type& x, const value_type& last)
-	: base_type(x, last)
-	{}
-
-	CPP_CONSTEXPR infinite(const value_type& first, const value_type& x, const value_type& last)
-	: base_type(first, x, last)
-	{}
-
-	FALCON_MEMBER_GETTER(value_type, operator->, get())
-
-	operator const value_type &() const
-	{ return get(); }
-
-	using base_type::get;
-	using base_type::get_by_reference;
-	using base_type::next;
-	using base_type::prev;
-
-	FALCON_MEMBER_INCREMENT(infinite, next())
-	FALCON_MEMBER_DECREMENT(infinite, prev())
-
-	infinite& operator+=(const _T& n)
-	{
-		this->add(n);
-		return *this;
-	}
-
-	infinite& operator-=(const _T& n)
-	{
-		this->minus(n);
-		return *this;
-	}
-
-	infinite& operator+=(std::size_t n)
-	{
-		next(n);
-		return *this;
-	}
-
-	infinite& operator-=(std::size_t n)
-	{
-		prev(n);
-		return *this;
-	}
+  value_type current_;
+  value_type first_;
+  value_type last_;
 };
 
 }

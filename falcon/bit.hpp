@@ -1,5 +1,5 @@
-#ifndef _PROJECTS_FALCON_BIT_HPP
-#define _PROJECTS_FALCON_BIT_HPP
+#ifndef PROJECTS_FALCON_BIT_HPP
+#define PROJECTS_FALCON_BIT_HPP
 
 #include <falcon/bit/back.hpp>
 #include <falcon/bit/bit_swap.hpp>

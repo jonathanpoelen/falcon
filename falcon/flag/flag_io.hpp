@@ -106,7 +106,7 @@ operator<<(
   std::basic_ostream<CharT, CharTraits>& os, const falcon::flag<T>& flag)
 {
 	CharT tmp[bit::size<T>::value + 1];
-	falcon::detail::flag::flag_copy_bit<T>::copy_from(flag.get(), tmp);
+	falcon::aux_::flag_copy_bit<T>::copy_from(flag.get(), tmp);
 	tmp[bit::size<T>::value] = CharT(0);
 	return os << tmp;
 }

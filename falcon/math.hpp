@@ -1,5 +1,5 @@
-#ifndef _FALCON_MATH_HPP
-#define _FALCON_MATH_HPP
+#ifndef FALCON_MATH_HPP
+#define FALCON_MATH_HPP
 
 #include <falcon/math/abs_diff.hpp>
 #include <falcon/math/deg.hpp>

@@ -1,5 +1,5 @@
-#ifndef _PROJECTS_FALCON_PARAMETER_HPP
-#define _PROJECTS_FALCON_PARAMETER_HPP
+#ifndef PROJECTS_FALCON_PARAMETER_HPP
+#define PROJECTS_FALCON_PARAMETER_HPP
 
 #include <falcon/parameter/index_element.hpp>
 #include <falcon/parameter/is_parameter_index_tag.hpp>

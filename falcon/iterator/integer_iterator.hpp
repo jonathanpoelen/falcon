@@ -39,7 +39,7 @@ namespace detail {
     typedef typename iterator_handler_types<
       IntegerIterator<T, ComparisonTag, Category>
     , T
-    , class default_or_type<
+    , typename default_or_type<
         use<std::random_access_iterator_tag /*TODO not always*/>
       , Category
       >::type
@@ -279,19 +279,23 @@ public:
   {}
 
   integer_iterator_with_step(const iterator_type& other)
+#if __cplusplus >= 201103L
+  = default;
+#else
   : inherit_type(other)
-  , step_(1)
+  , step_(other.step_)
   {}
+#endif
 
   integer_iterator_with_step(const iterator_type& other, difference_type step)
   : inherit_type(other)
-  , step_(other.step_)
+  , step_(step)
   {}
 
-  integer_iterator_with_step(const integer_iterator_with_step& other,
-                             difference_type step)
+  integer_iterator_with_step(
+    const integer_iterator_with_step& other, difference_type step)
   : inherit_type(other)
-  , step_(other.step_)
+  , step_(step)
   {}
 
 #if __cplusplus >= 201103L

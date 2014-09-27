@@ -25,101 +25,103 @@ struct properties
 using properties_t = int;
 
 
-template<typename T>
-using __get_property = accessors::return_reference<T>;
+namespace aux_ {
+  template<typename T>
+  using get_property = accessors::return_reference<T>;
 
 
-template<typename T>
-struct __set_property_assign
-{
-	template<typename U>
-	void operator()(T& oldvalue, const U& newvalue)
-	{ oldvalue = newvalue; }
-};
+  template<typename T>
+  struct set_property_assign
+  {
+    template<typename U>
+    void operator()(T& oldvalue, const U& newvalue)
+    { oldvalue = newvalue; }
+  };
 
-template<typename T, typename Assign>
-struct __set_property_through_get
-{
-	Assign assign = Assign();
+  template<typename T, typename Assign>
+  struct set_property_through_get
+  {
+    Assign assign = Assign();
 
-	template<typename Property>
-	void operator()(Property& property, const T& value)
-	{ assign(property.get(), value); }
-};
+    template<typename Property>
+    void operator()(Property& property, const T& value)
+    { assign(property.get(), value); }
+  };
 
-template<typename T, typename Assign = use_default>
-struct __set_property_through_base
-{
-	typedef typename default_or_type<
-		use<__set_property_assign<T>>,
-		Assign
-	>::type __functor_type;
+  template<typename T, typename Assign = use_default>
+  struct set_property_through_base
+  {
+    typedef typename default_or_type<
+      use<set_property_assign<T>>,
+      Assign
+    >::type functor_type;
 
-	__functor_type assign = __functor_type();
+    functor_type assign = functor_type();
 
-	template<typename Property>
-	void operator()(Property& property, const T& value)
-	{ assign(property.base(), value); }
-};
-
-
-template<typename T, typename Get>
-struct __get_property_traits
-: default_or_type<use<__get_property<T>>, Get>
-{};
-
-template<typename T, typename Get, typename Set>
-struct __set_property_through_get_traits
-: if_c<
-	std::is_void<Set>,
-	void,
-	__set_property_through_get<
-		T,
-		typename default_or_type<
-			use<__set_property_assign<T>>,
-			Set
-		>::type
-	>
->
-{};
-
-template<typename T, typename Set>
-struct __set_property_through_get_traits<T, void, Set>
-: use<__set_property_through_base<T, Set>>
-{};
+    template<typename Property>
+    void operator()(Property& property, const T& value)
+    { assign(property.base(), value); }
+  };
 
 
-template<properties_t Properties, typename T, typename Get, typename Set>
-struct __property_traits
-{
-	typedef typename __get_property_traits<T, Get>::type __getter_type;
-	typedef typename __set_property_through_get_traits<T, __getter_type, Set>::type __setter_type;
+  template<typename T, typename Get>
+  struct get_property_traits
+  : default_or_type<use<get_property<T>>, Get>
+  {};
 
-	typedef typename if_c<
-		std::is_void<__getter_type>,
-		std::nullptr_t,
-		__getter_type
-	>::type getter_type;
-	typedef typename if_c<
-		std::is_void<__setter_type>,
-		std::nullptr_t,
-		__setter_type
-	>::type setter_type;
+  template<typename T, typename Get, typename Set>
+  struct set_property_through_get_traits
+  : if_c<
+    std::is_void<Set>,
+    void,
+    set_property_through_get<
+      T,
+      typename default_or_type<
+        use<set_property_assign<T>>,
+        Set
+      >::type
+    >
+  >
+  {};
 
-	struct none_assignable{ void operator()(T&, T&){}};
-	struct default_assignable{ void operator()(T& a, T& b){a=b;}};
+  template<typename T, typename Set>
+  struct set_property_through_get_traits<T, void, Set>
+  : use<set_property_through_base<T, Set>>
+  {};
 
-	static void assign(T& a, T& b)
-	{
-		typedef typename if_<
-			(Properties & properties::copy_assignable_does_nothing)
-			&& !(Properties & properties::force_copy_assignable),
-			none_assignable,
-			default_assignable
-		>::type assignable;
-		assignable()(a, b);
-	}
-};
+
+  template<properties_t Properties, typename T, typename Get, typename Set>
+  struct property_traits
+  {
+    typedef typename get_property_traits<T, Get>::type getter_type;
+    typedef typename set_property_through_get_traits<T, getter_type, Set>::type setter_type;
+
+    typedef typename if_c<
+      std::is_void<getter_type>,
+      std::nullptr_t,
+      getter_type
+    >::type getter_type;
+    typedef typename if_c<
+      std::is_void<setter_type>,
+      std::nullptr_t,
+      setter_type
+    >::type setter_type;
+
+    struct none_assignable{ void operator()(T&, T&){}};
+    struct default_assignable{ void operator()(T& a, T& b){a=b;}};
+
+    static void assign(T& a, T& b)
+    {
+      typedef typename if_<
+        (Properties & properties::copy_assignable_does_nothing)
+        && !(Properties & properties::force_copy_assignable),
+        none_assignable,
+        default_assignable
+      >::type assignable;
+      assignable()(a, b);
+    }
+  };
+}
 
 
 template <
@@ -134,11 +136,11 @@ public:
 	typedef typename if_<Properties & properties::by_reference, T&, T>::type base_type;
 
 private:
-	typedef __property_traits<Properties, base_type, Get, Set> __traits;
+	typedef aux_::property_traits<Properties, base_type, Get, Set> traits_;
 
 public:
-	typedef typename __traits::getter_type getter_type;
-	typedef typename __traits::setter_type setter_type;
+	typedef typename traits_::getter_type getter_type;
+	typedef typename traits_::setter_type setter_type;
 
 	friend setter_type;
 
@@ -148,7 +150,8 @@ private:
 	setter_type setter;
 
 public:
-	class_property(const base_type& x, getter_type g, setter_type s = setter_type())
+	class_property(
+    const base_type& x, getter_type g, setter_type s = setter_type())
 	: value(x)
 	, getter(g)
 	, setter(s)
@@ -168,7 +171,7 @@ public:
 
 	class_property& operator=(const class_property& other)
 	{
-		__traits::assign(value, other.value);
+		traits_::assign(value, other.value);
 		getter = other.getter;
 		setter = other.setter;
 		return *this;

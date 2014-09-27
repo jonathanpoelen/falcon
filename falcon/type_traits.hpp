@@ -16,7 +16,6 @@
 #include <falcon/type_traits/is_java_iterator.hpp>
 #include <falcon/type_traits/is_same.hpp>
 #include <falcon/type_traits/normalize_index.hpp>
-#include <falcon/type_traits/numeric.hpp>
 #include <falcon/type_traits/scalar.hpp>
 #include <falcon/type_traits/selector.hpp>
 #include <falcon/type_traits/subtype.hpp>
@@ -26,9 +25,9 @@
 #include <falcon/type_traits/use_if.hpp>
 
 #if __cplusplus >= 201103L
-# include <falcon/type_traits/and.hpp>
+# include <falcon/tuple/is_tuple_like.hpp>
 # include <falcon/type_traits/build_class.hpp>
-# include <falcon/type_traits/is_tuple.hpp>
+# include <falcon/type_traits/and.hpp>
 # include <falcon/type_traits/or.hpp>
 #endif
 

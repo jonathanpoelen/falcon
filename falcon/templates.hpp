@@ -1,5 +1,5 @@
-#ifndef _FALCON_TEMPLATES_HPP
-#define _FALCON_TEMPLATES_HPP
+#ifndef FALCON_TEMPLATES_HPP
+#define FALCON_TEMPLATES_HPP
 
 #include <falcon/templates/and_template.hpp>
 #include <falcon/templates/binary_template.hpp>
