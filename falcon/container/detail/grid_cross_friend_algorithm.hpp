@@ -9,15 +9,15 @@ namespace detail {
 
 struct grid_cross_friend_algorithm
 {
-	template<typename _GridCross>
-	static void init(_GridCross& grid)
+	template<typename GridCross>
+	static void init(GridCross& grid)
 	{
 		auto it = grid.begin();
-		auto end = it + grid.size();
-		auto it2 = it + grid.width();
+		auto end = it + typename GridCross::difference_type(grid.size());
+		auto it2 = it + typename GridCross::difference_type(grid.width());
 		while (it2 != end){
 			it->_M_link().left = 0;
-			for (typename _GridCross::size_type endx = grid.width(); --endx; ++it, ++it2){
+			for (typename GridCross::size_type endx = grid.width(); --endx; ++it, ++it2){
 				down(it, it2);
 				right(it, it+1);
 			}
@@ -98,12 +98,12 @@ struct grid_cross_friend_algorithm
 		n2->_M_link().left = 0;
 	}
 
-	template<typename _GridCross>
-	static bool is_back_to_first(const _GridCross& grid)
+	template<typename GridCross>
+	static bool is_back_to_first(const GridCross& grid)
 	{ return equal(grid.front().left(), back_iterator(grid)); }
 
-	template<typename _GridCross>
-	static void back_to_first(_GridCross& grid, bool connect)
+	template<typename GridCross>
+	static void back_to_first(GridCross& grid, bool connect)
 	{
 		if (connect) {
 			right(back_iterator(grid), grid.begin());
@@ -112,14 +112,14 @@ struct grid_cross_friend_algorithm
 		}
 	}
 
-	template<typename _GridCross>
-	static bool is_back_to_first_each_line(const _GridCross& grid)
+	template<typename GridCross>
+	static bool is_back_to_first_each_line(const GridCross& grid)
 	{ auto it = back_line_iterator(grid); return equal(it->right(), it+1); }
 
-	template<typename _GridCross>
-	static void back_to_first_each_line(_GridCross& grid, bool connect)
+	template<typename GridCross>
+	static void back_to_first_each_line(GridCross& grid, bool connect)
 	{
-		for (auto it = back_line_iterator(grid), end = back_iterator(grid); it != end; it += grid.width()){
+		for (auto it = back_line_iterator(grid), end = back_iterator(grid); it != end; it += typename GridCross::difference_type(grid.width())) {
 			if (connect)
 				right(it, it+1);
 			else
@@ -128,12 +128,12 @@ struct grid_cross_friend_algorithm
 		back_to_first(grid, connect);
 	}
 
-	template<typename _GridCross>
-	static bool is_back_to_first_column(const _GridCross& grid)
+	template<typename GridCross>
+	static bool is_back_to_first_column(const GridCross& grid)
 	{ return equal(grid.front().up(), back_iterator(grid)); }
 
-	template<typename _GridCross>
-	static void back_to_first_column(_GridCross& grid, bool connect)
+	template<typename GridCross>
+	static void back_to_first_column(GridCross& grid, bool connect)
 	{
 		if (connect) {
 			down(back_iterator(grid), grid.begin());
@@ -152,14 +152,14 @@ protected:
 	{ return a ? *a == *b : false; }
 
 public:
-	template<typename _GridCross>
-	static bool is_back_to_first_each_column(const _GridCross& grid)
+	template<typename GridCross>
+	static bool is_back_to_first_each_column(const GridCross& grid)
 	{ return equal(grid.front().up(), back_iterator(grid)); }
 
-	template<typename _GridCross>
-	static void back_to_first_each_column(_GridCross& grid, bool connect)
+	template<typename GridCross>
+	static void back_to_first_each_column(GridCross& grid, bool connect)
 	{
-		for (auto it = grid.begin()+1, it2 = it + (grid.size() - (grid.width() + 1)), end = back_line_iterator(grid, it); it != end; ++it, ++it2){
+		for (auto it = grid.begin()+1, it2 = it + (typename GridCross::difference_type(grid.size() - (grid.width() + 1))), end = back_line_iterator(grid, it); it != end; ++it, ++it2){
 			if (connect)
 				down(it2, it);
 			else
@@ -168,14 +168,14 @@ public:
 		back_to_first_column(grid, connect);
 	}
 
-	template<typename _GridCross>
-	static bool is_edge_connect_horizontal(const _GridCross& grid)
-	{ return equal(grid.begin()->up(), grid.begin() + (grid.size() - grid.width())); }
+	template<typename GridCross>
+	static bool is_edge_connect_horizontal(const GridCross& grid)
+  { return equal(grid.begin()->up(), grid.begin() + typename GridCross::difference_type(grid.size() - grid.width())); }
 
-	template<typename _GridCross>
-	static void edge_connect_horizontal(_GridCross& grid, bool connect)
+	template<typename GridCross>
+	static void edge_connect_horizontal(GridCross& grid, bool connect)
 	{
-		for (auto it = grid.begin(), it2 = it + (grid.size() - grid.width()), end = it + grid.width(); it != end; ++it, ++it2){
+		for (auto it = grid.begin(), it2 = it + typename GridCross::difference_type(grid.size() - grid.width()), end = it + typename GridCross::difference_type(grid.width()); it != end; ++it, ++it2){
 			if (connect)
 				down(it2, it);
 			else
@@ -183,12 +183,12 @@ public:
 		}
 	}
 
-	template<typename _GridCross>
-	static bool is_edge_connect_vertical(const _GridCross& grid)
+	template<typename GridCross>
+	static bool is_edge_connect_vertical(const GridCross& grid)
 	{ return equal(grid.begin()->left(), back_line_iterator(grid)); }
 
-	template<typename _GridCross>
-	static void edge_connect_vertical(_GridCross& grid, bool connect)
+	template<typename GridCross>
+	static void edge_connect_vertical(GridCross& grid, bool connect)
 	{
 		for (auto it = grid.begin(), end = it + (grid.size() - grid.width()); it != end; it += grid.width()){
 			if (connect)
@@ -198,64 +198,64 @@ public:
 		}
 	}
 
-	template<typename _GridCross>
-	static void edge_connect(_GridCross& grid, bool connect)
+	template<typename GridCross>
+	static void edge_connect(GridCross& grid, bool connect)
 	{
 		edge_connect_horizontal(grid, connect);
 		edge_connect_vertical(grid, connect);
 	}
 
-	template<typename _GridCross>
-	static bool is_edge_up(const _GridCross& grid, typename _GridCross::size_type index)
+	template<typename GridCross>
+	static bool is_edge_up(const GridCross& grid, typename GridCross::size_type index)
 	{ return 0 <= index && index < grid.width(); }
 
-	template<typename _GridCross>
-	static bool is_edge_down(const _GridCross& grid, typename _GridCross::size_type index)
+	template<typename GridCross>
+	static bool is_edge_down(const GridCross& grid, typename GridCross::size_type index)
 	{ return grid.size() - grid.width() <= index && index < grid.size(); }
 
-	template<typename _GridCross>
-	static bool is_edge_horizontal(const _GridCross& grid, typename _GridCross::size_type index)
+	template<typename GridCross>
+	static bool is_edge_horizontal(const GridCross& /*grid*/, typename GridCross::size_type index)
 	{ return is_edge_up(index) || is_edge_down(index); }
 
-	template<typename _GridCross>
-	static bool is_edge_left(const _GridCross& grid, typename _GridCross::size_type index)
+	template<typename GridCross>
+	static bool is_edge_left(const GridCross& grid, typename GridCross::size_type index)
 	{ return 0 == index % grid.height(); }
 
-	template<typename _GridCross>
-	static bool is_edge_right(const _GridCross& grid, typename _GridCross::size_type index)
+	template<typename GridCross>
+	static bool is_edge_right(const GridCross& grid, typename GridCross::size_type index)
 	{ return grid.width() - 1 == index % grid.height(); }
 
-	template<typename _GridCross>
-	static bool is_edge_vertical(const _GridCross& grid, typename _GridCross::size_type index)
+	template<typename GridCross>
+	static bool is_edge_vertical(const GridCross& grid, typename GridCross::size_type index)
 	{ int m = index % grid.height(); return m == 0 || m == grid.width() - 1; }
 
-	template<typename _GridCross>
-	static bool is_edge(const _GridCross& grid, typename _GridCross::size_type index)
+	template<typename GridCross>
+	static bool is_edge(const GridCross& /*grid*/, typename GridCross::size_type index)
 	{ return is_edge_horizontal(index) || is_edge_vertical(index); }
 
-	template<typename _GridCross>
-	static typename _GridCross::iterator back_iterator(_GridCross& grid)
+	template<typename GridCross>
+	static typename GridCross::iterator back_iterator(GridCross& grid)
 	{ return grid.size() ? grid.end() - 1 : grid.end(); }
 
-	template<typename _GridCross>
-	static typename _GridCross::const_iterator back_iterator(const _GridCross& grid)
+	template<typename GridCross>
+	static typename GridCross::const_iterator back_iterator(const GridCross& grid)
 	{ return grid.size() ? grid.end() - 1 : grid.end(); }
 
-	template<typename _GridCross>
-	static typename _GridCross::iterator back_line_iterator(_GridCross& grid, typename _GridCross::iterator it)
-	{ return it + (grid.width() - 1); }
+	template<typename GridCross>
+	static typename GridCross::iterator back_line_iterator(GridCross& grid, typename GridCross::iterator it)
+  { return it + (typename GridCross::difference_type(grid.width()) - 1); }
 
-	template<typename _GridCross>
-	static typename _GridCross::const_iterator back_line_iterator(const _GridCross& grid, typename _GridCross::const_iterator it)
-	{ return it + (grid.width() - 1); }
+	template<typename GridCross>
+	static typename GridCross::const_iterator back_line_iterator(const GridCross& grid, typename GridCross::const_iterator it)
+  { return it + (typename GridCross::difference_type(grid.width()) - 1); }
 
-	template<typename _GridCross>
-	static typename _GridCross::iterator back_line_iterator(_GridCross& grid)
-	{ return grid.begin() + (grid.width() - 1); }
+	template<typename GridCross>
+	static typename GridCross::iterator back_line_iterator(GridCross& grid)
+  { return grid.begin() + (typename GridCross::difference_type(grid.width()) - 1); }
 
-	template<typename _GridCross>
-	static typename _GridCross::const_iterator back_line_iterator(const _GridCross& grid)
-	{ return grid.begin() + (grid.width() - 1); }
+	template<typename GridCross>
+	static typename GridCross::const_iterator back_line_iterator(const GridCross& grid)
+  { return grid.begin() + (typename GridCross::difference_type(grid.width()) - 1); }
 };
 
 }

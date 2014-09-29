@@ -198,7 +198,8 @@ namespace aux_ {
     void priv_construct(std::size_t& n, T * p, U&& a, Args&&... args)
     CPP_NOEXCEPT_OPERATOR2(
       void(T(std::forward<U>(a))),
-      priv_construct(std::declval<std::size_t&>(), nullptr, std::declval<Args>()...)
+      this->priv_construct(
+        std::declval<std::size_t&>(), nullptr, std::declval<Args>()...)
     )
     {
       new (p) T(std::forward<U>(a));
@@ -222,7 +223,7 @@ namespace aux_ {
       std::size_t i = 0;
       try
       {
-        priv_construct(i, this->address(), std::forward<Args>(args)...);
+        this->priv_construct(i, this->address(), std::forward<Args>(args)...);
       }
       catch (...)
       {
@@ -301,6 +302,9 @@ namespace aux_ {
     {}
   };
 }
+
+using aux_::emplace_t;
+using aux_::emplace;
 
 /**
  * \brief Reserve memory in the stack.

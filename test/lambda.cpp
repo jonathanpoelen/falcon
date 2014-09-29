@@ -57,16 +57,16 @@ void lambda_test() {
 	LAMBDA_TEST(11,	1 + phr::_1 + phr::_1, 5);
 
 	{
-		std::vector<int> v CPP1X(1,2,3,4,5,6,7,8,9);
-		int index = 0;
+		std::vector<unsigned> v CPP1X(1,2,3,4,5,6,7,8,9);
+		unsigned index = 0;
 		auto ref = std::ref(index);
 		auto f = phr::_1[ref];
-		LAMBDA_TEST(1, f, v);
-		LAMBDA_TEST(2, phr::_1 = phr::_2, index, 2);
-		LAMBDA_TEST(3, f, v);
-		LAMBDA_TEST(5, phr::_1 = 5, index);
-		LAMBDA_TEST(6, f, v);
-		LAMBDA_TEST(9u, phr::_1->*&std::vector<int>::size, v);
+		LAMBDA_TEST(1u, f, v);
+		LAMBDA_TEST(2u, phr::_1 = phr::_2, index, 2u);
+		LAMBDA_TEST(3u, f, v);
+		LAMBDA_TEST(5u, phr::_1 = 5u, index);
+		LAMBDA_TEST(6u, f, v);
+		LAMBDA_TEST(9u, phr::_1->*&std::vector<unsigned>::size, v);
 	}
 	{
 		B b;

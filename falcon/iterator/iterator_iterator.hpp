@@ -198,7 +198,6 @@ protected:
 		const pair_iterator * p = &_M_current();
 		const pair_iterator * last = &this->base_reference()[_M_count()];
 		difference_type d = p->second - p->first;
-		std::size_t pos = _pos;
 		while (d > n && ++p != last)
 		{
 			n -= d;

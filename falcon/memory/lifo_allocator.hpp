@@ -4,7 +4,6 @@
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/memory/allocator_rebind.hpp>
 #include <falcon/memory/allocator_swap.hpp>
-#include <falcon/memory/non_owner_ptr.hpp>
 
 #include <memory>
 #if __cplusplus >= 201103L
@@ -53,9 +52,24 @@ public:
 
 #if __cplusplus >= 201103L
   lifo_allocator(const lifo_allocator&) = delete;
-  lifo_allocator(lifo_allocator&&) = default;
+  lifo_allocator(lifo_allocator&& other)
+  : allocator_base(std::move(other))
+  , m_current(other.m_current)
+  , m_finish(other.m_finish)
+  {
+    other.m_current = nullptr;
+    other.m_finish = nullptr;
+  }
   lifo_allocator& operator=(const lifo_allocator&) = delete;
-  lifo_allocator& operator=(lifo_allocator&&) = default;
+  lifo_allocator& operator=(lifo_allocator&& other)
+  {
+    allocator_base::operator = (other);
+    m_current = other.m_current;
+    m_finish = other.m_finish;
+    other.m_current = nullptr;
+    other.m_finish = nullptr;
+    return *this;
+  }
 #else
 private:
   lifo_allocator(const lifo_allocator&);
@@ -97,8 +111,8 @@ public:
   { return !(this == &other); }
 
 private:
-  non_owner_ptr<T> m_current;
-  non_owner_ptr<T> m_finish;
+  T * m_current;
+  T * m_finish;
 
   allocator_base & base() const noexcept
   { return *this; }

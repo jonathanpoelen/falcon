@@ -4,8 +4,8 @@
 #include <falcon/iostreams/join.hpp>
 #include "join.hpp"
 
-template<typename _T>
-void dispath_join_test(_T& arr)
+template<typename T>
+void dispath_join_test(T& arr)
 {
   using falcon::iostreams::join;
   using falcon::begin;
@@ -58,12 +58,12 @@ void join_test()
   {
     typedef std::array<int, 4> container_type;
     container_type arr{{18,19,0,1}};
-    dispath_join_test<container_type>(arr);
+    dispath_join_test(arr);
   }
   {
     typedef int container_type[4];
     container_type arr{18,19,0,1};
-    dispath_join_test<container_type>(arr);
+    dispath_join_test(arr);
   }
 }
 FALCON_TEST_TO_MAIN(join_test)

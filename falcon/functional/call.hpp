@@ -26,6 +26,8 @@ namespace falcon {
  */
 constexpr struct call_t
 {
+  constexpr call_t() {}
+
   template <typename Function, typename... Args, std::size_t... Indexes>
   constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
     operator()(const parameter_index<Indexes...>&, Function && func, Args&&... args) const

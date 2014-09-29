@@ -1,24 +1,58 @@
 #ifndef FALCON_CONTAINER_CONTAINS_RANGE_ACCESS_HPP
 #define FALCON_CONTAINER_CONTAINS_RANGE_ACCESS_HPP
 
-#include <falcon/container/range_access.hpp>
-#include <falcon/sfinae/function_is_callable.hpp>
+#include <falcon/helper/has_iterator.hpp>
+#include <falcon/helper/has_const_iterator.hpp>
+#include <falcon/helper/has_reverse_iterator.hpp>
+#include <falcon/helper/has_const_reverse_iterator.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
+#include <falcon/type_traits/remove_cv_reference.hpp>
 
 namespace falcon {
-  namespace _aux {
-    FALCON_FUNCTION_IS_CALLABLE_TRAIT_DEF(begin);
-    FALCON_FUNCTION_IS_CALLABLE_TRAIT_DEF(rbegin);
+  namespace aux_ {
+    template <class T>
+    struct contains_range_access_iterator
+    : integral_constant<bool,
+      (has_iterator<T>::value || has_const_iterator<T>::value)
+    > {};
+
+    template <class T>
+    struct contains_range_access_iterator<const T>
+    : has_const_iterator<T>
+    {};
+
+    template <class T>
+    struct contains_range_access_reverse_iterator
+    : integral_constant<bool,
+      (has_reverse_iterator<T>::value || has_const_reverse_iterator<T>::value)
+    > {};
+
+    template <class T>
+    struct contains_range_access_reverse_iterator<const T>
+    : has_const_reverse_iterator<T>
+    {};
   }
 
   template <class T>
   struct contains_range_access_iterator
-  : integral_constant<bool, _aux::begin_is_callable<T&>::value>
+  : aux_::contains_range_access_iterator<
+    typename remove_cv_reference<T>::type
+  > {};
+
+  template <class T, std::size_t N>
+  struct contains_range_access_iterator<T[N]>
+  : true_type
   {};
 
   template <class T>
   struct contains_range_access_reverse_iterator
-  : integral_constant<bool, _aux::rbegin_is_callable<T&>::value>
+  : aux_::contains_range_access_reverse_iterator<
+    typename remove_cv_reference<T>::type
+  > {};
+
+  template <class T, std::size_t N>
+  struct contains_range_access_reverse_iterator<T[N]>
+  : true_type
   {};
 }
 

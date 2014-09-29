@@ -1,6 +1,7 @@
 #include <vector>
 #include <test/test.hpp>
 #include <falcon/container/contains_range_access.hpp>
+#include <falcon/container/range_access.hpp>
 #include "contains_range_access.hpp"
 
 void contains_range_access_test()

@@ -1,15 +1,10 @@
 #ifndef FALCON_TUPLE_ARRAY_COMPATIBILITY_HPP
 #define FALCON_TUPLE_ARRAY_COMPATIBILITY_HPP
 
-#include <falcon/tuple/detail/is_tuple.hpp>
+#include <array>
 #include <utility>
 
 namespace falcon {
-
-template<typename T, std::size_t N>
-struct is_tuple_impl<T[N]>
-: std::true_type
-{};
 
 template<std::size_t I, typename T, std::size_t N>
 T& get(T (&a)[N]) noexcept

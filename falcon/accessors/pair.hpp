@@ -18,6 +18,8 @@ struct first
   typedef pair_type argument_type;
   typedef typename match_cv_qualifiers<T, typename T::first_type>::type result_type;
 
+  CPP_CONSTEXPR first() {}
+
   CPP_CONSTEXPR result_type& operator()(pair_type& pair) const CPP_NOEXCEPT
   { return pair.first; }
 };
@@ -29,6 +31,8 @@ struct second
 	typedef pair_type argument_type;
   typedef typename match_cv_qualifiers<T, typename T::secondype>::type result_type;
 
+  CPP_CONSTEXPR second() {}
+
   CPP_CONSTEXPR result_type& operator()(pair_type& pair) const CPP_NOEXCEPT
   { return pair.second; }
 };
@@ -36,6 +40,8 @@ struct second
 template <>
 struct first<void>
 {
+  CPP_CONSTEXPR first() {}
+
   template<class T>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(
@@ -50,6 +56,8 @@ struct first<void>
 template <>
 struct second<void>
 {
+  CPP_CONSTEXPR second() {}
+
   template<class T>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(

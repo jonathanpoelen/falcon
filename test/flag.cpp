@@ -25,7 +25,7 @@ void flag_test()
 			ss << flag << bool(flag & flag) << bool(flag | flag);
 			flag += 0;
 			{
-				int i = 415;
+				unsigned i = 415;
 				flag += i;
 			}
 			{
@@ -66,7 +66,7 @@ void flag_test()
 		CHECK_EQUAL_VALUE(falcon::flag64::full(), falcon::flag64(flag[1]));
 
 		flag >>= 100;
-		CHECK_EQUAL_VALUE(falcon::flag64(flag[0]), 0);
+		CHECK_EQUAL_VALUE(falcon::flag64(flag[0]), 0u);
 		///BUG god for gcc-4.7, fail with gcc-4.6…
 		CHECK_EQUAL_VALUE(falcon::flag64::full() >> 40, falcon::flag64(flag[1]));
 	}
@@ -99,9 +99,9 @@ void flag_test()
 		CHECK_EQUAL_VALUE(falcon::flag64::full(), falcon::flag64(flag[3]));
 
 		flag >>= 64*3+8;
-		CHECK_EQUAL_VALUE(falcon::flag64(flag[0]), 0);
-		CHECK_EQUAL_VALUE(falcon::flag64(flag[1]), 0);
-		CHECK_EQUAL_VALUE(falcon::flag64(flag[2]), 0);
+		CHECK_EQUAL_VALUE(falcon::flag64(flag[0]), 0u);
+		CHECK_EQUAL_VALUE(falcon::flag64(flag[1]), 0u);
+		CHECK_EQUAL_VALUE(falcon::flag64(flag[2]), 0u);
 		CHECK_EQUAL_VALUE(falcon::flag64::full() >> (204%64), falcon::flag64(flag[3]));
 	}
 

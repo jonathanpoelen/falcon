@@ -41,6 +41,8 @@ struct base
   typedef typename default_or_type<_aux::result_base<T>, Result, void>::type result_type;
   typedef T argument_type;
 
+  CPP_CONSTEXPR base() {}
+
   CPP_CONSTEXPR result_type operator()(T& x) const
   CPP_NOEXCEPT_OPERATOR2(x.base())
   { return x.base(); }
@@ -49,6 +51,8 @@ struct base
 template<>
 struct base<void, void>
 {
+  CPP_CONSTEXPR base() {}
+
   template<class T>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(

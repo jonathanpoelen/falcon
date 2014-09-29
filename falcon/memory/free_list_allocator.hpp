@@ -71,7 +71,7 @@ public:
   : free_list_(other.count_by_alloc(), other.m_allocator)
   {}
 
-  free_list_allocator& operator=(const free_list_allocator& other) CPP_NOEXCEPT
+  free_list_allocator& operator=(const free_list_allocator&) CPP_NOEXCEPT
   { return *this; }
 
   pointer allocate(const void * = 0)

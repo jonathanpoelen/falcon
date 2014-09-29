@@ -80,7 +80,7 @@ public:
       return reinterpret_cast<pointer>(&m_memory[m_first_free - n - &m_allocate[0]]);
     }
     else {
-      if (n > &m_allocate[N] - m_first_free)
+      if (n > std::size_t(&m_allocate[N] - m_first_free))
         throw std::bad_alloc();
 
       size_type nn = 0;
@@ -96,7 +96,7 @@ public:
       }
       if (m_first_free + n == ppos+1)
         m_first_free += n;
-      std::memset(ppos+1-n, ~0u, n);
+      std::memset(ppos+1-n, 0xff, n);
       return reinterpret_cast<pointer>(&m_memory[ppos+1 - (&m_allocate[0] + n)]);
     }
   }
@@ -358,7 +358,7 @@ public:
            && p < reinterpret_cast<pointer>(&m_memory[N]));
     if (Policy & stack_allocator_policies::always_one)
       assert(n == 1);
-    std::size_t d = p - reinterpret_cast<pointer>(&m_memory[0]);
+    std::size_t d = std::size_t(p - reinterpret_cast<pointer>(&m_memory[0]));
     unsigned long * first_free = &m_is_allocate[0] + d / s_word_bit;
     unsigned long first_free_offset = d % s_word_bit;
 
@@ -393,13 +393,15 @@ class stack_allocator_base
 
 public:
   typedef typename if_<
-		Policy & stack_allocator_policies::lifo_allocation,
+    !!(Policy & stack_allocator_policies::lifo_allocation),
     select_stack_allocator_normal_lifo,
     typename if_<
-      Policy & stack_allocator_policies::minimal_storage,
+      !!(Policy & stack_allocator_policies::minimal_storage),
       select_stack_allocator_minimal_storage,
       typename if_<
-        Policy == (stack_allocator_policies::speed_deduction | stack_allocator_policies::always_one),
+        Policy == (
+          stack_allocator_policies::speed_deduction
+        | stack_allocator_policies::always_one),
         select_stack_allocator_speed_always_one,
         select_stack_allocator_bool_array
       >::type

@@ -34,6 +34,8 @@ struct begin
   , void
   >::type result_type;
 
+  CPP_CONSTEXPR begin() {}
+
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(begin(cont))
   {
@@ -56,6 +58,8 @@ struct rbegin
   , void
   >::type result_type;
 
+  CPP_CONSTEXPR rbegin() {}
+
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(rbegin(cont))
   {
@@ -70,6 +74,8 @@ struct cbegin
   typedef T argument_type;
   typedef typename default_or_type<use_const_iterator<T>, Result, void>::type result_type;
 
+  CPP_CONSTEXPR cbegin() {}
+
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(cbegin(cont))
   {
@@ -83,6 +89,8 @@ struct crbegin
 {
   typedef T argument_type;
   typedef typename default_or_type<use_const_reverse_iterator<T>, Result, void>::type result_type;
+
+  CPP_CONSTEXPR crbegin() {}
 
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(crbegin(cont))
@@ -107,6 +115,8 @@ struct end
   , void
   >::type result_type;
 
+  CPP_CONSTEXPR end() {}
+
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(end(cont))
   {
@@ -129,6 +139,8 @@ struct rend
   , void
   >::type result_type;
 
+  CPP_CONSTEXPR rend() {}
+
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(rend(cont))
   {
@@ -142,6 +154,8 @@ struct cend
 {
   typedef T argument_type;
   typedef typename default_or_type<use_const_iterator<T>, Result, void>::type result_type;
+
+  CPP_CONSTEXPR cend() {}
 
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(cend(cont))
@@ -157,6 +171,8 @@ struct crend
   typedef T argument_type;
   typedef typename default_or_type<use_const_reverse_iterator<T>, Result, void>::type result_type;
 
+  CPP_CONSTEXPR crend() {}
+
   result_type operator()(argument_type& cont) const
   CPP_NOEXCEPT_OPERATOR2(crend(cont))
   {
@@ -171,6 +187,7 @@ struct crend
   template<>                    \
   struct name<void>             \
   {                             \
+    CPP_CONSTEXPR name() {}     \
     template<class T>           \
     auto operator()(T& x) const \
     -> decltype(x.name())       \
@@ -181,6 +198,7 @@ struct crend
   template<>                      \
   struct name<void>               \
   {                               \
+    CPP_CONSTEXPR name() {}       \
     template<class T>             \
     typename name<T>::result_type \
     operator()(T& x) const        \

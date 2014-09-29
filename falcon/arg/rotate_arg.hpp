@@ -12,7 +12,7 @@
 namespace falcon {
 
 #if __cplusplus >= 201103L
-namespace _aux {
+namespace aux_ {
   template <std::size_t ShiftRight, std::size_t N>
   struct rotate_arg
   {
@@ -22,7 +22,7 @@ namespace _aux {
     template <std::size_t Nm, int Current, std::size_t... Indexes>
     struct build_index<Nm, Current, parameter_index<Indexes...>>
     : build_index<
-      Nm-1, Current - ShiftRight
+      Nm-1, int(Current - ShiftRight)
     , parameter_index<Indexes..., normalize_index<Current, N>::value>
     >
     {};
@@ -94,7 +94,7 @@ namespace _aux {
 template<int shift_right = 1, class... Args>
 void rotate_arg(Args&... args)
 {
-  _aux::rotate_arg<
+  aux_::rotate_arg<
     normalize_index<shift_right, sizeof...(args)>::value,
     sizeof...(args)
   >::impl(args...);
@@ -114,7 +114,7 @@ template<int shift_right = 1, class T>
 void impl(T&)
 {}
 
-namespace _aux {
+namespace aux_ {
   template<int shift_right, class T>
   struct rotate_arg;
 
@@ -190,19 +190,19 @@ namespace _aux {
 template<int shift_right = 1, class T>
 void rotate_arg(T& a, T& b)
 {
-  _aux::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b);
+  aux_::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b);
 }
 
 template<int shift_right = 1, class T>
 void rotate_arg(T& a, T& b, T& c)
 {
-  _aux::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b,c);
+  aux_::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b,c);
 }
 
 template<int shift_right = 1, class T>
 void rotate_arg(T& a, T& b, T& c, T& d)
 {
-  _aux::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b,c,d);
+  aux_::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b,c,d);
 }
 
 #endif

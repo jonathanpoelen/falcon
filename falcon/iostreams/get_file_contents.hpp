@@ -33,15 +33,15 @@ int get_file_contents(String& s, const char * name)
   }
 
 #if __cplusplus >= 201103L
-  s.resize(sz);
-  const std::streamsize n = buf.sgetn(&s[0], s.size());
-  return (sz != n) ? s.resize(n), errno : 0;
+  s.resize(std::size_t(sz));
+  const std::streamsize n = buf.sgetn(&s[0], std::streamsize(s.size()));
+  return (sz != n) ? s.resize(std::size_t(n)), errno : 0;
 #else
-  s.reserve(sz);
+  s.reserve(std::size_t(sz));
   char_type * cs = new char_type[sz];
   const std::streamsize n = buf.sgetn(cs, sz);
   const int err = (sz != n) ? errno : 0;
-  s.assign(cs, n);
+  s.assign(cs, std::size_t(n));
   delete[] cs;
   return err;
 #endif

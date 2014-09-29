@@ -14,6 +14,8 @@ struct tuple_get
 
   static const std::size_t index = N;
 
+  constexpr tuple_get() {}
+
   constexpr result_type & operator()(Tuple & t) const
   { return ::falcon::__detail::get<N>(t); }
 };
@@ -26,6 +28,8 @@ struct tuple_get<N, const Tuple>
 
 	static const std::size_t index = N;
 
+  constexpr tuple_get() {}
+
   constexpr result_type & operator()(Tuple const & t) const
   { return ::falcon::__detail::get<N>(t); }
 };
@@ -34,6 +38,8 @@ template <std::size_t N>
 struct tuple_get<N, void>
 {
   static const std::size_t index = N;
+
+  constexpr tuple_get() {}
 
   template<class Tuple>
   constexpr auto operator()(Tuple & t) const

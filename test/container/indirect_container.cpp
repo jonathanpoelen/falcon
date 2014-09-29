@@ -21,7 +21,7 @@ void indirect_container_test()
 	A i2{3};
 	v.push_back(i2);
 	i2 = 40;
-	std::vector<A*> vv{{&i2}};
+	std::vector<A*> vv({&i2});
 	//falcon::indirect_container(v).begin() = v.begin()->get()
 	//falcon::indirect_container(vv).begin() = *vv.begin()
 	CHECK(50 == v[0].i + falcon::indirect_container(v).begin()->i + falcon::indirect_container(vv).begin()->i);

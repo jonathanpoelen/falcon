@@ -40,7 +40,10 @@ struct at
   >::type result_type;
   typedef T first_argument_type;
 
-  CPP_CONSTEXPR result_type operator()(T& cont, const second_argument_type& pos) const
+  CPP_CONSTEXPR at() {}
+
+  CPP_CONSTEXPR result_type operator()(
+    T& cont, const second_argument_type& pos) const
   CPP_NOEXCEPT_OPERATOR2(cont.at(pos))
   { return cont.at(pos); }
 };
@@ -48,6 +51,8 @@ struct at
 template<>
 struct at<void, void, void>
 {
+  CPP_CONSTEXPR at() {}
+
   template<class T, class Position>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION(

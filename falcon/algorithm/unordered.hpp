@@ -24,7 +24,7 @@ unordered_erase(Container & cont,
                 typename range_access_iterator<Container>::type first,
                 typename range_access_iterator<Container>::type last)
 {
-  if(last = cont.end()) {
+  if(last == cont.end()) {
     return cont.erase(first, last);
   }
 

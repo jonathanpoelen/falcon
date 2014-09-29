@@ -64,12 +64,15 @@
 //   }
 // };
 
+#include <array>
 #include <iostream>
-#include <falcon/infinite.hpp>
+#include <falcon/iostreams/join.hpp>
 
 int main()
 {
-
+  std::array<int, 4> arr{{18,19,0,1}};
+  std::cout << falcon::iostreams::join(arr, ';');
+//   std::cout << falcon::normalize_index<1, 4>::value;
 
 
 //   falcon::retain_free_object_allocator<int> allocator;

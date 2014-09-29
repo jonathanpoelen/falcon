@@ -55,7 +55,7 @@ constexpr auto call_ignore_param(Function && func, Args&&... args)
 {    return call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
 
 
-template<std::size_t Start = 0, std::size_t Len = -1, typename Function,
+template<std::size_t Start = 0, std::size_t Len = -1u, typename Function,
   typename... Args,
   typename Indexes = typename keep_parameter_index<
     reverse_parameter_index_tag<Start, Len>, sizeof...(Args)

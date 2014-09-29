@@ -242,7 +242,7 @@ operator<<(
 , wrapper._size); }
 
 template<class CharT, class Container>
-class enable_if<
+typename enable_if<
   !is_ostream<Container>::value
 , join_wrapper<CharT, const CharT*, Container>
 >::type
@@ -250,7 +250,7 @@ join(const Container& container, const CharT* glue)
 { return join_wrapper<CharT, const CharT*, Container>(container, glue); }
 
 template<class CharT, class Container>
-class enable_if<
+typename enable_if<
   !is_ostream<Container>::value
 , join_wrapper<CharT, CharT, Container>
 >::type
@@ -270,7 +270,7 @@ join_wrapper<char, char, Container> join(const Container& container)
 { return join_wrapper<char, char, Container>(container, ','); }
 
 template<class CharT, class Container>
-class enable_if<
+typename enable_if<
   !is_ostream<Container>::value
 , join_wrapper<CharT, const CharT*, Container, true>
 >::type

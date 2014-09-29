@@ -13,6 +13,8 @@ typedef std::wistream&(*wimanip_type)(std::wistream&);
 namespace _aux {
   struct ws_t
   {
+    CPP_CONSTEXPR ws_t() {}
+
     template<class CharT, class Traits>
     std::basic_istream<CharT, Traits>&
     operator()(std::basic_istream<CharT, Traits>& is) const

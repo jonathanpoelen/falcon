@@ -18,6 +18,8 @@ struct return_reference
 	typedef reference result_type;
 	typedef typename add_const_if_reference<T>::type const_reference;
 
+  CPP_CONSTEXPR return_reference() {}
+
 	CPP_CONSTEXPR result_type operator()(reference x) const CPP_NOEXCEPT
 	{ return x; }
 
@@ -32,7 +34,9 @@ struct return_reference<const T>
 	typedef const T & reference;
 	typedef reference argument_type;
 	typedef reference result_type;
-	typedef reference const_reference;
+  typedef reference const_reference;
+
+  CPP_CONSTEXPR return_reference() {}
 
 	CPP_CONSTEXPR result_type operator()(const_reference x) const CPP_NOEXCEPT
 	{ return x; }
@@ -41,6 +45,8 @@ struct return_reference<const T>
 template<>
 struct return_reference<void>
 {
+  CPP_CONSTEXPR return_reference() {}
+
   template<class T>
   CPP_CONSTEXPR T& operator()(T & x) const CPP_NOEXCEPT
   { return x; }

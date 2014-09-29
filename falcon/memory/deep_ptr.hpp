@@ -291,7 +291,7 @@ make_deep(std::size_t sz)
 
 template<class T, class... Ts>
 typename _aux::MakeDeep<T>::invalid_type
-make_deep(Ts&&... args) = delete;
+make_deep(Ts&&...) = delete;
 
 }
 

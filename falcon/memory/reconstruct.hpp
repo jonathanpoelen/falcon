@@ -12,6 +12,7 @@
 namespace falcon {
 
 CPP_GLOBAL_CONSTEXPR struct reconstruct_t {
+  CPP_CONSTEXPR reconstruct_t() {}
 #if __cplusplus >= 201103L
   template<class T, class... Args>
   void operator()(T* p, Args&&... args) const
@@ -38,6 +39,7 @@ CPP_GLOBAL_CONSTEXPR struct reconstruct_t {
 
 
 CPP_GLOBAL_CONSTEXPR struct nothrow_renew_t {
+  CPP_CONSTEXPR nothrow_renew_t() {}
 #if __cplusplus >= 201103L
   template<class T, class... Args>
   T* operator()(T* p, Args&&... args) const noexcept
@@ -64,6 +66,7 @@ CPP_GLOBAL_CONSTEXPR struct nothrow_renew_t {
 
 
 CPP_GLOBAL_CONSTEXPR struct renew_t {
+  CPP_CONSTEXPR renew_t() {}
 #if __cplusplus >= 201103L
   template<class T, class... Args>
   T* operator()(T* p, Args&&... args) const
@@ -111,6 +114,7 @@ CPP_GLOBAL_CONSTEXPR struct renew_t {
 
 
 CPP_GLOBAL_CONSTEXPR struct nothrow_emplace_new_t {
+  CPP_CONSTEXPR nothrow_emplace_new_t() {}
 #if __cplusplus >= 201103L
   template<class T, class... Args>
   T* operator()(T* p, Args&&... args) const noexcept
@@ -132,6 +136,7 @@ CPP_GLOBAL_CONSTEXPR struct nothrow_emplace_new_t {
 
 
 CPP_GLOBAL_CONSTEXPR struct emplace_new_t {
+  CPP_CONSTEXPR emplace_new_t() {}
 #if __cplusplus >= 201103L
   template<class T, class... Args>
   T* operator()(T* p, Args&&... args) const

@@ -118,24 +118,28 @@ private:
 
 
 CPP_GLOBAL_CONSTEXPR struct nothrow_new_ptr_t {
+  CPP_CONSTEXPR nothrow_new_ptr_t() {}
   template<class T>
   void operator()(T * p) const
   { nothrow_default_new<T>()(p); }
 } nothrow_new_ptr;
 
 CPP_GLOBAL_CONSTEXPR struct nothrow_new_array_t {
+  CPP_CONSTEXPR nothrow_new_array_t() {}
   template<class T>
   void operator()(T * p) const
   { nothrow_default_new<T[]>()(p); }
 } nothrow_new_array;
 
 CPP_GLOBAL_CONSTEXPR struct new_ptr_t {
+  CPP_CONSTEXPR new_ptr_t() {}
   template<class T>
   void operator()(T * p) const
   { default_new<T>()(p); }
 } new_ptr;
 
 CPP_GLOBAL_CONSTEXPR struct new_array_t {
+  CPP_CONSTEXPR new_array_t() {}
   template<class T>
   void operator()(T * p) const
   { default_new<T[]>()(p); }

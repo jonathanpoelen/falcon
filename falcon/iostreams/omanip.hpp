@@ -14,6 +14,8 @@ typedef std::wostream&(*womanip_type)(std::wostream&);
 namespace _aux {                                                   \
 struct manipulator##_t                                             \
 {                                                                  \
+  CPP_CONSTEXPR manipulator##_t() {}                               \
+                                                                   \
   template<class CharT, class Traits>                              \
   std::basic_ostream<CharT, Traits>&                               \
   operator()(std::basic_ostream<CharT, Traits>& os) const          \

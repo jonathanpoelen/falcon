@@ -314,7 +314,7 @@ public:
   , m_used(reinterpret_cast<Obj*>(first))
   , m_free(reinterpret_cast<Obj*>(byte_cast(first) + Obj::s_heap_size))
   {
-    if (byte_distance(first, last) < 3 * Obj::s_heap_size) {
+    if (byte_distance(first, last) < std::ptrdiff_t(3 * Obj::s_heap_size)) {
       throw std::domain_error("range_fixed_allocator invalid size 0");
     }
 
@@ -326,7 +326,9 @@ public:
     m_free->prev = 0;
     m_free->next = reinterpret_cast<Obj*>(byte_cast(first) + 2 * Obj::s_heap_size);
 
-    m_free->next->byte_and_use = byte_cast(last) - byte_cast(first) - 2 * Obj::s_heap_size;
+    m_free->next->byte_and_use
+      = std::size_t(byte_cast(last) - byte_cast(first)
+      - std::ptrdiff_t(2 * Obj::s_heap_size));
     m_free->next->prev = m_free;
     m_free->next->next = 0;
   }

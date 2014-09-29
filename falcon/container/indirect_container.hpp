@@ -82,7 +82,7 @@ typename build_indirect_container<Container, AccessTraits>::type
 indirect_container(Container& cont, AccessTraits access)
 {
 	typedef typename build_indirect_container<Container, AccessTraits>::type result_type;
-	return result_type(cont);
+	return result_type(cont, access);
 }
 
 #if __cplusplus >= 201103L

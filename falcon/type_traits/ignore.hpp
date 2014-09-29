@@ -1,16 +1,14 @@
-#ifndef _FALCON_TYPE_TRAITS_IGNORE_HPP
-#define _FALCON_TYPE_TRAITS_IGNORE_HPP
+#ifndef FALCON_TYPE_TRAITS_IGNORE_HPP
+#define FALCON_TYPE_TRAITS_IGNORE_HPP
+
+#include <falcon/c++/constexpr.hpp>
+#include <falcon/c++/empty_class.hpp>
 
 namespace falcon {
 
-struct ignore_t
-{};
+CPP_EMPTY_CLASS(ignore_t);
 
-#if __cplusplus >= 201103L
-constexpr ignore_t ignore;
-#else
-const ignore_t ignore;
-#endif
+CPP_GLOBAL_CONSTEXPR ignore_t ignore;
 
 }
 

@@ -40,7 +40,8 @@ set_file_contents(const char * name, const CharT * s)
     std::basic_filebuf<CharT> sbout;
     if (sbout.open(name, std::ios_base::out)) {
       std::size_t len = std::char_traits<CharT>::length(s);
-      return sbout.sputn(s, len);
+      // TODO len > std::streamsize::max()
+      return sbout.sputn(s, std::streamsize(len));
     }
   }
   return 0;

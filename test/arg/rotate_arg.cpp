@@ -5,7 +5,7 @@
 void rotate_arg_test()
 {
 	int a = 1, b = 2, c = 3, d = 4;
-	falcon::rotate_arg<>(a,b,c,d);
+	falcon::rotate_arg(a,b,c,d);
 	CHECK_EQUAL_VALUE(4, a);
 	CHECK_EQUAL_VALUE(1, b);
 	CHECK_EQUAL_VALUE(2, c);
@@ -22,7 +22,7 @@ void rotate_arg_test()
 	CHECK_EQUAL_VALUE(4, d);
 
 	int e = 5;
-	falcon::rotate_arg<>(a,b,c,d,e);
+	falcon::rotate_arg(a,b,c,d,e);
 	CHECK_EQUAL_VALUE(5, a);
 	CHECK_EQUAL_VALUE(1, b);
 	CHECK_EQUAL_VALUE(2, c);

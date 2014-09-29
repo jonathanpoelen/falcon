@@ -41,33 +41,33 @@ template<int _Num>
 struct placeholder
 {
 	template<typename _Index>
-	inline constexpr ___lambda<index<>, placeholder<_Num>, const _Index&> operator[](const _Index& idx)
+	constexpr ___lambda<index<>, placeholder<_Num>, const _Index&> operator[](const _Index& idx) const
 	{
 		return CPP1X(index<>{}, idx);
 	}
 
 	/* use std::bind ?
 	template<typename... _Args>
-	inline ___lambda<functional_operators::function<_Args...>, placeholder<_Num> > bind(_Args&&... args)
+	___lambda<functional_operators::function<_Args...>, placeholder<_Num> > bind(_Args&&... args)
 	{ return CPP1X(std::tuple<_Args...>(std::forward<_Args>(args)...)); }*/
 
 	template<typename... _Args>
-	inline CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), arg<_Num-1>(args...))
+	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args) const, arg<_Num-1>(args...))
 
 	template<typename _T>
-	inline constexpr ___lambda<assign<>, placeholder<_Num>, const _T&> operator=(const _T& v)
+  constexpr ___lambda<assign<>, placeholder<_Num>, const _T&> operator=(const _T& v) const
 	{
 		return CPP1X(assign<>{}, v);
 	}
 
 	template<typename _T>
-	inline constexpr ___lambda<assign<>, placeholder<_Num>, _T> operator=(_T&& v)
+  constexpr ___lambda<assign<>, placeholder<_Num>, _T> operator=(_T&& v) const
 	{
 		return CPP1X(assign<>{}, v);
 	}
 
 	template<int _Num2>
-	inline constexpr ___lambda<assign<>, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&)
+  constexpr ___lambda<assign<>, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&) const
 	{
 		return CPP1X(assign<>{});
 	}
@@ -76,9 +76,9 @@ struct placeholder
 	constexpr ___lambda<
    decltype(std::mem_fn(std::declval<_T _Class::*>())), placeholder<_Num>
 #ifdef IN_IDE_PARSER
- , __force_placearg> operator ->(_T _Class::* mem)
+ , __force_placearg> operator ->(_T _Class::* mem) const
 #else
- , __force_placearg> operator ->*(_T _Class::* mem)
+ , __force_placearg> operator ->*(_T _Class::* mem) const
 #endif
 	{
 		return CPP1X(std::mem_fn(mem));
@@ -755,7 +755,7 @@ struct __is_istream_lambda<___lambda<left_shift<>, _Lambda1, _Lambda2>>
 {};
 
 template<typename _Operation, typename _TL, typename _TR>
-inline typename std::enable_if<
+typename std::enable_if<
 	__is_ostream_lambda<
 		___lambda<_Operation, _TL, _TR>
 	>::__value,
@@ -772,7 +772,7 @@ operator<<(___lambda<_Operation, _TL, _TR> l,
 { return {left_shift<>(), l, __pf}; }
 
 template<typename _Operation, typename _TL, typename _TR>
-inline typename std::enable_if<
+typename std::enable_if<
 	__is_istream_lambda<
 		___lambda<_Operation, _TL, _TR>
 	>::__value,

@@ -7,16 +7,20 @@
 namespace falcon {
 namespace bit {
 
+namespace aux_ {
+  struct count_impl {
+    template<class T>
+    CPP_CONSTEXPR static T
+    impl(T y, T count) CPP_NOEXCEPT {
+      return y ? impl(y >> 1, count + (y & 1)) : count;
+    }
+  };
+}
+
 ///count number of bits set in a byte
 template<class T>
 CPP_CONSTEXPR T count(T x) CPP_NOEXCEPT
-{
-  struct R { CPP_CONSTEXPR static T
-  r(T y, T count) CPP_NOEXCEPT {
-		return y ? r(y >> 1, count + (y & 1)) : count;
-	} };
-	return R::r(x >> 1, x & 1);
-}
+{ return aux_::count_impl::impl(x >> 1, x & 1); }
 
 }
 }

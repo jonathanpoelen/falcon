@@ -38,6 +38,8 @@ struct get
   typedef typename default_or_type<_aux::result_get<T>, Result, void>::type result_type;
   typedef T argument_type;
 
+  CPP_CONSTEXPR get() {}
+
   CPP_CONSTEXPR result_type operator()(T& x) const
   CPP_NOEXCEPT_OPERATOR2(x.get())
   { return x.get(); }
@@ -46,6 +48,8 @@ struct get
 template<>
 struct get<void, void>
 {
+  CPP_CONSTEXPR get() {}
+
   template<class T>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(

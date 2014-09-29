@@ -57,23 +57,30 @@ template <class T, class Compare> class all_equal_if_wrapper;
 #define FALCON_MAKE_LOGICAL_FUNC(name, op, and_or)                         \
   constexpr struct name##_t {                                              \
     template<class T, class U>                                             \
-    constexpr bool operator()(const T& a, const U& b)                      \
+    constexpr bool operator()(const T& a, const U& b) const                \
     noexcept(noexcept(a op b))                                             \
     { return a op b; }                                                     \
                                                                            \
     template<class T, class U, class... Args>                              \
     constexpr bool operator()(const T& a, const U& b, const Args&... args) \
-    noexcept(noexcept(a op b))                                             \
+    const noexcept(noexcept(a op b))                                       \
     { return (a op b) and_or operator()(a, args...); }                     \
   } name {};                                                               \
                                                                            \
   template<class T>                                                        \
   struct name##_wrapper                                                    \
   {                                                                        \
+    name##_wrapper() = default;                                            \
+    name##_wrapper(name##_wrapper const &) = default;                      \
+    name##_wrapper(name##_wrapper &&) = default;                           \
+    constexpr name##_wrapper(T&& x)                                        \
+    : x(std::forward<T>(x))                                                \
+    {}                                                                     \
     template<class... Args>                                                \
     constexpr bool operator()(const Args&... args) const                   \
     { return name(x, args...); }                                           \
-    const T & x;                                                           \
+  private:                                                                 \
+    T x;                                                                   \
   };
 
 FALCON_MAKE_LOGICAL_FUNC(all_equal_to, ==, &&)
@@ -97,13 +104,13 @@ FALCON_MAKE_LOGICAL_FUNC(any_greater_equal, >=, ||)
   constexpr struct name##_t {                                            \
     template<class Compare, class T, class U>                            \
     constexpr bool operator()(Compare cmp, const T& a, const U& b)       \
-    noexcept(noexcept(cmp(a, b)))                                        \
+    const noexcept(noexcept(cmp(a, b)))                                  \
     { return cmp(a, b) == v; }                                           \
                                                                          \
     template<class Compare, class T, class U, class... Args>             \
     constexpr bool                                                       \
     operator()(Compare cmp, const T& a, const U& b, const Args&... args) \
-    noexcept(noexcept(cmp(a, b)))                                        \
+    const noexcept(noexcept(cmp(a, b)))                                  \
     { return cmp(a, b) and_or operator()(cmp, a, args...); }             \
   } name {};                                                             \
                                                                          \
@@ -114,16 +121,10 @@ FALCON_MAKE_LOGICAL_FUNC(any_greater_equal, >=, ||)
     name##_wrapper(name##_wrapper const &) = default;                    \
     name##_wrapper(name##_wrapper &&) = default;                         \
     constexpr name##_wrapper(T&& x)                                      \
-    : t(std::move(x), Compare())                                         \
-    {}                                                                   \
-    constexpr name##_wrapper(T const & x)                                \
-    : t(x, Compare())                                                    \
+    : t(std::forward<T>(x), Compare())                                   \
     {}                                                                   \
     constexpr name##_wrapper(T&& x, Compare cmp)                         \
-    : t(std::move(x), cmp)                                               \
-    {}                                                                   \
-    constexpr name##_wrapper(T const & x, Compare cmp)                   \
-    : t(x, cmp)                                                          \
+    : t(std::forward<T>(x), cmp)                                         \
     {}                                                                   \
     constexpr name##_wrapper(Compare cmp)                                \
     : t(T(), cmp)                                                        \

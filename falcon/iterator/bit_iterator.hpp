@@ -41,7 +41,7 @@ namespace detail
   {
     struct bit_reference_type {
       typedef falcon::bit_reference<
-        class std::iterator_traits<Iterator>::value_type
+        typename std::iterator_traits<Iterator>::value_type
       > type;
     };
 
@@ -52,7 +52,7 @@ namespace detail
     , bool
     , use_default
     , void
-    , class eval_if<IsConst, use<bool>, bit_reference_type>::type
+    , typename eval_if<IsConst, use<bool>, bit_reference_type>::type
     >::type type;
   };
 }

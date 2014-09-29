@@ -20,7 +20,9 @@ template <typename T = void, typename Result = void>
 struct size
 {
 	typedef typename default_or_type<use_size_type<T>, Result, void>::type result_type;
-	typedef T argument_type;
+  typedef T argument_type;
+
+  CPP_CONSTEXPR size() {}
 
 	CPP_CONSTEXPR result_type operator()(const T& x) const
   CPP_NOEXCEPT_OPERATOR2(x.size())
@@ -30,6 +32,8 @@ struct size
 template <>
 struct size<void, void>
 {
+  CPP_CONSTEXPR size() {}
+
   template<class T>
 #if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(

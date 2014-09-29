@@ -93,18 +93,18 @@ namespace aux_ {
   template<properties_t Properties, typename T, typename Get, typename Set>
   struct property_traits
   {
-    typedef typename get_property_traits<T, Get>::type getter_type;
-    typedef typename set_property_through_get_traits<T, getter_type, Set>::type setter_type;
+    typedef typename get_property_traits<T, Get>::type getter_type_;
+    typedef typename set_property_through_get_traits<T, getter_type_, Set>::type setter_type_;
 
     typedef typename if_c<
-      std::is_void<getter_type>,
+      std::is_void<getter_type_>,
       std::nullptr_t,
-      getter_type
+      getter_type_
     >::type getter_type;
     typedef typename if_c<
-      std::is_void<setter_type>,
+      std::is_void<setter_type_>,
       std::nullptr_t,
-      setter_type
+      setter_type_
     >::type setter_type;
 
     struct none_assignable{ void operator()(T&, T&){}};
@@ -133,7 +133,8 @@ template <
 class class_property
 {
 public:
-	typedef typename if_<Properties & properties::by_reference, T&, T>::type base_type;
+	typedef typename if_<
+   !!(Properties & properties::by_reference), T&, T>::type base_type;
 
 private:
 	typedef aux_::property_traits<Properties, base_type, Get, Set> traits_;
@@ -184,11 +185,13 @@ public:
 	{ return value; }
 
 private:
-	template<typename _G>
-	auto dispatch_get(_G&) -> decltype(this->getter(this->base()));
+	template<typename G>
+	auto dispatch_get(G&)
+  -> decltype(std::declval<G>()(this->base()));
 
-	template<typename _G>
-	auto dispatch_get(const _G&) const -> decltype(this->getter(this->base()));
+	template<typename G>
+	auto dispatch_get(const G&) const
+  -> decltype(std::declval<G>()(this->base()));
 
 	void dispatch_get(std::nullptr_t) const;
 
@@ -215,20 +218,20 @@ public:
 
 	template<typename U>
 	typename std::enable_if<
-		Properties & properties::implicit_cast,
+		!!(Properties & properties::implicit_cast),
 		typename if_<0, U, void>::type
 	>::type operator=(U&& newvalue)
 	{ set(newvalue); }
 
 	operator typename eval_if<
-		Properties & properties::implicit_cast,
+		!!(Properties & properties::implicit_cast),
 		std::result_of<getter_type&(T&)>,
 		use<void>
 	>::type ()
 	{ return get(); }
 
 	operator typename eval_if<
-		Properties & properties::implicit_cast,
+    !!(Properties & properties::implicit_cast),
 		std::result_of<const getter_type&(const T&)>,
 		use<void>
 	>::type () const

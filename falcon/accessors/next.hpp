@@ -33,6 +33,8 @@ struct next
   typedef typename default_or_type<_aux::result_next<T>, Result, void>::type result_type;
   typedef T argument_type;
 
+  CPP_CONSTEXPR next() {}
+
   CPP_CONSTEXPR result_type operator()(T& x) const
   CPP_NOEXCEPT_OPERATOR2(x.next())
   { return x.next(); }
@@ -41,6 +43,8 @@ struct next
 template<>
 struct next<void, void>
 {
+  CPP_CONSTEXPR next() {}
+
   template<class T>
 # if __cplusplus >= 201103L
   constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(

@@ -25,6 +25,7 @@ struct default_delete
 template<class T>
 struct default_delete
 {
+  default_delete() {}
   void operator()(T* p) const
   { delete p; }
 };
@@ -32,6 +33,7 @@ struct default_delete
 template<class T>
 struct default_delete<T[]>
 {
+  default_delete() {}
   void operator()(T* p) const
   { delete[] p; }
 };
@@ -41,7 +43,10 @@ struct default_delete<T[]>
 template<class T>
 struct default_delete_then_zero
 {
-  void operator()(typename FALCON_BOOST_OR_STD_NAMESPACE::remove_extent<T>::type * & p) const
+  CPP_CONSTEXPR default_delete_then_zero() {}
+
+  void operator()(
+    typename FALCON_BOOST_OR_STD_NAMESPACE::remove_extent<T>::type * & p) const
   {
     default_delete<T>()(p);
     p = 0;
@@ -50,12 +55,14 @@ struct default_delete_then_zero
 
 
 CPP_GLOBAL_CONSTEXPR struct delete_ptr_t {
+  CPP_CONSTEXPR delete_ptr_t() {}
   template<class T>
   void operator()(T * p) const
   { default_delete<T>()(p); }
 } delete_ptr;
 
 CPP_GLOBAL_CONSTEXPR struct delete_array_t {
+  CPP_CONSTEXPR delete_array_t() {}
   template<class T>
   void operator()(T * p) const
   { default_delete<T[]>()(p); }
@@ -63,12 +70,14 @@ CPP_GLOBAL_CONSTEXPR struct delete_array_t {
 
 
 CPP_GLOBAL_CONSTEXPR struct delete_ptr_then_zero_t {
+  CPP_CONSTEXPR delete_ptr_then_zero_t() {}
   template<class T>
   void operator()(T * & p) const
   { default_delete_then_zero<T>()(p); }
 } delete_ptr_then_zero;
 
 CPP_GLOBAL_CONSTEXPR struct delete_array_then_zero_t {
+  CPP_CONSTEXPR delete_array_then_zero_t() {}
   template<class T>
   void operator()(T * & p) const
   { default_delete_then_zero<T[]>()(p); }

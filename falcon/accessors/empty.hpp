@@ -13,7 +13,9 @@ struct empty
 	typedef bool result_type;
 	typedef T argument_type;
 
-	CPP_CONSTEXPR result_type operator()(const T& x) const
+  CPP_CONSTEXPR empty() {}
+
+  CPP_CONSTEXPR result_type operator()(const T& x) const
   CPP_NOEXCEPT_OPERATOR2(x.empty())
   { return x.empty(); }
 };
@@ -21,6 +23,8 @@ struct empty
 template<>
 struct empty<void>
 {
+  CPP_CONSTEXPR empty() {}
+
   template<class T>
   constexpr bool operator()(const T& x) const
   CPP_NOEXCEPT_OPERATOR2(x.empty())

@@ -35,7 +35,7 @@ public:
   using std::tuple<Elements...>::operator=;
 
   constexpr const tuple_type& tuple() const
-  { return *this; }
+  { return reinterpret_cast<tuple_type const &>(*this); }
 
   CPP_CONSTEXPR_NOT_CONST tuple_type& tuple()
   { return *this; }
