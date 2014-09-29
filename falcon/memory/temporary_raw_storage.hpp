@@ -28,7 +28,15 @@ namespace _aux {
 template<class Allocator, class... Elements>
 class temporary_raw_storage_with_allocator
 {
-  typedef typename std::allocator_traits<Allocator>::template rebind_alloc<char> internalallocator_;
+  typedef typename std::allocator_traits<Allocator>
+    ::template rebind_alloc<char> internal_allocator;
+
+  typedef std::allocator_traits<internal_allocator> allocator_traits;
+  typedef typename allocator_traits::size_type size_type;
+  typedef typename allocator_traits::pointer pointer;
+
+  static constexpr bool is_noexcept()
+  { return noexcept(allocator_traits::allocate(std::declval<internal_allocator&>(), size_type(0))); }
 
 public:
   typedef Allocator allocator_type;
@@ -36,21 +44,21 @@ public:
   typedef tuple_type type;
 
   temporary_raw_storage_with_allocator()
-  noexcept(noexcept(internalallocator_()))
-  : t(0, tuple_type(), internalallocator_())
+  noexcept(noexcept(internal_allocator()))
+  : t(0, tuple_type(), internal_allocator())
   {}
 
   explicit
   temporary_raw_storage_with_allocator(_aux::usingsize__t<Elements>... sizes)
-  noexcept(this->is_noexcept())
-  : t(0, tuple_type(), internalallocator_())
+  noexcept(temporary_raw_storage_with_allocator::is_noexcept())
+  : t(0, tuple_type(), internal_allocator())
   { init_(indexes(), optimal_indexes(), sizes...); }
 
   explicit
   temporary_raw_storage_with_allocator(
     const allocator_type & alloc, _aux::usingsize__t<Elements>... sizes)
-  noexcept(this->is_noexcept())
-  : t(0, tuple_type(), internalallocator_(alloc))
+  noexcept(temporary_raw_storage_with_allocator::is_noexcept())
+  : t(0, tuple_type(), internal_allocator(alloc))
   { init_(indexes(), optimal_indexes(), sizes...); }
 
   temporary_raw_storage_with_allocator(
@@ -93,7 +101,7 @@ public:
   { return pointer_(); }
 
   void swap(temporary_raw_storage_with_allocator & other)
-  noexcept(_aux::is_nothrow_swap<internalallocator_>())
+  noexcept(_aux::is_nothrow_swap<internal_allocator>())
   {
     using std::swap;
     swap(get<1>(t), get<1>(other.t));
@@ -107,20 +115,11 @@ private:
   typedef typename optimal_index_pack<elements>::type optimal_indexes;
   typedef std::is_same<indexes, optimal_indexes> same;
 
-  typedef std::allocator_traits<internalallocator_> allocator_traits;
-  typedef typename allocator_traits::size_type size_type;
-  typedef typename allocator_traits::pointer pointer;
-
   optimal_tuple<
-    std::tuple<
       size_type,
       tuple_type,
-      internalallocator_
-    >
+      internal_allocator
   > t;
-
-  static constexpr bool is_noexcept()
-  { return noexcept(allocator_traits::allocate(std::declval<internalallocator_&>(), size_type(0))); }
 
   size_type size_() const noexcept
 	{ return get<0>(t); }
@@ -128,7 +127,7 @@ private:
   char * pointer_() const noexcept
   { return reinterpret_cast<char*>(std::get<index_element<0, optimal_indexes>::value>(get<1>(t))); }
 
-  internalallocator_ & allocator_() noexcept
+  internal_allocator & allocator_() noexcept
   { return get<2>(t); }
 
   template <std::size_t... Indexes, std::size_t... OptiIndexes>
@@ -145,7 +144,7 @@ private:
       p2 = reinterpret_cast<char*>(reinterpret_cast<size_t>(p1 + (
         std::alignment_of<typename parameter_element<OptiIndexes, elements>::type>::value - 1)
       ) & -std::alignment_of<typename parameter_element<OptiIndexes, elements>::type>::value),
-      szs[OptiIndexes] = p1 - static_cast<char*>(0),
+      szs[OptiIndexes] = std::size_t(p1 - static_cast<char*>(0)),
       p1 = p2,
       p1 += sizeof(typename parameter_element<OptiIndexes, elements>::type)
       * ::falcon::arg<OptiIndexes>(size_t(sizes)...)

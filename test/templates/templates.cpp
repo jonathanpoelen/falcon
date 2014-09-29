@@ -23,7 +23,7 @@ void templates_test()
 	STATIC_CHECK_VALUE(true, falcon::template_left_accumulator<falcon::template_or<static_value>::filter, int>::value_wrapper<int>);
 	STATIC_CHECK_VALUE(true, falcon::template_right_accumulator<falcon::template_or<static_value>::filter, int>::value_wrapper<int>);
 	STATIC_CHECK_VALUE(6, falcon::template_size<int,int,int,int,int,int>);
-	STATIC_CHECK_VALUE(15, falcon::template_binary<falcon::plus<>, falcon::template_size, falcon::template_val<int, 10>::filter>::value_wrapper<int,int,int,int,int>);
+	STATIC_CHECK_VALUE(15u, falcon::template_binary<falcon::plus<>, falcon::template_size, falcon::template_val<std::size_t, 10>::filter>::value_wrapper<int,int,int,int,int>);
 
 	STATIC_CHECK_VALUE(1, falcon::template_to_val<std::rank>::filter<int[]>);
 
@@ -32,7 +32,7 @@ void templates_test()
 		falcon::template_to_val<
 			std::rank
 		>::filter,
-		falcon::template_val<int, 3>::filter
+		falcon::template_val<std::size_t, 3>::filter
 	>::value_wrapper<int[4][8]>::value);
 }
 #else

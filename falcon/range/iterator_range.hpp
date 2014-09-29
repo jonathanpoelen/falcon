@@ -50,15 +50,9 @@ struct iterator_range
   {}
 
 #if __cplusplus >= 201103L
+  iterator_range(const iterator_range & r) = default;
   iterator_range& operator=(const iterator_range & r) = default;
-  iterator_range& operator=(const iterator_range && r) = default;
-#else
-  iterator_range & operator=(const iterator_range & r)
-  {
-    m_begin = r.m_begin;
-    m_end = r.m_end;
-    return *this;
-  }
+  iterator_range& operator=(iterator_range && r) = default;
 #endif
 
   template<class Range>
@@ -99,32 +93,41 @@ struct iterator_range
 
   CPP_CONSTEXPR reference front() const
   {
+#if __cplusplus > 201103L
     assert( !empty() );
+#endif
     return *m_begin;
   }
 
   CPP_CONSTEXPR reference back() const
   {
+#if __cplusplus > 201103L
     assert( !empty() );
-    Iterator last( m_end );
-    return *--last;
+#endif
+    return *--Iterator(m_end);
   }
 
   void pop_front()
   {
+#if __cplusplus > 201103L
     assert( !empty() );
+#endif
     ++m_begin;
   }
 
   void pop_back()
   {
+#if __cplusplus > 201103L
     assert( !empty() );
+#endif
     --m_end;
   }
 
   CPP_CONSTEXPR reference operator[](difference_type at) const
   {
+#if __cplusplus > 201103L
     assert( at >= 0 && at < size() );
+#endif
     return m_begin[at];
   }
 
@@ -140,17 +143,17 @@ struct iterator_range
     return *this;
   }
 
-  operator bool() const
+  CPP_CONSTEXPR operator bool() const
   {
     return m_begin != m_end;
   }
 
-  bool operator!() const
+  CPP_CONSTEXPR bool operator!() const
   {
     return empty();
   }
 
-  bool equal(const iterator_range& r) const
+  CPP_CONSTEXPR bool equal(const iterator_range& r) const
   {
     return r.m_begin == m_begin && r.m_end == m_end;
   }
@@ -301,7 +304,7 @@ bool operator>=( const ForwardRange& l, const iterator_range<Iterator>& r)
 
 
 template<class T>
-constexpr iterator_range<typename decay_and_strip<T>::type>
+CPP_CONSTEXPR iterator_range<typename decay_and_strip<T>::type>
 make_iterator_range(T CPP_RVALUE x, T CPP_RVALUE y)
 {
   typedef iterator_range<typename decay_and_strip<T>::type> iterator_range_type;

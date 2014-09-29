@@ -17,6 +17,15 @@ public:
   CPP_CONSTEXPR integer_range(Integer first, Integer last)
   : base_(iterator_(first), iterator_(last))
   {}
+
+#if __cplusplus >= 201103L
+  integer_range(const integer_range &) = default;
+  integer_range(integer_range &&) = default;
+#else
+  integer_range(const integer_range & other)
+  : base_(other)
+  {}
+#endif
 };
 
 template<typename Integer>
@@ -32,6 +41,15 @@ public:
   CPP_CONSTEXPR strided_integer_range(Integer first, Integer last, difference_type step)
   : base_(iterator_(first, step), iterator_(last, step))
   {}
+
+#if __cplusplus >= 201103L
+  strided_integer_range(const strided_integer_range &) = default;
+  strided_integer_range(strided_integer_range &&) = default;
+#else
+  strided_integer_range(const strided_integer_range & other)
+  : base_(other)
+  {}
+#endif
 };
 
 }

@@ -278,14 +278,20 @@ public:
   : step_(1)
   {}
 
-  integer_iterator_with_step(const iterator_type& other)
+  integer_iterator_with_step(const integer_iterator_with_step& other)
 #if __cplusplus >= 201103L
   = default;
+  integer_iterator_with_step(integer_iterator_with_step&&) = default;
 #else
   : inherit_type(other)
   , step_(other.step_)
   {}
 #endif
+
+  integer_iterator_with_step(const iterator_type& other)
+  : inherit_type(other)
+  , step_(other.step_)
+  {}
 
   integer_iterator_with_step(const iterator_type& other, difference_type step)
   : inherit_type(other)

@@ -155,7 +155,7 @@ public:
 protected:
 	self_type& operator=(const self_type& other)
 	{
-		if (_is_leaf = other._is_leaf)
+		if (_is_leaf == other._is_leaf)
 			_wrap.pointer = other._wrap.pointer;
 		else
 		{
@@ -311,11 +311,11 @@ protected:
 		return false;
 	}
 
-	bool extend_children(tree_type __left, tree_type __right, bool in_left = in_left)
+	bool extend_children(tree_type __left, tree_type __right, bool __in_left = in_left)
 	{
-		if ((in_left ? __left : __right) && _is_leaf)
+		if ((__in_left ? __left : __right) && _is_leaf)
 		{
-			*(in_left ? __left : __right) = _wrap.pointer;
+			*(__in_left ? __left : __right) = _wrap.pointer;
 			_is_leaf = false;
 			_wrap.children.left = __left;
 			_wrap.children.right = __right;

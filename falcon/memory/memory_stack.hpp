@@ -38,7 +38,7 @@ namespace aux_ {
   struct memory_stack_type<T[N]>
   {
     typedef T type[N];
-    typedef T base_type;
+    typedef T base_type[N];
     typedef typename memory_stack_type<T>::memory_type memory_type[N];
   };
 
@@ -156,8 +156,8 @@ namespace aux_ {
   : memory_stack_base<T[N]>
   {
     typedef typename memory_stack_base<T[N]>::type type;
+    typedef typename memory_stack_base<T[N]>::pointer pointer;
     typedef typename memory_stack_base<T[N]>::memory_type memory_type;
-
 
     template<class CPP_PACK Args>
     void construct(Args CPP_RVALUE CPP_PACK args)
@@ -166,7 +166,7 @@ namespace aux_ {
       std::size_t i = 0;
       try
       {
-        T * p = this->address();
+        T * p = &this->get()[0];
         for (; i != N; ++i, ++p)
           new (p) T(FALCON_FORWARD(Args, args)CPP_PACK);
       }
@@ -188,7 +188,7 @@ namespace aux_ {
   private:
     void destroy_n(std::size_t i) CPP_NOEXCEPT
     {
-      T * p = this->address();
+      T * p = &this->get()[0];
       while (i)
         p[--i].~T();
     }
@@ -223,7 +223,7 @@ namespace aux_ {
       std::size_t i = 0;
       try
       {
-        this->priv_construct(i, this->address(), std::forward<Args>(args)...);
+        this->priv_construct(i, &this->get()[0], std::forward<Args>(args)...);
       }
       catch (...)
       {
@@ -247,6 +247,7 @@ namespace aux_ {
   {
   public:
     typedef typename memory_stack_base<T[N]>::type type;
+    typedef typename memory_stack_base<T[N]>::pointer pointer;
     typedef typename memory_stack_base<T[N]>::memory_type memory_type;
 
 
@@ -255,7 +256,7 @@ namespace aux_ {
     void construct(Args&&... args)
     noexcept(noexcept(T(std::forward<Args>(args)...)))
     {
-      T* p = this->address();
+      pointer p = this->address();
       for (std::size_t i = 0; i != N; ++i, ++p)
         new (p) T{std::forward<Args>(args)...};
     }

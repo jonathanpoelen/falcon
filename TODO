@@ -370,3 +370,4 @@ retravailler (certain sont déjà listé au-dessus)
  - tree
  - coordinate
 
+integer_iterator -> integral_iterator (+merger avec le fichier integral_iterator)

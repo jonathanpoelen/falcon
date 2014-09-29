@@ -14,13 +14,10 @@
 
 namespace falcon {
 
-template<typename Tuple>
-struct optimal_tuple_traits;
-
-template<typename... Params>
-struct optimal_tuple_traits<std::tuple<Params...>>
+template<typename... Elements>
+struct optimal_tuple_traits
 {
-  typedef std::tuple<Params...> tuple_base;
+  typedef std::tuple<Elements...> tuple_base;
 
 private:
   typedef typename tuple_to_parameter_pack<tuple_base>::type parameter_pack;
@@ -42,31 +39,43 @@ public:
   { typedef typename std::tuple_element<idx<I>::value, tuple_base>::type type; };
 
   struct tuple_size
-  { static const std::size_t value = std::tuple_size<tuple_base>::value; };
+  { static const std::size_t value = sizeof...(Elements); };
 
   constexpr static std::size_t size()
   { return tuple_size::value; }
 
   template<std::size_t I>
-  static typename tuple_element<I>::type& get(tuple_base& t)
-  { return std::get<idx<I>::value>(t); }
+  constexpr static typename tuple_element<I>::type&
+  get(tuple_base& t)
+  {
+    using std::get;
+    return get<idx<I>::value>(t);
+  }
 
   template<std::size_t I>
-  static const typename tuple_element<I>::type& get(const tuple_base& t)
-  { return std::get<idx<I>::value>(t); }
+  constexpr static const typename tuple_element<I>::type&
+  get(const tuple_base& t)
+  {
+    using std::get;
+    return get<idx<I>::value>(t);
+  }
 
   template<std::size_t I>
-  static typename tuple_element<I>::type&& get(tuple_base&& t)
-  { return std::get<idx<I>::value>(std::forward<tuple_base>(t)); }
+  constexpr static typename tuple_element<I>::type&&
+  get(tuple_base&& t)
+  {
+    using std::get;
+    return get<idx<I>::value>(std::forward<tuple_base>(t));
+  }
 };
 
 
-template<typename Tuple>
+template<class... Elements>
 class optimal_tuple
 {
-  using indexes = build_parameter_index_t<std::tuple_size<Tuple>::value>;
+  using indexes = build_parameter_index_t<sizeof...(Elements)>;
 public:
-  using traits_type = optimal_tuple_traits<Tuple>;
+  using traits_type = optimal_tuple_traits<Elements...>;
 
 private:
   struct spa{};
@@ -76,27 +85,28 @@ private:
     opti_impl() = default;
 
     template<std::size_t... Indexes, typename... Args>
-    opti_impl(spa, parameter_index<Indexes...>, Args&&... args)
+    constexpr opti_impl(spa, parameter_index<Indexes...>, Args&&... args)
     : tuple(arg<traits_type::template idx<Indexes>::value>(
       std::forward<Args>(args)...)...
     )
     {}
 
     template<std::size_t... Indexes, typename Tuple2>
-    opti_impl(spt, parameter_index<Indexes...>, Tuple2&& t)
+    constexpr opti_impl(spt, parameter_index<Indexes...>, Tuple2&& t)
     : tuple(traits_type::template get<Indexes>(std::forward<Tuple2>(t))...)
     {}
 
     template<typename Tuple2>
-    opti_impl(Tuple2&& t)
+    constexpr opti_impl(Tuple2&& t)
     : tuple(std::forward<Tuple2>(t))
     {}
 
     template<typename Tuple2, std::size_t... Indexes>
     void assign(parameter_index<Indexes...>, Tuple2&& t)
     {
+      using std::get;
       FALCON_UNPACK(traits_type::get<Indexes>(tuple)
-      = get<Indexes>(std::forward<Tuple2>(t)));
+        = get<Indexes>(std::forward<Tuple2>(t)));
     }
 
     typename traits_type::tuple tuple;
@@ -106,19 +116,19 @@ public:
   optimal_tuple() = default;
 
   template<typename Tuple2>
-  optimal_tuple(Tuple2&& t)
+  constexpr optimal_tuple(Tuple2&& t)
   : impl_(typename std::conditional<traits_type::size() != 1, spt, spa>::type(),
             indexes(), std::forward<Tuple2>(t))
   {}
 
   template<typename... Args>
-  optimal_tuple(Args&&... args)
+  constexpr optimal_tuple(Args&&... args)
   : impl_(spa(), indexes(), std::forward<Args>(args)...)
   {}
 
-  template<typename Tuple2>
-  optimal_tuple(optimal_tuple<Tuple2>&& other)
-  : impl_(std::forward<Tuple2>(other.impl.tuple))
+  template<typename... Elements2>
+  constexpr optimal_tuple(optimal_tuple<Elements2...>&& other)
+  : impl_(std::forward<Elements2...>(other.impl.tuple))
   {}
 
   template<typename Tuple2>
@@ -128,10 +138,10 @@ public:
     return *this;
   }
 
-  template<typename Tuple2>
-  optimal_tuple& operator=(optimal_tuple<Tuple2>&& other)
+  template<typename... Elements2>
+  optimal_tuple& operator=(optimal_tuple<Elements2...>&& other)
   {
-    impl_.tuple = std::forward<Tuple2>(other.impl.tuple);
+    impl_.tuple = std::forward<Elements2...>(other.impl.tuple);
     return *this;
   }
 
@@ -140,29 +150,29 @@ public:
 };
 
 
-template<typename Tuple>
-struct is_tuple_like<optimal_tuple<Tuple>>
+template<class... Elements>
+struct is_tuple_like<optimal_tuple<Elements...>>
 : std::true_type
 {};
 
-template<std::size_t I, typename Tuple>
-auto get(optimal_tuple<Tuple>&& t)
--> decltype(optimal_tuple_traits<Tuple>::
-  template get<I>(std::forward<Tuple>(t.impl_.tuple)))
+template<std::size_t I, class... Elements>
+constexpr auto get(optimal_tuple<Elements...>&& t)
+-> decltype(optimal_tuple_traits<Elements...>::
+  template get<I>(std::forward<Elements...>(t.impl_.tuple)))
 {
-  return optimal_tuple_traits<Tuple>::
-  template get<I>(std::forward<Tuple>(t.impl_.tuple));
+  return optimal_tuple_traits<Elements...>::
+  template get<I>(std::forward<Elements...>(t.impl_.tuple));
 }
 
-template<std::size_t I, typename Tuple>
-auto get(const optimal_tuple<Tuple>& t)
--> decltype(optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple))
-{ return optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple); }
+template<std::size_t I, class... Elements>
+constexpr auto get(const optimal_tuple<Elements...>& t)
+-> decltype(optimal_tuple_traits<Elements...>::template get<I>(t.impl_.tuple))
+{ return optimal_tuple_traits<Elements...>::template get<I>(t.impl_.tuple); }
 
-template<std::size_t I, typename Tuple>
-auto get(optimal_tuple<Tuple>& t)
--> decltype(optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple))
-{ return optimal_tuple_traits<Tuple>::template get<I>(t.impl_.tuple); }
+template<std::size_t I, class... Elements>
+constexpr auto get(optimal_tuple<Elements...>& t)
+-> decltype(optimal_tuple_traits<Elements...>::template get<I>(t.impl_.tuple))
+{ return optimal_tuple_traits<Elements...>::template get<I>(t.impl_.tuple); }
 
 }
 

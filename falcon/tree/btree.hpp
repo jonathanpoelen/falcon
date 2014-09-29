@@ -313,7 +313,7 @@ public:
 		return std::pair<bool, self_type*>(false , 0);
 	}
 
-	std::pair<bool, std::pair<self_type*, self_type*> > extend_children(self_type* __left, self_type* __right, bool in_left = base_type::in_left)
+	std::pair<bool, std::pair<self_type*, self_type*> > extend_children(self_type* __left, self_type* __right, bool /*in_left*/ = base_type::in_left)
 	{
 		if (base_type::extend_children(__right))
 			return std::make_pair(true, std::make_pair(detail_type::attach_parent(this, __left), detail_type::attach_parent(this, __right)));
