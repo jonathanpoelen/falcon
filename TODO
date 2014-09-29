@@ -87,9 +87,6 @@ node/*.hpp: peuvent fonctionner de façon transparente avec des std::unique_ptr 
 
 utiliser optimal_tuple dans recursive_iterator
 
-revoir les java_iterator pour faire un heritage sur un java_iterator_handler comme pour les iterators. Supprimer {java_,}iterator/detail et type_traits/is_java_iterator.hpp
-changer le nom des java_iterator en range_iterator et merger les fonctions make_range_iterator et range_iterator
-
 peut-on supprimer les constructeurs de copie et l'affectation dans les iterateurs sans que cela crée des copies ? il faudra surement faire un move ctor et un move copy
 
 preprocessor/move.hpp -> c++/move.hpp ?
@@ -343,8 +340,6 @@ faire pour begin/end et les autres la même méthode que pour swap
 make_reverse_iterator
 
 attention au barriere (adl) pour begin et co
-
-range(I,I), range(I,n), range(n,n) (remplacer irange et make_iterator_range). Il y a range_container, seq() et container::range()
 
 faire une fonction tuple_size() pour être compatible avec les tuple_like ET initializer_list
 
