@@ -10,7 +10,7 @@ cast           :)
 container      :)
 coordinates    :|
 enum           :|
-flag           :)
+flag           :|
 functional     :)
 helper         :)
 iostreams      :)

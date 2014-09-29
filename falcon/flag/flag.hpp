@@ -325,13 +325,13 @@ struct flag<_T[_N]>
 
   typedef flag<_T[_N]> self_type;
 
-  value_type _M_flag;
+  value_type flag_;
 
 public:
 #if __cplusplus >= 201103L
   template<typename _U, typename... _Args, typename _ = typename std::enable_if<std::is_integral<_U>::value>::type>
   constexpr flag(const _U& __flag, const _Args&... __flags)
-  : _M_flag{__flag, __flags...}
+  : flag_{__flag, __flags...}
   {}
 
 private:
@@ -361,20 +361,20 @@ public:
   flag(const value_type& __flags)
   {
     for (std::size_t i = 0; i != _N; ++i)
-      *_M_flag[i] = *__flags[i];
+      *flag_[i] = *__flags[i];
   }
 
   flag(const self_type& other)
   {
     for (std::size_t i = 0; i != _N; ++i)
-      *_M_flag[i] = *other._flags[i];
+      *flag_[i] = *other._flags[i];
     *this = other;
   }
 
   flag& operator=(const self_type& other)
   {
     for (std::size_t i = 0; i != _N; ++i)
-      *_M_flag[i] = *other._flags[i];
+      *flag_[i] = *other._flags[i];
     return *this;
   }
 
@@ -388,21 +388,21 @@ public:
 
   ///TODO constructeur avec initializer_list + array
   CPP_CONSTEXPR flag()
-  : _M_flag CPP1X()
+  : flag_ CPP1X()
   {}
 
   _T& operator[](std::size_t n)
-  { return _M_flag[n]; }
+  { return flag_[n]; }
   const _T& operator[](std::size_t n) const
-  { return _M_flag[n]; }
+  { return flag_[n]; }
 
   CPP_CONSTEXPR std::size_t size() const
   { return sizeof(_T) * _N; }
 
   value_type& get()
-  { return _M_flag; }
+  { return flag_; }
   const value_type& get() const
-  { return _M_flag; }
+  { return flag_; }
 
 #if __cplusplus >= 201103L
       ///TODO move algorithm : namespace constexpr_algorithm ? namespce cexpr ?
@@ -427,7 +427,7 @@ public:
   public:\
     constexpr self_type operator Op(const self_type& other) const\
     {\
-      return name<0, _T>::run(_M_flag, other._M_flag);\
+      return name<0, _T>::run(flag_, other.flag_);\
     }
 #else
 #define _FALCON_FLAG_MAKE_BINARY_OPERATOR(name, Op)\
@@ -446,18 +446,18 @@ public:
   CPP_CONSTEXPR self_type operator+(const self_type& other) const
   { return *this | other; }
   CPP_CONSTEXPR self_type operator-(const self_type& other) const
-  { return this->_M_flag ^ other._flag; }
+  { return this->flag_ ^ other._flag; }
 
   self_type& operator&=(const self_type& other)
   {
     for (std::size_t i = 0; i != _N; ++i)
-      ~_M_flag[i] &= other._flag[i];
+      ~flag_[i] &= other._flag[i];
     return *this;
   }
   self_type& operator|=(const self_type& other)
   {
     for (std::size_t i = 0; i != _N; ++i)
-      ~_M_flag[i] |= other._flag[i];
+      ~flag_[i] |= other._flag[i];
     return *this;
   }
 
@@ -487,7 +487,7 @@ private:
 public:
   constexpr self_type operator~() const
   {
-    return op_compl<1, _T>::run(_M_flag, ~_M_flag[0]);
+    return op_compl<1, _T>::run(flag_, ~flag_[0]);
   }
 #else
   self_type operator~(const self_type& other) const
@@ -501,16 +501,16 @@ public:
   void flip()
   {
     for (std::size_t i = 0; i != _N; ++i)
-      _M_flag[i] ^= bit::fill<_T>::value;
+      flag_[i] ^= bit::fill<_T>::value;
   }
 
   void clear(const self_type& remove)
-  { _M_flag ^= remove; }
+  { flag_ ^= remove; }
 
   void clear()
   {
     for (std::size_t i = 0; i != _N; ++i)
-      _M_flag[0] = 0;
+      flag_[0] = 0;
   }
 
 private:
@@ -535,14 +535,14 @@ public:
       return set_null();
     std::size_t d = n / (bit::size<_T>::value);
     n %= bit::size<_T>::value;
-    _M_flag[0] = _M_flag[d] << n;
+    flag_[0] = flag_[d] << n;
     for (std::size_t i = d; i != _N; ++i)
     {
-      _M_flag[i-d-1] |= _M_flag[i] << n >> n;
-      _M_flag[i] <<= n;
+      flag_[i-d-1] |= flag_[i] << n >> n;
+      flag_[i] <<= n;
     }
     while (d)
-      _M_flag[_N - d--] = 0;
+      flag_[_N - d--] = 0;
     return *this;
   }
 
@@ -562,12 +562,12 @@ public:
     n %= unsigned(bit::size<_T>::value);
     for (std::size_t i = _N-1; i != _N-1-d; --i)
     {
-      _M_flag[i] = _M_flag[i-d] >> n;
-      _M_flag[i] |= _M_flag[i-1-d] >> n << n;
+      flag_[i] = flag_[i-d] >> n;
+      flag_[i] |= flag_[i-1-d] >> n << n;
     }
-    _M_flag[d] >>= n;
+    flag_[d] >>= n;
     while (d)
-      _M_flag[--d] = 0;
+      flag_[--d] = 0;
     return *this;
   }
 
@@ -593,14 +593,14 @@ private:
 public:
   constexpr bool operator==(const self_type& other) const
   {
-    return op_eq<0, value_type>::run(_M_flag, other._M_flag);
+    return op_eq<0, value_type>::run(flag_, other.flag_);
   }
 #else
   bool operator==(const self_type& other) const
   {
     for (std::size_t i = 0; i != _N; ++i)
     {
-      if (_M_flag[i] != other._flag[i])
+      if (flag_[i] != other._flag[i])
         return false;
     }
     return true;
@@ -619,7 +619,7 @@ public:
   CPP_CONSTEXPR bool has(const self_type& other) const
   { return (*this & other) == other; }
   CPP_CONSTEXPR bool has(std::size_t other) const
-  { return (_M_flag[_N-1] & other) == other; }
+  { return (flag_[_N-1] & other) == other; }
   //@}
 
   /**
@@ -629,7 +629,7 @@ public:
   CPP_CONSTEXPR bool has_one(const self_type& other) const
   { return *this & other; }
   CPP_CONSTEXPR bool has_one(std::size_t other) const
-  { return _M_flag[_N-1] & other; }
+  { return flag_[_N-1] & other; }
   //@}
 };
 
