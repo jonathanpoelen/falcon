@@ -344,9 +344,7 @@ make_reverse_iterator
 
 attention au barriere (adl) pour begin et co
 
-is_character et is_string : enlever les remove_cv ? comment et std::is_array ou std::is_*
-
-range(I,I), range(I,n), range(n,n) (remplacer irange et make_iterator_range). Il y a range_container et seq()
+range(I,I), range(I,n), range(n,n) (remplacer irange et make_iterator_range). Il y a range_container, seq() et container::range()
 
 faire une fonction tuple_size() pour être compatible avec les tuple_like ET initializer_list
 
@@ -371,3 +369,8 @@ retravailler (certain sont déjà listé au-dessus)
  - coordinate
 
 integer_iterator -> integral_iterator (+merger avec le fichier integral_iterator)
+
+strided_iterator : voir integer_iterator
+integer_iterator : reference = value_type (par defaut)
+integer_iterator_with_step = strided_iterator<integer_iterator> ou enlever
+completer range

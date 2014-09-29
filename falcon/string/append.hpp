@@ -138,8 +138,8 @@ inline T& append(T& lhs, const U& rhs)
 template<typename T, typename U1, typename U2>
 inline T& append(T& lhs, const U1& rhs1, const U2& rhs2)
 {
-  const std::size_t sz1 = ::falcon::aux_::string::string_size::size(rhs1);
-  const std::size_t sz2 = ::falcon::aux_::string::string_size::size(rhs2);
+  const std::size_t sz1 = ::falcon::aux_::string::string_size<U1>::size(rhs1);
+  const std::size_t sz2 = ::falcon::aux_::string::string_size<U2>::size(rhs2);
   lhs.reserve(sz1 + sz2);
   append(lhs, rhs1, sz1);
   append(lhs, rhs2, sz2);
@@ -149,9 +149,9 @@ inline T& append(T& lhs, const U1& rhs1, const U2& rhs2)
 template<typename T, typename U1, typename U2, typename U3>
 inline T& append(T& lhs, const U1& rhs1, const U2& rhs2, const U3& rhs3)
 {
-  const std::size_t sz1 = ::falcon::aux_::string::string_size::size(rhs1);
-  const std::size_t sz2 = ::falcon::aux_::string::string_size::size(rhs2);
-  const std::size_t sz3 = ::falcon::aux_::string::string_size::size(rhs3);
+  const std::size_t sz1 = ::falcon::aux_::string::string_size<U1>::size(rhs1);
+  const std::size_t sz2 = ::falcon::aux_::string::string_size<U2>::size(rhs2);
+  const std::size_t sz3 = ::falcon::aux_::string::string_size<U3>::size(rhs3);
   lhs.reserve(sz1 + sz2 + sz3);
   append(lhs, rhs1, sz1);
   append(lhs, rhs2, sz2);

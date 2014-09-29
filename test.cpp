@@ -64,10 +64,16 @@
 //   }
 // };
 
-// #include <iostream>
+#include <iostream>
+#include <string>
+#include <falcon/range/range.hpp>
 
 int main()
 {
+  auto l = {1, 2, 3};
+  for (auto x : falcon::range(l.begin(), 2)) {
+    std::cout << x << ',';
+  }
 
 
 //   falcon::retain_free_object_allocator<int> allocator;

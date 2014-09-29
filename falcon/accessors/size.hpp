@@ -19,14 +19,27 @@ namespace accessors {
 template <typename T = void, typename Result = void>
 struct size
 {
-	typedef typename default_or_type<use_size_type<T>, Result, void>::type result_type;
+  typedef typename default_or_type<use_size_type<T>, Result, void>::type result_type;
   typedef T argument_type;
 
   CPP_CONSTEXPR size() {}
 
-	CPP_CONSTEXPR result_type operator()(const T& x) const
+  CPP_CONSTEXPR result_type operator()(const T& x) const
   CPP_NOEXCEPT_OPERATOR2(x.size())
   { return x.size(); }
+};
+
+template <class T, std::size_t N, class Result>
+struct size<T[N], Result>
+{
+	typedef typename default_or_type<use_size_type<T>, Result, void>::type result_type;
+  typedef T argument_type[N];
+
+  CPP_CONSTEXPR size() {}
+
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR std::size_t operator()(const T (&)[N]) const
+  { return N; }
 };
 
 template <>
@@ -43,6 +56,10 @@ struct size<void, void>
   std::size_t operator()(const T& x) const
   { return x.size(); }
 #endif
+
+  template<class T, std::size_t N>
+  CPP_CONSTEXPR std::size_t operator()(const T (&)[N]) const
+  { return N; }
 };
 
 CPP_GLOBAL_CONSTEXPR size<> size_f;
