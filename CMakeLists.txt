@@ -18,5 +18,5 @@ add_subdirectory(test)
 
 # enable_testing()
 
-# find test -type f -perm 755 | while read l ; do $l >/dev/null ; done |& grep -v \ passed
+# find test -type f -executable | while read l ; do $l >/dev/null ; done |& grep -v \ passed
 

@@ -11,7 +11,7 @@ void set_file_contents_test()
   int err;
   std::string str = falcon::iostreams::get_file_contents("/tmp/l", &err);
   CHECK_EQUAL_VALUE("plop", str);
-  CHECK_EQUAL_VALUE(true, err);
+  CHECK_EQUAL_VALUE(0, err);
 }
 
 FALCON_TEST_TO_MAIN(set_file_contents_test)

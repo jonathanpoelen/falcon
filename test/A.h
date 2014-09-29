@@ -1,7 +1,6 @@
-#ifndef _FALCON_TEST_A_H
-#define _FALCON_TEST_A_H
+#ifndef FALCON_TEST_A_H
+#define FALCON_TEST_A_H
 
-#include <boost/current_function.hpp>
 #include <iostream>
 
 struct A{
@@ -24,7 +23,7 @@ struct A{
   A operator+(int ii)const { std::cout << "A& A::operator+(" << ii << ')' << std::endl; return A(i+ii);}
   A operator+(const A&a)const { std::cout << "A& A::operator+(A(" << a.i << "))" << std::endl; return A(i+a.i);}
 
-  operator int() const {std::cout << BOOST_CURRENT_FUNCTION << std::endl; return i;}
+  operator int() const {std::cout << "A::operator int() const" << std::endl; return i;}
 
   A* address() { return this; }
   const A* address() const { return this; }
