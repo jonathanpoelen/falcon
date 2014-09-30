@@ -5,19 +5,20 @@
 #include <falcon/range/iterator_range.hpp>
 #include <falcon/iterator/integer_iterator.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(is_integral)
+#include FALCON_BOOST_OR_STD_TRAITS(remove_cv)
 
 namespace falcon {
 
 namespace aux_ {
   template<class Iterator,
     bool = FALCON_BOOST_OR_STD_NAMESPACE::is_integral<Iterator>::value>
-  struct make_range {
+  struct make_range_impl {
     typedef ::falcon::iterator_range<Iterator> iterator_range;
     //typedef ::falcon::iterator_range<Iterator> iterator_range_with_step;
   };
 
   template<class Integral>
-  struct make_range<Integral, true> {
+  struct make_range_impl<Integral, true> {
     typedef ::falcon::iterator::integer_iterator<Integral> integer_iterator;
     typedef ::falcon::iterator_range<integer_iterator> integral_range;
     typedef ::falcon::iterator::integer_iterator_with_step<
@@ -26,6 +27,11 @@ namespace aux_ {
     typedef ::falcon::iterator_range<integer_iterator_with_step>
       integral_range_with_step;
   };
+
+  template<class T>
+  struct make_range
+  : make_range_impl<typename FALCON_BOOST_OR_STD_NAMESPACE::remove_cv<T>::type>
+  {};
 }
 
 template<class Iterator, class IteratorOrSize>

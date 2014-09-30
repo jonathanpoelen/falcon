@@ -292,11 +292,8 @@ bool operator>=(
 
 template<class Iterator>
 CPP_CONSTEXPR iterator_range<Iterator>
-make_iterator_range(Iterator CPP_RVALUE x, Iterator CPP_RVALUE y)
-{
-  return iterator_range<Iterator>(
-    FALCON_FORWARD(Iterator, x), FALCON_FORWARD(Iterator, y));
-}
+make_iterator_range(Iterator x, Iterator y)
+{ return iterator_range<Iterator>(x, y); }
 
 template<class Iterator>
 iterator_range<Iterator>

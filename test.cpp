@@ -67,11 +67,14 @@
 #include <iostream>
 #include <string>
 #include <falcon/range/range.hpp>
+#include <falcon/iterator/strided_iterator.hpp>
 
 int main()
 {
-  auto l = {1, 2, 3};
-  for (auto x : falcon::range(l.begin(), 2)) {
+  auto l = {1, 2, 3, 4, 5, 6, 7};
+  auto first = falcon::iterator::make_safe_strided_iterator(l.begin(), 2);
+  auto last = falcon::iterator::make_safe_strided_iterator(l.end(), 2);
+  for (auto x : falcon::range(first, last)) {
     std::cout << x << ',';
   }
 
