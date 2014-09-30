@@ -22,7 +22,7 @@
 #include <falcon/functional/compose.hpp>
 #include <falcon/functional/operators.hpp>
 #include <falcon/iterator/nexter_iterator.hpp>
-#include <falcon/iterator/integer_iterator.hpp>
+#include <falcon/iterator/integral_iterator.hpp>
 
 /**
  * struct Enumerator
@@ -304,15 +304,15 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 #define __FALCON_PP_LIST_ENUM_RULE_START_lbit(start) (start)
 #define __FALCON_PP_LIST_ENUM_RULE_START_rbit(start) (start)
 
-///TODO utiliser un integer_iterator est vraiment utile ?
+///TODO utiliser un integral_iterator est vraiment utile ?
 
-///TODO utiliser un integer_iterator<const enum_t> ?
+///TODO utiliser un integral_iterator<const enum_t> ?
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_default(rule)\
   ::falcon::iterator::nexter_iterator<\
-    ::falcon::iterator::integer_iterator<enum_t>,\
+    ::falcon::iterator::integral_iterator<enum_t>,\
     ::falcon::unary_compose<\
       ::falcon::increment_emulation<enum_t>,\
-      ::falcon::pointer<falcon::iterator::integer_iterator<enum_t> >\
+      ::falcon::pointer<falcon::iterator::integral_iterator<enum_t> >\
     >\
   >
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_linear(n)\
@@ -320,9 +320,9 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step(n) __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step_I
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_step_I(rule)\
   ::falcon::iterator::nexter_iterator<\
-    ::falcon::iterator::integer_iterator<enum_t>,\
+    ::falcon::iterator::integral_iterator<enum_t>,\
     ::falcon::detail::enum_class::__nexter_step<\
-      ::falcon::iterator::integer_iterator<enum_t>,\
+      ::falcon::iterator::integral_iterator<enum_t>,\
       __FALCON_PP_LIST_ENUM_RULE_STEP_ ## rule\
     >\
 	>

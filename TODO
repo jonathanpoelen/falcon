@@ -214,8 +214,6 @@ iterator_handler: faire en sorte que recoil dépende de advance. Idem pour next 
 
 pas de namespace iterator
 
-pas de category selectif dans un integer_iterator
-
 get_file_contents qui prend en param un objet quelconque et qui utilise resize+data ou un trait. spécialisation pour le string car pas de data ? virer la partie specifique c++11, se débrouiller pour rester comptible
 
 functional/operators.hpp: séparer dans plusieurs fichier. Ne pas oublier le move sémantique dans les opérateurs
@@ -291,8 +289,6 @@ fake_container qui definit les protos et les types des containers standars (fake
 
 placeholders -> placeholder
 
-le dossier range a sup, deplacer les fichiers
-
 [int,bool,...]_constant dans integral_constant pour c++11
 
 or_c and and_c (dans type_traits) à optimisé (ne fait pas ::value)
@@ -363,9 +359,8 @@ retravailler (certain sont déjà listé au-dessus)
  - tree
  - coordinate
 
-integer_iterator -> integral_iterator (+merger avec le fichier integral_iterator)
+container_view n'est-il pas en copie avec ptr_container ou iterator_range ? seq,rseq,etc mem perimetre que range ?
+faire un reverse_range (-> rseq ?) qui ne fait que reverse_iterator pour begin/end.
 
-strided_iterator : voir integer_iterator
-integer_iterator : reference = value_type (par defaut)
-integer_iterator_with_step = strided_iterator<integer_iterator> ou enlever
-completer range
+
+

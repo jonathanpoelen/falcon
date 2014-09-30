@@ -3,12 +3,14 @@
 
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/reference.hpp>
+#include <falcon/c++/boost_or_std.hpp>
+#include <falcon/type_traits/enable_if.hpp>
 #include <falcon/container/range_access.hpp>
-#include <falcon/utility/move.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <cassert>
+#include FALCON_BOOST_OR_STD_TRAITS(is_integral)
 
 namespace falcon {
 
@@ -57,22 +59,25 @@ public:
   {}
 
   template<class IteratorT>
-  iterator_range(IteratorT first, size_type n)
-  : first_(first)
-#if __cplusplus >= 201103L
-  , last_(std::next(first, difference_type(n)))
-#else
-  , last_(first+difference_type(n))
-#endif
-  {}
-
-  template<class IteratorT>
   iterator_range(IteratorT first, difference_type n)
   : first_(first)
 #if __cplusplus >= 201103L
   , last_(std::next(first, n))
 #else
   , last_(first+n)
+#endif
+  {}
+
+  template<
+    class IteratorT , class Integral
+  , class = typename enable_if_c<
+    FALCON_BOOST_OR_STD_NAMESPACE::is_integral<Integral> >::type>
+  iterator_range(IteratorT first, Integral n)
+  : first_(first)
+#if __cplusplus >= 201103L
+  , last_(std::next(first, difference_type(n)))
+#else
+  , last_(first+difference_type(n))
 #endif
   {}
 
