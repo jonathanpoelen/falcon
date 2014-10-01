@@ -33,7 +33,7 @@ public:
 
 public:
   explicit container_view()
-  : container_()
+  : container_(0)
   , access_()
   {}
 
@@ -65,28 +65,36 @@ public:
   : container_(&container)
   , access_(std::forward<Args>(argtraits)...)
   {}
-#endif
-
+  container_view(const container_view& other) = default;
+  container_view(container_view&& other) = default;
+  container_view& operator=(const container_view& other) = default;
+  container_view& operator=(container_view&& other) = default;
+#else
   container_view(const container_view& other)
   : container_(other.container_)
   , access_(other.access_)
   {}
 
-  bool valid()
-  { return container_ != nullptr; }
-
-  container_view& operator=(container_view& other)
+  container_view& operator=(const container_view& other)
   {
-        container_ = other.container_;
-        access_ = other.access_;
+    container_ = other.container_;
+    access_ = other.access_;
     return *this;
   }
+#endif
 
   container_view& operator=(container_type& other)
   {
-        container_ = &other;
+    container_ = &other;
     return *this;
   }
+
+#if __cplusplus >= 201103L
+  explicit operator bool () const noexcept
+#else
+  operator void* () const
+#endif
+  { return container_; }
 
   iterator begin() const
   { return access_.begin(base()); }
@@ -95,7 +103,7 @@ public:
   { return access_.end(base()); }
 
   value_type& operator[](difference_type n) const
-  { return *(begin() + n); }
+  { return container_[n]; }
 
   void swap(container_view& other)
   {
@@ -103,16 +111,6 @@ public:
     swap(access_, other.access_);
     swap(container_, other.container_);
   }
-
-  template<class Access2>
-  void swap_container(container_view<Container, Access2>& other)
-  {
-    using std::swap;
-    swap(container_, other._container);
-  }
-
-  operator container_type&() const
-  { return base(); }
 
   container_type& base() const
   { return *container_; }
@@ -153,17 +151,16 @@ struct build_reverse_container_view
 };
 
 #if __cplusplus >= 201103L
-template<class Container,
-  class Access = reverse_range_access_traits<const Container> >
-using const_container_view = container_view<const Container, Access>;
+template<class Container>
+using const_container_view
+  = container_view<const Container, range_access_traits<const Container>>;
 
-template<class Container,
-  class Access = reverse_range_access_traits<Container> >
-using reverse_container_view = container_view<Container, Access>;
+template<class Container>
+using reverse_container_view
+  = container_view<Container, reverse_range_access_traits<Container>>;
 
-template<class Container,
-  class Access = reverse_range_access_traits<const Container> >
-using const_reverse_container_view = container_view<const Container, Access>;
+template<class Container>
+using const_reverse_container_view = reverse_container_view<const Container>;
 #endif
 
 
@@ -173,14 +170,48 @@ seq(Container& cont)
 { return container_view<Container>(cont); }
 
 template<class Container, class Access>
-typename enable_if_not_integral<Access, container_view<Container, Access> >::type
+typename enable_if_not_integral<
+  Access, container_view<Container, Access> >::type
 seq(Container& cont, Access access)
 { return container_view<Container, Access>(cont, access); }
+
+#if __cplusplus >= 201103L
+template<class Container, class Access>
+typename enable_if_not_integral<
+  Access, container_view<const Container, Access> >::type
+seq(const Container& cont, Access access)
+{ return container_view<const Container, Access>(cont, access); }
+
+template<class Container, class Access>
+typename enable_if_not_integral<
+Access, container_view<Container, Access> >::type
+seq(Container&& cont, Access access)
+{ return container_view<Container, Access>(cont, access); }
+#endif
+
 
 template<class Container>
 container_view<Container, reverse_range_access_traits<Container> >
 rseq(Container& cont)
-{ return container_view<Container, reverse_range_access_traits<Container> >(cont); }
+{
+  return container_view<
+    Container,
+    reverse_range_access_traits<Container>
+  >(cont);
+}
+
+#if __cplusplus >= 201103L
+template<class Container>
+reverse_container_view<const Container>
+rseq(const Container& cont)
+{ return reverse_container_view<const Container>(cont); }
+
+template<class Container>
+reverse_container_view<const Container>
+rseq(Container&& cont)
+{ return reverse_container_view<const Container>(cont); }
+#endif
+
 
 template<class Container>
 container_view<const Container>
@@ -192,14 +223,21 @@ container_view<const Container, Access>
 cseq(const Container& cont, Access access)
 { return container_view<const Container, Access>(cont, access); }
 
+
 template<class Container>
 container_view<const Container, reverse_range_access_traits<const Container> >
 crseq(const Container& cont)
-{ return container_view<const Container, reverse_range_access_traits<const Container> >(cont); }
+{
+  return container_view<
+    const Container,
+    reverse_range_access_traits<const Container>
+  >(cont);
+}
+
 
 template<class Container, class Access>
-void swap(container_view<Container, Access>& a,
-          container_view<Container, Access>& b)
+void swap(
+  container_view<Container, Access>& a, container_view<Container, Access>& b)
 { a.swap(b); }
 
 }

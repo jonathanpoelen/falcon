@@ -1,10 +1,4 @@
-little_endian et big_endian non vérifier
-number.hpp pas finalisée
-voir les TODO et NOTE de endian.hpp
-
 fonction de construction par lot voir bits/stl_uninitialized.h et bits/stl_construct.h (+implementation qui ne fait pas de destruction en passant par exemple un no_garbage_collector_t ou en indiquand dans le nom uninitialized_without_garbage_collector qui retourne un objet avec l'exceptions ou non et l'iterator de fin). fichier à mettre dans memory. Trouver un autre nom que garbage_collector.
-
-rendre operators.hpp un peu compatible c++89
 
 modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit une expression. Donc CPP0X_PROTO(f(char), (int)), CPP0X_DELEGATE_FUNCTION(f(char c), (c+8)). Faire un CPP0X_PROTO_EXPR qui fait comme CPP0X_DELEGATE_FUNCTION mais avec juste le prototype.
 
@@ -333,7 +327,7 @@ non_owner_ptr : le faire avec unique_ptr + destructeur qui ne fait rien ? (le no
 
 faire pour begin/end et les autres la même méthode que pour swap
 
-make_reverse_iterator
+make_reverse_iterator (et rev_iter)
 
 attention au barriere (adl) pour begin et co
 
@@ -347,7 +341,7 @@ limit_array
 
 retravailler (certain sont déjà listé au-dessus)
  - flag (pas d'opérateur +,-,* sauf pour faire des op binaire, istream non fait)
- - number (comparer avec l'implémentation de boost... ?)
+ - number (comparer avec l'implémentation de boost... ?) à sup
  - bits (+ bswap_32, etc)
  - parameter
  - template
@@ -359,8 +353,6 @@ retravailler (certain sont déjà listé au-dessus)
  - tree
  - coordinate
 
-container_view n'est-il pas en copie avec ptr_container ou iterator_range ? seq,rseq,etc mem perimetre que range ?
-faire un reverse_range (-> rseq ?) qui ne fait que reverse_iterator pour begin/end.
 
 
 
