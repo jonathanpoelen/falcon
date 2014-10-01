@@ -341,7 +341,6 @@ limit_array
 
 retravailler (certain sont déjà listé au-dessus)
  - flag (pas d'opérateur +,-,* sauf pour faire des op binaire, istream non fait)
- - number (comparer avec l'implémentation de boost... ?) à sup
  - bits (+ bswap_32, etc)
  - parameter
  - template
