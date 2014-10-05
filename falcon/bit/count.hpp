@@ -20,6 +20,7 @@ namespace aux_ {
 ///count number of bits set in a byte
 template<class T>
 CPP_CONSTEXPR T count(T x) CPP_NOEXCEPT
+// TODO __builtin_popcountl
 { return aux_::count_impl::impl(x >> 1, x & 1); }
 
 }

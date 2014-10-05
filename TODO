@@ -340,7 +340,7 @@ mutable_pointer et store_if = bof
 limit_array
 
 retravailler (certain sont déjà listé au-dessus)
- - flag (pas d'opérateur +,-,* sauf pour faire des op binaire, istream non fait)
+ - flag (istream non fait)
  - bits (+ bswap_32, etc)
  - parameter
  - template
@@ -352,6 +352,12 @@ retravailler (certain sont déjà listé au-dessus)
  - tree
  - coordinate
 
+bit_reference et flag[_base]::reference à merger. Mettre un trait dans bit_reference et utiliser un typedef pour flag::referene
 
+revoir les fonctions dans bit/ pour ne pas les rendre recursive. (cosntexpr pour c++14)
 
+un stringstream (ou/et buffer) qui n'alloue pas de chaîne (utilise un cstring)
 
+get_line
+
+un make_unique qui prend un allocator et le deleter qui le wrap
