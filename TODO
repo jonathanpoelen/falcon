@@ -361,3 +361,5 @@ un stringstream (ou/et buffer) qui n'alloue pas de chaîne (utilise un cstring)
 get_line
 
 un make_unique qui prend un allocator et le deleter qui le wrap
+
+using deep_ptr<T> = unique_ptr<T, not_delete> ?

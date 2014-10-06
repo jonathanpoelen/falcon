@@ -64,12 +64,17 @@
 //   }
 // };
 
+#include <falcon/flag/flag.hpp>
 #include <iostream>
-// #include <falcon/range/range.hpp>
+#include <bitset>
 
 int main()
 {
-  ;
+  falcon::bitflag<unsigned> f;
+  f.flip();
+  std::cout << f << std::endl;
+  unsigned i = f.get();
+  return int(f.to_ulong() + i);
 
 //   falcon::retain_free_object_allocator<int> allocator;
 //   allocator.deallocate(allocator.allocate(2), 2);
