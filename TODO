@@ -340,7 +340,6 @@ mutable_pointer et store_if = bof
 limit_array
 
 retravailler (certain sont déjà listé au-dessus)
- - flag (istream non fait)
  - bits (+ bswap_32, etc)
  - parameter
  - template

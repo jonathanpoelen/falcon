@@ -4,7 +4,7 @@ include_directories(..)
 set(EXECUTABLES
 	math
 	enumerator
-	flag
+	bitflags
 	infinite
 	lambda
 	logical
