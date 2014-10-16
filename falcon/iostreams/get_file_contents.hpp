@@ -23,6 +23,9 @@ int get_file_contents(String& s, const char * name)
 
   std::basic_filebuf<char_type, traits_type> buf;
 
+  char_type c;
+  buf.pubsetbuf(&c, 1);
+
   if (!buf.open(name, std::ios::in)) {
     return errno;
   }

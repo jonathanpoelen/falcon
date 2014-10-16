@@ -24,6 +24,8 @@ set_file_contents(
   if (size)
   {
     std::basic_filebuf<CharT> sbout;
+    CharT c;
+    sbout.pubsetbuf(&c, 1);
     if (sbout.open(name, std::ios_base::out)) {
       return sbout.sputn(s, size);
     }
