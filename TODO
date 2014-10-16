@@ -361,8 +361,6 @@ get_line
 
 un make_unique qui prend un allocator et le deleter qui le wrap
 
-using deep_ptr<T> = unique_ptr<T, not_delete> ?
+collision de range (insert,extend[r,l],rien)
 
-colision de range (insert,extend[r,l],rien)
-
-allocate -> allocate_t + allocate function
+delete[] en c++14 prend un size_t

@@ -15,7 +15,7 @@ void new_test() {
 	std::stringstream ss;
 	std::streambuf* oldbuf = std::cout.rdbuf(ss.rdbuf());
 	{
-		A* i = falcon::allocate<A>()();
+		A* i = falcon::allocate<A>();
 		A* keep = i;
 		falcon::construct(i,4);
 		CHECK_EQUAL_VALUE(ss.str(), "A(4)\n"); ss.str("");
@@ -27,7 +27,7 @@ void new_test() {
 		CHECK_EQUAL_VALUE(keep, i);
 		falcon::destroy(i);
 		CHECK_EQUAL_VALUE(ss.str(), "~A(8)\n"); ss.str("");
-		falcon::deallocate<A>()(i);
+		falcon::deallocate<A>(i);
 
 		i = falcon::default_new<A>()(20);
 		CHECK_EQUAL_VALUE(ss.str(), "A(20)\n"); ss.str("");

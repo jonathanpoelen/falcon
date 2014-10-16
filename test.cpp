@@ -64,15 +64,10 @@
 //   }
 // };
 
-#include <falcon/bitflags.hpp>
-#include <iostream>
+// #include <iostream>
 
 int main()
 {
-  falcon::bitflags<unsigned> f(0xff);
-  f -= 0x11u;
-  f -= 0x11u;
-  std::cout << f << std::endl;
 
 //   falcon::retain_free_object_allocator<int> allocator;
 //   allocator.deallocate(allocator.allocate(2), 2);

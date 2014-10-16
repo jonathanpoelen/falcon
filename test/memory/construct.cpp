@@ -35,7 +35,7 @@ void construct_test()
   A * p3 = falcon::default_new<A[2]>()(A{1},A{7});
   C * p4 = falcon::default_new<C>()(5,6,8);
   D aa {{1, 2}, {3, 4}};
-  D * p5 = falcon::allocate<D>()();
+  D * p5 = falcon::allocate<D>();
   falcon::construct(p5, aa);
 
   CHECK(p1->x == 2);
@@ -56,7 +56,7 @@ void construct_test()
   std::default_delete<A[]>()(p3);
   std::default_delete<C>()(p4);
   falcon::destroy(p5);
-  falcon::deallocate<D>()(p5);
+  falcon::deallocate(p5);
 }
 
 FALCON_TEST_TO_MAIN(construct_test)
