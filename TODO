@@ -55,8 +55,6 @@ enlever les doubles underscore car reservé. Idem pour les underscores suivit de
 Vérifier les types tag dans les iterateurs.
 Ajouter dans les iterators les fonctions pour acceder aux fonctorx lorsque ceux-ci en utilisent (fn() ?).
 
-tuple_get_accessor → get_idx_accessor ? get_index_accessor ?
-
 late_delegation<_FunctorTemplate, _FunctorAllocator = always<> > -> operator(…) { return _FunctorAllocator(…) } ; _FunctorAllocator -> return _ClassTemplate<_T>()
 
 ajouter PP dans les macros de preprocessor (FALCON_CAT ⇒ FALCON_PP_CAT) qui sera remplacé par BOOST_PP_CAT
@@ -98,8 +96,6 @@ fonction pour simplifier les operations sur buffer (renvoit false si eof):
 	sgetc: bool sgetc(buffer, &c)
 	ios/streambuf.hpp
 intrusive data stream (eback, gptr, egptr, pbase, pptrm epptr). Retourne les valeurs interne de ces pointeurs (mettre dans ios/)
-
-tuple/detail/operateurs.hpp ? -> tuple/tuple_manip.hpp : et implementation pour tout qui se comporte comme un tuple
 
 classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.h). (header different pour vs++ ?). Voir boost.simd
 
@@ -195,15 +191,9 @@ un tableau de taille fixe à plusieurs dimension aplati (flat_array<T, size_t...
 
 split operators dans plein de fichier (1 opérateur par fichier). Idem pour celui sur les enum, idem pour les algorithm/range
 
-le traits badar pour tranformer les signé en non-signé et inversement peuvent être remplacés par std::make_signed et std::make_unsigned
-
 renommer build_class en make_type, build_type, make_of ou autre
 
-iterator_handler: faire en sorte que recoil dépende de advance. Idem pour next avec prev
-
 pas de namespace iterator
-
-get_file_contents qui prend en param un objet quelconque et qui utilise resize+data ou un trait. spécialisation pour le string car pas de data ? virer la partie specifique c++11, se débrouiller pour rester comptible
 
 functional/operators.hpp: séparer dans plusieurs fichier. Ne pas oublier le move sémantique dans les opérateurs
 
@@ -211,8 +201,6 @@ http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/#mailing2014-01 (entre a
 
 natsort compare + avec locale (voir implémentation de martin pool (lien dans la doc php de natsort) et aussi en javascript dans katepart commands/utils.js)
 char_trait insentive case (ci_char_trait). Note et boost ?
-
-faire une passe sur les fonctions prenant des references constantes ou/et des rvalue (argument conservé par la fonction) en valeur dure. Utiliser une des macro pour les codes non C++11
 
 adaptater -> view ? Pas pour tous. Les transformer en vues si possible
 
@@ -235,13 +223,7 @@ synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier l
 
 utiliser boost::addressof ou std::addressof (dans <memory>). enlever detail/addressof.hpp
 
-enable_if_type_exist: Voir comment cela est fait dans les classes de sfinae pour le rafiner
-
-has_${machin} -> has_${machin}_member ? Idem pour use_* et restrict_* ?
-
 const parameter_index & -> parameter_index
-
-regrouper ostream et istream dans iostreams et faire un namespace iostreams
 
 suffixer les types des foncteurs variable avec _f plutôt que _t ?
 
@@ -251,13 +233,9 @@ un objet mutable avec tous les operators (cast implicite pour ne pas tous les fa
 
 dynamic_callback avec range. Autre fonction ? paramètres supplémentaire au début qui représente des indices ou des ranges ?
 
-bug memoire dans flag. flag -> std::bitset ? (héritage ?)
-
 un objet qui créer un arbre de condition dichtomique xxx(yyy(value_ref, f),...)
 
 les maker en foncteur ?
-
-modifier les fonction d'accesseur (+accessors/get) sur get pour y ajouter le get de type et constexpr. Faire une simplification pour synchroniser et arguments_wrapper en utilisant que le forwading sur std::get
 
 tuple_apply -> apply_from_tuple
 
@@ -267,8 +245,6 @@ macro pour créer les fonctions de comparaisons !=, >, <=, >=
 macro pour créer les operateurs arithmetique +, -, /, %, *
 macro pour créer les operateurs bitwise &, |, ^, <<, >>
 macro pour créer les operateurs de post incrementation et post decrementation
-
-reference_vector -> reference_container + reference_accosiative_container (le premier peut si key_type existe utiliser le second ?)
 
 simplifier arg/* en utilisant les types parameter et autres
 
@@ -286,8 +262,6 @@ synchronizer: une vue
 
 un objet transaction qui dans son destructeur fait un commit si aucune exception n'est lancée, sinon un rollback (std::uncaught_exception())
 
-class_maker (renommage de late_maker) (différence avec build_class ?)
-
 comment le type interne des bucket des containers std::unordered_* ?
 
 iterator: posibilité de compararer avec l'itérateur interne
@@ -304,8 +278,6 @@ variable fonction pour les algorithmes, manipulateurs de flux, fonctions utilita
 
 passer par des tuples quand les types internes peuvent être des structures vides
 
-constructor<T>, destructor(pa|a), new_ptr<T>, new_array<T>(sz|arg_list...), delete_ptr, delete_array,
-
 filter_type<int, float>
 filter_type<???<is_integral>>
 filter_type<...>::template fiter<T>::value
@@ -316,13 +288,10 @@ allocator_adapter: rebind ne change pas l'allocateur internet mais modifier les 
 
 mettre des noexcept pour les fichiers dans memory
 
-non_owner_ptr : le faire avec unique_ptr + destructeur qui ne fait rien ? (le nommer et le mettre dans fonctionnal)
-
-faire pour begin/end et les autres la même méthode que pour swap
-
 make_reverse_iterator (et rev_iter)
 
 attention au barriere (adl) pour begin et co
+faire pour begin/end et les autres la même méthode que pour swap
 
 faire une fonction tuple_size() pour être compatible avec les tuple_like ET initializer_list
 
@@ -348,13 +317,15 @@ bit_reference et flag[_base]::reference à merger. Mettre un trait dans bit_refe
 
 revoir les fonctions dans bit/ pour ne pas les rendre recursive. (cosntexpr pour c++14)
 
-un stringstream (ou/et buffer) qui n'alloue pas de chaîne (utilise un cstring)
+un stringstream (ou/et buffer) qui n'alloue pas de chaîne (utilise un cstring) (cstringstream + cstringbuf)
 
-get_line
+get_line (see proposal)
 
 un make_unique qui prend un allocator et le deleter qui le wrap
 
 collision de range (insert,extend[r,l],rien)
 
 delete[] en c++14 prend un size_t
+
+revoir les construct, destruct,default_new, etc pour refaire des fonctions libres et harmoniser les noms
 

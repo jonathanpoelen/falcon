@@ -1,17 +1,19 @@
 #ifndef FALCON_FUNCTIONAL_DYNAMIC_CALLBACK_HPP
 #define FALCON_FUNCTIONAL_DYNAMIC_CALLBACK_HPP
 
+#include <falcon/tuple/get.hpp>
 #include <falcon/utility/unpack.hpp>
-#include <falcon/tuple/detail/tuplefwd.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 
 #include <utility>
 
 namespace falcon {
 
-template<typename Callbacks, std::size_t... Indexes, typename... Args>
-bool dynamic_callback(parameter_index<Indexes...>, Callbacks callbacks,
-                      std::size_t id, Args&&... args)
+template<class Callbacks, std::size_t... Indexes, class... Args>
+bool dynamic_callback(
+  parameter_index<Indexes...>
+, Callbacks callbacks
+, std::size_t id, Args&&... args)
 {
   bool test = false;
   FALCON_UNPACK((
@@ -22,7 +24,7 @@ bool dynamic_callback(parameter_index<Indexes...>, Callbacks callbacks,
   return test;
 }
 
-template<typename Callbacks, typename... Args>
+template<class Callbacks, class... Args>
 bool dynamic_callback(Callbacks callbacks, std::size_t id, Args&&... args)
 {
   return dynamic_callback<Callbacks&>(
@@ -31,29 +33,31 @@ bool dynamic_callback(Callbacks callbacks, std::size_t id, Args&&... args)
   );
 }
 
-namespace _aux {
-  template<typename T, typename... Args>
+namespace aux_ {
+  template<class T, class... Args>
   void dynamic_callback_elem(Args&&... args)
   { T()(std::forward<Args>(args)...); }
 }
 
-template<typename... Ts, std::size_t... Indexes, typename... Args>
+template<class... Ts, std::size_t... Indexes, class... Args>
 bool dynamic_callback(parameter_index<Indexes...>, std::size_t id, Args&&... args)
 {
   bool test = false;
   FALCON_UNPACK((
     Indexes == id
-    ? (test = true, _aux::dynamic_callback_elem<Ts>(std::forward<Args>(args)...))
+    ? (test = true, aux_::dynamic_callback_elem<Ts>(std::forward<Args>(args)...))
     : void()
   ));
   return test;
 }
 
-template<typename... Ts, typename... Args>
+template<class... Ts, class... Args>
 bool dynamic_callback(std::size_t id, Args&&... args)
 {
-  return dynamic_callback<Ts...>(build_parameter_index_t<sizeof...(Ts)>(),
-                                 id, std::forward<Args>(args)...);
+  return dynamic_callback<Ts...>(
+    build_parameter_index_t<sizeof...(Ts)>(),
+    id, std::forward<Args>(args)...
+  );
 }
 
 }

@@ -17,7 +17,7 @@
 namespace falcon {
 namespace accessors {
 
-namespace _aux {
+namespace aux_ {
   template <class T>
   struct result_get
   {
@@ -35,7 +35,7 @@ namespace _aux {
 template <class T = void, class Result = void>
 struct get
 {
-  typedef typename default_or_type<_aux::result_get<T>, Result, void>::type result_type;
+  typedef typename default_or_type<aux_::result_get<T>, Result, void>::type result_type;
   typedef T argument_type;
 
   CPP_CONSTEXPR get() {}
@@ -56,7 +56,7 @@ struct get<void, void>
     operator()(T& x) const
   , x.get())
 #else
-  typename _aux::result_get<T>::type
+  typename aux_::result_get<T>::type
   operator()(T& x) const
   { return x.get(); }
 #endif
