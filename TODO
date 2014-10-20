@@ -4,11 +4,6 @@ modifier CPP0X_PROTO et CPP0X_DELEGATE_FUNCTION pour que le second argument soit
 
 objet optimiser pour la conversion de chiffre en chaine numeric_string<TypeInt, CharT, CharTraits>. Notamment pour ce qui est de l'incrementation de chaine (et l'incrementation répercuter en general (ex: unite puis dizaine, etc)). pouvoir utilisé des char* ou std::string. Le CharTraits fait l'affaire ? faire un typedef pour le c et wchar en string ou non. (cnumeric_string, cnumeric_wstring, numeric_string, numeric_wstring). Le type char* peut fonctionner avec unique_ptr. Laisser à l'utilisateur choisir le container de stockage (on boucle dessus avec infinite_iterator pour écrire les chiffres)
 
-flag.hpp: doit possèder un constructeur avec avec initializer_list.
-flag<>::operator[n] : bit_flag<> ? bit_wrapper<_T>{_T*} ?
-enlever la hack qui permet une fonction consexpr en n'utilisant pas de boucle. C++14 permet les fonctions constexpr avec des boucles. Nouvelle macro ?
-valgrind retourne un jump sur variable non initialisée
-
 optimiser recursive_iterator (et l'algo de recursion) pour les tableaux. En partant du principe que a[x][y] = a[x*y] ne faire qu'une boucle
 
 optimisation de taille des enum class: enum class E : typename std::conditional<l.size() == 2, bool, int>::type {…}; (minimal_int<>::type ?)
@@ -227,8 +222,6 @@ fixed_grid_cross, grid_cross -> grid_cross_view
 
 allocator qui alloue plusieurs bloc.
 
-basic_cstring (et basic_string) prent-il en compte les manipulateur de flux dans operator << et >>
-
 max_size dans les allocateurs est le nombre max d'element que alloc() peut théoriquement faire.
 
 pas besoin de swap si move construceur/assignement
@@ -364,3 +357,4 @@ un make_unique qui prend un allocator et le deleter qui le wrap
 collision de range (insert,extend[r,l],rien)
 
 delete[] en c++14 prend un size_t
+
