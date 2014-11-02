@@ -2,7 +2,7 @@
 #define FALCON_ITERATOR_GET_ACCESSOR_ITERATOR_HPP
 
 #include <falcon/iterator/indirect_iterator.hpp>
-#include <falcon/accessors/get.hpp>
+#include <falcon/fn/get.hpp>
 #include <iterator>
 
 namespace falcon {
@@ -15,7 +15,7 @@ class build_get_accessor_iterator
 public:
 	typedef falcon::iterator::indirect_iterator<
 		Iterator,
-		falcon::accessors::get<x_value_type>,
+		falcon::fn::get_fn,
 		typename x_value_type::type
 	> type;
 };

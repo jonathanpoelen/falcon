@@ -66,8 +66,24 @@
 
 // #include <iostream>
 
+
+#include <iostream>
+#include <vector>
+#include <array>
+#include <falcon/fn.hpp>
+
+namespace fn = falcon::fn;
+
 int main()
 {
+  std::vector<std::array<int, 2>> v{
+    {{1, 2}}
+  , {{2, 3}}
+  , {{3, 4}}
+  };
+
+  return int(fn::_1(fn::self(fn::tuple_get<1>()(fn::front(v)))));
+
 
 //   falcon::retain_free_object_allocator<int> allocator;
 //   allocator.deallocate(allocator.allocate(2), 2);

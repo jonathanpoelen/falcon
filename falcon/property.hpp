@@ -5,7 +5,8 @@
 #include <type_traits>
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/default_or_type.hpp>
-#include <falcon/accessors/return_reference.hpp>
+#include <falcon/fn/self.hpp>
+#include <falcon/fn/unref.hpp>
 #include <falcon/type_traits/eval_if.hpp>
 
 namespace falcon {
@@ -27,7 +28,7 @@ using properties_t = int;
 
 namespace aux_ {
   template<typename T>
-  using get_property = accessors::return_reference<T>;
+  using get_property = fn::self_fn;
 
 
   template<typename T>

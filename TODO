@@ -327,5 +327,5 @@ collision de range (insert,extend[r,l],rien)
 
 delete[] en c++14 prend un size_t
 
-revoir les construct, destruct,default_new, etc pour refaire des fonctions libres et harmoniser les noms
+is_transparent pour les opérateurs de comparaison en c++14
 
