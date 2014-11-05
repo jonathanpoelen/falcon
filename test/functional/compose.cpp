@@ -6,7 +6,7 @@
 void compose_test()
 {
 	typedef falcon::increment<int> increment;
-	typedef falcon::pointer<int*> pointer;
+	typedef falcon::dereference<int*> pointer;
 	typedef falcon::unary_compose<increment, pointer> unary1;
 
 	int i = 5;

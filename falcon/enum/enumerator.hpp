@@ -311,8 +311,8 @@ bool operator>=(const falcon::detail::enum_class::__bit_iterator<_Enum, _BitTrai
   ::falcon::iterator::nexter_iterator<\
     ::falcon::iterator::integral_iterator<enum_t>,\
     ::falcon::unary_compose<\
-      ::falcon::increment_emulation<enum_t>,\
-      ::falcon::pointer<falcon::iterator::integral_iterator<enum_t> >\
+      ::falcon::increment3<enum_t>,\
+      ::falcon::dereference<falcon::iterator::integral_iterator<enum_t> >\
     >\
   >
 #define __FALCON_PP_ENUMERATOR_CONTAINER_RULE_linear(n)\

@@ -70,19 +70,20 @@
 #include <iostream>
 #include <vector>
 #include <array>
-#include <falcon/fn.hpp>
+// #include <falcon/fn.hpp>
+#include <falcon/functional/operators.hpp>
 
-namespace fn = falcon::fn;
+// namespace fn = falcon::fn;
 
 int main()
 {
-  std::vector<std::array<int, 2>> v{
-    {{1, 2}}
-  , {{2, 3}}
-  , {{3, 4}}
-  };
+enum E {A};
+E i = A;
+falcon::increment3<>()(i);
+return static_cast<int>(i);
 
-  return int(fn::_1(fn::self(fn::tuple_get<1>()(fn::front(v)))));
+
+//   return int(fn::_1(fn::self(fn::tuple_get<1>()(fn::front(v)))));
 
 
 //   falcon::retain_free_object_allocator<int> allocator;

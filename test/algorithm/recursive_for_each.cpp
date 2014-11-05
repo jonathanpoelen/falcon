@@ -12,7 +12,7 @@ namespace alg = falcon::algorithm;
 void recursive_for_each_test(/*int argc, char **argv*/)
 {
 	typedef falcon::decrement<int> func_type;
-	typedef falcon::binary_negate<int> filter_type;
+	typedef falcon::bit_not<int> filter_type;
 	typedef std::array<int, 5> subarray;
 	std::vector<subarray> v{{
 		{{1,2,3,4,5}},

@@ -58,11 +58,11 @@ namespace aux_ {
 
 FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(->, arrow, FALCON_PP_NIL());
 FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(&, address, FALCON_PP_NIL());
-FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(*, pointer, using Base::operator*;);
+FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(*, dereference, using Base::operator*;);
 FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(+, unary_plus, using Base::operator+;);
-FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(-, unary_negate, using Base::operator-;);
+FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(-, negate, using Base::operator-;);
 FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(~, bit_not, FALCON_PP_NIL());
-FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(!, binary_negate, FALCON_PP_NIL());
+FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2(!, logical_not, FALCON_PP_NIL());
 
 #undef FALCON_SYNCHRONISE_AUX_IF_AVAILABLE2
 #undef FALCON_SYNCHRONISE_AUX_IF_AVAILABLE
@@ -299,16 +299,16 @@ using synchronizer_base
     const_arrow_if_available<
     address_if_available<
     const_address_if_available<
-    pointer_if_available<
-    const_pointer_if_available<
+    dereference_if_available<
+    const_dereference_if_available<
     unary_plus_if_available<
     const_unary_plus_if_available<
-    unary_negate_if_available<
-    const_unary_negate_if_available<
+    negate_if_available<
+    const_negate_if_available<
     bit_not_if_available<
     const_bit_not_if_available<
-    binary_negate_if_available<
-    const_binary_negate_if_available<
+    logical_not_if_available<
+    const_logical_not_if_available<
     basic_synchronizer<Elements...>
 > > > > > > > > > > > > > >;
 

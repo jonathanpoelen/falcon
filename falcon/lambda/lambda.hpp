@@ -607,13 +607,13 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 // #define __FALCON_RETURN_TYPE_OPERATOR(_Sign) decltype(_Sign std::declval<_T&>())
 
 //@{
-#define __FALCON_NAME_OPERATOR pointer<>
+#define __FALCON_NAME_OPERATOR dereference<>
 #define __FALCON_SIGN_OPERATOR *
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
 #undef __FALCON_SIGN_OPERATOR
 
-#define __FALCON_NAME_OPERATOR unary_negate<>
+#define __FALCON_NAME_OPERATOR negate<>
 #define __FALCON_SIGN_OPERATOR -
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR
@@ -651,7 +651,7 @@ struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
 #define __FALCON_CALIFIER_FIRST_PARAM const
 
 //@{
-#define __FALCON_NAME_OPERATOR binary_negate<>
+#define __FALCON_NAME_OPERATOR logical_not<>
 #define __FALCON_SIGN_OPERATOR !
 #include <falcon/lambda/unary_operator.tcc>
 #undef __FALCON_NAME_OPERATOR

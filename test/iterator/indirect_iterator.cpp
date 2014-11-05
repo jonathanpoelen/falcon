@@ -32,7 +32,7 @@ void indirect_iterator_test()
 		int a = 0, b = 1, c = 2, d = 3, e = 4;
 		container_type cont = {&a,&b,&c,&d,&e};
 
-		typedef falcon::iterator::indirect_iterator<iterator, falcon::pointer<int*>> pointer_iterator;
+		typedef falcon::iterator::indirect_iterator<iterator, falcon::dereference<int*>> pointer_iterator;
 		pointer_iterator it(cont.begin());
 		pointer_iterator end(cont.end());
 
