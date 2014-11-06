@@ -70,16 +70,16 @@
 #include <iostream>
 #include <vector>
 #include <array>
-// #include <falcon/fn.hpp>
-#include <falcon/functional/operators.hpp>
+#include <falcon/fn.hpp>
+// #include <falcon/functional/operators.hpp>
 
-// namespace fn = falcon::fn;
+namespace fn = falcon::fn;
 
 int main()
 {
 enum E {A};
 E i = A;
-falcon::increment3<>()(i);
+fn::increment3(i);
 return static_cast<int>(i);
 
 

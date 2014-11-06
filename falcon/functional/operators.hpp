@@ -85,7 +85,9 @@ namespace falcon {
   template<class T = void> struct less_equal;
 #endif
 
+  /// \brief !(T < U) && !(U < T)
   template<class T = void> struct equivalent;
+  /// \brief !(T < U) && !(T > U)
   template<class T = void> struct equivalent2;
   //@}
 
