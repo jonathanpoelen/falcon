@@ -4,6 +4,7 @@
 #include <falcon/c++1x/syntax.hpp>
 #include <falcon/type_traits/default_or_type.hpp>
 #include <falcon/type_traits/internal_reference.hpp>
+#include <falcon/functional/is_transparent_inheritance.hpp>
 
 #include <utility>
 #include <type_traits>
@@ -260,7 +261,7 @@ namespace falcon {
   };
 
 #if __cplusplus == 201103L
-  FALCON_MAKE_UNARY_OP(negate, +, T, T const &)
+  FALCON_MAKE_UNARY_OP(negate, -, T, T const &)
 
   FALCON_MAKE_UNARY_OP(logical_not, !, bool, T const &)
 #endif

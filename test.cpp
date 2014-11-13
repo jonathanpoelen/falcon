@@ -64,25 +64,73 @@
 //   }
 // };
 
+// #include <memory>
+//
+// template<class T, class Alloc>
+// struct allocator_delete
+// {
+//   using allocator_type
+//     = std::allocator_traits<Alloc>::template rebind_traits<T>;
+//
+//   template<class Alloc>
+//   allocator_delete(const Alloc & alloc)
+//   : alloc_(alloc)
+//   {}
+//
+//   allocator_delete(const allocator_type & alloc)
+//   : alloc_(alloc)
+//   {}
+//
+//   allocator_delete() = default;
+//   allocator_delete(allocator_delete &&) = default;
+//   allocator_delete(allocator_delete const &) = default;
+//   allocator_delete&operator=(allocator_delete &&) = default;
+//   allocator_delete&operator=(allocator_delete const &) = default;
+//
+//   void operator()(T * p) const noexcept
+//   {
+//     alloc_.destruct(p);
+//     alloc_.destroy(p, 1);
+//   }
+//
+// private:
+//   allocator_type alloc_;
+// };
+//
+// template<class T, class Alloc, class... Args>
+// std::unique_ptr<T, std::allocator_traits<Alloc>::template rebind_traits<T>>
+// allocate_unique(const Alloc& alloc, Args... args)
+// {
+//   using allocator = std::allocator_traits<Alloc>::template rebind_traits<T>;
+//   auto p = alloc.allocate(1);
+//   alloc.construct(p);
+//   return std::unique_ptr<T, allocator_delete<T, allocator>>(p, alloc);
+// }
+//
+//
+//
+// // #include <iostream>
+// #include <vector>
 // #include <iostream>
-
-
-#include <iostream>
-#include <vector>
-#include <array>
-#include <falcon/fn.hpp>
-// #include <falcon/functional/operators.hpp>
-
-namespace fn = falcon::fn;
+#include <falcon/fn/operators.hpp>
+// #include <falcon/fn/if_else.hpp>
+// #include <falcon/lambda/lambda.hpp>
+// #include <algorithm>
+// #include <functional>
+// // #include <array>
+//
+// #include <falcon/fn/operators.hpp>
 
 int main()
 {
-enum E {A};
-E i = A;
-fn::increment3(i);
-return static_cast<int>(i);
-
-
+  int i = 1, ii = 2;
+  using namespace falcon::fn;
+  return op::reduce(op::add)(i, ii) + op::if_else(1, 2)(0);
+//   return i+ii;
+//   std::cout << (check_any_if_next(op::lt)(1, 2, 3, 4, 5)) << std::endl;
+//   std::cout << (op::any(op::lt)(1, 2, 3, 4, 5)) << std::endl;
+//   check_any_if_next(lt)(1, 2, 3, 4, 5);
+//   check_if_next(lt, or_)(1, 2, 3, 4, 5);
 //   return int(fn::_1(fn::self(fn::tuple_get<1>()(fn::front(v)))));
 
 

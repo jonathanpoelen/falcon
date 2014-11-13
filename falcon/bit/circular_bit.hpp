@@ -4,7 +4,6 @@
 #include <falcon/c++/boost_or_std.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_cv)
 #include <falcon/type_traits/integral_constant.hpp>
-#include <falcon/type_traits/invalid_type.hpp>
 #include <falcon/type_traits/unqualified.hpp>
 #include <falcon/preprocessor/incremental.hpp>
 #include <falcon/preprocessor/comparison.hpp>

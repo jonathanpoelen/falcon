@@ -327,5 +327,13 @@ collision de range (insert,extend[r,l],rien)
 
 delete[] en c++14 prend un size_t
 
-is_transparent pour les opérateurs de comparaison en c++14
+fn::args<i...>(f) / fn::a<i...>(f)
+fn::pack<i,n>(f)
+
+apply_to_tuple op::apply qui retourne une tuple (déjà dans tuple/ ?)
+
+is_transparent_inheritance<F> pour certain foncteurs
+
+remove_const_reference -> decay
+
 
