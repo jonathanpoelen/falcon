@@ -55,6 +55,12 @@
       = ::falcon::static_const<namespace_adl::FALCON_CONCAT(name,_fn)>::value; \
   }
 
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WRAPPER(namespace_adl, name) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2( \
+    namespace_adl, name \
+  , (class... Ts), (Ts&&...args), (std::forward<Ts>(args)...))
+
+
 #define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_RESULT(result, namespace_adl, name) \
   namespace namespace_adl { \
     template<class T> \
@@ -92,7 +98,7 @@
 \
       template<class T, FALCON_PP_PACK template_params> \
       constexpr result operator()(T && x, FALCON_PP_PACK type_params) const \
-      noexcept(name(std::forward<T>(x), FALCON_PP_PACK params)) \
+      noexcept(noexcept(name(std::forward<T>(x), FALCON_PP_PACK params))) \
       { return name(std::forward<T>(x), FALCON_PP_PACK params); } \
     }; \
   } \
@@ -101,5 +107,11 @@
     constexpr auto const & name \
       = ::falcon::static_const<namespace_adl::FALCON_CONCAT(name,_fn)>::value; \
   }
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_RESULT_WRAPPER( \
+  result, namespace_adl, name) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2_RESULT( \
+    result, namespace_adl, name \
+  , (class... Ts), (Ts&&args...), (std::forward<Ts>(args)...))
 
 #endif

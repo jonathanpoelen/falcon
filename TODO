@@ -217,7 +217,6 @@ pas besoin de swap si move construceur/assignement
 faire de certaines fonctions libres des foncteurs en constexpr
 
 pour les foncteurs pris en rvalue, utiliser forward avant l'appel. (parce que ref qualifier: int f()&&)
-faire tous les opérateurs en 2 version ? const & et && ?
 
 synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier les valeurs des iterateur par defaut ? (tous, 1 ?). Ajouter des tests avec des iterateurs de taille different et regarder si ne debordent pas
 
