@@ -34,19 +34,19 @@
 #define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2( \
   namespace_adl, name, template_params, type_params, params) \
   namespace namespace_adl { \
-    template<class T, FALCON_PP_PACK template_params> \
+    template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
     constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
-      name(T && x, FALCON_PP_PACK type_params)\
-    , std::forward<T>(x).name params) \
+      name(Falcon_GFO_T && x, FALCON_PP_PACK type_params)\
+    , std::forward<Falcon_GFO_T>(x).name params) \
 \
     struct FALCON_CONCAT(name,_fn) \
     { \
       constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
 \
-      template<class T, FALCON_PP_PACK template_params> \
+      template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
       constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
-        operator()(T && x, FALCON_PP_PACK type_params) const \
-      , name(std::forward<T>(x), FALCON_PP_PACK params)) \
+        operator()(Falcon_GFO_T && x, FALCON_PP_PACK type_params) const \
+      , name(std::forward<Falcon_GFO_T>(x), FALCON_PP_PACK params)) \
     }; \
   } \
 \
@@ -87,19 +87,21 @@
 #define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2_RESULT( \
   result, namespace_adl, name, template_params, type_params, params) \
   namespace namespace_adl { \
-    template<class T, FALCON_PP_PACK template_params> \
-    constexpr result name(T && x, FALCON_PP_PACK type_params) \
-    noexcept(noexcept(std::forward<T>(x).name params)) \
-    { return std::forward<T>(x).name params; } \
+    template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
+    constexpr result name(Falcon_GFO_T && x, FALCON_PP_PACK type_params) \
+    noexcept(noexcept(std::forward<Falcon_GFO_T>(x).name params)) \
+    { return std::forward<Falcon_GFO_T>(x).name params; } \
 \
     struct FALCON_CONCAT(name,_fn) \
     { \
       constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
 \
-      template<class T, FALCON_PP_PACK template_params> \
-      constexpr result operator()(T && x, FALCON_PP_PACK type_params) const \
-      noexcept(noexcept(name(std::forward<T>(x), FALCON_PP_PACK params))) \
-      { return name(std::forward<T>(x), FALCON_PP_PACK params); } \
+      template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
+      constexpr result operator()( \
+        Falcon_GFO_T && x, FALCON_PP_PACK type_params) const \
+      noexcept(noexcept( \
+        name(std::forward<Falcon_GFO_T>(x), FALCON_PP_PACK params))) \
+      { return name(std::forward<Falcon_GFO_T>(x), FALCON_PP_PACK params); } \
     }; \
   } \
 \
