@@ -2,6 +2,7 @@
 #define FALCON_FN_PLACEHOLDERS_HPP
 
 #include <falcon/type_traits/static_const.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <tuple>
 
 namespace falcon {
@@ -12,12 +13,12 @@ namespace fn {
     constexpr placeholder() noexcept {}
 
     template<class... Ts>
-    constexpr auto operator()(Ts&&... args) const noexcept ->
-    decltype(std::get<I>(std::forward_as_tuple(args...)))
-    { return std::get<I>(std::forward_as_tuple(args...)); }
+    constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
+      operator()(Ts&&... args) const
+    , std::get<I>(std::forward_as_tuple(std::forward<Ts>(args)...)))
   };
 
-  namespace  {
+  namespace {
     constexpr auto const & _1 = static_const<placeholder<0>>::value;
     constexpr auto const & _2 = static_const<placeholder<1>>::value;
     constexpr auto const & _3 = static_const<placeholder<2>>::value;

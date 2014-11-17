@@ -225,7 +225,7 @@ utiliser boost::addressof ou std::addressof (dans <memory>). enlever detail/addr
 
 const parameter_index & -> parameter_index
 
-suffixer les types des foncteurs variable avec _f plutôt que _t ?
+suffixer les types des foncteurs variable avec _fn plutôt que _t ?
 
 deplacer certain header de math dans logical
 
@@ -281,6 +281,7 @@ passer par des tuples quand les types internes peuvent être des structures vide
 filter_type<int, float>
 filter_type<???<is_integral>>
 filter_type<...>::template fiter<T>::value
+(mpl::filter ?)
 
 temporary_initialized: initialize de la memoire non initiliasée (non copiable)
 

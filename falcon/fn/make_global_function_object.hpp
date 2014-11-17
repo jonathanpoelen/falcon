@@ -4,23 +4,25 @@
 #include <falcon/type_traits/static_const.hpp>
 #include <falcon/preprocessor/concat.hpp>
 #include <falcon/preprocessor/pack.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <utility>
 
 #define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(namespace_adl, name) \
   namespace namespace_adl { \
     template<class T> \
-    constexpr auto name(T && x) -> \
-    decltype(std::forward<T>(x).name()) \
-    { return std::forward<T>(x).name(); } \
+    constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
+      name(T && x) \
+    , std::forward<T>(x).name()) \
 \
     struct FALCON_CONCAT(name,_fn) \
     { \
       constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
 \
       template<class T> \
-      constexpr auto operator()(T && x) const -> \
-      decltype(name(std::forward<T>(x))) \
-      { return name(std::forward<T>(x)); } \
+      constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
+        operator()(T && x) const \
+      , name(std::forward<T>(x)) \
+      ) \
     }; \
   } \
 \
@@ -33,18 +35,18 @@
   namespace_adl, name, template_params, type_params, params) \
   namespace namespace_adl { \
     template<class T, FALCON_PP_PACK template_params> \
-    constexpr auto name(T && x, FALCON_PP_PACK type_params) -> \
-    decltype(std::forward<T>(x).name params) \
-    { return std::forward<T>(x).name params; } \
+    constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
+      name(T && x, FALCON_PP_PACK type_params)\
+    , std::forward<T>(x).name params) \
 \
     struct FALCON_CONCAT(name,_fn) \
     { \
       constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
 \
       template<class T, FALCON_PP_PACK template_params> \
-      constexpr auto operator()(T && x, FALCON_PP_PACK type_params) const -> \
-      decltype(name(std::forward<T>(x), FALCON_PP_PACK params)) \
-      { return name(std::forward<T>(x), FALCON_PP_PACK params); } \
+      constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
+        operator()(T && x, FALCON_PP_PACK type_params) const \
+      , name(std::forward<T>(x), FALCON_PP_PACK params)) \
     }; \
   } \
 \
@@ -57,6 +59,7 @@
   namespace namespace_adl { \
     template<class T> \
     constexpr result name(T && x) \
+    noexcept(noexcept(std::forward<T>(x).name())) \
     { return std::forward<T>(x).name(); } \
 \
     struct FALCON_CONCAT(name,_fn) \
@@ -65,6 +68,7 @@
 \
       template<class T> \
       constexpr result operator()(T && x) const \
+      noexcept(name(std::forward<T>(x))) \
       { return name(std::forward<T>(x)); } \
     }; \
   } \
@@ -79,6 +83,7 @@
   namespace namespace_adl { \
     template<class T, FALCON_PP_PACK template_params> \
     constexpr result name(T && x, FALCON_PP_PACK type_params) \
+    noexcept(noexcept(std::forward<T>(x).name params)) \
     { return std::forward<T>(x).name params; } \
 \
     struct FALCON_CONCAT(name,_fn) \
@@ -87,6 +92,7 @@
 \
       template<class T, FALCON_PP_PACK template_params> \
       constexpr result operator()(T && x, FALCON_PP_PACK type_params) const \
+      noexcept(name(std::forward<T>(x), FALCON_PP_PACK params)) \
       { return name(std::forward<T>(x), FALCON_PP_PACK params); } \
     }; \
   } \

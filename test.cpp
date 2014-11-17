@@ -64,74 +64,64 @@
 //   }
 // };
 
-// #include <memory>
-//
-// template<class T, class Alloc>
-// struct allocator_delete
-// {
-//   using allocator_type
-//     = std::allocator_traits<Alloc>::template rebind_traits<T>;
-//
-//   template<class Alloc>
-//   allocator_delete(const Alloc & alloc)
-//   : alloc_(alloc)
-//   {}
-//
-//   allocator_delete(const allocator_type & alloc)
-//   : alloc_(alloc)
-//   {}
-//
-//   allocator_delete() = default;
-//   allocator_delete(allocator_delete &&) = default;
-//   allocator_delete(allocator_delete const &) = default;
-//   allocator_delete&operator=(allocator_delete &&) = default;
-//   allocator_delete&operator=(allocator_delete const &) = default;
-//
-//   void operator()(T * p) const noexcept
-//   {
-//     alloc_.destruct(p);
-//     alloc_.destroy(p, 1);
-//   }
-//
-// private:
-//   allocator_type alloc_;
-// };
-//
-// template<class T, class Alloc, class... Args>
-// std::unique_ptr<T, std::allocator_traits<Alloc>::template rebind_traits<T>>
-// allocate_unique(const Alloc& alloc, Args... args)
-// {
-//   using allocator = std::allocator_traits<Alloc>::template rebind_traits<T>;
-//   auto p = alloc.allocate(1);
-//   alloc.construct(p);
-//   return std::unique_ptr<T, allocator_delete<T, allocator>>(p, alloc);
-// }
-//
-//
-//
-// // #include <iostream>
-// #include <vector>
-// #include <iostream>
-#include <falcon/fn/operators.hpp>
-// #include <falcon/fn/if_else.hpp>
-// #include <falcon/lambda/lambda.hpp>
-// #include <algorithm>
-// #include <functional>
-// // #include <array>
-//
-// #include <falcon/fn/operators.hpp>
+#include <memory>
+#include <falcon/memory/allocator_rebind.hpp>
+
+namespace falcon {
+
+template<class T, class Alloc>
+struct allocator_delete
+{
+  using allocator_type = allocator_rebind_t<Alloc, T>;
+
+  template<class Alloc2>
+  explicit allocator_delete(const Alloc2 & alloc)
+  : alloc_(alloc)
+  {}
+
+  explicit allocator_delete(const allocator_type & alloc)
+  : alloc_(alloc)
+  {}
+
+  allocator_delete() = default;
+  allocator_delete(allocator_delete &&) = default;
+  allocator_delete(allocator_delete const &) = default;
+  allocator_delete&operator=(allocator_delete &&) = default;
+  allocator_delete&operator=(allocator_delete const &) = default;
+
+  void operator()(T * p) noexcept
+  {
+    alloc_.destroy(p);
+    alloc_.deallocate(p, 1);
+  }
+
+private:
+  allocator_type alloc_;
+};
+
+template<class T, class Alloc, class... Args>
+std::unique_ptr<T, allocator_delete<T, allocator_rebind_t<Alloc, T> > >
+allocate_unique(const Alloc& alloc, Args&&... args)
+{
+  using Allocator = allocator_rebind_t<Alloc, T>;
+  using Deleter = allocator_delete<T, Allocator>;
+  using Unique = std::unique_ptr<T, Deleter>;
+  Unique ret(nullptr, Deleter(alloc));
+  Allocator & deleter = reinterpret_cast<Allocator&>(ret.get_deleter());
+  ret.reset(deleter.allocate(1));
+  // ATTENTION exception
+  deleter.construct(ret.get(), std::forward<Args>(args)...);
+  return ret;
+}
+
+}
+
+
+#include <iostream>
 
 int main()
 {
-  int i = 1, ii = 2;
-  using namespace falcon::fn;
-  return op::reduce(op::add)(i, ii) + op::if_else(1, 2)(0);
-//   return i+ii;
-//   std::cout << (check_any_if_next(op::lt)(1, 2, 3, 4, 5)) << std::endl;
-//   std::cout << (op::any(op::lt)(1, 2, 3, 4, 5)) << std::endl;
-//   check_any_if_next(lt)(1, 2, 3, 4, 5);
-//   check_if_next(lt, or_)(1, 2, 3, 4, 5);
-//   return int(fn::_1(fn::self(fn::tuple_get<1>()(fn::front(v)))));
+  auto p = falcon::allocate_unique<int>(std::allocator<int>(), 3);
 
 
 //   falcon::retain_free_object_allocator<int> allocator;
