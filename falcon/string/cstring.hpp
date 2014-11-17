@@ -9,7 +9,6 @@
 #include <falcon/string/stox.hpp>
 #include <falcon/container/range_access.hpp>
 #include <falcon/iterator/normal_iterator.hpp>
-#include <falcon/type_traits/remove_cv_reference.hpp>
 
 #include <iosfwd>
 #include <limits>
@@ -21,6 +20,7 @@
 # include <type_traits>
 # include <initializer_list>
 #else
+# include <boost/type_traits/decay.hpp
 # include <boost/type_traits/is_array.hpp>
 # include <boost/type_traits/is_pointer.hpp>
 # include <boost/type_traits/is_integral.hpp>
@@ -30,9 +30,9 @@ namespace falcon { namespace aux_ {
 
 template<typename CharT, typename Traits, typename String,
   bool is_pointer_or_array = FALCON_BOOST_OR_STD_NAMESPACE::is_pointer<
-    typename remove_cv_reference<String>::type
+    typename FALCON_BOOST_OR_STD_NAMESPACE::decay<String>::type
   >::value && ! FALCON_BOOST_OR_STD_NAMESPACE::is_array<
-    typename remove_cv_reference<String>::type
+    typename FALCON_BOOST_OR_STD_NAMESPACE::decay<String>::type
   >::value
 >
 struct dispath_cs_cons

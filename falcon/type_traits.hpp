@@ -18,7 +18,6 @@
 #include <falcon/type_traits/scalar.hpp>
 #include <falcon/type_traits/selector.hpp>
 #include <falcon/type_traits/subtype.hpp>
-#include <falcon/type_traits/unqualified.hpp>
 #include <falcon/type_traits/unspecified_type.hpp>
 #include <falcon/type_traits/use.hpp>
 #include <falcon/type_traits/use_if.hpp>

@@ -2,7 +2,6 @@
 #define FALCON_TUPLE_PARAMETER_INDEX_HPP
 
 #include <falcon/parameter/parameter_index.hpp>
-#include <falcon/type_traits/remove_cv_reference.hpp>
 
 #include <tuple>
 
@@ -13,7 +12,7 @@ struct build_tuple_index
 {
   typedef typename build_parameter_index<
     std::tuple_size<
-      typename remove_cv_reference<T>::type
+      typename std::decay<T>::type
     >::value
   >::type type;
 };

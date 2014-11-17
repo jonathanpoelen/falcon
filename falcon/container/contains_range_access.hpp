@@ -6,7 +6,6 @@
 #include <falcon/helper/has_reverse_iterator.hpp>
 #include <falcon/helper/has_const_reverse_iterator.hpp>
 #include <falcon/type_traits/integral_constant.hpp>
-#include <falcon/type_traits/remove_cv_reference.hpp>
 
 namespace falcon {
   namespace aux_ {
@@ -36,7 +35,7 @@ namespace falcon {
   template <class T>
   struct contains_range_access_iterator
   : aux_::contains_range_access_iterator<
-    typename remove_cv_reference<T>::type
+    typename std::decay<T>::type
   > {};
 
   template <class T, std::size_t N>
@@ -47,7 +46,7 @@ namespace falcon {
   template <class T>
   struct contains_range_access_reverse_iterator
   : aux_::contains_range_access_reverse_iterator<
-    typename remove_cv_reference<T>::type
+    typename std::decay<T>::type
   > {};
 
   template <class T, std::size_t N>

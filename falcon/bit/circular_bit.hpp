@@ -4,7 +4,6 @@
 #include <falcon/c++/boost_or_std.hpp>
 #include FALCON_BOOST_OR_STD_TRAITS(remove_cv)
 #include <falcon/type_traits/integral_constant.hpp>
-#include <falcon/type_traits/unqualified.hpp>
 #include <falcon/preprocessor/incremental.hpp>
 #include <falcon/preprocessor/comparison.hpp>
 #include <falcon/bit/right.hpp>
@@ -20,7 +19,7 @@ public:
 	typedef typename FALCON_BOOST_OR_STD_NAMESPACE::remove_cv<T>::type value_type;
 
 private:
-	typedef typename unqualified<value_type>::type unqualified_type;
+	typedef typename std::decay<value_type>::type unqualified_type;
 	static const unqualified_type s_left = bit::left<unqualified_type>::value;
 	static const unqualified_type s_right = bit::right<unqualified_type>::value;
 
