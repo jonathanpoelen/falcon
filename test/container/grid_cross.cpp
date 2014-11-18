@@ -34,7 +34,10 @@ void template_grid_test(Grid& grid)
 	//falcon::generate(grid, ++falcon::make_lambda(0));
 	std::stringstream ss;
 	std::string s;
-	std::generate(begin(grid), end(grid), ++falcon::lambda::lambda(0));
+  {
+    int i = 0;
+    std::generate(begin(grid), end(grid), ++falcon::lambda::var(i));
+	}
 	PASSED();
 
   std::for_each(begin(grid), end(grid), ss << _1 << ',');

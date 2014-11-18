@@ -73,7 +73,11 @@ private:
   { this->base_reference() += n * strided_; }
 
   difference_type difference(const strided_iterator& other) const
-  { return (this->base_reference() - other.base_reference()) / strided_; }
+  {
+    const difference_type d = this->base_reference() - other.base_reference();
+    const difference_type ret = d / 2;
+    return ret * 2 < d ? ret + 1 : ret;
+  }
 
   typedef typename default_or_type<
     use<strided_iterator_full_comparison_tag>,

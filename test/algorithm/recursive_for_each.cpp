@@ -12,7 +12,7 @@ namespace alg = falcon::algorithm;
 void recursive_for_each_test(/*int argc, char **argv*/)
 {
 	typedef falcon::decrement<int> func_type;
-	typedef falcon::bit_not<int> filter_type;
+	typedef falcon::logical_not<int> filter_type;
 	typedef std::array<int, 5> subarray;
 	std::vector<subarray> v{{
 		{{1,2,3,4,5}},
@@ -35,9 +35,9 @@ void recursive_for_each_test(/*int argc, char **argv*/)
   CHECK_EQUAL_VALUE("-1,1,2,3,4,-1,1,2,3,4,-1,1,2,3,4,-1,1,2,3,4,", oss.str());
   oss.str("");
   alg::recursive_for_each<1>(v, alg::recursive_intermediate(
-		falcon::lambda::lambda(oss) << '[',
+		falcon::lambda::var(oss) << '[',
 		print,
-		falcon::lambda::lambda(oss) << ']'
+		falcon::lambda::var(oss) << ']'
 	));
   CHECK_EQUAL_VALUE("[-1,1,2,3,4,][-1,1,2,3,4,][-1,1,2,3,4,][-1,1,2,3,4,]", oss.str());
   oss.str("");

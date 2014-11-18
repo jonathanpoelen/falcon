@@ -1,10 +1,10 @@
-#ifndef FALCON_LAMBDA2_SWITCH_HPP
-#define FALCON_LAMBDA2_SWITCH_HPP
+#ifndef FALCON_LAMBDA_SWITCH_HPP
+#define FALCON_LAMBDA_SWITCH_HPP
 
-#include <falcon/lambda2/lambda.hpp>
+#include <falcon/lambda/lambda.hpp>
 
 namespace falcon {
-namespace lambda2 {
+namespace lambda {
 
 namespace _aux {
 

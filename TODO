@@ -195,8 +195,6 @@ renommer build_class en make_type, build_type, make_of ou autre
 
 pas de namespace iterator
 
-functional/operators.hpp: séparer dans plusieurs fichier. Ne pas oublier le move sémantique dans les opérateurs
-
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/#mailing2014-01 (entre autre l'implémentation de apply_tuple (apply_from_tuple dans le standars))
 
 natsort compare + avec locale (voir implémentation de martin pool (lien dans la doc php de natsort) et aussi en javascript dans katepart commands/utils.js)
@@ -212,15 +210,13 @@ allocator qui alloue plusieurs bloc.
 
 max_size dans les allocateurs est le nombre max d'element que alloc() peut théoriquement faire.
 
-pas besoin de swap si move construceur/assignement
+pas besoin de swap si move constructeur/assignement
 
 faire de certaines fonctions libres des foncteurs en constexpr
 
 pour les foncteurs pris en rvalue, utiliser forward avant l'appel. (parce que ref qualifier: int f()&&)
 
-synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier les valeurs des iterateur par defaut ? (tous, 1 ?). Ajouter des tests avec des iterateurs de taille different et regarder si ne debordent pas
-
-utiliser boost::addressof ou std::addressof (dans <memory>). enlever detail/addressof.hpp
+synchroniser_iterator fonctionne bien au niveau des tag ? Comment est verifier les valeurs des iterateur par defaut ? (tous, 1 ?). Ajouter des tests avec des iterateurs de taille different et regarder si ne deborde pas
 
 const parameter_index & -> parameter_index
 
@@ -327,13 +323,14 @@ collision de range (insert,extend[r,l],rien)
 
 delete[] en c++14 prend un size_t
 
-fn::args<i...>(f) / fn::a<i...>(f)
-fn::pack<i,n>(f)
+la::args<i...>(f) / la::a<i...>(f)
+la::pack<i,n>(f) (à la place de arguments_wrapper dans functional/)
 
 apply_to_tuple op::apply qui retourne une tuple (déjà dans tuple/ ?)
 
 is_transparent_inheritance<F> pour certain foncteurs
 
-remove_const_reference -> decay
+cstring: utiliser la même interface que string_view (ou le remplacer par ?)
 
+removed resolve_manipulator
 

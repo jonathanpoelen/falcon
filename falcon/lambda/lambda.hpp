@@ -1,824 +1,521 @@
-#ifndef _FALCON_LAMBDA_LAMBDA_HPP
-#define _FALCON_LAMBDA_LAMBDA_HPP
+#ifndef FALCON_LAMBDA_LAMBDA_HPP
+#define FALCON_LAMBDA_LAMBDA_HPP
 
-#include <falcon/config.hpp>
-#include <falcon/functional/operators.hpp>
-#include <falcon/functional/call.hpp>
-#include <falcon/parameter/keep_parameter_index.hpp>
-#include <falcon/arg/arg.hpp>
-#include <falcon/preprocessor/not_ide_parser.hpp>
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/iostreams/is_ios.hpp>
+#include <falcon/functional/operators.hpp>
+#include <falcon/preprocessor/d_punctuation.hpp>
+#include <falcon/parameter/keep_parameter_index.hpp>
+#include <falcon/functional/call.hpp>
 
+#include <tuple>
+#include <iosfwd>
+#include <utility>
 #include <functional>
 
 namespace falcon {
 namespace lambda {
-namespace operators {
-class binder;
+
+namespace _aux {
+
+template<class Op, class T = void, class U = void>
+struct lambda;
+
+template<class F>
+struct func_t;
+
+template<class F>
+struct mem_t;
+
+template<
+  class T
+, class Remove = typename std::remove_reference<T>::type
+, bool = std::is_bind_expression<T>::value>
+struct to_lambda_impl
+{ using type = lambda<Remove>; };
+
+template<class T, class Remove>
+struct to_lambda_impl<T, Remove, true>
+{ using type = lambda<func_t<Remove>>; };
+
+template<class T, class Remove, std::size_t N>
+struct to_lambda_impl<T, Remove[N], false>
+{ using type = lambda<Remove(&)[N]>; };
+
+template<class T>
+using to_lambda = typename to_lambda_impl<T>::type;
+
+
+template<class L>
+struct lambda_operators
+{
+  typedef lambda_operators operators_type;
+
+  template<class I>
+  constexpr lambda<index<>, L, to_lambda<I>>
+  operator[](I pos) const noexcept
+  { return {index<>(), static_cast<const L&>(*this), to_lambda<I>{std::move(pos)}}; }
+
+  template<class Op, class T, class U>
+  constexpr lambda<index<>, L, lambda<Op, T, U>>
+  operator[](lambda<Op, T, U> pos) const noexcept
+  { return {index<>(), static_cast<const L&>(*this), std::move(pos)}; }
+
+  template<class T>
+  constexpr lambda<assign<>, L, to_lambda<T>>
+  operator=(T && x) const noexcept
+  { return {assign<>(), static_cast<const L&>(*this)
+  , to_lambda<T>{std::forward<T>(x)}}; }
+
+  template<class Op, class T, class U>
+  constexpr lambda<assign<>, L, lambda<Op, T, U>>
+  operator=(lambda<Op, T, U> x) const noexcept
+  { return {assign<>(), static_cast<const L&>(*this), std::move(x)}; }
+
+  template<class T2, class Class>
+  constexpr auto
+#ifdef IN_IDE_PARSER
+  operator->
+#else
+  operator->*
+#endif
+  (T2 Class::* mem) const noexcept
+  -> lambda<mem_t<decltype(std::mem_fn(mem))>, L>
+  { return {std::mem_fn(mem)/*, static_cast<const L&>(*this)*/}; }
+};
+
+template<class... Elements>
+struct lambda_with_tuple
+{
+  typedef lambda_with_tuple with_tuple_type;
+
+  std::tuple<Elements...> t;
+
+  template<class... Args>
+  constexpr lambda_with_tuple(Args&&... args)
+  : t(std::forward<Args>(args)...)
+  {}
+
+  template<class T, class U = typename std::enable_if<
+    std::is_base_of<lambda_with_tuple, typename
+      std::remove_reference<T>::type
+    >::value
+  >::type>
+  constexpr lambda_with_tuple(T&& x)
+  : t(std::forward<std::tuple<Elements...>>(x.t))
+  {}
+};
+
+template<class Op, class T, class U>
+struct lambda
+: lambda_operators<lambda<Op, T, U>>
+, lambda_with_tuple<Op, T, U>
+{
+  using lambda_with_tuple<Op, T, U>::lambda_with_tuple;
+  using lambda::operators_type::operator=;
+
+  template<class... Args>
+  constexpr CPP1X_DELEGATE_FUNCTION(
+    operator()(Args&&... args) const
+  , std::get<0>(this->t)(
+      std::get<1>(this->t)(std::forward<Args>(args)...)
+    , std::get<2>(this->t)(std::forward<Args>(args)...)
+    )
+  )
+};
+
+template<class Op, class T>
+struct lambda<Op, T, void>
+: lambda_operators<lambda<Op, T>>
+, lambda_with_tuple<Op, T>
+{
+  using lambda_with_tuple<Op, T>::lambda_with_tuple;
+  using lambda::operators_type::operator=;
+
+  template<class... Args>
+  constexpr CPP1X_DELEGATE_FUNCTION(
+    operator()(Args&&... args) const
+  , std::get<0>(this->t)(
+      std::get<1>(this->t)(std::forward<Args>(args)...)
+    )
+  )
+};
+
+template<class T>
+struct lambda<T, void, void>
+: lambda_operators<lambda<T>>
+{
+  T x;
+
+  using lambda::operators_type::operator=;
+
+  template<class U>
+  constexpr lambda(U && xx)
+  : x(std::forward<U>(xx))
+  {}
+
+  template<class... Args>
+  constexpr T operator()(Args&&...) const
+  { return x; }
+};
+
+template<int N>
+struct lambda<std::integral_constant<int, N>, void, void>
+: lambda_operators<lambda<std::integral_constant<int, N>>>
+{
+  constexpr lambda() noexcept {}
+  using lambda::operators_type::operator=;
+
+  template<class... Args>
+  constexpr CPP1X_DELEGATE_FUNCTION(
+    operator()(Args&&... args) const
+  , std::get<N-1>(std::forward_as_tuple(std::forward<Args>(args)...))
+  )
+};
+
+
+struct bind_t {};
+
+template<class F>
+struct lambda<func_t<F>, void, void>
+: lambda_operators<lambda<func_t<F>>>
+{
+  F f;
+
+  template<class T, class U = typename std::enable_if<
+    std::is_base_of<lambda, typename
+      std::remove_reference<T>::type
+    >::value
+  >::type>
+  constexpr lambda(T&& x)
+  : f(std::forward<F>(x.f))
+  {}
+
+  template<class... Args>
+  constexpr lambda(Args&&... args)
+  : f(std::forward<Args>(args)...)
+  {}
+
+  template<class... Args>
+  constexpr lambda(bind_t, Args&&... args)
+  : f(std::bind(std::forward<Args>(args)...))
+  {}
+
+  template<class... Args>
+  constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
+    operator()(Args&&... args) const
+  , f(std::forward<Args>(args)...)
+  )
+};
+
+template<class F, int N>
+struct lambda<mem_t<F>, _aux::lambda<std::integral_constant<int, N>>, void>
+// : lambda_operators<lambda<mem_t<F>>>
+{
+  F f;
+
+  template<class... Args>
+  constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
+    operator()(Args&&... args) const
+  , call(
+    typename keep_parameter_index<
+      ignore_parameter_index_tag<N, 1>,
+      sizeof...(Args)+1
+    >::type()
+  , f
+  , std::get<N-1>(std::forward_as_tuple(std::forward<Args>(args)...))
+  , std::forward<Args>(args)...
+  ))
+};
+
+
+template<class T, bool = std::is_bind_expression<T>::value>
+struct to_lambda_ref_impl
+{ using type = lambda<T&>; };
+
+template<class T>
+struct to_lambda_ref_impl<T, true>
+{ using type = lambda<func_t<T>>; };
+
+template<class T, std::size_t N>
+struct to_lambda_ref_impl<T[N], false>
+{ using type = lambda<func_t<T>>; };
+
+template<class T>
+using to_lambda_ref = typename to_lambda_ref_impl<T>::type;
+
+
+#define FALCON_MAKE_OPERATOR(op, func_op)                                   \
+  template<class Op1, class T1, class U1, class Op2, class T2, class U2>    \
+  constexpr lambda<func_op<>, lambda<Op1, T1, U1>, lambda<Op2, T2, U2>>     \
+  operator op (lambda<Op1, T1, U1> l, lambda<Op2, T2, U2> r) noexcept       \
+  { return {func_op<>(), std::move(l), std::move(r)}; }                     \
+                                                                            \
+  template<class Op1, class T1, class U1, class T>                          \
+  constexpr lambda<func_op<>, lambda<Op1, T1, U1>, to_lambda<T>>            \
+  operator op (lambda<Op1, T1, U1> l, T && r) noexcept                      \
+  { return {func_op<>(), std::move(l), to_lambda<T>{std::forward<T>(r)}}; } \
+                                                                            \
+  template<class T, class Op1, class T1, class U1>                          \
+  constexpr lambda<func_op<>, to_lambda<T>, lambda<Op1, T1, U1>>            \
+  operator op (T && l, lambda<Op1, T1, U1> r) noexcept                      \
+  { return {func_op<>(), to_lambda<T>{std::forward<T>(l)}, std::move(r)}; }
+
+FALCON_MAKE_OPERATOR(+,  plus)
+FALCON_MAKE_OPERATOR(-,  minus)
+FALCON_MAKE_OPERATOR(*,  multiplies)
+FALCON_MAKE_OPERATOR(/,  divides)
+FALCON_MAKE_OPERATOR(%,  modulus)
+FALCON_MAKE_OPERATOR(&,  bit_and)
+FALCON_MAKE_OPERATOR(|,  bit_or)
+FALCON_MAKE_OPERATOR(^,  bit_xor)
+
+FALCON_MAKE_OPERATOR(==, equal_to)
+FALCON_MAKE_OPERATOR(!=, not_equal_to)
+FALCON_MAKE_OPERATOR(>,  greater)
+FALCON_MAKE_OPERATOR(<,  less)
+FALCON_MAKE_OPERATOR(>=, greater_equal)
+FALCON_MAKE_OPERATOR(<=, less_equal)
+FALCON_MAKE_OPERATOR(&&, logical_and)
+FALCON_MAKE_OPERATOR(||, logical_or)
+
+template<class = void>
+struct comma {
+  template<typename T, typename U>
+  constexpr CPP1X_DELEGATE_FUNCTION(operator()(T& a, U& b) const, (void(a) , b))
+};
+FALCON_MAKE_OPERATOR(FALCON_PP_D_COMMA, comma)
+
+#define FALCON_MAKE_OPERATOR_EQUAL(op, func_op)                      \
+  FALCON_MAKE_OPERATOR(op, func_op)                                  \
+                                                                     \
+  template<class T, class Op1, class T1, class U1>                   \
+  constexpr lambda<func_op<>, to_lambda_ref<T>, lambda<Op1, T1, U1>> \
+  operator op (T & l, lambda<Op1, T1, U1> r) noexcept                \
+  { return {func_op<>(), to_lambda_ref<T>{l}, std::move(r)}; }
+
+FALCON_MAKE_OPERATOR_EQUAL(+=,  plus_equal)
+FALCON_MAKE_OPERATOR_EQUAL(-=,  minus_equal)
+FALCON_MAKE_OPERATOR_EQUAL(*=,  multiplies_equal)
+FALCON_MAKE_OPERATOR_EQUAL(/=,  divides_equal)
+FALCON_MAKE_OPERATOR_EQUAL(%=,  modulus_equal)
+FALCON_MAKE_OPERATOR_EQUAL(<<=, left_shift_equal)
+FALCON_MAKE_OPERATOR_EQUAL(>>=, right_shift_equal)
+FALCON_MAKE_OPERATOR_EQUAL(&=,  bit_and_equal)
+FALCON_MAKE_OPERATOR_EQUAL(|=,  bit_or_equal)
+FALCON_MAKE_OPERATOR_EQUAL(^=,  bit_xor_equal)
+
+#undef FALCON_MAKE_OPERATOR_EQUAL
+#undef FALCON_MAKE_OPERATOR
+
+#define FALCON_MAKE_OPERATOR(op, func_op)       \
+  template<class Op, class T, class U>          \
+  constexpr lambda<func_op<>, lambda<Op, T, U>> \
+  operator op (lambda<Op, T, U> x) noexcept     \
+  { return {func_op<>(), std::move(x)}; }
+
+FALCON_MAKE_OPERATOR(-, negate)
+FALCON_MAKE_OPERATOR(+, unary_plus)
+FALCON_MAKE_OPERATOR(!, logical_not)
+FALCON_MAKE_OPERATOR(~, bit_not)
+FALCON_MAKE_OPERATOR(&, address)
+FALCON_MAKE_OPERATOR(*, dereference)
+FALCON_MAKE_OPERATOR(++, increment)
+FALCON_MAKE_OPERATOR(--, decrement)
+
+#undef FALCON_MAKE_OPERATOR
+
+template<class Op, class T, class U>
+constexpr lambda<post_increment<>, lambda<Op, T, U>>
+operator++(lambda<Op, T, U> x, int) noexcept
+{ return {post_increment<>(), std::move(x) }; }
+
+template<class Op, class T, class U>
+constexpr lambda<post_decrement<>, lambda<Op, T, U>>
+operator--(lambda<Op, T, U> x, int) noexcept
+{ return {post_decrement<>(), std::move(x) }; }
+
+
+#define FALCON_MAKE_OPERATOR(op, func_op)                                   \
+  template<class Op1, class T1, class U1, class Op2, class T2, class U2>    \
+  constexpr lambda<func_op<>, lambda<Op1, T1, U1>, lambda<Op2, T2, U2>>     \
+  operator op (lambda<Op1, T1, U1> l, lambda<Op2, T2, U2> r) noexcept       \
+  { return {func_op<>(), std::move(l), std::move(r)}; }                     \
+                                                                            \
+  template<class Op1, class T1, class U1, class T>                          \
+  constexpr lambda<func_op<>, lambda<Op1, T1, U1>, to_lambda<T>>            \
+  operator op (lambda<Op1, T1, U1> l, T && r) noexcept                      \
+  { return {func_op<>(), std::move(l), to_lambda<T>{std::forward<T>(r)}}; }
+
+FALCON_MAKE_OPERATOR(<<, left_shift)
+FALCON_MAKE_OPERATOR(>>, right_shift)
+
+#undef FALCON_MAKE_OPERATOR
+
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  iostreams::is_ostream<T>::value
+, lambda<left_shift<>, lambda<T&>, lambda<Op1, T1, U1>>
+>::type
+operator << (T & l, lambda<Op1, T1, U1> r) noexcept
+{ return {left_shift<>()
+, lambda<T&>{l}
+, std::move(r)
+}; }
+
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  iostreams::is_ostream<T>::value
+, lambda<left_shift<>, lambda<T>, lambda<Op1, T1, U1>>
+>::type
+operator << (T && l, lambda<Op1, T1, U1> r) noexcept
+{ return {left_shift<>()
+, lambda<T>{std::forward<T>(l)}
+, std::move(r)
+}; }
+
+namespace aux_ {
+  template<class T>
+  struct omanip {
+    static const bool value = false;
+  };
+  template<class T>
+  struct omanip<lambda<T&, void, void>> {
+    static const bool value = iostreams::is_ostream<T>::value;
+    typedef typename T::char_type char_type;
+    typedef typename T::traits_type traits_type;
+    typedef std::basic_ostream<char_type, traits_type> ostream;
+    typedef ostream&(*type)(ostream&);
+  };
+  template<class T, class U>
+  struct omanip<lambda<left_shift<>, T, U>>
+  : omanip<T>
+  {};
 }
 
-class __placearg;
-class __force_placearg;
+template<class Op1, class T1, class U1>
+constexpr lambda<left_shift<>, lambda<Op1, T1, U1>
+, lambda<typename aux_::omanip<T1>::type>>
+operator << (
+  lambda<Op1, T1, U1> r
+, typename aux_::omanip<T1>::type omanip) noexcept
+{ return {left_shift<>()
+, std::move(r)
+, omanip
+}; }
 
-template<typename _T, typename _U>
-class __pair;
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  iostreams::is_istream<T>::value
+, lambda<right_shift<>, lambda<T&>, lambda<Op1, T1, U1>>
+>::type
+operator >> (T & l, lambda<Op1, T1, U1> r) noexcept
+{ return {right_shift<>()
+, lambda<T&>{l}
+, std::move(r)
+}; }
 
-template<typename _Func, typename _Left = __placearg, typename _Right = __placearg>
-class ___lambda;
+template<class T, class Op1, class T1, class U1>
+constexpr typename std::enable_if<
+  iostreams::is_istream<T>::value
+, lambda<right_shift<>, lambda<T>, lambda<Op1, T1, U1>>
+>::type
+operator >> (T && l, lambda<Op1, T1, U1> r) noexcept
+{ return {right_shift<>()
+, lambda<T>{std::forward<T>(l)}
+, std::move(r)
+}; }
+
+namespace aux_ {
+  template<class T>
+  struct imanip {
+    static const bool value = false;
+  };
+  template<class T>
+  struct imanip<lambda<T&, void, void>> {
+    static const bool value = iostreams::is_istream<T>::value;
+    typedef typename T::char_type char_type;
+    typedef typename T::traits_type traits_type;
+    typedef std::basic_istream<char_type, traits_type> istream;
+    typedef istream&(*type)(istream&);
+  };
+  template<class T, class U>
+  struct imanip<lambda<right_shift<>, T, U>>
+  : imanip<T>
+  {};
+}
+
+template<class Op1, class T1, class U1>
+constexpr lambda<right_shift<>, lambda<Op1, T1, U1>
+, lambda<typename aux_::imanip<T1>::type>>
+operator >> (
+  lambda<Op1, T1, U1> r
+, typename aux_::imanip<T1>::type omanip) noexcept
+{ return {right_shift<>()
+, std::move(r)
+, omanip
+}; }
+
+template<class CharT, class Traits, class Op1, class T1, class U1>
+constexpr lambda<right_shift<>
+, lambda<std::basic_istream<CharT, Traits>&>
+, lambda<Op1, T1, U1>>
+operator >> ( std::basic_istream<CharT, Traits> & l
+            , lambda<Op1, T1, U1> r) noexcept
+{ return {right_shift<>()
+, lambda<std::basic_istream<CharT, Traits>&>{l}
+, std::move(r)
+}; }
+
+}
 
 
-template<typename _T>
-struct is_lambda_expression
-: public std::false_type
-{};
-template<typename _Operation, typename _T, typename _U>
-struct is_lambda_expression<___lambda<_Operation, _T, _U> >
-: public std::true_type
-{};
-
-
-template<int _Num>
-struct placeholder
-{
-	template<typename _Index>
-	constexpr ___lambda<index<>, placeholder<_Num>, const _Index&> operator[](const _Index& idx) const
-	{
-		return CPP1X(index<>{}, idx);
-	}
-
-	/* use std::bind ?
-	template<typename... _Args>
-	___lambda<functional_operators::function<_Args...>, placeholder<_Num> > bind(_Args&&... args)
-	{ return CPP1X(std::tuple<_Args...>(std::forward<_Args>(args)...)); }*/
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args) const, arg<_Num-1>(args...))
-
-	template<typename _T>
-  constexpr ___lambda<assign<>, placeholder<_Num>, const _T&> operator=(const _T& v) const
-	{
-		return CPP1X(assign<>{}, v);
-	}
-
-	template<typename _T>
-  constexpr ___lambda<assign<>, placeholder<_Num>, _T> operator=(_T&& v) const
-	{
-		return CPP1X(assign<>{}, v);
-	}
-
-	template<int _Num2>
-  constexpr ___lambda<assign<>, placeholder<_Num>, placeholder<_Num2> > operator=(const placeholder<_Num2>&) const
-	{
-		return CPP1X(assign<>{});
-	}
-
-	template<typename _T, typename _Class>
-	constexpr ___lambda<
-   decltype(std::mem_fn(std::declval<_T _Class::*>())), placeholder<_Num>
-#ifdef IN_IDE_PARSER
- , __force_placearg> operator ->(_T _Class::* mem) const
-#else
- , __force_placearg> operator ->*(_T _Class::* mem) const
-#endif
-	{
-		return CPP1X(std::mem_fn(mem));
-	}
-};
-
-template<typename>
-struct is_placeholder
-: std::false_type
-{};
-
-template<int _Num>
-struct is_placeholder<placeholder<_Num> >
-: std::true_type
-{};
-
-template<typename _Func, typename _FuncL, typename _Left, typename _Right, typename _FuncL2, typename _Left2, typename _Right2>
-struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, ___lambda<_FuncL2, _Left2, _Right2> >
-{
-	_Func function;
-	___lambda<_FuncL, _Left, _Right> left;
-	___lambda<_FuncL2, _Left2, _Right2> right;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right(std::forward<_Args>(args)...)))
-};
-
-template<typename _Func, typename _FuncL, typename _Left, typename _Right, int _Num>
-struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, placeholder<_Num> >
-{
-	_Func function;
-	___lambda<_FuncL, _Left, _Right> left;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), arg<_Num-1>(args...)))
-};
-
-template<typename _Func, typename _FuncL, typename _Left, typename _Right, int _Num>
-struct ___lambda<_Func, placeholder<_Num>, ___lambda<_FuncL, _Left, _Right> >
-{
-	_Func function;
-	___lambda<_FuncL, _Left, _Right> right;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right(std::forward<_Args>(args)...)))
-};
-
-template<typename _Func, typename _FuncL, typename _Left, typename _Right, typename _T>
-struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, _T>
-{
-	_Func function;
-	___lambda<_FuncL, _Left, _Right> left;
-	_T right;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right))
-};
-
-template<typename _Func, typename _FuncL, typename _Left, typename _Right>
-struct ___lambda<_Func, ___lambda<_FuncL, _Left, _Right>, __placearg>
-{
-	_Func function;
-	___lambda<_FuncL, _Left, _Right> left;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...)/*, std::forward<_Args>(args)...*/))
-};
-
-template<typename _Func, typename _FuncL, typename _Left, typename _Right, typename _T>
-struct ___lambda<_Func, _T, ___lambda<_FuncL, _Left, _Right> >
-{
-	_Func function;
-	_T left;
-	___lambda<_FuncL, _Left, _Right> right;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, right(std::forward<_Args>(args)...)))
-};
-
-template<typename _Func, int _Num>
-struct ___lambda<_Func, placeholder<_Num>, __force_placearg>
-{
-	_Func function;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), call(
-		typename keep_parameter_index<
-			ignore_parameter_index_tag<_Num, 1>,
-			sizeof...(_Args)+1
-		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
-	)
-};
-
-template<typename _Func>
-struct ___lambda<_Func, placeholder<1>, __force_placearg>
-{
-	_Func function;
-
-	template<typename _T, typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
-};
-
-template<typename _Func, int _Num>
-struct ___lambda<_Func, placeholder<_Num>, __placearg>
-{
-	_Func function;
-
-	template<typename _T, typename... _Args>
-	auto operator()(_T&& a, _Args&&... args)
-	-> decltype(function(a))
-	{
-		return function(a);
-		(void)sizeof...(args);
-	}
-};
-
-// template<typename _Func, int _Num>
-// struct ___lambda<_Func, __placearg, placeholder<_Num> >
-// {
-// 	_Func function;
-//
-// 	template<typename... _Args>
-// 	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args),call(
-// 		typename keep_parameter_index<
-// 			ignore_parameter_index_tag<_Num, 1>,
-// 			sizeof...(_Args)+1
-// 		>::type(), function, arg<_Num-1>(args...), std::forward<_Args>(args)...)
-// 	)
-// };
-//
-// template<typename _Func>
-// struct ___lambda<_Func, __placearg, placeholder<1> >
-// {
-// 	_Func function;
-//
-// 	template<typename _T, typename... _Args>
-// 	CPP1X_DELEGATE_FUNCTION(operator()(_T&& a, _Args&&... args), function(a, std::forward<_Args>(args)...))
-// };
-
-template<typename _Func, int _Num, typename _Right>
-struct ___lambda<_Func, placeholder<_Num>, _Right>
-{
-	_Func function;
-	_Right right;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right))
-};
-
-template<typename _Func, typename _Left, int _Num>
-struct ___lambda<_Func, _Left, placeholder<_Num> >
-{
-	_Func function;
-	_Left left;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left, arg<_Num-1>(args...)))
-};
-
-template<typename _Func, int _Num, int _Num2>
-struct ___lambda<_Func, placeholder<_Num>, placeholder<_Num2> >
-{
-	_Func function;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), arg<_Num2-1>(args...)))
-};
-
-template<typename _T>
-struct ___lambda<void, _T, __placearg>
-{
-	_T val;
-
-	template<typename... _Args>
-	_T& operator()(_Args&&...)
-	{
-		return val;
-	}
-};
-
-template<typename _Func, typename _Bind>
-struct ___lambda<_Func, _Bind, operators::binder>
-{
-	_Func function;
-	_Bind bind;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(bind(std::forward<_Args>(args)...)))
-};
-
-template<typename _Func, typename _Bind, typename _Bind2>
-struct ___lambda<_Func, ___lambda<operators::binder, _Bind, _Bind2>, operators::binder>
-{
-	_Func function;
-	_Bind left;
-	_Bind2 right;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), right(std::forward<_Args>(args)...)))
-};
-
-template<typename _Func, typename _Bind, int _Num>
-struct ___lambda<_Func, __pair<_Bind, placeholder<_Num> >, operators::binder>
-{
-	_Func function;
-	_Bind right;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(arg<_Num-1>(args...), right(std::forward<_Args>(args)...)))
-};
-
-template<typename _Func, typename _Bind, int _Num>
-struct ___lambda<_Func, __pair<placeholder<_Num>, _Bind>, operators::binder>
-{
-	_Func function;
-	_Bind left;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), function(left(std::forward<_Args>(args)...), arg<_Num-1>(args...)))
-};
-
-template<typename _Bind>
-struct ___lambda<operators::binder, _Bind, void>
-{
-	_Bind bind;
-
-	template<typename... _Args>
-	CPP1X_DELEGATE_FUNCTION(operator()(_Args&&... args), bind(std::forward<_Args>(args)...))
-};
+template<int N>
+using placeholder = _aux::lambda<std::integral_constant<int, N>>;
 
 namespace placeholders {
-	constexpr placeholder<1> _1 = {};
-	constexpr placeholder<2> _2 = {};
-	constexpr placeholder<3> _3 = {};
-	constexpr placeholder<4> _4 = {};
-	constexpr placeholder<5> _5 = {};
-	constexpr placeholder<6> _6 = {};
-	constexpr placeholder<7> _7 = {};
-	constexpr placeholder<8> _8 = {};
-	constexpr placeholder<9> _9 = {};
-	constexpr placeholder<10> _10 = {};
-	constexpr placeholder<11> _11 = {};
-	constexpr placeholder<12> _12 = {};
-	constexpr placeholder<13> _13 = {};
-	constexpr placeholder<14> _14 = {};
-	constexpr placeholder<15> _15 = {};
-	constexpr placeholder<16> _16 = {};
-	constexpr placeholder<17> _17 = {};
-	constexpr placeholder<18> _18 = {};
-	constexpr placeholder<19> _19 = {};
-	constexpr placeholder<20> _20 = {};
-	constexpr placeholder<21> _21 = {};
-	constexpr placeholder<22> _22 = {};
-	constexpr placeholder<23> _23 = {};
-	constexpr placeholder<24> _24 = {};
-	constexpr placeholder<25> _25 = {};
-	constexpr placeholder<26> _26 = {};
-	constexpr placeholder<27> _27 = {};
-	constexpr placeholder<28> _28 = {};
-	constexpr placeholder<29> _29 = {};
+  constexpr placeholder<1> _1;
+  constexpr placeholder<2> _2;
+  constexpr placeholder<3> _3;
+  constexpr placeholder<4> _4;
+  constexpr placeholder<5> _5;
+  constexpr placeholder<6> _6;
+  constexpr placeholder<7> _7;
+  constexpr placeholder<8> _8;
+  constexpr placeholder<9> _9;
 }
 
-#define __FALCON_CALIFIER_FIRST_PARAM const
-
-//@{
-#define __FALCON_NAME_OPERATOR plus<>
-#define __FALCON_SIGN_OPERATOR +
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR minus<>
-#define __FALCON_SIGN_OPERATOR -
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR multiplies<>
-#define __FALCON_SIGN_OPERATOR *
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR modulus<>
-#define __FALCON_SIGN_OPERATOR %
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR divides<>
-#define __FALCON_SIGN_OPERATOR /
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR bit_and<>
-#define __FALCON_SIGN_OPERATOR &
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR bit_or<>
-#define __FALCON_SIGN_OPERATOR |
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR bit_xor<>
-#define __FALCON_SIGN_OPERATOR ^
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-//@}
-
-// #undef __FALCON_RETURN_TYPE_OPERATOR
-// #define __FALCON_RETURN_TYPE_OPERATOR(_Sign) bool
-
-//@{
-#define __FALCON_NAME_OPERATOR equal_to<>
-#define __FALCON_SIGN_OPERATOR ==
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR not_equal_to<>
-#define __FALCON_SIGN_OPERATOR !=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR greater<>
-#define __FALCON_SIGN_OPERATOR >
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR greater_equal<>
-#define __FALCON_SIGN_OPERATOR >=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR less<>
-#define __FALCON_SIGN_OPERATOR <
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR less_equal<>
-#define __FALCON_SIGN_OPERATOR <=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR logical_and<>
-#define __FALCON_SIGN_OPERATOR &&
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR logical_or<>
-#define __FALCON_SIGN_OPERATOR ||
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-//@}
-
-
-//@{
-struct ___lambda_comma
-{
-	template<typename _T, typename _U>
-	auto operator()(_T& a, _U& b) -> decltype(b())
-	{
-		a();
-		return b();
-	}
-};
-
-template<typename _FuncL, typename _Left, typename _Right, typename _FuncL2, typename _Left2, typename _Right2>
-struct ___lambda<___lambda_comma, ___lambda<_FuncL, _Left, _Right>, ___lambda<_FuncL2, _Left2, _Right2> >
-{
-	___lambda_comma f;
-	___lambda<_FuncL, _Left, _Right> left;
-	___lambda<_FuncL2, _Left2, _Right2> right;
-
-	template<typename... _Args>
-	auto operator()(_Args&&... args)
-	-> decltype(right(std::forward<_Args>(args)...))
-	{
-		left(std::forward<_Args>(args)...);
-		return right(std::forward<_Args>(args)...);
-	}
-};
-
-template<typename _FuncL, typename _Left, typename _Right, int _Num>
-struct ___lambda<___lambda_comma, ___lambda<_FuncL, _Left, _Right>, placeholder<_Num> >
-{
-	___lambda_comma f;
-	___lambda<_FuncL, _Left, _Right> left;
-
-	template<typename... _Args>
-	auto operator()(_Args&&... args)
-	-> decltype(arg<_Num-1>(args...))
-	{
-		left(std::forward<_Args>(args)...);
-		return arg<_Num-1>(args...);
-	}
-};
-
-template<typename _FuncL, typename _Left, typename _Right, int _Num>
-struct ___lambda<___lambda_comma, placeholder<_Num>, ___lambda<_FuncL, _Left, _Right> >
-{
-	___lambda_comma f;
-	___lambda<_FuncL, _Left, _Right> right;
-
-	template<typename... _Args>
-	auto operator()(_Args&&... args)
-	-> decltype(right(std::forward<_Args>(args)...))
-	{
-		return right(std::forward<_Args>(args)...);
-	}
-};
-
-template<std::size_t _Num, std::size_t _Num2>
-struct ___lambda<___lambda_comma, placeholder<_Num>, placeholder<_Num2>>
-{
-	___lambda_comma f;
-
-	template<typename... _Args>
-	auto operator()(_Args&&... args)
-	-> decltype(arg<_Num2-1>(args...))
-	{
-		return arg<_Num2-1>(args...);
-	}
-};
-
-#define __FALCON_NAME_OPERATOR ___lambda_comma
-#define __FALCON_SIGN_OPERATOR ,
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-//@}
-
-// #undef __FALCON_RETURN_TYPE_OPERATOR
-#undef __FALCON_CALIFIER_FIRST_PARAM
-// #define __FALCON_RETURN_TYPE_OPERATOR(_Sign) _T&
-#define __FALCON_CALIFIER_FIRST_PARAM
-
-//@{
-#define __FALCON_NAME_OPERATOR plus_equal<>
-#define __FALCON_SIGN_OPERATOR +=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR minus_equal<>
-#define __FALCON_SIGN_OPERATOR -=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR multiplies_equal<>
-#define __FALCON_SIGN_OPERATOR *=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR modulus_equal<>
-#define __FALCON_SIGN_OPERATOR %=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR divides_equal<>
-#define __FALCON_SIGN_OPERATOR /=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR bit_and_equal<>
-#define __FALCON_SIGN_OPERATOR &=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR bit_or_equal<>
-#define __FALCON_SIGN_OPERATOR |=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR bit_xor_equal<>
-#define __FALCON_SIGN_OPERATOR ^=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR left_shift<>
-#define __FALCON_SIGN_OPERATOR <<
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR right_shift<>
-#define __FALCON_SIGN_OPERATOR >>
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR left_shift_equal<>
-#define __FALCON_SIGN_OPERATOR <<=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR right_shift_equal<>
-#define __FALCON_SIGN_OPERATOR >>=
-#include <falcon/lambda/binary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-//@}
-
-// #undef __FALCON_RETURN_TYPE_OPERATOR
-// #define __FALCON_RETURN_TYPE_OPERATOR(_Sign) decltype(_Sign std::declval<_T&>())
-
-//@{
-#define __FALCON_NAME_OPERATOR dereference<>
-#define __FALCON_SIGN_OPERATOR *
-#include <falcon/lambda/unary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR negate<>
-#define __FALCON_SIGN_OPERATOR -
-#include <falcon/lambda/unary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR unary_plus<>
-#define __FALCON_SIGN_OPERATOR +
-#include <falcon/lambda/unary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR increment<>
-#define __FALCON_SIGN_OPERATOR ++
-#include <falcon/lambda/unary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR decrement<>
-#define __FALCON_SIGN_OPERATOR --
-#include <falcon/lambda/unary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-
-#define __FALCON_NAME_OPERATOR bit_not<>
-#define __FALCON_SIGN_OPERATOR ~
-#include <falcon/lambda/unary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-//@}
-
-// #undef __FALCON_RETURN_TYPE_OPERATOR
-#undef __FALCON_CALIFIER_FIRST_PARAM
-
-// #define __FALCON_RETURN_TYPE_OPERATOR(_Sign) bool
-#define __FALCON_CALIFIER_FIRST_PARAM const
-
-//@{
-#define __FALCON_NAME_OPERATOR logical_not<>
-#define __FALCON_SIGN_OPERATOR !
-#include <falcon/lambda/unary_operator.tcc>
-#undef __FALCON_NAME_OPERATOR
-#undef __FALCON_SIGN_OPERATOR
-//@}
-
-
-//support manipulator ios
-namespace operators {
-
-template<typename _T,
-bool = iostreams::is_istream<_T>::value,
-bool = iostreams::is_ostream<_T>::value,
-bool = iostreams::is_ios<_T>::value>
-struct __deduce_iostream_lambda
-{
-	static const bool __value = false;
-	typedef void __iomanip_type;
-};
-
-template<template<class, class> class _T, typename _Char, typename _Traits>
-struct __deduce_iostream_lambda<_T<_Char, _Traits>, true, false, true>
-{
-	static const bool __value = true;
-	typedef std::basic_istream<_Char, _Traits> __ios_type;
-	typedef __ios_type&(*__iomanip_type)(__ios_type&);
-};
-
-template<template<class, class> class _T, typename _Char, typename _Traits>
-struct __deduce_iostream_lambda<_T<_Char, _Traits>, false, true, true>
-{
-	static const bool __value = true;
-	typedef std::basic_ostream<_Char, _Traits> __ios_type;
-	typedef __ios_type&(*__iomanip_type)(__ios_type&);
-};
-
-template<template<class, class> class _T, typename _Char, typename _Traits>
-struct __deduce_iostream_lambda<_T<_Char, _Traits>, false, false, true>
-{
-	static const bool __value = true;
-	typedef std::basic_ios<_Char, _Traits> __ios_type;
-	typedef __ios_type&(*__iomanip_type)(__ios_type&);
-};
-
-template<template<class, class, class> class _T, typename _Char, typename _Traits, typename _Allocator>
-struct __deduce_iostream_lambda<_T<_Char, _Traits, _Allocator>, true, false, true>
-{
-	static const bool __value = true;
-	typedef std::basic_istream<_Char, _Traits> __ios_type;
-	typedef __ios_type&(*__iomanip_type)(__ios_type&);
-};
-
-template<template<class, class, class> class _T, typename _Char, typename _Traits, typename _Allocator>
-struct __deduce_iostream_lambda<_T<_Char, _Traits, _Allocator>, false, true, true>
-{
-	static const bool __value = true;
-	typedef std::basic_ostream<_Char, _Traits> __ios_type;
-	typedef __ios_type&(*__iomanip_type)(__ios_type&);
-};
-
-template<template<class, class, class> class _T, typename _Char, typename _Traits, typename _Allocator>
-struct __deduce_iostream_lambda<_T<_Char, _Traits, _Allocator>, false, false, true>
-{
-	static const bool __value = true;
-	typedef std::basic_ios<_Char, _Traits> __ios_type;
-	typedef __ios_type&(*__iomanip_type)(__ios_type&);
-};
-
-typedef __deduce_iostream_lambda<void, false, false, false> __bad_ios_lambda;
-
-
-template<typename _Lambda>
-struct __is_ostream_lambda
-: __bad_ios_lambda
-{};
-
-template<typename _T>
-struct __is_ostream_lambda<___lambda<void, _T&>>
-: __deduce_iostream_lambda<_T, false, iostreams::is_ostream<_T>::value>
-{};
-
-template<typename _Lambda1, typename _Lambda2>
-struct __is_ostream_lambda<___lambda<left_shift<>, _Lambda1, _Lambda2>>
-: __is_ostream_lambda<_Lambda1>
-{};
-
-
-template<typename _Lambda>
-struct __is_istream_lambda
-: __bad_ios_lambda
-{};
-
-template<typename _T>
-struct __is_istream_lambda<___lambda<void, _T&>>
-: __deduce_iostream_lambda<_T, iostreams::is_istream<_T>::value, false>
-{};
-
-template<typename _Lambda1, typename _Lambda2>
-struct __is_istream_lambda<___lambda<left_shift<>, _Lambda1, _Lambda2>>
-: __is_istream_lambda<_Lambda1>
-{};
-
-template<typename _Operation, typename _TL, typename _TR>
-typename std::enable_if<
-	__is_ostream_lambda<
-		___lambda<_Operation, _TL, _TR>
-	>::__value,
-	___lambda<
-		left_shift<>,
-		___lambda<_Operation, _TL, _TR>,
-		typename __is_ostream_lambda<
-			___lambda<_Operation, _TL, _TR>
-		>::__iomanip_type
-	>
->::type
-operator<<(___lambda<_Operation, _TL, _TR> l,
-		   typename __is_ostream_lambda<___lambda<_Operation, _TL, _TR>>::__iomanip_type __pf)
-{ return {left_shift<>(), l, __pf}; }
-
-template<typename _Operation, typename _TL, typename _TR>
-typename std::enable_if<
-	__is_istream_lambda<
-		___lambda<_Operation, _TL, _TR>
-	>::__value,
-	___lambda<
-		right_shift<>,
-		___lambda<_Operation, _TL, _TR>,
-		typename __is_istream_lambda<
-			___lambda<_Operation, _TL, _TR>
-		>::__iomanip_type
-	>
->::type
-operator>>(___lambda<_Operation, _TL, _TR> l,
-		   typename __is_istream_lambda<___lambda<_Operation, _TL, _TR>>::__iomanip_type __pf)
-{ return {right_shift<>(), l, __pf}; }
+template<class T>
+constexpr _aux::lambda<T&>
+var(T& x)
+{ return {x}; }
+
+template<class T>
+constexpr _aux::lambda<typename std::remove_reference<T>::type>
+constant(T && x)
+{ return {std::forward<T>(x)}; }
+
+template<class F>
+constexpr _aux::lambda<_aux::func_t<F>>
+func(F && f)
+{ return {std::forward<F>(f)}; }
+
+template<class F, class... Args>
+constexpr _aux::lambda<_aux::func_t<
+  decltype(std::bind(std::declval<F>(), std::declval<Args>()...))
+>>
+bind(F && f, Args&&... args)
+{ return {_aux::bind_t(), std::forward<F>(f), std::forward<Args>(args)...}; }
 
 }
-
-
-template<typename _T>
-constexpr typename std::enable_if<std::is_lvalue_reference<_T&>::value, ___lambda<void, _T&> >::type lambda(_T& ref)
-{
-	return {ref};
 }
 
-template<typename _T>
-constexpr typename std::enable_if<std::is_rvalue_reference<_T&&>::value, ___lambda<void, _T>>::type lambda(_T&& rvalue)
-{
-	return {rvalue};
+namespace std {
+  template<int I>
+  struct is_placeholder<
+    ::falcon::lambda::_aux::lambda<integral_constant<int, I>>
+  > : integral_constant<int, I>
+  {};
 }
-
-template<typename _T>
-constexpr typename std::enable_if<std::is_lvalue_reference<_T&>::value, ___lambda<operators::binder, _T&, void> >::type lambda_bind(_T& ref)
-{
-	return {ref};
-}
-
-template<typename _T>
-constexpr typename std::enable_if<std::is_rvalue_reference<_T&&>::value, ___lambda<operators::binder, _T, void>>::type lambda_bind(_T&& rvalue)
-{
-	return {rvalue};
-}
-
-}
-
-}
-
-using namespace falcon::lambda::operators;
 
 #endif

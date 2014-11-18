@@ -16,11 +16,12 @@ namespace algorithm {
  *  such that @c *i == @p val, or @p last if no such iterator exists.
  */
 template<class RandomAccessIterator, class T>
-RandomAccessIterator dichotomous_find(RandomAccessIterator first,
-                                      RandomAccessIterator last, const T& val)
+RandomAccessIterator dichotomous_find(
+  RandomAccessIterator first, RandomAccessIterator last
+, const T& val)
 {
   first = std::lower_bound(first, last, val);
-  if (first != last && *first != val) {
+  if (first != last && val < *first) {
     return last;
   }
 	return first;
@@ -37,9 +38,9 @@ RandomAccessIterator dichotomous_find(RandomAccessIterator first,
  *  such that @p pred(*i) is true, or @p last if no such iterator exists.
  */
 template<class RandomAccessIterator, class T, class LowerCompare>
-RandomAccessIterator dichotomous_find(RandomAccessIterator first,
-                                      RandomAccessIterator last, const T& val,
-                                      LowerCompare lower_comp)
+RandomAccessIterator dichotomous_find(
+  RandomAccessIterator first, RandomAccessIterator last
+, const T& val, LowerCompare lower_comp)
 {
   first = std::lower_bound(first, last, val, lower_comp);
   if (first != last && lower_comp(val, *first)) {

@@ -1,97 +1,163 @@
-#ifndef _FALCON_LAMBDA_IF_HPP
-#define _FALCON_LAMBDA_IF_HPP
+#ifndef FALCON_LAMBDA_IF_HPP
+#define FALCON_LAMBDA_IF_HPP
 
 #include <falcon/lambda/lambda.hpp>
 
 namespace falcon {
 namespace lambda {
 
-template<typename _Functor, typename _TrueFunctor>
-struct ifthen
-{
-	_Functor condition;
-	_TrueFunctor true_f;
+namespace _aux {
 
-	template<typename... _Args>
-	inline void operator()(_Args&&... args)
-	{
-		if(condition(std::forward<_Args>(args)...))
-			true_f(std::forward<_Args>(args)...);
-	}
-};
+  template<class>
+  class condition_t;
 
-template<typename _Functor, typename _TrueFunctor, typename _FalseFunctor>
-struct ifthen_else
-{
-	_Functor condition;
-	_TrueFunctor true_f;
-	_FalseFunctor false_f;
+  template<class Condition, class ThenPart>
+  struct lambda<condition_t<Condition>, ThenPart, void>
+  : lambda_with_tuple<Condition, ThenPart>
+  {
+    using lambda::with_tuple_type::lambda_with_tuple;
 
-	template<typename... _Args>
-	inline void operator()(_Args&&... args)
-	{
-		if(condition(std::forward<_Args>(args)...))
-			true_f(std::forward<_Args>(args)...);
-		else
-			false_f(std::forward<_Args>(args)...);
-	}
-};
+    template<class... Args>
+    void operator()(Args&&... args) const {
+      if (std::get<0>(this->t)(std::forward<Args>(args)...)) {
+        std::get<1>(this->t)(std::forward<Args>(args)...);
+      }
+    }
+  };
 
-template<typename _Functor, typename _TrueFunctor, typename _FalseFunctor>
-struct ifthen_else_return
-{
-	_Functor condition;
-	_TrueFunctor true_f;
-	_FalseFunctor false_f;
+  template<class Condition, class ThenPart, class ElsePart>
+  struct lambda<condition_t<Condition>, ThenPart, ElsePart>
+  : lambda_with_tuple<Condition, ThenPart, ElsePart>
+  {
+    using lambda::with_tuple_type::lambda_with_tuple;
 
-	template<typename... _Args, typename _Result = typename std::common_type<decltype(true_f(std::declval<_Args>()...)), decltype(false_f(std::declval<_Args>()...))>::type>
-	inline _Result operator()(_Args&&... args)
-	{
-		if (condition(std::forward<_Args>(args)...))
-			return true_f(std::forward<_Args>(args)...);
-		return false_f(std::forward<_Args>(args)...);
-	}
-};
+    template<class... Args>
+    void operator()(Args&&... args) const {
+      if (std::get<0>(this->t)(std::forward<Args>(args)...)) {
+        std::get<1>(this->t)(std::forward<Args>(args)...);
+      }
+      else  {
+        std::get<2>(this->t)(std::forward<Args>(args)...);
+      }
+    }
+  };
 
-template<typename _Functor, typename _TrueFunctor, typename _FalseFunctor>
-struct ifthen_return
-{
-	_Functor condition;
-	_TrueFunctor true_f;
-	_FalseFunctor f;
+  template<class>
+  class condition_return_t;
 
-	template<typename... _Args, typename _Result = decltype(f(std::declval<_Args>()...))>
-	inline _Result operator()(_Args&&... args)
-	{
-		if(condition(std::forward<_Args>(args)...))
-			true_f(std::forward<_Args>(args)...);
-		return f(std::forward<_Args>(args)...);
-	}
-};
+  template<class Condition, class ThenPart, class ElsePart>
+  struct lambda<condition_return_t<Condition>, ThenPart, ElsePart>
+  : lambda_with_tuple<Condition, ThenPart, ElsePart>
+  , lambda_operators<lambda<condition_return_t<Condition>, ThenPart, ElsePart>>
+  {
+    using lambda::with_tuple_type::lambda_with_tuple;
+    using lambda::operators_type::operator=;
 
-template<typename _Functor, typename _TrueFunctor>
-inline ___lambda<operators::binder, ifthen<_Functor, _TrueFunctor> > if_then(_Functor condition, _TrueFunctor f)
-{
-	return {{condition, f}};
+    template<class... Args>
+    constexpr CPP1X_DELEGATE_FUNCTION(
+      operator()(Args&&... args) const
+    , std::get<0>(this->t)(std::forward<Args>(args)...)
+      ? std::get<1>(this->t)(std::forward<Args>(args)...)
+      : std::get<2>(this->t)(std::forward<Args>(args)...)
+    )
+  };
+
+  template<class>
+  class if_else_t;
+
+  template<class Condition>
+  struct lambda<condition_t<Condition>, void, void>
+  {
+    Condition cond;
+
+    template<class... Args>
+    void operator()(Args&&...) const
+    { static_assert(true, "contains no body"); }
+
+    template<class ThenPart>
+    constexpr lambda<if_else_t<Condition>
+    , typename std::remove_reference<ThenPart>::type>
+    operator[](ThenPart && then_part) const
+    { return {cond, std::forward<ThenPart>(then_part)}; }
+  };
+
+  template<class Condition, class ThenPart>
+  struct lambda<if_else_t<Condition>, ThenPart, void>
+  : lambda<condition_t<Condition>, ThenPart>
+  {
+    using lambda<condition_t<Condition>, ThenPart>::lambda;
+
+    template<class C>
+    struct else_t
+    {
+      lambda & l;
+
+      template<class ElsePart>
+      constexpr lambda<C, ThenPart
+      , typename std::remove_reference<ElsePart>::type>
+      operator[](ElsePart && else_part) const
+      { return {std::get<0>(l.t)
+      , std::get<1>(l.t)
+      , std::forward<ElsePart>(else_part)}; }
+    };
+
+    else_t<condition_t<Condition>> else_ = {*this};
+    else_t<condition_return_t<Condition>> else_return = {*this};
+  };
+
 }
 
-template<typename _Functor, typename _TrueFunctor, typename _FalseFunctor>
-inline ___lambda<operators::binder, ifthen_else<_Functor, _TrueFunctor, _FalseFunctor> > if_then_else(_Functor condition, _TrueFunctor true_f, _FalseFunctor false_f)
-{
-	return {{condition, true_f, false_f}};
-}
+template<class Condition>
+constexpr
+_aux::lambda<_aux::condition_t<typename std::remove_reference<Condition>::type>>
+if_(Condition && cond)
+{ return {std::forward<Condition>(cond)}; }
 
-template<typename _Functor, typename _TrueFunctor, typename _FalseFunctor>
-inline ___lambda<operators::binder, ifthen_else_return<_Functor, _TrueFunctor, _FalseFunctor> > if_then_else_return(_Functor condition, _TrueFunctor true_f, _FalseFunctor false_f)
-{
-	return {{condition, true_f, false_f}};
-}
+template<class Condition, class ThenPart>
+constexpr _aux::lambda<
+  _aux::condition_t<typename std::remove_reference<Condition>::type>
+, typename std::remove_reference<ThenPart>::type>
+if_(Condition && cond, ThenPart && then_part)
+{ return {
+  std::forward<Condition>(cond)
+, std::forward<ThenPart>(then_part)
+}; }
 
-template<typename _Functor, typename _TrueFunctor, typename _FalseFunctor>
-inline ___lambda<operators::binder, ifthen_return<_Functor, _TrueFunctor, _FalseFunctor> > if_then_return(_Functor condition, _TrueFunctor true_f, _FalseFunctor f)
-{
-	return {{condition, true_f, f}};
-}
+template<class Condition, class ThenPart, class ElsePart>
+constexpr _aux::lambda<
+  _aux::condition_t<typename std::remove_reference<Condition>::type>
+, typename std::remove_reference<ThenPart>::type
+, typename std::remove_reference<ElsePart>::type>
+if_(Condition && cond, ThenPart && then_part, ElsePart && else_part)
+{ return {
+  std::forward<Condition>(cond)
+, std::forward<ThenPart>(then_part)
+, std::forward<ElsePart>(else_part)
+}; }
+
+template<class Condition, class ThenPart, class ElsePart>
+constexpr _aux::lambda<
+  _aux::condition_t<typename std::remove_reference<Condition>::type>
+, typename std::remove_reference<ThenPart>::type
+, typename std::remove_reference<ElsePart>::type>
+if_else(Condition && cond, ThenPart && then_part, ElsePart && else_part)
+{ return {
+  std::forward<Condition>(cond)
+, std::forward<ThenPart>(then_part)
+, std::forward<ElsePart>(else_part)
+}; }
+
+template<class Condition, class ThenPart, class ElsePart>
+constexpr _aux::lambda<
+  _aux::condition_return_t<typename std::remove_reference<Condition>::type>
+, typename std::remove_reference<ThenPart>::type
+, typename std::remove_reference<ElsePart>::type>
+if_else_return(Condition && cond, ThenPart && then_part, ElsePart && else_part)
+{ return {
+  std::forward<Condition>(cond)
+, std::forward<ThenPart>(then_part)
+, std::forward<ElsePart>(else_part)
+}; }
 
 }
 }

@@ -19,10 +19,9 @@ void iomanip_test()
 	}
 
 	{
-		using falcon::lambda::lambda;
 		using namespace falcon::lambda::placeholders;
 		std::wstringstream wss;
-		auto p3 = lambda(wss) << _1 << falcon::endl;
+		auto p3 = wss << _1 << falcon::endl;
 		p3(56);
 		CHECK(wss.str() == L"56\n");
 	}
