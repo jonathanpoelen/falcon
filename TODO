@@ -332,5 +332,5 @@ is_transparent_inheritance<F> pour certain foncteurs
 
 cstring: utiliser la même interface que string_view (ou le remplacer par ?)
 
-removed resolve_manipulator
+generic_allocator : si non trivial constructeur, utiliser constructeur parenthèsé
 
