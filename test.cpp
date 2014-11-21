@@ -65,56 +65,7 @@
 // };
 
 #include <memory>
-#include <falcon/memory/allocator_rebind.hpp>
-
-namespace falcon {
-
-template<class T, class Alloc>
-struct allocator_delete
-{
-  using allocator_type = allocator_rebind_t<Alloc, T>;
-
-  template<class Alloc2>
-  explicit allocator_delete(const Alloc2 & alloc)
-  : alloc_(alloc)
-  {}
-
-  explicit allocator_delete(const allocator_type & alloc)
-  : alloc_(alloc)
-  {}
-
-  allocator_delete() = default;
-  allocator_delete(allocator_delete &&) = default;
-  allocator_delete(allocator_delete const &) = default;
-  allocator_delete&operator=(allocator_delete &&) = default;
-  allocator_delete&operator=(allocator_delete const &) = default;
-
-  void operator()(T * p) noexcept
-  {
-    alloc_.destroy(p);
-    alloc_.deallocate(p, 1);
-  }
-
-private:
-  allocator_type alloc_;
-};
-
-template<class T, class Alloc, class... Args>
-std::unique_ptr<T, allocator_delete<T, allocator_rebind_t<Alloc, T> > >
-allocate_unique(const Alloc& alloc, Args&&... args)
-{
-  using Allocator = allocator_rebind_t<Alloc, T>;
-  using Deleter = allocator_delete<T, Allocator>;
-  using Unique = std::unique_ptr<T, Deleter>;
-  Unique ret(nullptr, Deleter(alloc));
-  Allocator & deleter = reinterpret_cast<Allocator&>(ret.get_deleter());
-  ret.reset(deleter.allocate(1));
-  // ATTENTION exception
-  deleter.construct(ret.get(), std::forward<Args>(args)...);
-  return ret;
-}
-
-}
+#include <falcon/memory/allocate_unique.hpp>
 
 
 // #include <iostream>
@@ -135,8 +86,8 @@ int main()
 //                                                  size_t(12), size_t(32));
 // //   get<0>(t2) = const_cast<char*>("plop");
 //   std::cout
-//   << ptr_t(get<0>(t2)) << "\n"
-//   << ptr_t(get<1>(t2)) << "\n"
+//   << ptrt(get<0>(t2)) << "\n"
+//   << ptrt(get<1>(t2)) << "\n"
 //   ;
 
 //   falcon::grouping_new<int, char>(2, 4);
