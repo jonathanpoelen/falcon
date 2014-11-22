@@ -48,7 +48,7 @@ public:
   template<typename F, std::size_t... Is>
   constexpr CPP1X_DELEGATE_FUNCTION(
     operator()(F && func, parameter_index<Is...> indexes) const
-    , tuple_apply(indexes, std::forward<F>(func), this->tuple()))
+  , tuple_apply(indexes, std::forward<F>(func), this->tuple()))
 };
 
 
@@ -60,6 +60,22 @@ make_arguments(Elements&&... args)
     std::forward<Elements>(args)...
   };
 }
+
+
+template<typename... Elements>
+arguments_wrapper<Elements...>&
+arguments_cast(std::tuple<Elements...> & t)
+{ return static_cast<arguments_wrapper<Elements...>&>(t); }
+
+template<typename... Elements>
+arguments_wrapper<Elements...>&&
+arguments_cast(const std::tuple<Elements...> && t)
+{ return static_cast<arguments_wrapper<Elements...>&&>(t); }
+
+template<typename... Elements>
+const arguments_wrapper<Elements...>&
+arguments_cast(const std::tuple<Elements...> & t)
+{ return static_cast<const arguments_wrapper<Elements...>&>(t); }
 
 
 template<typename... Elements>

@@ -65,14 +65,12 @@
 // };
 
 #include <memory>
-#include <falcon/memory/allocate_unique.hpp>
 
 
 // #include <iostream>
 
 int main()
 {
-  auto p = falcon::allocate_unique<int>(std::allocator<int>(), 3);
 
 
 //   falcon::retain_free_object_allocator<int> allocator;

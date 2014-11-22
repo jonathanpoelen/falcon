@@ -317,14 +317,16 @@ un stringstream (ou/et buffer) qui n'alloue pas de chaîne (utilise un cstring) 
 
 get_line (see proposal)
 
-un make_unique qui prend un allocator et le deleter qui le wrap
-
 collision de range (insert,extend[r,l],rien)
 
 delete[] en c++14 prend un size_t
 
 la::args<i...>(f) / la::a<i...>(f)
-la::pack<i,n>(f) (à la place de arguments_wrapper dans functional/)
+la::pack<i,n>(f) (à la place de parameter_index_adapter (renommer) dans functional/)
+la::propagate(f1,f2,f3) -> f3(f2(f1(args...)))
+la::compose(mk_tuple, f1,f2,f3) -> mk_tuple(f1(args...),f2(args...),f3(args...))
+
+foncteur qui permet de différer la position des arguments (une sorte de bind en 2 étapes): xxx(<0,1,4>, a0,a1,a2)(f,a3) = f(a0,a1,a3,a2). Existe déjà ?
 
 apply_to_tuple op::apply qui retourne une tuple (déjà dans tuple/ ?)
 

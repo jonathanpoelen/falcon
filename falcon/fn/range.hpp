@@ -64,8 +64,8 @@ namespace fn {
 
       template<class T>
       constexpr auto operator()(T const & x) const ->
-      decltype(begin(std::forward<T>(x)))
-      { return begin(std::forward<T>(x)); }
+      decltype(rbegin(std::forward<T>(x)))
+      { return rbegin(std::forward<T>(x)); }
     };
 
     struct crend_fn
@@ -74,8 +74,8 @@ namespace fn {
 
       template<class T>
       constexpr auto operator()(T const & x) const ->
-      decltype(begin(std::forward<T>(x)))
-      { return begin(std::forward<T>(x)); }
+      decltype(rbegin(std::forward<T>(x)))
+      { return rbegin(std::forward<T>(x)); }
     };
   }
 
