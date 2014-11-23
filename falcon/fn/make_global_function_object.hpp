@@ -7,113 +7,116 @@
 #include <falcon/c++1x/syntax.hpp>
 #include <utility>
 
-#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(namespace_adl, name) \
+#define FALCON_MAKE_STATIC_GLOBAL_FUNCTION_OBJECT(namespace_adl, name)\
+  FALCON_GLOBAL_OBJECT(name, namespace_adl::FALCON_CONCAT(name,_fn))
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_TYPE_IMPL( \
+  namespace_adl, name, template_params, type_params, impl) \
   namespace namespace_adl { \
-    template<class T> \
-    constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
-      name(T && x) \
-    , std::forward<T>(x).name()) \
-\
     struct FALCON_CONCAT(name,_fn) \
     { \
       constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
 \
-      template<class T> \
+      template<FALCON_PP_PACK template_params> \
       constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
-        operator()(T && x) const \
-      , name(std::forward<T>(x)) \
-      ) \
+        operator()(FALCON_PP_PACK type_params) const \
+      , impl) \
     }; \
-  } \
-\
-  namespace { \
-    constexpr auto const & name \
-      = ::falcon::static_const<namespace_adl::FALCON_CONCAT(name,_fn)>::value; \
   }
 
-#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2( \
-  namespace_adl, name, template_params, type_params, params) \
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_NON_MEMBER_FUNCTION_IMPL( \
+  namespace_adl, name, template_params, type_params, impl) \
   namespace namespace_adl { \
-    template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
+    template<FALCON_PP_PACK template_params> \
     constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
-      name(Falcon_GFO_T && x, FALCON_PP_PACK type_params)\
-    , std::forward<Falcon_GFO_T>(x).name params) \
-\
-    struct FALCON_CONCAT(name,_fn) \
-    { \
-      constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
-\
-      template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
-      constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(\
-        operator()(Falcon_GFO_T && x, FALCON_PP_PACK type_params) const \
-      , name(std::forward<Falcon_GFO_T>(x), FALCON_PP_PACK params)) \
-    }; \
-  } \
-\
-  namespace { \
-    constexpr auto const & name \
-      = ::falcon::static_const<namespace_adl::FALCON_CONCAT(name,_fn)>::value; \
+      name(FALCON_PP_PACK type_params) \
+    , impl) \
   }
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_IMPL( \
+  namespace_adl, name, template_params, type_params, obj_impl, func_impl) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_NON_MEMBER_FUNCTION_IMPL( \
+    namespace_adl, name, template_params, type_params, func_impl) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_TYPE_IMPL( \
+    namespace_adl, name, template_params, type_params, obj_impl) \
+  FALCON_MAKE_STATIC_GLOBAL_FUNCTION_OBJECT(namespace_adl, name)
+
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(namespace_adl, name) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_IMPL(namespace_adl, name, \
+    (class T), (T && x), name(std::forward<T>(x)), std::forward<T>(x).name())
 
 #define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WRAPPER(namespace_adl, name) \
-  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2( \
-    namespace_adl, name \
-  , (class... Ts), (Ts&&...args), (std::forward<Ts>(args)...))
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_IMPL(namespace_adl, name, \
+    (class T, class... Args), \
+    (T && x, Args&&... args), \
+    name(std::forward<T>(x), std::forward<Args>(args)...), \
+    std::forward<T>(x).name(std::forward<Args>(args)...))
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_ARGS( \
+  namespace_adl, name, template_params, type_params, params) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_IMPL(namespace_adl, name, \
+    (class T, FALCON_PP_PACK template_params), \
+    (T && x, FALCON_PP_PACK type_params), \
+    name(std::forward<T>(x), FALCON_PP_PACK params), \
+    std::forward<T>(x).name(FALCON_PP_PACK params))
 
 
-#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_RESULT(result, namespace_adl, name) \
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_TYPE_WITH_RESULT_IMPL( \
+  result, namespace_adl, name, template_params, type_params, impl) \
   namespace namespace_adl { \
-    template<class T> \
-    constexpr result name(T && x) \
-    noexcept(noexcept(std::forward<T>(x).name())) \
-    { return std::forward<T>(x).name(); } \
-\
     struct FALCON_CONCAT(name,_fn) \
     { \
+      using result_type = result;\
       constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
 \
-      template<class T> \
-      constexpr result operator()(T && x) const \
-      noexcept(name(std::forward<T>(x))) \
-      { return name(std::forward<T>(x)); } \
+      template<FALCON_PP_PACK template_params> \
+      constexpr result operator()(FALCON_PP_PACK type_params) const \
+      noexcept(noexcept(impl)) \
+      { return impl; } \
     }; \
-  } \
-\
-  namespace { \
-    constexpr auto const & name \
-      = ::falcon::static_const<namespace_adl::FALCON_CONCAT(name,_fn)>::value; \
   }
 
-#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2_RESULT( \
-  result, namespace_adl, name, template_params, type_params, params) \
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_NON_MEMBER_FUNCTION_WITH_RESULT_IMPL( \
+  result, namespace_adl, name, template_params, type_params, impl) \
   namespace namespace_adl { \
-    template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
-    constexpr result name(Falcon_GFO_T && x, FALCON_PP_PACK type_params) \
-    noexcept(noexcept(std::forward<Falcon_GFO_T>(x).name params)) \
-    { return std::forward<Falcon_GFO_T>(x).name params; } \
-\
-    struct FALCON_CONCAT(name,_fn) \
-    { \
-      constexpr FALCON_CONCAT(name,_fn)() noexcept {} \
-\
-      template<class Falcon_GFO_T, FALCON_PP_PACK template_params> \
-      constexpr result operator()( \
-        Falcon_GFO_T && x, FALCON_PP_PACK type_params) const \
-      noexcept(noexcept( \
-        name(std::forward<Falcon_GFO_T>(x), FALCON_PP_PACK params))) \
-      { return name(std::forward<Falcon_GFO_T>(x), FALCON_PP_PACK params); } \
-    }; \
-  } \
-\
-  namespace { \
-    constexpr auto const & name \
-      = ::falcon::static_const<namespace_adl::FALCON_CONCAT(name,_fn)>::value; \
+    template<FALCON_PP_PACK template_params> \
+    constexpr result name(FALCON_PP_PACK type_params) \
+    noexcept(noexcept(impl)) \
+    { return impl; } \
   }
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WITH_RESULT_IMPL( \
+  result, namespace_adl, name, \
+  template_params, type_params, obj_impl, func_impl) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_NON_MEMBER_FUNCTION_WITH_RESULT_IMPL( \
+    result, namespace_adl, name, template_params, type_params, func_impl) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_TYPE_WITH_RESULT_IMPL( \
+    result, namespace_adl, name, template_params, type_params, obj_impl) \
+  FALCON_MAKE_STATIC_GLOBAL_FUNCTION_OBJECT(namespace_adl, name)
+
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_RESULT( \
+  result, namespace_adl, name) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WITH_RESULT_IMPL( \
+    result, namespace_adl, name, \
+    (class T), (T && x), name(std::forward<T>(x)), std::forward<T>(x).name())
 
 #define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_RESULT_WRAPPER( \
   result, namespace_adl, name) \
-  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT2_RESULT( \
-    result, namespace_adl, name \
-  , (class... Ts), (Ts&&args...), (std::forward<Ts>(args)...))
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WITH_RESULT_IMPL( \
+    result, namespace_adl, name, \
+    (class T, class... Args), (T && x, Args && ... ), \
+    name(std::forward<T>(x), std::forward<Args>(args)...), \
+    std::forward<T>(x).name(std::forward<Args>(args)...))
+
+#define FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_RESULT_ARGS( \
+  result, namespace_adl, name, template_params, type_params, params) \
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WITH_RESULT_IMPL( \
+    result, namespace_adl, name, \
+    (class T, , FALCON_PP_PACK template_params), \
+    (T && x, FALCON_PP_PACK type_params), \
+    name(std::forward<T>(x), FALCON_PP_PACK params), \
+    std::forward<T>(x).name(FALCON_PP_PACK params))
 
 #endif

@@ -5,7 +5,7 @@
 
 namespace falcon {
 namespace fn {
-  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WRAPPER(adl_, pop_back)
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, pop_back)
   using pop_back_fn = adl_::pop_back_fn;
 }
 }

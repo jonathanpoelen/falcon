@@ -5,7 +5,8 @@
 
 namespace falcon {
 namespace fn {
-  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WRAPPER(adl_, insert_after)
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_ARGS(
+    adl_, insert_after, (class U), (U&& arg), (std::forward<U>(arg)))
   using insert_after_fn = adl_::insert_after_fn;
 }
 }

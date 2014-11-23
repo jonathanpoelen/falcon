@@ -14,6 +14,11 @@ struct static_const
 template<class T>
 constexpr T static_const<T>::value;
 
+#define FALCON_GLOBAL_OBJECT(name, type) \
+  namespace { \
+    constexpr auto const & name = ::falcon::static_const<type>::value; \
+  }
+
 }
 
 #endif

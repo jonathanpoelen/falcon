@@ -5,6 +5,16 @@
 
 namespace falcon {
 namespace fn {
+  namespace adl_ {
+    template<class T, std::size_t N>
+    constexpr T const * data(T const (&arr)[N]) noexcept
+    { return arr; }
+
+    template<class T, std::size_t N>
+    T * data(T (&arr)[N]) noexcept
+    { return arr; }
+  }
+
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, data)
   using data_fn = adl_::data_fn;
 }

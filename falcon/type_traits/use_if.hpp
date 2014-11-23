@@ -14,6 +14,9 @@ struct use_if
 : eval_if<T::value, T, Default>
 {};
 
+template<class T, typename Default>
+using use_if_t = typename use_if<T, Default>::type;
+
 }
 
 #endif

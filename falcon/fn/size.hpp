@@ -10,6 +10,7 @@ namespace fn {
     constexpr std::size_t size(T const (&)[N]) noexcept
     { return N; }
   }
+
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, size)
   using size_fn = adl_::size_fn;
 }

@@ -321,10 +321,10 @@ collision de range (insert,extend[r,l],rien)
 
 delete[] en c++14 prend un size_t
 
-la::args<i...>(f) / la::a<i...>(f)
-la::pack<i,n>(f) (à la place de parameter_index_adapter (renommer) dans functional/)
-la::propagate(f1,f2,f3) -> f3(f2(f1(args...)))
+la::linking(f1,f2,f3) -> f3(f2(f1(args...)))
+la::propagate(f1,f2,f3) -> f1(args...),f2(args...),f3(args...)
 la::compose(mk_tuple, f1,f2,f3) -> mk_tuple(f1(args...),f2(args...),f3(args...))
+la::xxx(f)(a1,a2) -> f(a1),f(a2)
 
 foncteur qui permet de différer la position des arguments (une sorte de bind en 2 étapes): xxx(<0,1,4>, a0,a1,a2)(f,a3) = f(a0,a1,a3,a2). Existe déjà ?
 
@@ -336,3 +336,6 @@ cstring: utiliser la même interface que string_view (ou le remplacer par ?)
 
 generic_allocator : si non trivial constructeur, utiliser constructeur parenthèsé
 
+keep_parameter_index devrais pouvoir fonctionner avec des indice non normalisé (idem pour fn::args et fn::pack)
+
+static_new et co: is_trivial_copy_constructor suffit avec memcpy (si les types soit différents utiliser is_trivially_constructible, is_standard_layout ? )
