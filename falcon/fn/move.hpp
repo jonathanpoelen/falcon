@@ -9,6 +9,7 @@
 namespace falcon {
 namespace fn {
 
+/// \brief call std::forward< T>(x)
 struct forward_fn {
   constexpr forward_fn() noexcept {}
 
@@ -18,6 +19,7 @@ struct forward_fn {
   , std::forward<T>(x))
 };
 
+/// \brief call std::move(x)
 struct move_fn {
   constexpr move_fn() noexcept {}
 
@@ -27,6 +29,7 @@ struct move_fn {
   , std::move(std::forward<T>(x)))
 };
 
+/// \brief call std::move_if_noexcept(x)
 struct move_if_noexcept_fn {
   constexpr move_if_noexcept_fn() noexcept {}
 

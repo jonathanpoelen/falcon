@@ -1,11 +1,12 @@
-#ifndef FALCOI_FI_TUPLE_GET_HPP
-#define FALCOI_FI_TUPLE_GET_HPP
+#ifndef FALCOI_FN_TUPLE_GET_HPP
+#define FALCOI_FN_TUPLE_GET_HPP
 
 #include <falcon/tuple/get.hpp>
 
 namespace falcon {
 namespace fn {
 
+/// \brief call get< I>(T)
 template <std::size_t I, typename Tuple = void>
 struct tuple_get
 {

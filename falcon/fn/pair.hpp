@@ -41,8 +41,10 @@ namespace falcon
     };
   }
 
-  using first_fn = adl_::first_fn;
-  using second_fn = adl_::second_fn;
+  /// \brief call get< 0>(T)
+  typedef adl_::first_fn first_fn;
+  /// \brief call get< 1>(T)
+  typedef adl_::second_fn second_fn;
 
   namespace {
     constexpr auto const & first = static_const<first_fn>::value;

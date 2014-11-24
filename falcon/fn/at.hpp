@@ -27,11 +27,13 @@ namespace fn {
         : void()) , arr[i];
     }
   }
-  
+
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_ARGS(
     adl_, at, (class = void),
     (use_if_t<use_size_type<T>, use<std::size_t>> i), (i))
-  using at_fn = adl_::at_fn;
+
+  /// \brief call if possible, non member function at(T, size_t), otherwise T::at(size_t)
+  typedef adl_::at_fn at_fn;
 }
 }
 

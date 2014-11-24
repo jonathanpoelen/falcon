@@ -1,6 +1,5 @@
 2014-05-19
 module /dir   feel
-fn             :)
 algorithm      :)
 arg            :)
 bit            :)
@@ -11,6 +10,7 @@ container      :)
 coordinates    :|
 enum           :|
 flag           :|
+fn             :)
 functional     :)
 helper         :)
 iostreams      :)

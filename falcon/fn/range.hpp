@@ -31,9 +31,14 @@ namespace fn {
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, end)
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, rbegin)
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, rend)
+
+  /// \brief call if possible, non member function begin(T), otherwise std::begin(T)
   using begin_fn = adl_::begin_fn;
+  /// \brief call if possible, non member function end(T), otherwise std::end(T)
   using end_fn = adl_::end_fn;
+  /// \brief call if possible, non member function rbegin(T), otherwise std::rbegin(T)
   using rbegin_fn = adl_::rbegin_fn;
+  /// \brief call if possible, non member function rend(T), otherwise std::rend(T)
   using rend_fn = adl_::rend_fn;
 
   namespace adl_
@@ -79,9 +84,13 @@ namespace fn {
     };
   }
 
+  /// \brief call if possible, non member function cbegin(T), otherwise std::cbegin(T)
   using cbegin_fn = adl_::cbegin_fn;
+  /// \brief call if possible, non member function cend(T), otherwise std::cend(T)
   using cend_fn = adl_::cend_fn;
+  /// \brief call if possible, non member function crbegin(T), otherwise std::crbegin(T)
   using crbegin_fn = adl_::crbegin_fn;
+  /// \brief call if possible, non member function crend(T), otherwise std::crend(T)
   using crend_fn = adl_::crend_fn;
 
   namespace {

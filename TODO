@@ -339,3 +339,5 @@ generic_allocator : si non trivial constructeur, utiliser constructeur parenthè
 keep_parameter_index devrais pouvoir fonctionner avec des indice non normalisé (idem pour fn::args et fn::pack)
 
 static_new et co: is_trivial_copy_constructor suffit avec memcpy (si les types soit différents utiliser is_trivially_constructible, is_standard_layout ? )
+
+alg::count,find,lower_bound,etc (fonction membre ou algorithme)

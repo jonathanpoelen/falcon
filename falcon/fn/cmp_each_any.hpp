@@ -36,9 +36,11 @@ namespace aux_ {
   };
 }
 
+/// \example cmp_each(lt)(a,b,c) is equivalent to (a < b && b < c)
 template<class Cmp>
 using cmp_each_fn = aux_::cmp_if_impl<Cmp, false>;
 
+/// \example cmp_any(lt)(a,b,c) is equivalent to (a < b || b < c)
 template<class Cmp>
 using cmp_any_fn = aux_::cmp_if_impl<Cmp, true>;
 

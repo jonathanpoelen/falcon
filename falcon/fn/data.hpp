@@ -16,7 +16,9 @@ namespace fn {
   }
 
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, data)
-  using data_fn = adl_::data_fn;
+  /// \brief call if possible, non member function data(T), otherwise T::data()
+  /// If an array is passed, a pointer is returned.
+  typedef adl_::data_fn data_fn;
 }
 }
 

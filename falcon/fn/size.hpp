@@ -12,6 +12,8 @@ namespace fn {
   }
 
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, size)
+  /// \brief call if possible, non member function size(T), otherwise T::size()
+  /// If an array is passed, it size is returned.
   using size_fn = adl_::size_fn;
 }
 }

@@ -1,22 +1,37 @@
 #ifndef FALCON_FN_FRONT_HPP
 #define FALCON_FN_FRONT_HPP
 
-#include <falcon/fn/make_global_function_object.hpp>
+#include <falcon/type_traits/static_const.hpp>
+
+#include <cstddef>
 
 namespace falcon {
 namespace fn {
-  namespace adl_ {
-    template<class T, std::size_t N>
-    constexpr T const & front(T const (&arr)[N]) noexcept
-    { return arr[0]; }
 
-    template<class T, std::size_t N>
-    T & front(T (&arr)[N]) noexcept
-    { return arr[0]; }
-  }
+/// \brief call T::front()
+/// If an array is passed, the first element is returned.
+struct front_fn
+{
+  constexpr front_fn() noexcept {}
 
-  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, front)
-  using front_fn = adl_::front_fn;
+  template<class T>
+  constexpr auto operator()(T && x) const
+  noexcept(noexcept(x.front()))
+  -> decltype(x.front())
+  { return x.front() ; }
+
+  template<class T, std::size_t N>
+  constexpr T const &
+  front(T const (&arr)[N]) noexcept
+  { return arr[0]; }
+
+  template<class T, std::size_t N>
+  T & front(T (&arr)[N]) noexcept
+  { return arr[0]; }
+};
+
+FALCON_GLOBAL_OBJECT(front, front_fn);
+
 }
 }
 

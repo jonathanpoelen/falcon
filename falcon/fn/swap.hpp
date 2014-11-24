@@ -7,6 +7,7 @@
 namespace falcon {
 namespace fn {
 
+/// \brief call if possible, non member function swap(T, T), otherwise std::swap(T, T)
 struct swap_fn {
   constexpr swap_fn() noexcept {}
 

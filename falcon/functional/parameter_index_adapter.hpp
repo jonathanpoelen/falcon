@@ -110,6 +110,18 @@ parameter_index_adapter<Functor, Tag>
 make_parameter_index_adapter(Functor && f, Tag)
 { return parameter_index_adapter<Functor, Tag>{std::forward<Functor>(f)};  }
 
+
+template<class F, std::size_t... Ints>
+using func_args = parameter_index_adapter<
+F
+, specified_parameter_index_tag<parameter_index<(Ints-1)...>>
+>;
+
+template<std::size_t... Ints, class F>
+func_args<F, Ints...> func(F && f)
+{ return func_args<F, Ints...>{std::forward<F>(f)}; }
+
+
 template <typename Functor, typename Tag>
 void swap(parameter_index_adapter<Functor, Tag>& x,
         parameter_index_adapter<Functor, Tag>& y)

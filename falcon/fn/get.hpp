@@ -5,8 +5,9 @@
 
 namespace falcon {
 namespace fn {
-  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, get)
-  using get_fn = adl_::get_fn;
+  FALCON_MAKE_GLOBAL_FUNCTION_OBJECT_WRAPPER(adl_, get)
+  /// \brief call if possible, non member function get(T, args...), otherwise T::get(args...)
+  typedef adl_::get_fn get_fn;
 }
 }
 

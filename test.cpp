@@ -66,8 +66,15 @@
 
 // #include <iostream>
 
+#include <falcon/fn/next.hpp>
+
 int main()
 {
+  int * b = 0;
+  int * i = b;
+  return int(falcon::fn::next(i)-b);
+
+
 //   falcon::retain_free_object_allocator<int> allocator;
 //   allocator.deallocate(allocator.allocate(2), 2);
 

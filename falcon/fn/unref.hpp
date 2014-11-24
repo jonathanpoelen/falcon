@@ -7,15 +7,23 @@
 namespace falcon {
 namespace fn {
 
+  /// \brief return a copy of T
   struct unref_fn {
     constexpr unref_fn() noexcept {}
 
     template<class T>
+    constexpr T operator()(T & x) const
+    noexcept(noexcept(T(x)))
+    { return x; }
+
+    template<class T>
     constexpr T operator()(T const & x) const
+    noexcept(noexcept(T(x)))
     { return x; }
 
     template<class T>
     constexpr T operator()(T && x) const
+    noexcept(noexcept(T(std::move(x))))
     { return std::move(x); }
   };
 
