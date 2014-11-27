@@ -1,37 +1,30 @@
 #ifndef FALCON_TYPE_TRAITS_NORMALIZE_INDEX_HPP
 #define FALCON_TYPE_TRAITS_NORMALIZE_INDEX_HPP
 
+#include <falcon/config.hpp>
+
+#include <type_traits>
+
 namespace falcon {
-///\brief if @a i is negative the normalize at the last position. First index is 0.
-template<long __i, unsigned Nm>
-class normalize_index
-{
-#if __cplusplus >= 201103L
-	static_assert(Nm != 0, "size is 0");
+
+#ifdef IN_IDE_PARSER
+using unormalized_index_t = long long;
+#else
+using unormalized_index_t = long long;
+// using unormalized_index_t = std::make_signed<std::size_t>::type;
 #endif
 
-	template<long I, bool is_negate, bool in_range>
-	struct impl
-	{ static const unsigned value = I; };
-
-	template<long I, bool in_range>
-	struct impl<I, true, in_range>
-	{
-		static const unsigned value
-      = impl<long(Nm + I), (long(Nm) + I < 0), (unsigned(Nm + I) < Nm)>::value;
-	};
-
-	template<long I>
-	struct impl<I, false, false>
-	{
-		static const unsigned value
-      = impl<long(I - Nm), (I - long(Nm) < 0), (unsigned(I - Nm) < Nm)>::value;
-	};
-
-public:
-	static const unsigned value
-    = impl<__i, (__i < 0), (unsigned(__i) < Nm)>::value;
+///\brief if @a I less to 0, value = @a I + @a Nm, otherwise value = @a I.
+template<unormalized_index_t I, std::size_t Nm>
+struct normalize_index
+: std::integral_constant<
+  std::size_t
+, ((I < 0) ? Nm - std::size_t(-I) : std::size_t(I))>
+{
+  static_assert(Nm != 0, "Nm is 0");
+  static_assert(I < 0 ? std::size_t(-I) <= Nm : 1, "I < 0 && -I > Nm");
 };
+
 }
 
 #endif

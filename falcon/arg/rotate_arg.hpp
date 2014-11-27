@@ -6,13 +6,42 @@
 # include <falcon/parameter/parameter_index.hpp>
 #else
 # include <algorithm> //std::swap
+# include <falcon/type_traits/normalize_index.hpp>
 #endif
-#include <falcon/type_traits/normalize_index.hpp>
 
 namespace falcon {
 
 #if __cplusplus >= 201103L
 namespace aux_ {
+
+template<long __i, unsigned Nm>
+  class rotate_normalize_index
+  {
+    static_assert(Nm != 0, "size is 0");
+
+    template<long I, bool is_negate, bool in_range>
+    struct impl
+    { static const unsigned value = I; };
+
+    template<long I, bool in_range>
+    struct impl<I, true, in_range>
+    {
+      static const unsigned value
+        = impl<long(Nm + I), (long(Nm) + I < 0), (unsigned(Nm + I) < Nm)>::value;
+    };
+
+    template<long I>
+    struct impl<I, false, false>
+    {
+      static const unsigned value
+        = impl<long(I - Nm), (I - long(Nm) < 0), (unsigned(I - Nm) < Nm)>::value;
+    };
+
+  public:
+    static const unsigned value
+      = impl<__i, (__i < 0), (unsigned(__i) < Nm)>::value;
+  };
+
   template <std::size_t ShiftRight, std::size_t N>
   struct rotate_arg
   {
@@ -23,7 +52,7 @@ namespace aux_ {
     struct build_index<Nm, Current, parameter_index<Indexes...>>
     : build_index<
       Nm-1, int(Current - ShiftRight)
-    , parameter_index<Indexes..., normalize_index<Current, N>::value>
+    , parameter_index<Indexes..., rotate_normalize_index<Current, N>::value>
     >
     {};
 
@@ -95,7 +124,7 @@ template<int shift_right = 1, class... Args>
 void rotate_arg(Args&... args)
 {
   aux_::rotate_arg<
-    normalize_index<shift_right, sizeof...(args)>::value,
+    aux_::rotate_normalize_index<shift_right, sizeof...(args)>::value,
     sizeof...(args)
   >::impl(args...);
 }
