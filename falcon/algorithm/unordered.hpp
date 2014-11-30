@@ -12,7 +12,7 @@ typename range_access_iterator<Container>::type
 unordered_erase(Container & cont, typename range_access_iterator<Container>::type pos)
 {
   if(pos + 1 != cont.end()) {
-    *pos = cont.back();
+    *pos = FALCON_MOVE(cont.back());
   }
   cont.pop_back();
   return pos;
@@ -38,7 +38,7 @@ unordered_erase(Container & cont,
 
   typedef typename container_type::iterator iterator;
   for(iterator pos = cont.end() - dis; first != last; ++first, ++pos) {
-    *first = *pos;
+    *first = FALCON_MOVE(*pos);
   }
   return cont.erase(cont.end() - dis, cont.end());
 }
