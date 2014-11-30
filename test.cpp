@@ -70,6 +70,7 @@
 
 int main()
 {
+  const std::size_t i = 2;
   return falcon::alast(1, 2, 45, 3);
 
 //   falcon::retain_free_object_allocator<int> allocator;

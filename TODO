@@ -342,3 +342,7 @@ static_new et co: is_trivial_copy_constructor suffit avec memcpy (si les types s
 
 alg::count,find,lower_bound,etc (fonction membre ou algorithme)
 
+transform_reduce
+
+simplifier les sfinae/* en passant par decltype. Y remettre is_function_callable ?
+
