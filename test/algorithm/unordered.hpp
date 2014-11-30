@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_ALGORITHM_UNORDERED_HPP
+#define FALCON_TEST_ALGORITHM_UNORDERED_HPP
+
+void unordered_test();
+
+#endif
