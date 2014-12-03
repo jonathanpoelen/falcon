@@ -22,7 +22,7 @@ namespace _aux {
   {
     template<class T, class... Args>
     static constexpr Result get(T&&, Args&&... args)
-    { return arg<I-1, Result>::get(args...); }
+    { return arg<I-1, Result>::get(std::forward<Args>(args)...); }
   };
 
   template<class Result>
@@ -30,15 +30,26 @@ namespace _aux {
   {
     template<class T, class... Args>
     static constexpr Result get(T&& a, Args&&...)
-    { return a; }
+    { return std::forward<T>(a); }
   };
+
+  template<class T>
+  struct arg_result
+  { typedef T&& type; };
+
+  template<class T>
+  struct arg_result<T&>
+  { typedef T& type; };
 }
 
 template<std::size_t I, class... Args>
-constexpr typename arg_element<I, Args...>::type arg(Args&&... args)
+constexpr typename _aux::arg_result<
+  typename arg_element<I, Args...>::type
+>::type arg(Args&&... args)
 {
-  return _aux::arg<I, typename arg_element<I, Args...>::type>
-    ::get(std::forward<Args>(args)...);
+  return _aux::arg<I, typename _aux::arg_result<
+    typename arg_element<I, Args...>::type
+  >::type>::get(std::forward<Args>(args)...);
 }
 
 }

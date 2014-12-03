@@ -1,6 +1,7 @@
 #ifndef FALCON_LAMBDA_LAMBDA_HPP
 #define FALCON_LAMBDA_LAMBDA_HPP
 
+#include <falcon/arg/arg.hpp>
 #include <falcon/c++1x/syntax.hpp>
 #include <falcon/iostreams/is_ios.hpp>
 #include <falcon/functional/operators.hpp>
@@ -169,7 +170,7 @@ struct lambda<std::integral_constant<int, N>, void, void>
   template<class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION(
     operator()(Args&&... args) const
-  , std::get<N-1>(std::forward_as_tuple(std::forward<Args>(args)...))
+  , ::falcon::arg<N-1>(std::forward<Args>(args)...)
   )
 };
 
@@ -223,7 +224,7 @@ struct lambda<mem_t<F>, _aux::lambda<std::integral_constant<int, N>>, void>
       sizeof...(Args)+1
     >::type()
   , f
-  , std::get<N-1>(std::forward_as_tuple(std::forward<Args>(args)...))
+  , ::falcon::arg<N-1>(std::forward<Args>(args)...)
   , std::forward<Args>(args)...
   ))
 };

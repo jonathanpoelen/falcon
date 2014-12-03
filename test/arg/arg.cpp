@@ -21,5 +21,9 @@ void arg_test()
 	int i = 2;
 	++arg<1>(1,i,3);
 	CHECK_EQUAL_VALUE(3, i);
+
+  STATIC_ASSERT(std::is_same<int&&, decltype(arg<0>(1))>::value);
+  STATIC_ASSERT(std::is_same<int&, decltype(arg<0>(i))>::value);
+  STATIC_ASSERT(std::is_same<int const &, decltype(arg<0>(static_cast<const int &>(i)))>::value);
 }
 FALCON_TEST_TO_MAIN(arg_test)
