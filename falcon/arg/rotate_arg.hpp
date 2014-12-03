@@ -1,46 +1,13 @@
 #ifndef FALCON_ARG_ROTATE_ARG_HPP
 #define FALCON_ARG_ROTATE_ARG_HPP
 
-#if __cplusplus >= 201103L
-# include <falcon/arg/arg.hpp>
-# include <falcon/parameter/parameter_index.hpp>
-#else
-# include <algorithm> //std::swap
-# include <falcon/type_traits/normalize_index.hpp>
-#endif
+#include <falcon/arg/arg.hpp>
+#include <falcon/parameter/parameter_index.hpp>
+#include <falcon/type_traits/normalize_index.hpp>
 
 namespace falcon {
 
-#if __cplusplus >= 201103L
 namespace aux_ {
-
-template<long __i, unsigned Nm>
-  class rotate_normalize_index
-  {
-    static_assert(Nm != 0, "size is 0");
-
-    template<long I, bool is_negate, bool in_range>
-    struct impl
-    { static const unsigned value = I; };
-
-    template<long I, bool in_range>
-    struct impl<I, true, in_range>
-    {
-      static const unsigned value
-        = impl<long(Nm + I), (long(Nm) + I < 0), (unsigned(Nm + I) < Nm)>::value;
-    };
-
-    template<long I>
-    struct impl<I, false, false>
-    {
-      static const unsigned value
-        = impl<long(I - Nm), (I - long(Nm) < 0), (unsigned(I - Nm) < Nm)>::value;
-    };
-
-  public:
-    static const unsigned value
-      = impl<__i, (__i < 0), (unsigned(__i) < Nm)>::value;
-  };
 
   template <std::size_t ShiftRight, std::size_t N>
   struct rotate_arg
@@ -52,7 +19,7 @@ template<long __i, unsigned Nm>
     struct build_index<Nm, Current, parameter_index<Indexes...>>
     : build_index<
       Nm-1, int(Current - ShiftRight)
-    , parameter_index<Indexes..., rotate_normalize_index<Current, N>::value>
+    , parameter_index<Indexes..., normalize_index<(Current % N), N>::value>
     >
     {};
 
@@ -124,8 +91,8 @@ template<int shift_right = 1, class... Args>
 void rotate_arg(Args&... args)
 {
   aux_::rotate_arg<
-    aux_::rotate_normalize_index<shift_right, sizeof...(args)>::value,
-    sizeof...(args)
+    normalize_index<(shift_right % sizeof...(args)), sizeof...(args)>::value
+  , sizeof...(args)
   >::impl(args...);
 }
 
@@ -136,105 +103,6 @@ void rotate_arg(T&)
 template<int shift_right = 1>
 void rotate_arg()
 {}
-
-#else
-
-template<int shift_right = 1, class T>
-void impl(T&)
-{}
-
-namespace aux_ {
-  template<int shift_right, class T>
-  struct rotate_arg;
-
-  template<class T>
-  struct rotate_arg<0, T>
-  {
-    void impl(T&, T&)
-    {}
-
-    void impl(T&, T&, T&)
-    {}
-
-    void impl(T&, T&, T&, T&)
-    {}
-  };
-
-  template<class T>
-  struct rotate_arg<1, T>
-  {
-    void impl(T& a, T& b)
-    {
-      using std::swap;
-      swap(a, b);
-    }
-
-    void impl(T& a, T& b, T& c)
-    {
-      T tmp = c;
-      c = b;
-      b = a;
-      a = tmp;
-    }
-
-    void impl(T& a, T& b, T& c, T& d)
-    {
-      T tmp = d;
-      d = c;
-      c = b;
-      b = a;
-      a = tmp;
-    }
-  };
-
-  template<class T>
-  struct rotate_arg<2, T>
-  {
-    void impl(T& a, T& b, T& c)
-    {
-      T tmp = a;
-      a = b;
-      b = c;
-      c = tmp;
-    }
-
-    void impl(T& a, T& b, T& c, T& d)
-    {
-      using std::swap;
-      swap(a, c);
-      swap(b, d);
-    }
-  };
-
-  template<class T>
-  struct rotate_arg<3, T>
-  {
-    void impl(T& a, T& b, T& c, T& d)
-    {
-      rotate_arg<1, T>::impl(d,c,b,a);
-    }
-  };
-}
-
-template<int shift_right = 1, class T>
-void rotate_arg(T& a, T& b)
-{
-  aux_::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b);
-}
-
-template<int shift_right = 1, class T>
-void rotate_arg(T& a, T& b, T& c)
-{
-  aux_::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b,c);
-}
-
-template<int shift_right = 1, class T>
-void rotate_arg(T& a, T& b, T& c, T& d)
-{
-  aux_::rotate_arg<normalize_index<shift_right, 1>::value, T>::impl(a,b,c,d);
-}
-
-#endif
 
 }
 

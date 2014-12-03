@@ -7,12 +7,7 @@
 
 namespace falcon {
 
-#ifdef IN_IDE_PARSER
 using unormalized_index_t = long long;
-#else
-using unormalized_index_t = long long;
-// using unormalized_index_t = std::make_signed<std::size_t>::type;
-#endif
 
 ///\brief if @a I less to 0, value = @a I + @a Nm, otherwise value = @a I.
 template<unormalized_index_t I, std::size_t Nm>

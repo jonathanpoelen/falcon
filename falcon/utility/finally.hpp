@@ -21,11 +21,14 @@ namespace falcon {
  * @code
  * {
  *   T * v = new T;
- *   //...
- *   if (condition)
- *   {
+ *   try {
+ *     //...
+ *     if (condition)
+ *       throw std::runtime_error("...");
+ *   }
+ *   catch (...) {
  *     delete v;
- *     throw std::runtime_error("...");
+ *     throw;
  *   }
  *   delete v;
  * }

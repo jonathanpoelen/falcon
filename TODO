@@ -151,6 +151,7 @@ Changer les interfaces de templates/*.hpp. Mettre des constexpr quant-il faut.
 faire un hash constexpressive spécialisé pour cstring en C++14.
 
 faire des fonctions spéciliasées pour retourner des objets ou faire des algos constexpressive en c++14 pour cstring et format.
+https://github.com/cppformat/cppformat
 
 C++14: utilisé integer_sequence à la place de parameter_index.
 
@@ -342,7 +343,15 @@ static_new et co: is_trivial_copy_constructor suffit avec memcpy (si les types s
 
 alg::count,find,lower_bound,etc (fonction membre ou algorithme)
 
-transform_reduce
-
 simplifier les sfinae/* en passant par decltype. Y remettre is_function_callable ?
+
+ajout de trie à bulle (pour un petit nombre d'élément) + fonction sort qui utilise trie à bulle ou std::sort (std::sort le fait déjà ?)
+
+pas d'implementation satisfesante de deque. En faire une avec control externe du range. (comment est fait l'implémentation de gcc)
+
+{has,use,resitric}_ -> %_member ?
+
+container associative à valeur/clef séparé (limite les miss cache)
+
+iterator_category -> iter_cat ?
 
