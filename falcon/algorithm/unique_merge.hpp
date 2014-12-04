@@ -5,7 +5,6 @@
 #include <algorithm>
 
 namespace falcon {
-namespace algorithm {
 
 namespace _aux {
   template<class It>
@@ -71,7 +70,6 @@ OutputIt unique_merge(InputIt1 first1, InputIt1 last1,
   );
 }
 
-}
 }
 
 #endif

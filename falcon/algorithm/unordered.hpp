@@ -5,7 +5,6 @@
 #include <falcon/container/range_access.hpp>
 
 namespace falcon {
-namespace algorithm {
 
 template<typename Container>
 typename range_access_iterator<Container>::type
@@ -83,7 +82,6 @@ BidirectionIt unordered_remove(BidirectionIt first, BidirectionIt last, const T&
   return first;
 }
 
-}
 }
 
 #endif

@@ -11,7 +11,6 @@
 #include FALCON_BOOST_OR_STD_TRAITS(remove_const)
 
 namespace falcon {
-namespace algorithm {
 
 template <class ForwardIterator, class ForwardIterator2, class BinaryFunction>
 typename enable_if_c<is_iterator<ForwardIterator2>, BinaryFunction>::type
@@ -79,7 +78,6 @@ BinaryFunction for_each2(Container& cont,
 	return for_each2(begin(cont), end(cont), first, last, func);
 }
 
-}
 }
 
 #endif

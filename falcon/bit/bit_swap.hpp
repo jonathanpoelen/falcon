@@ -4,29 +4,13 @@
 #include <falcon/c++/noexcept.hpp>
 #include <falcon/bit/size.hpp>
 #include <falcon/memory/addressof.hpp>
-// #include <falcon/bit/bit_back.hpp>
-// #include <falcon/type_traits/numeric/minimal_int.hpp>
 
 namespace falcon {
 
-/*template<typename T>
-inline void generic_bit_swap(T& n) CPP_NOEXCEPT
+inline void b8swap(uint8_t& n) CPP_NOEXCEPT
 {
-  typedef typename minimal_int<bit_back<T>::value, char>::type int_type;
-  int_type d = bit_back<T>::value;
-  T b = 1;
-  T ret = 0;
-  for (; d != 1; b <<= 1, d -= 2)
-    ret |= (n & b) << d;
-  ret |= (n & b) << d;
-  for (; d != bit_back<T>::value; d += 2)
-    ret |= (n & (b <<= 1)) >> d;
-  n = ret | (n & (b << 1)) >> d;
-}*/
-
-inline void bit8_swap(uint8_t& n) CPP_NOEXCEPT
-{
-  n = static_cast<uint8_t>((n & 1) << 7
+  n = static_cast<uint8_t>(
+    (n & 1) << 7
   | (n & 2) << 5
   | (n & 4) << 3
   | (n & 8) << 1
@@ -36,9 +20,10 @@ inline void bit8_swap(uint8_t& n) CPP_NOEXCEPT
   | (n & 128) >> 7);
 }
 
-inline void bit16_swap(uint16_t& n) CPP_NOEXCEPT
+inline void b16swap(uint16_t& n) CPP_NOEXCEPT
 {
-  n = static_cast<uint16_t>((n & 1) << 15
+  n = static_cast<uint16_t>(
+    (n & 1) << 15
   | (n & 2) << 13
   | (n & 4) << 11
   | (n & 8) << 9
@@ -56,45 +41,47 @@ inline void bit16_swap(uint16_t& n) CPP_NOEXCEPT
   | (n & 32768) >> 15);
 }
 
-inline void bit32_swap(uint32_t& n) CPP_NOEXCEPT
+inline void b32swap(uint32_t& n) CPP_NOEXCEPT
 {
-  n = static_cast<uint32_t>((n & 1) << 31
-  | (n & 2) << 29
-  | (n & 4) << 27
-  | (n & 8) << 25
-  | (n & 16) << 23
-  | (n & 32) << 21
-  | (n & 64) << 19
-  | (n & 128) << 17
-  | (n & 256) << 15
-  | (n & 512) << 13
-  | (n & 1024) << 11
-  | (n & 2048) << 9
-  | (n & 4096) << 7
-  | (n & 8192) << 5
-  | (n & 16384) << 3
-  | (n & 32768) << 1
-  | (n & 65536) >> 1
-  | (n & 131072) >> 3
-  | (n & 262144) >> 5
-  | (n & 524288) >> 7
-  | (n & 1048576) >> 9
-  | (n & 2097152) >> 11
-  | (n & 4194304) >> 13
-  | (n & 8388608) >> 15
-  | (n & 16777216) >> 17
-  | (n & 33554432) >> 19
-  | (n & 67108864) >> 21
-  | (n & 134217728) >> 23
-  | (n & 268435456) >> 25
-  | (n & 536870912) >> 27
-  | (n & 1073741824) >> 29
-  | (n & 2147483648) >> 31);
+  n = static_cast<uint32_t>(
+    (n & 1) << 31
+  | (n & uint32_t(2ul)) << 29
+  | (n & uint32_t(4ul)) << 27
+  | (n & uint32_t(8ul)) << 25
+  | (n & uint32_t(16ul)) << 23
+  | (n & uint32_t(32ul)) << 21
+  | (n & uint32_t(64ul)) << 19
+  | (n & uint32_t(128ul)) << 17
+  | (n & uint32_t(256ul)) << 15
+  | (n & uint32_t(512ul)) << 13
+  | (n & uint32_t(1024ul)) << 11
+  | (n & uint32_t(2048ul)) << 9
+  | (n & uint32_t(4096ul)) << 7
+  | (n & uint32_t(8192ul)) << 5
+  | (n & uint32_t(16384ul)) << 3
+  | (n & uint32_t(32768ul)) << 1
+  | (n & uint32_t(65536ul)) >> 1
+  | (n & uint32_t(131072ul)) >> 3
+  | (n & uint32_t(262144ul)) >> 5
+  | (n & uint32_t(524288ul)) >> 7
+  | (n & uint32_t(1048576ul)) >> 9
+  | (n & uint32_t(2097152ul)) >> 11
+  | (n & uint32_t(4194304ul)) >> 13
+  | (n & uint32_t(8388608ul)) >> 15
+  | (n & uint32_t(16777216ul)) >> 17
+  | (n & uint32_t(33554432ul)) >> 19
+  | (n & uint32_t(67108864ul)) >> 21
+  | (n & uint32_t(134217728ul)) >> 23
+  | (n & uint32_t(268435456ul)) >> 25
+  | (n & uint32_t(536870912ul)) >> 27
+  | (n & uint32_t(1073741824ul)) >> 29
+  | (n & uint32_t(2147483648ul)) >> 31);
 }
 
-inline void bit64_swap(uint64_t& n) CPP_NOEXCEPT
+inline void b64swap(uint64_t& n) CPP_NOEXCEPT
 {
-  n = static_cast<uint64_t>((n & 1ul) << 63
+  n = static_cast<uint64_t>(
+    (n & 1ul) << 63
   | (n & 2ul) << 61
   | (n & 4ul) << 59
   | (n & 8ul) << 57
@@ -161,10 +148,10 @@ inline void bit64_swap(uint64_t& n) CPP_NOEXCEPT
 }
 
 namespace _aux {
-  inline char get_char_swap(char c) CPP_NOEXCEPT
+  inline unsigned char get_char_swap(unsigned char c) CPP_NOEXCEPT
 	{
-#if __CHAR_BIT__ == 8
-		return static_cast<char>((c & 1) << 7
+		return static_cast<unsigned char>(
+      (c & 1) << 7
 		| (c & 2) << 5
 		| (c & 4) << 3
 		| (c & 8) << 1
@@ -172,24 +159,14 @@ namespace _aux {
 		| (c & 32) >> 3
 		| (c & 64) >> 5
 		| (c & 128) >> 7);
-#elif __CHAR_BIT__ == 7
-		return static_cast<char>((c & 1) << 6
-		| (c & 2) << 4
-		| (c & 4) << 2
-		| (c & 8)
-		| (c & 16) >> 2
-		| (c & 32) >> 3
-		| (c & 64) >> 6);
-#else
-#error unimplemented swap on char
-#endif
 	}
 }
 
-inline void bit_swap(char* n, std::size_t size) CPP_NOEXCEPT
+inline void bswap(void * p, std::size_t size) CPP_NOEXCEPT
 {
-  char *end = n + size;
-  for (char c; n < end; ++n)
+  unsigned char *n = static_cast<unsigned char*>(p);
+  unsigned char *end = n + size;
+  for (unsigned char c; n < end; ++n)
   {
     c = _aux::get_char_swap(*n);
     --end;
@@ -205,21 +182,21 @@ inline void bit_swap(char* n, std::size_t size) CPP_NOEXCEPT
 
 namespace _aux {
 	template<class T, std::size_t S = bit::size<T>::value>
-	struct bit_swap
+	struct bswap
 	{
 		inline static void impl(T& bits) CPP_NOEXCEPT
-		{ bit_swap(reinterpret_cast<char*>(falcon::addressof(bits)), sizeof(T)); }
+		{ bswap(reinterpret_cast<char*>(falcon::addressof(bits)), sizeof(T)); }
 	};
 
 #define FALCON_CREATE_BIT_SWAP(S)\
 	template<>\
-	struct bit_swap<uint##S##_t, S>\
+	struct bswap<uint##S##_t, S>\
 	{\
 		inline static void impl(uint##S##_t& bits) CPP_NOEXCEPT\
 		{ falcon::bit##S##_swap(bits); }\
 	};\
 	template<class T>\
-	struct bit_swap<T, S>\
+	struct bswap<T, S>\
 	{\
 		inline static void impl(T& bits) CPP_NOEXCEPT\
 		{ falcon::bit##S##_swap(*reinterpret_cast<uint##S##_t*>(&bits)); }\
@@ -233,9 +210,9 @@ namespace _aux {
 #undef FALCON_CREATE_BIT_SWAP
 }
 
-	template <class T>
-	void bit_swap(T& bits) CPP_NOEXCEPT
-	{ _aux::bit_swap<T>::impl(bits); }
+template <class T>
+void bswap(T& bits) CPP_NOEXCEPT
+{ _aux::bswap<T>::impl(bits); }
 
 }
 

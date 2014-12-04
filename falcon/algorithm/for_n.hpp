@@ -6,7 +6,6 @@
 #include <iterator>
 
 namespace falcon {
-namespace algorithm {
 
 namespace _aux {
 
@@ -57,7 +56,6 @@ UnaryFunction for_n(ForwardIerator it, std::size_t n, UnaryFunction func)
 	return FALCON_MOVE(func);
 }
 
-}
 }
 
 #endif

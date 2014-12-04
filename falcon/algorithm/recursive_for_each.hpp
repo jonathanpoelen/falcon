@@ -9,7 +9,6 @@
 #include <falcon/utility/move.hpp>
 
 namespace falcon {
-namespace algorithm {
 namespace _aux {
 
 template <class Function, class T, bool Break = true>
@@ -394,7 +393,6 @@ struct recursive_intermediate<ignore_t, Function, ignore_t, Dimension>
 
 }
 
-}
 }
 
 #endif

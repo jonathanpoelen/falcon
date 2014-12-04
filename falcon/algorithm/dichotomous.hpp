@@ -4,7 +4,6 @@
 #include <algorithm>
 
 namespace falcon {
-namespace algorithm {
 
 /**
  *  @brief Find the first occurrence of a value in a <em>sorted</em> sequence.
@@ -49,7 +48,6 @@ RandomAccessIterator dichotomous_find(
   return first;
 }
 
-}
 }
 
 #endif

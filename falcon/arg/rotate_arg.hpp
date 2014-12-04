@@ -4,6 +4,7 @@
 #include <falcon/arg/arg.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 #include <falcon/type_traits/normalize_index.hpp>
+#include <utility>
 
 namespace falcon {
 
@@ -12,10 +13,10 @@ namespace aux_ {
   template <std::size_t ShiftRight, std::size_t N>
   struct rotate_arg
   {
-    template <std::size_t Nm, int Current, class Indexes = parameter_index<>>
+    template <std::size_t Nm, unormalized_index_t Current, class Indexes = parameter_index<>>
     struct build_index;
 
-    template <std::size_t Nm, int Current, std::size_t... Indexes>
+    template <std::size_t Nm, unormalized_index_t Current, std::size_t... Indexes>
     struct build_index<Nm, Current, parameter_index<Indexes...>>
     : build_index<
       Nm-1, int(Current - ShiftRight)
@@ -23,7 +24,7 @@ namespace aux_ {
     >
     {};
 
-    template <int Current, std::size_t... Indexes>
+    template <unormalized_index_t Current, std::size_t... Indexes>
     struct build_index<0, Current, parameter_index<Indexes...>>
     {
       typedef parameter_index<Indexes...> type;
@@ -87,7 +88,7 @@ namespace aux_ {
   };
 }
 
-template<int shift_right = 1, class... Args>
+template<unormalized_index_t shift_right = 1, class... Args>
 void rotate_arg(Args&... args)
 {
   aux_::rotate_arg<
@@ -96,11 +97,18 @@ void rotate_arg(Args&... args)
   >::impl(args...);
 }
 
-template<int shift_right = 1, class T>
+template<unormalized_index_t shift_right = 1, class T, class U>
+void rotate_arg(T & a, U & b)
+{
+  using std::swap;
+  swap(a, b);
+}
+
+template<unormalized_index_t shift_right = 1, class T>
 void rotate_arg(T&)
 {}
 
-template<int shift_right = 1>
+template<unormalized_index_t shift_right = 1>
 void rotate_arg()
 {}
 

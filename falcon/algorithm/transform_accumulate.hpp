@@ -3,7 +3,10 @@
 
 namespace falcon {
 
-/// init = op(init, unary_op(*first))
+/**
+ * \brief init = op(init, unary_op(*first))
+ * \see std::transform and std::accumulate
+ */
 template<
   class InputIt, class UnaryOperation
 , class T, class BinaryOperation>
@@ -17,7 +20,11 @@ T transform_accumulate(
   return init;
 }
 
-/// init = op(init, binary_op(*first1, *first2))
+
+/**
+* \brief init = op(init, unary_op(*first))
+* \see std::transform and std::accumulate
+*/
 template<
   class InputIt1, class InputIt2, class BinaryOperation
 , class T, class BinaryOperationReduce>
