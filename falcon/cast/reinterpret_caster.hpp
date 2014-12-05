@@ -1,7 +1,7 @@
 #ifndef FALCON_CAST_REINTERPRET_CASTER_HPP
 #define FALCON_CAST_REINTERPRET_CASTER_HPP
 
-#include <falcon/c++/noexcept.hpp>
+#include <utility>
 
 namespace falcon {
 
@@ -9,13 +9,11 @@ namespace falcon {
 template <typename Cast>
 struct reinterpret_caster
 {
-  template<typename T>
-  Cast operator()(T& d) const CPP_NOEXCEPT
-  { return reinterpret_cast<Cast>(d); }
+  constexpr reinterpret_caster() noexcept {}
 
-  template<typename T>
-  Cast operator()(const T& d) const CPP_NOEXCEPT
-  { return reinterpret_cast<Cast>(d); }
+  template<class T>
+  Cast operator()(T&& d) const
+  { return reinterpret_cast<Cast>(std::forward<T>(d)); }
 };
 
 }
