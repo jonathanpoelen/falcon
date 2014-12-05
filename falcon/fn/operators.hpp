@@ -55,10 +55,10 @@ using bit_not_fn = falcon::bit_not<>;
 using deref_fn = falcon::dereference<>;
 using addr_fn = falcon::address<>;
 using arrow_fn = falcon::arrow<>;
-using index_fn = falcon::index<>;
-using index2_fn = falcon::index2<>;
+using idx_fn = falcon::index<>;
+using idx2_fn = falcon::index2<>;
 using comma_fn = falcon::comma<>;
-using pointer_to_member_fn = falcon::pointer_to_member<>;
+using ptr_to_mem_fn = falcon::pointer_to_member<>;
 
 #define FALCON_MAKE_NOT_BINARY_OP(name, op)\
 struct name##_fn {\
@@ -134,10 +134,10 @@ constexpr auto const & bit_not = static_const<bit_not_fn>::value;
 constexpr auto const & deref = static_const<deref_fn>::value;
 constexpr auto const & addr = static_const<addr_fn>::value;
 constexpr auto const & arrow = static_const<arrow_fn>::value;
-constexpr auto const & index = static_const<index_fn>::value;
-constexpr auto const & index2 = static_const<index2_fn>::value;
+constexpr auto const & idx = static_const<idx_fn>::value;
+constexpr auto const & idx2 = static_const<idx2_fn>::value;
 constexpr auto const & comma = static_const<comma_fn>::value;
-constexpr auto const & pointer_to_member = static_const<pointer_to_member_fn>::value;
+constexpr auto const & ptr_to_mem = static_const<ptr_to_mem_fn>::value;
 }
 
 }
