@@ -25,6 +25,31 @@ namespace fn {
     constexpr std::reverse_iterator<T*>
     rend(T (&a)[N]) noexcept
     { return std::reverse_iterator<T*>(a); }
+
+    template<class Cont>
+    constexpr auto has_rbegin_member_function(int)
+    -> decltype(bool((void(std::declval<Cont>().rbegin()), true)))
+    { return true; }
+
+    template<class Cont>
+    constexpr bool has_rbegin_member_function(unsigned)
+    { return false; }
+
+    template<class Cont>
+    constexpr auto rbegin(Cont & cont)
+    -> typename std::enable_if<
+      !has_rbegin_member_function<Cont>(1)
+    , std::reverse_iterator<decltype(cont.end())>
+    >::type
+    { return std::reverse_iterator<decltype(cont.end())>(cont.end()); }
+
+    template<class Cont>
+    constexpr auto rend(Cont & cont)
+    -> typename std::enable_if<
+      !has_rbegin_member_function<Cont>(1)
+    , std::reverse_iterator<decltype(cont.begin())>
+    >::type
+    { return std::reverse_iterator<decltype(cont.begin())>(cont.begin()); }
   }
 
   FALCON_MAKE_GLOBAL_FUNCTION_OBJECT(adl_, begin)
@@ -48,9 +73,9 @@ namespace fn {
       constexpr cbegin_fn() noexcept {}
 
       template<class T>
-      constexpr auto operator()(T const & x) const ->
-      decltype(begin(std::forward<T>(x)))
-      { return begin(std::forward<T>(x)); }
+      constexpr auto operator()(T const & x) const
+      -> decltype(begin(x))
+      { return begin(x); }
     };
 
     struct cend_fn
@@ -58,9 +83,9 @@ namespace fn {
       constexpr cend_fn() noexcept {}
 
       template<class T>
-      constexpr auto operator()(T const & x) const ->
-      decltype(begin(std::forward<T>(x)))
-      { return begin(std::forward<T>(x)); }
+      constexpr auto operator()(T const & x) const
+      -> decltype(begin(x))
+      { return begin(x); }
     };
 
     struct crbegin_fn
@@ -68,9 +93,9 @@ namespace fn {
       constexpr crbegin_fn() noexcept {}
 
       template<class T>
-      constexpr auto operator()(T const & x) const ->
-      decltype(rbegin(std::forward<T>(x)))
-      { return rbegin(std::forward<T>(x)); }
+      constexpr auto operator()(T const & x) const
+      -> decltype(rbegin(x))
+      { return rbegin(x); }
     };
 
     struct crend_fn
@@ -78,9 +103,9 @@ namespace fn {
       constexpr crend_fn() noexcept {}
 
       template<class T>
-      constexpr auto operator()(T const & x) const ->
-      decltype(rbegin(std::forward<T>(x)))
-      { return rbegin(std::forward<T>(x)); }
+      constexpr auto operator()(T const & x) const
+      -> decltype(rbegin(x))
+      { return rbegin(x); }
     };
   }
 
