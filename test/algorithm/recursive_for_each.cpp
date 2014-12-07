@@ -7,7 +7,7 @@
 #include <falcon/lambda/lambda.hpp>
 #include "recursive_for_each.hpp"
 
-namespace alg = falcon::algorithm;
+namespace alg = falcon;
 
 void recursive_for_each_test(/*int argc, char **argv*/)
 {

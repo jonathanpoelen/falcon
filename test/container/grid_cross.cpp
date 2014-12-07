@@ -53,7 +53,7 @@ void template_grid_test(Grid& grid)
 	s += "1 1 0 0\n";
 	PASSED();
 
-	using falcon::algorithm::for_n;
+	using falcon::for_n;
 
 	for_n(typename Grid::right_iterator(grid.front()),
 					grid.size() , ss << ++_1 << ',');

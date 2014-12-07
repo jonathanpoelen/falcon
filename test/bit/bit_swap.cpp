@@ -2,33 +2,33 @@
 #include <falcon/bit/bit_swap.hpp>
 #include "bit_swap.hpp"
 
-void bit_swap_test()
+void bswap_test()
 {
 	{
 		uint16_t i = 0x0005;
 		CHECK_EQUAL_VALUE(0x0005, i);
-		falcon::bit_swap(i);
+		falcon::bswap(i);
 		CHECK_EQUAL_VALUE(0xA000, i);
-		falcon::bit_swap(i);
+		falcon::bswap(i);
 		CHECK_EQUAL_VALUE(0x0005, i);
 	}
 	{
 		int16_t ii = 5;
 		uint16_t& i = *reinterpret_cast<uint16_t*>(&ii);
 		CHECK_EQUAL_VALUE(0x0005, i);
-		falcon::bit16_swap(i);
+		falcon::b16swap(i);
 		CHECK_EQUAL_VALUE(static_cast<uint16_t>(0xA000), i);
-		falcon::bit16_swap(i);
+		falcon::b16swap(i);
 		CHECK_EQUAL_VALUE(0x0005, i);
 	}
 	{
 		uint16_t i[] = {0x0001,0x0001};
 		CHECK_EQUAL_VALUE(0x0001, i[0]);
 		CHECK_EQUAL_VALUE(0x0001, i[1]);
-		falcon::bit_swap(i);
+		falcon::bswap(i);
 		CHECK_EQUAL_VALUE(0x8000, i[0]);
 		CHECK_EQUAL_VALUE(0x8000, i[1]);
-		falcon::bit_swap(i);
+		falcon::bswap(i);
 		CHECK_EQUAL_VALUE(0x0001, i[0]);
 		CHECK_EQUAL_VALUE(0x0001, i[1]);
 	}
@@ -41,12 +41,12 @@ void bit_swap_test()
 		Test i = {0x00000001,0x00000001};
 		CHECK_EQUAL_VALUE(0x00000001u, i.l);
 		CHECK_EQUAL_VALUE(0x00000001u, i.l2);
-		falcon::bit_swap(i);
+		falcon::bswap(i);
 		CHECK_EQUAL_VALUE(0x80000000, i.l);
 		CHECK_EQUAL_VALUE(0x80000000, i.l2);
-		falcon::bit_swap(i);
+		falcon::bswap(i);
 		CHECK_EQUAL_VALUE(0x00000001u, i.l);
 		CHECK_EQUAL_VALUE(0x00000001u, i.l2);
 	}
 }
-FALCON_TEST_TO_MAIN(bit_swap_test)
+FALCON_TEST_TO_MAIN(bswap_test)

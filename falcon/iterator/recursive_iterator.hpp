@@ -21,7 +21,7 @@ namespace iterator {
 template <typename Iterators, typename ComparisonParameterTag = last_parameter_index_tag<1>>
 class basic_recursive_iterator;
 
-template<typename Iterator, typename AccessTrait = range_access_traits<typename std::iterator_traits<Iterator>::value_type>>
+template<typename Iterator, typename AccessTrait = range_access_traits>
 struct recursive_iterator_access_adapter
 {
 	typedef Iterator iterator;

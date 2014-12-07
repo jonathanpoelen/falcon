@@ -193,13 +193,13 @@ namespace _aux {
 	struct bswap<uint##S##_t, S>\
 	{\
 		inline static void impl(uint##S##_t& bits) CPP_NOEXCEPT\
-		{ falcon::bit##S##_swap(bits); }\
+		{ falcon::b##S##swap(bits); }\
 	};\
 	template<class T>\
 	struct bswap<T, S>\
 	{\
 		inline static void impl(T& bits) CPP_NOEXCEPT\
-		{ falcon::bit##S##_swap(*reinterpret_cast<uint##S##_t*>(&bits)); }\
+		{ falcon::b##S##swap(*reinterpret_cast<uint##S##_t*>(&bits)); }\
 	};
 
 	FALCON_CREATE_BIT_SWAP(8)

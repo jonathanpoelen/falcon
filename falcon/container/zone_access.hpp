@@ -6,11 +6,11 @@
 
 namespace falcon {
 
-template<class Container, class Access = range_access_traits<Container> >
+template<class Container, class RangeAccess = range_access_traits>
 struct zone_access
 {
 private:
-	typedef typename Access::iterator sub_iterator;
+  using sub_iterator = range_access_to_iterator<RangeAccess, Container>;
 	typedef std::iterator_traits<sub_iterator> traits;
 
 public:
@@ -24,13 +24,13 @@ public:
 	size_t y_;
 	size_t width_zone_;
 	size_t height_zone_;
-	Access access_;
+  RangeAccess access_;
 
 	constexpr zone_access(size_t width_container,
 												size_t x, size_t y,
 												size_t width_zone,
 												size_t height_zone,
-												Access access = Access())
+												RangeAccess access = RangeAccess())
 	: width_container_(width_container)
 	, x_(x)
 	, y_(y)

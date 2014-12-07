@@ -30,7 +30,12 @@ struct unordered_container_view
   : c(&cont)
   {}
 
-  unordered_container_view & operator=(container_type & cont) = default;
+  unordered_container_view & operator=(container_type & cont)
+  {
+    c = &cont;
+    return *this;
+  }
+
   unordered_container_view & operator=(unordered_container_view const & other) = default;
 
   iterator erase(const_iterator pos)

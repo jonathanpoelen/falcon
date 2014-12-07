@@ -6,7 +6,7 @@
 
 void for_n_test()
 {
-	using falcon::algorithm::for_n;
+	using falcon::for_n;
 
 	std::vector<int> vector(3,3);
 	for_n(vector.begin(), 2, falcon::increment<>());

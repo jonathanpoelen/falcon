@@ -18,7 +18,7 @@ void container_wrapper_test()
   CHECK_EQUAL_VALUE(4, *(wrap.begin()+2));
   CHECK_EQUAL_VALUE(5, *(wrap.begin()+3));
 
-  falcon::container_view<array_type, falcon::reverse_range_access_traits<array_type> > rwrap(arr);
+  falcon::reverse_container_view<array_type> rwrap(arr);
   std::sort(rwrap.begin(), rwrap.end());
   CHECK_EQUAL_VALUE(5, *wrap.begin());
   CHECK_EQUAL_VALUE(4, *(wrap.begin()+1));

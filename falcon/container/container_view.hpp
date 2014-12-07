@@ -5,21 +5,23 @@
 #include <falcon/container/range_access_traits.hpp>
 #include <falcon/type_traits/rebind.hpp>
 #include <falcon/utility/move.hpp>
+
 #include <iterator>
+#include <tuple>
 
 
-namespace falcon{
+namespace falcon {
 
 /**
  * @ingroup sequences
  */
-template<class Container, class Access = range_access_traits<Container> >
+template<class Container, class RangeAccess = range_access_traits >
 class container_view
 {
 public:
   typedef Container container_type;
-  typedef typename rebind<Access, Container>::type access_type;
-  typedef typename Access::iterator iterator;
+  typedef RangeAccess access_type;
+  using iterator = range_access_to_iterator<RangeAccess, Container>;
 
 private:
   typedef std::iterator_traits<iterator> iterator_traits;
@@ -32,136 +34,100 @@ public:
 
 
 public:
-  explicit container_view()
-  : container_(0)
-  , access_()
-  {}
-
-#if __cplusplus >= 201103L
-  explicit container_view(std::nullptr_t)
-  : container_(0)
-  , access_()
-  {}
-#endif
+  container_view() = default;
+  container_view(const container_view& other) = default;
+  container_view(container_view&& other) = default;
 
   explicit container_view(access_type traits)
-  : container_(0)
-  , access_(FALCON_MOVE(traits))
+  : t(nullptr, std::move(traits))
   {}
 
   explicit container_view(container_type& container)
-  : container_(&container)
-  , access_()
-  {}
+  {
+    std::get<0>(t) = &container;
+  }
 
   container_view(container_type& container, access_type traits)
-  : container_(&container)
-  , access_(FALCON_MOVE(traits))
+  : t(&container, std::move(traits))
   {}
 
-#if __cplusplus >= 201103L
   template<typename... Args>
-  container_view(container_type& container, Args&&... argtraits)
-  : container_(&container)
-  , access_(std::forward<Args>(argtraits)...)
+  explicit container_view(container_type& container, Args&&... access_args)
+  : t(&container, access_type(std::forward<Args>(access_args)...))
   {}
-  container_view(const container_view& other) = default;
-  container_view(container_view&& other) = default;
+
   container_view& operator=(const container_view& other) = default;
   container_view& operator=(container_view&& other) = default;
-#else
-  container_view(const container_view& other)
-  : container_(other.container_)
-  , access_(other.access_)
-  {}
-
-  container_view& operator=(const container_view& other)
-  {
-    container_ = other.container_;
-    access_ = other.access_;
-    return *this;
-  }
-#endif
 
   container_view& operator=(container_type& other)
   {
-    container_ = &other;
+    std::get<0>(t) = &other;
     return *this;
   }
 
-#if __cplusplus >= 201103L
   explicit operator bool () const noexcept
-#else
-  operator void* () const
-#endif
-  { return container_; }
+  { return std::get<0>(t); }
 
   iterator begin() const
-  { return access_.begin(base()); }
+  { return std::get<1>(t).begin(base()); }
 
   iterator end() const
-  { return access_.end(base()); }
+  { return std::get<1>(t).end(base()); }
 
   value_type& operator[](difference_type n) const
-  { return container_[n]; }
+  { return std::get<0>(t)[n]; }
 
   void swap(container_view& other)
   {
     using std::swap;
-    swap(access_, other.access_);
-    swap(container_, other.container_);
+    swap(t, other.t);
   }
 
   container_type& base() const
-  { return *container_; }
+  { return *std::get<0>(t); }
 
-  container_type& access()
-  { return access_; }
+  container_type& get_access()
+  { return std::get<1>(t); }
 
-  const container_type& access() const
-  { return access_; }
-
+  const container_type& get_access() const
+  { return std::get<1>(t); }
 
 private:
-  container_type* container_;
-  access_type access_;
+  std::tuple<container_type*, access_type> t;
 };
 
 
-template<class Container, typename Iterator>
-struct build_container_view
-{
-  typedef container_view<
-    Container
-  , range_access_to_iterator_traits<
-      Container
-    , range_access_traits<Container>, Iterator>
-  > type;
-};
-
-template<class Container, typename Iterator>
-struct build_reverse_container_view
-{
-  typedef container_view<
-    Container
-  , range_access_to_iterator_traits<
-      Container
-    , reverse_range_access_traits<Container>, Iterator>
-  > type;
-};
-
-#if __cplusplus >= 201103L
 template<class Container>
 using const_container_view
-  = container_view<const Container, range_access_traits<const Container>>;
+= container_view<const Container, range_access_traits>;
 
 template<class Container>
 using reverse_container_view
-  = container_view<Container, reverse_range_access_traits<Container>>;
+= container_view<Container, reverse_range_access_traits>;
 
 template<class Container>
 using const_reverse_container_view = reverse_container_view<const Container>;
-#endif
+
+
+template<class Container, typename Iterator>
+using iterator_container_view = container_view<
+  Container
+, iterator_range_access_traits<Iterator, range_access_traits>
+>;
+
+template<class Container, typename Iterator>
+using reverse_iterator_container_view = container_view<
+  Container
+, iterator_range_access_traits<Iterator, reverse_range_access_traits>
+>;
+
+template<class Container, typename Iterator>
+using iterator_const_container_view
+  = iterator_container_view<const Container, Iterator>;
+
+template<class Container, typename Iterator>
+using reverse_iterator_const_container_view
+  = reverse_iterator_container_view<const Container, Iterator>;
 
 
 template<class Container>
@@ -169,48 +135,17 @@ container_view<Container>
 seq(Container& cont)
 { return container_view<Container>(cont); }
 
-template<class Container, class Access>
+template<class Container, class RangeAccess>
 typename enable_if_not_integral<
-  Access, container_view<Container, Access> >::type
-seq(Container& cont, Access access)
-{ return container_view<Container, Access>(cont, access); }
-
-#if __cplusplus >= 201103L
-template<class Container, class Access>
-typename enable_if_not_integral<
-  Access, container_view<const Container, Access> >::type
-seq(const Container& cont, Access access)
-{ return container_view<const Container, Access>(cont, access); }
-
-template<class Container, class Access>
-typename enable_if_not_integral<
-Access, container_view<Container, Access> >::type
-seq(Container&& cont, Access access)
-{ return container_view<Container, Access>(cont, access); }
-#endif
+  RangeAccess, container_view<Container, RangeAccess> >::type
+seq(Container& cont, RangeAccess access)
+{ return container_view<Container, RangeAccess>(cont, access); }
 
 
 template<class Container>
-container_view<Container, reverse_range_access_traits<Container> >
+reverse_container_view<Container>
 rseq(Container& cont)
-{
-  return container_view<
-    Container,
-    reverse_range_access_traits<Container>
-  >(cont);
-}
-
-#if __cplusplus >= 201103L
-template<class Container>
-reverse_container_view<const Container>
-rseq(const Container& cont)
-{ return reverse_container_view<const Container>(cont); }
-
-template<class Container>
-reverse_container_view<const Container>
-rseq(Container&& cont)
-{ return reverse_container_view<const Container>(cont); }
-#endif
+{ return reverse_container_view<Container>(cont); }
 
 
 template<class Container>
@@ -218,26 +153,22 @@ container_view<const Container>
 cseq(const Container& cont)
 { return container_view<const Container>(cont); }
 
-template<class Container, class Access>
-container_view<const Container, Access>
-cseq(const Container& cont, Access access)
-{ return container_view<const Container, Access>(cont, access); }
+template<class Container, class RangeAccess>
+container_view<const Container, RangeAccess>
+cseq(const Container& cont, RangeAccess access)
+{ return container_view<const Container, RangeAccess>(cont, access); }
 
 
 template<class Container>
-container_view<const Container, reverse_range_access_traits<const Container> >
+reverse_container_view<const Container>
 crseq(const Container& cont)
-{
-  return container_view<
-    const Container,
-    reverse_range_access_traits<const Container>
-  >(cont);
-}
+{ return reverse_container_view<const Container>(cont); }
 
 
-template<class Container, class Access>
+template<class Container, class RangeAccess>
 void swap(
-  container_view<Container, Access>& a, container_view<Container, Access>& b)
+  container_view<Container, RangeAccess>& a
+, container_view<Container, RangeAccess>& b)
 { a.swap(b); }
 
 }

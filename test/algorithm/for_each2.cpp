@@ -7,7 +7,7 @@
 
 void for_each2_test()
 {
-  using falcon::algorithm::for_each2;
+  using falcon::for_each2;
 
   std::stringstream ss;
 	auto f = [&ss](int i, int i2){ ss << i << '-' << i2 << ' ';};

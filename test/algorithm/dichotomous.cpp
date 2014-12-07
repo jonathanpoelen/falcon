@@ -5,7 +5,7 @@
 
 void dichotomous_test()
 {
-	using falcon::algorithm::dichotomous_find;
+	using falcon::dichotomous_find;
 
 	std::array<int, 10> arr{{0,1,2,5,7,9,10,11,15,20}};
 	auto first = arr.begin();

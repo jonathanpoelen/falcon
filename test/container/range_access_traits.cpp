@@ -7,21 +7,33 @@
 
 void range_access_traits_test()
 {
-	typedef std::array<int, 3> container1;
-	typedef std::vector<int> container2;
+  typedef std::array<int, 3> container1;
+  typedef std::vector<int> container2;
 
-	CHECK_NOTYPENAME_TYPE(container1::iterator,
-						  falcon::range_access_iterator<container1>::type);
-	CHECK_NOTYPENAME_TYPE(container2::iterator,
-						  falcon::range_access_iterator<container2>::type);
-	CHECK_NOTYPENAME_TYPE(container1::const_iterator,
-						  falcon::range_access_iterator<const container1>::type);
-	CHECK_NOTYPENAME_TYPE(container2::const_iterator,
-						  falcon::range_access_iterator<const container2>::type);
+  container1 c1;
+  container2 c2;
 
-	container1 a;
-	CHECK(a.begin() == falcon::range_access_traits<container1>::begin(a));
-	CHECK(a.cbegin() == falcon::range_access_traits<const container1>::begin(a));
+  CHECK_NOTYPENAME_TYPE(
+    container1::iterator
+  , decltype(falcon::range_access_traits::begin(c1)));
+
+  CHECK_NOTYPENAME_TYPE(
+    container2::iterator
+  , decltype(falcon::range_access_traits::begin(c2)));
+
+  container1 const & cc1 = c1;
+  container2 const & cc2 = c2;
+
+  CHECK_NOTYPENAME_TYPE(
+    container1::const_iterator
+  , decltype(falcon::range_access_traits::begin(cc1)));
+
+  CHECK_NOTYPENAME_TYPE(
+    container2::const_iterator
+  , decltype(falcon::range_access_traits::begin(cc2)));
+
+  CHECK(c1.begin() == falcon::range_access_traits::begin(c1));
+  CHECK(cc1.cbegin() == falcon::range_access_traits::begin(cc1));
 }
 
 FALCON_TEST_TO_MAIN(range_access_traits_test)

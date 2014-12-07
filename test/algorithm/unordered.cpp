@@ -35,7 +35,7 @@ void unordered_test()
     }
   };
 
-  using namespace falcon::algorithm;
+  using namespace falcon;
 
   unordered_erase(v1, v1.begin());
   test(v1, {2, 2, 4, 4, 2, 1, 3, 3, 3}); PASSED();

@@ -326,7 +326,7 @@ struct recursive_intermediate
   void operator()(Container& v)
   {
     preface();
-    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+    ::falcon::recursive_for_each<Dimension>(v, functor);
     postface();
   }
 };
@@ -347,7 +347,7 @@ struct recursive_intermediate<ignore_t, Function, Postface, Dimension>
   template<class Container>
   void operator()(Container& v)
   {
-    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+    ::falcon::recursive_for_each<Dimension>(v, functor);
     postface();
   }
 };
@@ -369,7 +369,7 @@ struct recursive_intermediate<Preface, Function, ignore_t, Dimension>
   void operator()(Container& v)
   {
     preface();
-    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+    ::falcon::recursive_for_each<Dimension>(v, functor);
   }
 };
 
@@ -387,7 +387,7 @@ struct recursive_intermediate<ignore_t, Function, ignore_t, Dimension>
   template<class Container>
   void operator()(Container& v)
   {
-    ::falcon::algorithm::recursive_for_each<Dimension>(v, functor);
+    ::falcon::recursive_for_each<Dimension>(v, functor);
   }
 };
 

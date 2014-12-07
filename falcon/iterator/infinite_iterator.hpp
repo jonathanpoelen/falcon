@@ -1,9 +1,9 @@
 #ifndef FALCON_ITERATOR_INFINITE_ITERATOR_HPP
 #define FALCON_ITERATOR_INFINITE_ITERATOR_HPP
 
+#include <falcon/fn/range.hpp>
 #include <falcon/infinite.hpp>
 #include <falcon/container/range_access.hpp>
-#include <falcon/container/range_access_traits.hpp>
 #include <falcon/iterator/iterator_handler.hpp>
 
 namespace falcon {
@@ -62,16 +62,16 @@ public:
 
   template <class Container>
   infinite_iterator(Container& container)
-  : inherit_type(range_access_traits<Container>::begin(container))
+  : inherit_type(fn::begin(container))
   , first_(this->base_reference())
-  , last_(range_access_traits<Container>::end(container))
+  , last_(fn::end(container))
   {}
 
   template <class Container>
   infinite_iterator(Container& container, iterator_type it)
-  : inherit_type(range_access_traits<Container>::begin(container))
+  : inherit_type(fn::begin(container))
   , first_(it)
-  , last_(range_access_traits<Container>::end(container))
+  , last_(fn::end(container))
   {}
 
   using inherit_type::operator=;
