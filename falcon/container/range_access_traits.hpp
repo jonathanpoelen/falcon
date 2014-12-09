@@ -26,13 +26,18 @@ struct FALCON_CONCAT(prefix_name, range_access_traits)     \
   { return fn::FALCON_CONCAT(prefix_func, end)(cont); }    \
 }
 
+/// begin()/end() traits
 MAKE_RANGE_ACCESS_TRAITS(FALCON_PP_NIL(), FALCON_PP_NIL());
+/// rbegin()/rend() traits
 MAKE_RANGE_ACCESS_TRAITS(reverse_, r);
+/// cbegin()/cend() traits
 MAKE_RANGE_ACCESS_TRAITS(const_, c);
+/// crbegin()/crend() traits
 MAKE_RANGE_ACCESS_TRAITS(const_reverse_, cr);
 
 #undef MAKE_RANGE_ACCESS_TRAITS
 
+/// transforms the iterator returned by RangeAccessTraits
 template<
   class ToIterator
 , class RangeAccessTraits = range_access_traits

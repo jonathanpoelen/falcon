@@ -355,3 +355,4 @@ container associative à valeur/clef séparé (limite les miss cache)
 
 iterator_category -> iter_cat ?
 
+un namespace qui contient des alias sur les type communs (tt::iterator<Cont> = typename Cont::iterator)

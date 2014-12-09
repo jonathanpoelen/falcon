@@ -34,5 +34,3 @@ tuple          :)
 type_traits    :)
 utility        :)
 
-container/fixed_grid_cross.hpp :|
-container/grid_cross.hpp :|

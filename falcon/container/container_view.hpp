@@ -14,8 +14,10 @@ namespace falcon {
 
 /**
  * @ingroup sequences
+ *
+ * @param RangeAccess  Class with members function begin(Container&) and end(Container&)
  */
-template<class Container, class RangeAccess = range_access_traits >
+template<class Container, class RangeAccess = range_access_traits>
 class container_view
 {
 public:
@@ -59,7 +61,7 @@ public:
   container_view& operator=(const container_view& other) = default;
   container_view& operator=(container_view&& other) = default;
 
-  container_view& operator=(container_type& other)
+  container_view& operator=(container_type& other) noexcept
   {
     std::get<0>(t) = &other;
     return *this;
@@ -75,7 +77,7 @@ public:
   { return std::get<1>(t).end(base()); }
 
   value_type& operator[](difference_type n) const
-  { return std::get<0>(t)[n]; }
+  { return *(begin() + n); }
 
   void swap(container_view& other)
   {

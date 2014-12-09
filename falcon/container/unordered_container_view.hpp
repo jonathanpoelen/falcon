@@ -7,6 +7,15 @@
 
 namespace falcon {
 
+/**
+ * \brief Minimizes movement in the suppression of the elements. insert(), push() and emplace() append to the end of container.
+ *
+ * @see unordered_erase
+ * @see unordered_remove
+ * @see unordered_remove_if
+ *
+ * @ingroup sequences
+ */
 template<class Cont>
 struct unordered_container_view
 {
@@ -30,13 +39,13 @@ struct unordered_container_view
   : c(&cont)
   {}
 
-  unordered_container_view & operator=(container_type & cont)
+  unordered_container_view & operator=(container_type & cont) noexcept
   {
     c = &cont;
     return *this;
   }
 
-  unordered_container_view & operator=(unordered_container_view const & other) = default;
+  unordered_container_view & operator=(unordered_container_view const &) = default;
 
   iterator erase(const_iterator pos)
   { return unordered_erase(c, pos); }
@@ -52,6 +61,10 @@ struct unordered_container_view
 
   template<typename... Args>
   void emplace_back(Args &&... args)
+  { c->emplace_back(std::forward<Args>(args)...); }
+
+  template<typename... Args>
+  void emplace(Args &&... args)
   { c->emplace_back(std::forward<Args>(args)...); }
 
   void insert(value_type && value)

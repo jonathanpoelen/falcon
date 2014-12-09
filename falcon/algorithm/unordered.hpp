@@ -6,6 +6,13 @@
 
 namespace falcon {
 
+/**
+ * \brief Removes the element at pos. The end member is moved to fill the void.
+ *
+ * @a cont must provide the following functions with the usual semantics:
+ *  - back()
+ *  - pop_back()
+ */
 template<typename Container>
 typename range_access_iterator<Container>::type
 unordered_erase(Container & cont, typename range_access_iterator<Container>::type pos)
@@ -17,11 +24,19 @@ unordered_erase(Container & cont, typename range_access_iterator<Container>::typ
   return pos;
 }
 
+/**
+ * \brief Removes the elements in the range [first; last). The end members are moved to fill the void.
+ *
+ * @a cont must provide the following functions with the usual semantics:
+ *  - end()
+ *  - erase(first, last)
+ */
 template<typename Container>
 typename range_access_iterator<Container>::type
-unordered_erase(Container & cont,
-                typename range_access_iterator<Container>::type first,
-                typename range_access_iterator<Container>::type last)
+unordered_erase(
+  Container & cont
+, typename range_access_iterator<Container>::type first
+, typename range_access_iterator<Container>::type last)
 {
   if(last == cont.end()) {
     return cont.erase(first, last);
@@ -44,8 +59,8 @@ unordered_erase(Container & cont,
 
 
 template<typename BidirectionIt, typename UnaryPredicate>
-BidirectionIt unordered_remove_if(BidirectionIt first, BidirectionIt last,
-                                  UnaryPredicate p)
+BidirectionIt
+unordered_remove_if(BidirectionIt first, BidirectionIt last, UnaryPredicate p)
 {
   while (first != last) {
     if (p(*first)) {
@@ -64,7 +79,8 @@ BidirectionIt unordered_remove_if(BidirectionIt first, BidirectionIt last,
 }
 
 template<typename BidirectionIt, typename T>
-BidirectionIt unordered_remove(BidirectionIt first, BidirectionIt last, const T& x)
+BidirectionIt
+unordered_remove(BidirectionIt first, BidirectionIt last, const T& x)
 {
   while (first != last) {
     if (*first == x) {

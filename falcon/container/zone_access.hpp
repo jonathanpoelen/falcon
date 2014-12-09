@@ -6,6 +6,11 @@
 
 namespace falcon {
 
+/**
+ * \brief View on a table with two dimensional linearized
+ *
+ * \note preferably use std::array_view
+ */
 template<class Container, class RangeAccess = range_access_traits>
 struct zone_access
 {

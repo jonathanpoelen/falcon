@@ -37,11 +37,23 @@ using indirect_container_view = container_view<
   Cont, indirect_iterator_access_traits<Cont, AccessTraits>
 >;
 
+/**
+ * container_view with a indirect_iterator
+ *
+ * @see container_view
+ * @see indirect_iterator
+ */
 template<class Cont>
 indirect_container_view<Cont>
 indirect_container(Cont& cont)
 { return indirect_container_view<Cont>(cont); }
 
+/**
+ * reverse_container_view with a indirect_iterator
+ *
+ * @see container_view
+ * @see indirect_iterator
+ */
 template<class Cont>
 indirect_container_view<Cont, reverse_range_access_traits>
 indirect_reverse_container(Cont& cont)
@@ -61,11 +73,23 @@ using container_proxy_view = container_view<
   >
 >;
 
+/**
+ * container_view with a indirect_iterator
+ *
+ * @see container_view
+ * @see indirect_iterator
+ */
 template<class Cont, class Proxy>
 container_proxy_view<Cont, Proxy>
 indirect_container(Cont& cont, Proxy proxy)
 { return container_proxy_view<Cont, Proxy>(cont, std::move(proxy)); }
 
+/**
+ * container_view with a indirect_iterator
+ *
+ * @see reverse_container_view
+ * @see indirect_iterator
+ */
 template<class Cont, class Proxy>
 container_proxy_view<Cont, Proxy, reverse_range_access_traits>
 indirect_reverse_container(Cont& cont, Proxy proxy)
