@@ -1,6 +1,7 @@
 #ifndef FALCON_RANGE_ITERATOR_RANGE_HPP
 #define FALCON_RANGE_ITERATOR_RANGE_HPP
 
+#include <falcon/c++/noexcept.hpp>
 #include <falcon/c++/constexpr.hpp>
 #include <falcon/c++/reference.hpp>
 #include <falcon/c++/boost_or_std.hpp>
