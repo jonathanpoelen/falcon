@@ -1,7 +1,7 @@
 #ifndef FALCON_MPL_DETAIL_ASSOC_INSERT_HPP
 #define FALCON_MPL_DETAIL_ASSOC_INSERT_HPP
 
-#include <falcon/arg/arg.hpp>
+#include <falcon/functional/arg.hpp>
 #include <falcon/mpl/detail/has_key.hpp>
 
 namespace falcon {

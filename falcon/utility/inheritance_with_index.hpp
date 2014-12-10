@@ -2,7 +2,7 @@
 #define FALCON_UTILITY_INHERITANCE_WITH_INDEX_HPP
 
 #include <utility>
-#include <falcon/arg/arg.hpp>
+#include <falcon/functional/arg.hpp>
 
 namespace falcon
 {

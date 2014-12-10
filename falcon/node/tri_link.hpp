@@ -2,7 +2,7 @@
 #define _FALCON_NODE_TRI_LINK_HPP
 
 #include <falcon/c++/constexpr.hpp>
-#include <falcon/arg/rotate_arg.hpp>
+#include <falcon/functional/rotate_arg.hpp>
 
 namespace falcon{ namespace node {
 

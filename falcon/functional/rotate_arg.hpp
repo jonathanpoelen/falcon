@@ -1,7 +1,7 @@
-#ifndef FALCON_ARG_ROTATE_ARG_HPP
-#define FALCON_ARG_ROTATE_ARG_HPP
+#ifndef FALCON_FUNCTIONAL_ROTATE_ARG_HPP
+#define FALCON_FUNCTIONAL_ROTATE_ARG_HPP
 
-#include <falcon/arg/arg.hpp>
+#include <falcon/functional/arg.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 #include <falcon/type_traits/normalize_index.hpp>
 #include <utility>

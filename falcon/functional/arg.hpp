@@ -1,5 +1,5 @@
-#ifndef FALCON_ARG_ARG_HPP
-#define FALCON_ARG_ARG_HPP
+#ifndef FALCON_FUNCTIONAL_ARG_HPP
+#define FALCON_FUNCTIONAL_ARG_HPP
 
 #include <falcon/parameter/parameter_element.hpp>
 #include <type_traits>

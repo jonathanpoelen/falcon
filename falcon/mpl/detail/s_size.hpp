@@ -1,7 +1,7 @@
 #ifndef FALCON_MPL_DETAIL_S_SIZE_HPP
 #define FALCON_MPL_DETAIL_S_SIZE_HPP
 
-#include <falcon/arg/arg.hpp>
+#include <falcon/functional/arg.hpp>
 
 namespace falcon {
 namespace mpl {

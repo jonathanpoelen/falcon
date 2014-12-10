@@ -1,5 +1,5 @@
 #include <test/test.hpp>
-#include <falcon/arg/arg.hpp>
+#include <falcon/functional/arg.hpp>
 #include "arg.hpp"
 
 void arg_test()

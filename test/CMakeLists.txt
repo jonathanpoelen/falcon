@@ -20,7 +20,6 @@ set_property(
 )
 
 add_subdirectory(algorithm)
-add_subdirectory(arg)
 add_subdirectory(bit)
 add_subdirectory(container)
 add_subdirectory(coordinates)

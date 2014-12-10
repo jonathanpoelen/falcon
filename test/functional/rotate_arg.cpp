@@ -1,5 +1,5 @@
 #include <test/test.hpp>
-#include <falcon/arg/rotate_arg.hpp>
+#include <falcon/functional/rotate_arg.hpp>
 #include "rotate_arg.hpp"
 
 void rotate_arg_test()

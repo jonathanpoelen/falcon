@@ -1,7 +1,7 @@
 #ifndef FALCON_LAMBDA_LAMBDA_HPP
 #define FALCON_LAMBDA_LAMBDA_HPP
 
-#include <falcon/arg/arg.hpp>
+#include <falcon/functional/arg.hpp>
 #include <falcon/c++1x/syntax.hpp>
 #include <falcon/iostreams/is_ios.hpp>
 #include <falcon/functional/operators.hpp>

@@ -9,7 +9,7 @@
 #include <falcon/parameter/manip.hpp>
 #include <falcon/tuple/parameter_pack.hpp>
 #include <falcon/tuple/tuple_apply.hpp>
-#include <falcon/arg/arg.hpp>
+#include <falcon/functional/arg.hpp>
 #include <falcon/type_traits/dimension.hpp>
 #include <falcon/utility/maker.hpp>
 

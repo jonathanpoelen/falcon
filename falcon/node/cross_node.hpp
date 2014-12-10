@@ -1,7 +1,7 @@
 #ifndef _FALCON_NODE_CROSS_NODE_HPP
 #define _FALCON_NODE_CROSS_NODE_HPP
 
-#include <falcon/arg/rotate_arg.hpp>
+#include <falcon/functional/rotate_arg.hpp>
 #include <falcon/node/cross_link.hpp>
 #include <falcon/node/detail/set_node.hpp>
 #include <falcon/node/iterator.hpp>
