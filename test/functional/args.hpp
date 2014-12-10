@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_FUNCTIONAL_ARGS_HPP
+#define FALCON_TEST_FUNCTIONAL_ARGS_HPP
+
+void args_test();
+
+#endif

@@ -1,14 +1,15 @@
 #ifndef FALCON_FUNCTIONAL_A_HPP
 #define FALCON_FUNCTIONAL_A_HPP
 
-#include <falcon/type_traits/normalize_argument.hpp>
+#include <falcon/type_traits/normalize_index.hpp>
 #include <falcon/type_traits/static_const.hpp>
+#include <falcon/functional/arg.hpp>
 #include <falcon/c++1x/syntax.hpp>
 
-#include <tuple>
 
 namespace falcon {
 
+/// \brief wrapper for arg< I>(args...)
 template<unormalized_index_t I>
 struct a {
   constexpr a() noexcept {}
@@ -16,12 +17,13 @@ struct a {
   template<class... Ts>
   constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
     operator()(Ts&&... args) const
-  , std::get<
-    (normalize_argument<I, sizeof...(args)>::value - 1)
-  >(std::forward_as_tuple(std::forward<Ts>(args)...)))
+  , arg<
+    (normalize_index<I, sizeof...(args)>::value)
+  >(std::forward<Ts>(args)...))
 };
 
 namespace {
+  constexpr auto const & a0 = static_const<a<0>>::value;
   constexpr auto const & a1 = static_const<a<1>>::value;
   constexpr auto const & a2 = static_const<a<2>>::value;
   constexpr auto const & a3 = static_const<a<3>>::value;
