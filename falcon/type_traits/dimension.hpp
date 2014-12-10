@@ -1,7 +1,7 @@
 #ifndef FALCONTYPETRAITS_DIMENSION_HPP
 #define FALCONTYPETRAITS_DIMENSION_HPP
 
-#include <falcon/container/contains_range_access.hpp>
+#include <falcon/iterator/is_iterable.hpp>
 #include <falcon/container/range_access.hpp>
 
 namespace falcon {
@@ -22,7 +22,7 @@ class dimension
 
 public:
 	static const std::size_t value
-    = dimension_child<contains_range_access_iterator<T>::value>::value;
+    = dimension_child<is_iterable<T>::value>::value;
 };
 
 }
