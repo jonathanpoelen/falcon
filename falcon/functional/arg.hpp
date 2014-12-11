@@ -16,7 +16,7 @@ template <std::size_t I, class... Args>
 struct arg_element
 { typedef typename parameter_element<I, parameter_pack<Args...>>::type type; };
 
-namespace _aux {
+namespace aux_ {
   template<std::size_t I, class Result>
   struct arg
   {
@@ -43,11 +43,11 @@ namespace _aux {
 }
 
 template<std::size_t I, class... Args>
-constexpr typename _aux::arg_result<
+constexpr typename aux_::arg_result<
   typename arg_element<I, Args...>::type
 >::type arg(Args&&... args)
 {
-  return _aux::arg<I, typename _aux::arg_result<
+  return aux_::arg<I, typename aux_::arg_result<
     typename arg_element<I, Args...>::type
   >::type>::get(std::forward<Args>(args)...);
 }
