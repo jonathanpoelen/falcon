@@ -7,7 +7,7 @@
 #include <falcon/functional/operators.hpp>
 #include <falcon/preprocessor/d_punctuation.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
-#include <falcon/functional/call.hpp>
+#include <falcon/functional/invoke.hpp>
 
 #include <tuple>
 #include <iosfwd>
@@ -218,7 +218,7 @@ struct lambda<mem_t<F>, _aux::lambda<std::integral_constant<int, N>>, void>
   template<class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION_NOEXCEPT(
     operator()(Args&&... args) const
-  , call(
+  , invoke(
     typename keep_parameter_index<
       ignore_parameter_index_tag<N, 1>,
       sizeof...(Args)+1

@@ -3,7 +3,7 @@
 
 #include <falcon/math/min.hpp>
 #include <falcon/c++1x/syntax.hpp>
-#include <falcon/functional/call.hpp>
+#include <falcon/functional/invoke.hpp>
 #include <falcon/parameter/manip.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
 
@@ -19,7 +19,7 @@ namespace _aux {
     , std::size_t Start = (N - 1) * (NumberArg - 1) + NumberArg + 1>
     static constexpr CPP1X_DELEGATE_FUNCTION(
       impl(Function func, Args&&... args)
-    , call(
+    , invoke(
         typename parameter_index_cat<
           parameter_index<0>,
           build_range_parameter_index_t<
@@ -43,7 +43,7 @@ namespace _aux {
     template<typename Function, typename... Args>
     static constexpr CPP1X_DELEGATE_FUNCTION(
       impl(Function func, Args&&... args)
-    , call(
+    , invoke(
         build_parameter_index_t<min(NumberArg, sizeof...(Args))>()
       , func
       , std::forward<Args>(args)...

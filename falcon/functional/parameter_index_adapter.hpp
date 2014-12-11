@@ -2,7 +2,7 @@
 #define FALCON_FUNCTIONAL_PARAMETER_INDEX_ADAPTER_HPP
 
 #include <falcon/c++1x/syntax.hpp>
-#include <falcon/functional/call.hpp>
+#include <falcon/functional/invoke.hpp>
 #include <falcon/functional/call_partial_param_loop.hpp>
 #include <falcon/functional/call_partial_recursive_param_loop.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
@@ -19,7 +19,7 @@ struct call_partial_recursive_param_loop_tag {};
 
 
 /**
- * \brief Functor for used \link call-arguments \p call(), \p call_partial_param_loop() and \p call_partial_recursive_param_loop() \endlink
+ * \brief Functor for used \link call-arguments \p invoke(), \p call_partial_param_loop() and \p call_partial_recursive_param_loop() \endlink
  *
  * Tag is \p call_partial_param_loop_tag for used \p call_partial_param_loop(), \p call_partial_recursive_param_loop_tag for used \p call_partial_recursive_param_loop(), each tag of \link indexes-tag indexes-tag \endlink or \p parameter_index
  * @{
@@ -37,7 +37,7 @@ public:
   = typename keep_parameter_index<tag_type, sizeof...(Args)>::type>
   constexpr CPP1X_DELEGATE_FUNCTION(
     operator()(Args&&... args) const
-  , call(BuildIndexes(), func_, std::forward<Args>(args)...))
+  , invoke(BuildIndexes(), func_, std::forward<Args>(args)...))
 
   void swap(parameter_index_adapter& other)
   {

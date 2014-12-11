@@ -1,7 +1,7 @@
 #ifndef FALCON_FUNCTIONAL_SPECIAL_CALL_HPP
 #define FALCON_FUNCTIONAL_SPECIAL_CALL_HPP
 
-#include <falcon/functional/call.hpp>
+#include <falcon/functional/invoke.hpp>
 #include <falcon/parameter/keep_parameter_index.hpp>
 
 namespace falcon {
@@ -11,7 +11,7 @@ namespace falcon {
  * @{
  */
 /**
- * \brief Specification of \p call()
+ * \brief Specification of \p invoke()
  * @{
  */
 template<std::size_t Keep = 1, typename Function, typename... Args,
@@ -20,8 +20,8 @@ template<std::size_t Keep = 1, typename Function, typename... Args,
   >::type
 >
 constexpr auto call_first_param(Function && func, Args&&... args)
--> decltype(call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
-{    return call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
+-> decltype(invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
+{    return invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
 
 
 template<std::size_t Keep = 1, typename Function, typename... Args,
@@ -30,8 +30,8 @@ template<std::size_t Keep = 1, typename Function, typename... Args,
   >::type
 >
 constexpr auto call_last_param(Function && func, Args&&... args)
--> decltype(call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
-{    return call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
+-> decltype(invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
+{    return invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
 
 
 template<std::size_t Start, std::size_t Len, typename Function, typename... Args,
@@ -40,8 +40,8 @@ template<std::size_t Start, std::size_t Len, typename Function, typename... Args
   >::type
 >
 constexpr auto call_range_param(Function && func, Args&&... args)
--> decltype(call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
-{    return call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
+-> decltype(invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
+{    return invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
 
 
 template<std::size_t Pos, std::size_t Ignore = 1, typename Function,
@@ -51,8 +51,8 @@ template<std::size_t Pos, std::size_t Ignore = 1, typename Function,
   >::type
 >
 constexpr auto call_ignore_param(Function && func, Args&&... args)
--> decltype(call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
-{    return call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
+-> decltype(invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
+{    return invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
 
 
 template<std::size_t Start = 0, std::size_t Len = -1u, typename Function,
@@ -62,8 +62,8 @@ template<std::size_t Start = 0, std::size_t Len = -1u, typename Function,
   >::type
 >
 constexpr auto call_reverse_param(Function && func, Args&&... args)
--> decltype(call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
-{    return call(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
+-> decltype(invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...))
+{    return invoke(Indexes(), std::forward<Function>(func), std::forward<Args>(args)...); }
 //@}
 //@}
 

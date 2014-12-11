@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_FUNCTIONAL_INVOKE_HPP
+#define FALCON_TEST_FUNCTIONAL_INVOKE_HPP
+
+void invoke_test();
+
+#endif

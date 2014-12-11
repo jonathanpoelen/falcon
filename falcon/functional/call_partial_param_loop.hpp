@@ -2,7 +2,7 @@
 #define FALCON_FUNCTIONAL_CALL_PARTIAL_PARAM_LOOP_HPP
 
 #include <falcon/utility/unpack.hpp>
-#include <falcon/functional/call.hpp>
+#include <falcon/functional/invoke.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 
 #include <utility>
@@ -15,7 +15,7 @@ namespace _aux {
   void call_partial_param_loop(parameter_index<Indexes...>,
                                F && func, Args&&... args)
   {
-    FALCON_UNPACK(call(
+    FALCON_UNPACK(invoke(
       build_range_parameter_index_t<
         Indexes * NumberArg
       , Indexes * NumberArg + NumberArg
@@ -49,10 +49,10 @@ template<std::size_t NumberArg, typename F, typename... Args
 , typename LastIndexes = build_range_parameter_index_t<N*NumberArg, sizeof...(Args)>
 >
 auto call_partial_param_loop(F func, Args&&... args)
--> decltype(call(LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...))
+-> decltype(invoke(LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...))
 {
   _aux::call_partial_param_loop<NumberArg>(Indexes(), func, std::forward<Args>(args)...);
-  return call(LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...);
+  return invoke(LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...);
 }
 
 }
