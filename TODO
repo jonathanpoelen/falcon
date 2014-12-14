@@ -287,9 +287,6 @@ mettre des noexcept pour les fichiers dans memory
 
 make_reverse_iterator (et rev_iter)
 
-attention au barriere (adl) pour begin et co
-faire pour begin/end et les autres la même méthode que pour swap
-
 faire une fonction tuple_size() pour être compatible avec les tuple_like ET initializer_list
 
 traits<template<class...>class> pour creer un parameter_index en fonction du nombre d'element
@@ -356,4 +353,6 @@ container associative à valeur/clef séparé (limite les miss cache)
 iterator_category -> iter_cat ?
 
 un namespace qui contient des alias sur les type communs (tt::iterator<Cont> = typename Cont::iterator ; tt::value<T> = typename T::value_type)
+
+ne pas oublier noexcept pour les fonction swap
 

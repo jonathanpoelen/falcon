@@ -36,6 +36,7 @@ public:
   , std::min(a, b, this->cmp_))
 };
 
+/// \example min(fn::lt)(a, b, c)
 template<class F = less<>>
 basic_min<F> min(F f = F())
 { return {std::move(f)}; }
@@ -69,6 +70,7 @@ public:
   , std::max(a, b, this->cmp_))
 };
 
+/// \example max(fn::lt)(a, b, c)
 template<class F = less<>>
 basic_max<F> max(F f = F())
 { return {std::move(f)}; }

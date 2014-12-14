@@ -1,5 +1,5 @@
-#ifndef FALCON_FUNCTIONAL_CALL_PARTIAL_RECURSIVE_PARAM_HPP
-#define FALCON_FUNCTIONAL_CALL_PARTIAL_RECURSIVE_PARAM_HPP
+#ifndef FALCON_FUNCTIONAL_INVOKE_PARTIAL_RECURSIVE_PARAM_HPP
+#define FALCON_FUNCTIONAL_INVOKE_PARTIAL_RECURSIVE_PARAM_HPP
 
 #include <falcon/math/min.hpp>
 #include <falcon/c++1x/syntax.hpp>
@@ -7,11 +7,13 @@
 #include <falcon/parameter/manip.hpp>
 #include <falcon/preprocessor/not_ide_parser.hpp>
 
+#include <utility>
+
 namespace falcon {
 
-namespace _aux {
+namespace aux_ {
   template<std::size_t NumberArg, std::size_t N>
-  struct call_partial_recursive_param_loop
+  struct invoke_partial_recursive_param_loop
   {
     static_assert(NumberArg > 1, "NumberArg < 2");
 
@@ -28,7 +30,7 @@ namespace _aux {
           >
         >::type()
       , func
-      , call_partial_recursive_param_loop<NumberArg, N-1>
+      , invoke_partial_recursive_param_loop<NumberArg, N-1>
         ::impl(func, std::forward<Args>(args)...)
       , std::forward<Args>(args)...
       )
@@ -36,7 +38,7 @@ namespace _aux {
   };
 
   template<std::size_t NumberArg>
-  struct call_partial_recursive_param_loop<NumberArg, 0>
+  struct invoke_partial_recursive_param_loop<NumberArg, 0>
   {
     static_assert(NumberArg > 1, "NumberArg < 2");
 
@@ -54,11 +56,11 @@ namespace _aux {
 
 
 /**
- * \brief Call \c func with \c _NumberArg arguments. The return of \c func is the first argument of next call.
+ * \brief Call \c func with \c NumberArg arguments. The return of \c func is the first argument of next call.
  * \return Last operations.
  *
  * \code
- * int n = call_partial_param_loop<2>(accu_t(), 1,2,3,4,5,6);
+ * int n = invoke_partial_param_loop<2>(accu_t(), 1,2,3,4,5,6);
  * \endcode
  * equivalent to
  * \code
@@ -71,8 +73,8 @@ namespace _aux {
 template<std::size_t NumberArg, typename Function, typename... Args
 , std::size_t N = (sizeof...(Args) - 2) / (NumberArg - 1)>
 constexpr CPP1X_DELEGATE_FUNCTION(
-  call_partial_recursive_param_loop(Function func, Args&&... args)
-, _aux::call_partial_recursive_param_loop<NumberArg, N>
+  invoke_partial_recursive_param_loop(Function func, Args&&... args)
+, aux_::invoke_partial_recursive_param_loop<NumberArg, N>
   ::impl(func, std::forward<Args>(args)...)
 )
 

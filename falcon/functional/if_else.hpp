@@ -45,19 +45,15 @@ public:
   , test_(std::forward<Args>(args)...) ? this->a_() : this->b_())
 };
 
-template<class T, class U>
-basic_if_else<
-  typename std::decay<T>::type
-, typename std::decay<U>::type>
-if_else(T && x, U && y)
-{ return {std::forward<T>(x), std::forward<U>(y)}; }
-
-template<class T, class U, class Test>
+/**
+ * if_else(a, b, test)(args) equivalent to test(args)?a:b
+ */
+template<class T, class U, class Test = static_caster<bool>>
 basic_if_else<
   typename std::decay<T>::type
 , typename std::decay<U>::type
 , typename std::decay<Test>::type>
-if_else(T && x, U && y, Test test)
+if_else(T && x, U && y, Test && test = Test())
 { return {
   std::forward<T>(x), std::forward<U>(y), std::forward<Test>(test)
 }; }
@@ -107,19 +103,15 @@ public:
     : this->b_(std::forward<Args>(args)...))
 };
 
-template<class F1, class F2>
-basic_if_else2<
-  typename std::decay<F1>::type
-, typename std::decay<F2>::type>
-if_else2(F1 && f1, F2 && f2)
-{ return {std::forward<F1>(f1), std::forward<F2>(f2)}; }
-
-template<class F1, class F2, class Test>
+/**
+ * if_else2(a, b, test)(args) equivalent to test(args)?a(args):b(args)
+ */
+template<class F1, class F2, class Test = static_caster<bool>>
 basic_if_else2<
   typename std::decay<F1>::type
 , typename std::decay<F2>::type
 , typename std::decay<Test>::type>
-if_else2(F1 && f1, F2 && f2, Test && test)
+if_else2(F1 && f1, F2 && f2, Test && test = Test())
 { return {
   std::forward<F1>(f1), std::forward<F2>(f2), std::forward<Test>(test)
 }; }
