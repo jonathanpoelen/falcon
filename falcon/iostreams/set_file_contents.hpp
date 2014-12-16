@@ -3,112 +3,77 @@
 
 #include <falcon/iostreams/copy.hpp>
 
-#include <fstream> //basic_streambuf
-
-#if __cplusplus >= 201103L
-#define FALCON_CHECK_CHAR_TYPE() \
-  static_assert(std::is_same<CharT, class String::value_type>(),\
-                "Incompatible CharT")
-#endif
+#include <fstream> //basic_filebuf
 
 namespace falcon {
 namespace iostreams {
 
+/**
+ * \brief Write \a s in the file \a name
+ *
+ * \return -1 if file cannot be open. Otherwise the number of characters to write.
+ */
 template<class CharT>
 std::streamsize
-set_file_contents(
-  const char * name
-, const CharT * s
-, std::size_t size)
+set_file_contents(const char * name, const CharT * s, std::size_t size)
 {
-  if (size)
-  {
+  if (size) {
     std::basic_filebuf<CharT> sbout;
     CharT c;
     sbout.pubsetbuf(&c, 1);
     if (sbout.open(name, std::ios_base::out)) {
-      return sbout.sputn(s, size);
+      return sbout.sputn(s, std::streamsize(size));
     }
+    return std::streamsize(-1);
   }
   return 0;
 }
 
-template<class CharT>
-std::streamsize
-set_file_contents(const char * name, const CharT * s)
-{
-  if (*s)
-  {
-    std::basic_filebuf<CharT> sbout;
-    if (sbout.open(name, std::ios_base::out)) {
-      std::size_t len = std::char_traits<CharT>::length(s);
-      // TODO len > std::streamsize::max()
-      return sbout.sputn(s, std::streamsize(len));
-    }
-  }
-  return 0;
-}
 
-template<class CharT, class String>
-std::streamsize
-set_file_contents(const char * name, String& s, std::size_t size)
-{
-  FALCON_CHECK_CHAR_TYPE();
-  if (size)
-  {
-    std::basic_filebuf<CharT> sbout;
-    if (sbout.open(name, std::ios_base::out)) {
-      return sbout.sputn(s.data(), size);
-    }
-  }
-  return 0;
-}
-
-template<class CharT, class String>
-std::streamsize
-set_file_contents(const char * name, String& s)
-{
-  FALCON_CHECK_CHAR_TYPE();
-  if (*s)
-  {
-    std::basic_filebuf<CharT> sbout;
-    if (sbout.open(name, std::ios_base::out)) {
-      return sbout.sputn(s.data(), s.size());
-    }
-  }
-  return 0;
-}
-
+/**
+ * \brief Write \a sbin in the file \a name
+ * \attention \a sbin must be non-null
+ *
+ * \return -1 if file cannot be open. Otherwise the number of characters to write.
+ */
 template<class CharT, class Traits>
 std::streamsize
-set_file_contents(
-  const char * name
-, std::basic_streambuf<CharT, Traits> * sbin)
+set_file_contents(const char * name, std::basic_streambuf<CharT, Traits> * sbin)
 {
-  if (sbin)
-  {
-    std::basic_filebuf<CharT, Traits> sbout;
-    if (sbout.open(name, std::ios_base::out)) {
-      return copy(&sbout, sbin);
-    }
+  std::basic_filebuf<CharT, Traits> sbout;
+  CharT buf[4096];
+  sbout.pubsetbuf(buf, 4096);
+  if (sbout.open(name, std::ios_base::out)) {
+    return copy(sbout, *sbin);
   }
   return std::streamsize(-1);
 }
 
+
+template<class CharT>
+std::streamsize
+set_file_contents(const char * name, const CharT * s)
+{ return set_file_contents(name, s, std::char_traits<CharT>::length(s)); }
+
+template<class CharT, class String>
+std::streamsize
+set_file_contents(const char * name, String const & s, std::size_t size)
+{ return set_file_contents(name, s.data(), size); }
+
+template<class CharT, class String>
+std::streamsize
+set_file_contents(const char * name, String const & s)
+{ return set_file_contents(name, s.data(), s.size()); }
+
 template<class CharT, class Traits>
 std::streamsize
-set_file_contents(
-  const char * name
-, std::basic_istream<CharT, Traits>& is)
+set_file_contents(const char * name, std::basic_istream<CharT, Traits>& is)
 { return set_file_contents(name, is.rdbuf()); }
 
 
 template<class CharT>
 std::streamsize
-set_file_contents(
-  const std::string & name
-, const CharT * s
-, std::size_t size)
+set_file_contents(const std::string & name, const CharT * s, std::size_t size)
 { return set_file_contents(name.c_str(), s, size); }
 
 template<class CharT>
