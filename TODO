@@ -344,7 +344,7 @@ simplifier les sfinae/* en passant par decltype. Y remettre is_function_callable
 
 ajout de trie à bulle (pour un petit nombre d'élément) + fonction sort qui utilise trie à bulle ou std::sort (std::sort le fait déjà ?)
 
-pas d'implementation satisfesante de deque. En faire une avec control externe du range. (comment est fait l'implémentation de gcc)
+pas d'implementation satisfesante de deque. En faire une avec control externe du range.
 
 {has,use,resitric}_ -> %_member ?
 
@@ -355,4 +355,8 @@ iterator_category -> iter_cat ?
 un namespace qui contient des alias sur les type communs (tt::iterator<Cont> = typename Cont::iterator ; tt::value<T> = typename T::value_type)
 
 ne pas oublier noexcept pour les fonction swap
+
+une fonction qui propage les éléments d'une tuple ou d'un range dans une fonction (dispatch ?)
+
+déplacer tuple_get dans le dossier tuple/ et renommer en la classe en 't' ?
 

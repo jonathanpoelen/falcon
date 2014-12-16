@@ -1,6 +1,7 @@
 #ifndef FALCON_FUNCTIONAL_INVOKE_PARTIAL_PARAM_LOOP_HPP
 #define FALCON_FUNCTIONAL_INVOKE_PARTIAL_PARAM_LOOP_HPP
 
+#include <falcon/c++1x/syntax.hpp>
 #include <falcon/utility/unpack.hpp>
 #include <falcon/functional/invoke.hpp>
 #include <falcon/parameter/parameter_index.hpp>
@@ -9,10 +10,11 @@
 
 namespace falcon {
 
-namespace aux_ {
-  template<std::size_t NumberArg, class F
-  , class... Args, std::size_t... Indexes>
-  void invoke_partial_param_loop(
+template<std::size_t NumberArg>
+class invoke_partial_param_loop_fn
+{
+  template<class F, class... Args, std::size_t... Indexes>
+  static void impl_(
     parameter_index<Indexes...>, F && func, Args&&... args)
   {
     FALCON_UNPACK(invoke(
@@ -24,7 +26,28 @@ namespace aux_ {
     , std::forward<Args>(args)...
     ));
   }
-}
+
+public:
+  constexpr invoke_partial_param_loop_fn() noexcept {}
+
+  template<
+    class F, class... Args
+  , std::size_t N = sizeof...(Args) / NumberArg
+      - ((sizeof...(Args) % NumberArg) ? 0 : 1)
+  , class Indexes = build_parameter_index_t<N>
+  , class LastIndexes = build_range_parameter_index_t<
+      N*NumberArg, sizeof...(Args)
+    >
+  >
+  auto operator()(F && func, Args&&... args) const
+  -> decltype(invoke(
+    LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...))
+  {
+    impl_(Indexes(), func, std::forward<Args>(args)...);
+    return invoke(
+      LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...);
+  }
+};
 
 /**
  * \brief Call \c func with \c NumberArg arguments at the same time.
@@ -43,21 +66,13 @@ namespace aux_ {
  *
  * \ingroup call-arguments
  */
-template<std::size_t NumberArg, class F, class... Args
-, std::size_t N = sizeof...(Args) / NumberArg
-  - ((sizeof...(Args) % NumberArg) ? 0 : 1)
-, class Indexes = build_parameter_index_t<N>
-, class LastIndexes = build_range_parameter_index_t<N*NumberArg, sizeof...(Args)>
->
-auto invoke_partial_param_loop(F func, Args&&... args)
--> decltype(invoke(
-  LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...))
-{
-  aux_::invoke_partial_param_loop<NumberArg>(
-    Indexes(), func, std::forward<Args>(args)...);
-  return invoke(
-    LastIndexes(), std::forward<F>(func), std::forward<Args>(args)...);
-}
+template<std::size_t NumberArg, class F, class... Args>
+CPP1X_DELEGATE_FUNCTION(
+  invoke_partial_param_loop(F func, Args&&... args)
+, invoke_partial_param_loop_fn<NumberArg>()(
+    std::forward<F>(func), std::forward<Args>(args)...
+  )
+)
 
 }
 

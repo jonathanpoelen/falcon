@@ -11,16 +11,18 @@
 
 namespace falcon {
 
-namespace aux_ {
-  template<std::size_t NumberArg, std::size_t N>
-  struct invoke_partial_recursive_param_loop
-  {
-    static_assert(NumberArg > 1, "NumberArg < 2");
+template<std::size_t NumberArg>
+class invoke_partial_recursive_param_loop_fn
+{
+  static_assert(NumberArg > 1, "NumberArg < 2");
 
-    template<typename Function, typename... Args
+  template<std::size_t N, class = void>
+  struct Impl {
+    template<
+      class F, class... Args
     , std::size_t Start = (N - 1) * (NumberArg - 1) + NumberArg + 1>
     static constexpr CPP1X_DELEGATE_FUNCTION(
-      impl(Function func, Args&&... args)
+      impl_(F && func, Args&&... args)
     , invoke(
         typename parameter_index_cat<
           parameter_index<0>,
@@ -29,30 +31,37 @@ namespace aux_ {
           , min(Start + (NumberArg - 1), sizeof...(Args) + 1)
           >
         >::type()
-      , func
-      , invoke_partial_recursive_param_loop<NumberArg, N-1>
-        ::impl(func, std::forward<Args>(args)...)
+      , std::forward<F>(func)
+      , Impl<N-1>::impl_(std::forward<F>(func), std::forward<Args>(args)...)
       , std::forward<Args>(args)...
       )
     )
   };
 
-  template<std::size_t NumberArg>
-  struct invoke_partial_recursive_param_loop<NumberArg, 0>
-  {
-    static_assert(NumberArg > 1, "NumberArg < 2");
-
-    template<typename Function, typename... Args>
+  template<class T>
+  struct Impl<0, T> {
+    template<class F, class... Args>
     static constexpr CPP1X_DELEGATE_FUNCTION(
-      impl(Function func, Args&&... args)
+      impl_(F && func, Args&&... args)
     , invoke(
         build_parameter_index_t<min(NumberArg, sizeof...(Args))>()
-      , func
+      , std::forward<F>(func)
       , std::forward<Args>(args)...
       )
     )
   };
-}
+
+public:
+  constexpr invoke_partial_recursive_param_loop_fn() noexcept {}
+
+  template<
+    class F, class... Args
+  , std::size_t N = (sizeof...(Args) - 2) / (NumberArg - 1)>
+  constexpr CPP1X_DELEGATE_FUNCTION(
+    operator()(F && func, Args&&... args) const
+  , Impl<N>::impl_(std::forward<F>(func), std::forward<Args>(args)...)
+  )
+};
 
 
 /**
@@ -70,12 +79,11 @@ namespace aux_ {
  *
  * \ingroup call-arguments
  */
-template<std::size_t NumberArg, typename Function, typename... Args
-, std::size_t N = (sizeof...(Args) - 2) / (NumberArg - 1)>
+template<std::size_t NumberArg, class F, class... Args>
 constexpr CPP1X_DELEGATE_FUNCTION(
-  invoke_partial_recursive_param_loop(Function func, Args&&... args)
-, aux_::invoke_partial_recursive_param_loop<NumberArg, N>
-  ::impl(func, std::forward<Args>(args)...)
+  invoke_partial_recursive_param_loop(F func, Args&&... args)
+, invoke_partial_recursive_param_loop_fn<NumberArg>()(
+    std::forward<F>(func), std::forward<Args>(args)...)
 )
 
 }

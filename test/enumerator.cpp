@@ -1,4 +1,5 @@
 #include <falcon/enum/enumerator.hpp>
+#include <typeinfo>
 #include "test/enumerator.hpp"
 
 FALCON_PP_ENUMERATOR(my_enum_class1, default, (A),(B, "b"),C,D);
