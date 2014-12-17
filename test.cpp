@@ -64,12 +64,12 @@
 //   }
 // };
 
-// #include <iostream>
-
+#include <iostream>
+#include <falcon/iostreams/sput.hpp>
 
 int main()
 {
-
+  falcon::iostreams::sput(std::cout, 1, "]");
 
 //   falcon::retain_free_object_allocator<int> allocator;
 //   allocator.deallocate(allocator.allocate(2), 2);
