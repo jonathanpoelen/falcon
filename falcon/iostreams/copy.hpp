@@ -61,7 +61,7 @@ copy(
   return copy(sbout, sbin, ineof);
 }
 
-namespace _aux {
+namespace aux_ {
   template<
     class CharT
   , class Traits>
@@ -94,7 +94,7 @@ copy_streambuf(
 , std::basic_streambuf<CharT, Traits> * sbout)
 {
   return (sbout && sbin)
-  ? _aux::copy_streambuf(*sbin, *sbout)
+  ? aux_::copy_streambuf(*sbin, *sbout)
   : std::ios_base::failbit;
 }
 

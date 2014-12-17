@@ -105,6 +105,8 @@ get_file_contents(const char * name, const CharT * s, std::streamsize n)
   errno = 0;
   if (n) {
     std::basic_filebuf<CharT> sbin;
+    CharT c;
+    sbin.pubsetbuf(&c, 1);
     if (sbin.open(name, std::ios_base::in)) {
       return sbin.sgetn(s, n);
     }
@@ -121,6 +123,8 @@ get_file_contents(
   std::ios_base::iostate ret = std::ios_base::goodbit;
   if (sbout) {
     std::basic_filebuf<CharT> sbin;
+    CharT c;
+    sbin.pubsetbuf(&c, 1);
     ret = sbin.open(name, std::ios_base::in)
     ? _aux::copy_streambuf(*sbin, *sbout)
     : std::ios_base::failbit;

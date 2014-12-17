@@ -14,7 +14,7 @@
 namespace falcon {
 namespace iostreams {
 
-namespace _aux {
+namespace aux_ {
 
 template<
   class T
@@ -85,67 +85,67 @@ struct is_io_base
 
 template<class T>
 struct is_ios
-: _aux::is_ios<T, std::basic_ios>::base
+: aux_::is_ios<T, std::basic_ios>::base
 {};
 
 template<class T>
 struct is_streambuf
-: _aux::is_ios<T, std::basic_streambuf>::base
+: aux_::is_ios<T, std::basic_streambuf>::base
 {};
 
 template<class T>
 struct is_ostream
-: _aux::is_ios<T, std::basic_ostream>::base
+: aux_::is_ios<T, std::basic_ostream>::base
 {};
 
 template<class T>
 struct is_istream
-: _aux::is_ios<T, std::basic_istream>::base
+: aux_::is_ios<T, std::basic_istream>::base
 {};
 
 template<class T>
 struct is_iostream
-: _aux::is_ios<T, std::basic_iostream>::base
+: aux_::is_ios<T, std::basic_iostream>::base
 {};
 
 template<class T>
 struct is_stringbuf
-: _aux::is_iostrings<T, std::basic_stringbuf>::base
+: aux_::is_iostrings<T, std::basic_stringbuf>::base
 {};
 
 template<class T>
 struct is_istringstream
-: _aux::is_iostrings<T, std::basic_istringstream>::base
+: aux_::is_iostrings<T, std::basic_istringstream>::base
 {};
 
 template<class T>
 struct is_ostringstream
-: _aux::is_iostrings<T, std::basic_ostringstream>::base
+: aux_::is_iostrings<T, std::basic_ostringstream>::base
 {};
 
 template<class T>
 struct is_stringstream
-: _aux::is_iostrings<T, std::basic_stringstream>::base
+: aux_::is_iostrings<T, std::basic_stringstream>::base
 {};
 
 template<class T>
 struct is_filebuf
-: _aux::is_ios<T, std::basic_filebuf>::base
+: aux_::is_ios<T, std::basic_filebuf>::base
 {};
 
 template<class T>
 struct is_ifstream
-: _aux::is_ios<T, std::basic_ifstream>::base
+: aux_::is_ios<T, std::basic_ifstream>::base
 {};
 
 template<class T>
 struct is_ofstream
-: _aux::is_ios<T, std::basic_ofstream>::base
+: aux_::is_ios<T, std::basic_ofstream>::base
 {};
 
 template<class T>
 struct is_fstream
-: _aux::is_ios<T, std::basic_fstream>::base
+: aux_::is_ios<T, std::basic_fstream>::base
 {};
 
 }
