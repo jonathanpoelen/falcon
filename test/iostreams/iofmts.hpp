@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_IOSTREAMS_IOFMTS_HPP
+#define FALCON_TEST_IOSTREAMS_IOFMTS_HPP
+
+void iofmts_test();
+
+#endif

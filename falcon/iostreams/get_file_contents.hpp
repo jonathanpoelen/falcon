@@ -126,7 +126,7 @@ get_file_contents(
     CharT c;
     sbin.pubsetbuf(&c, 1);
     ret = sbin.open(name, std::ios_base::in)
-    ? _aux::copy_streambuf(*sbin, *sbout)
+    ? aux_::copy_streambuf(*sbin, *sbout)
     : std::ios_base::failbit;
   }
   else {
