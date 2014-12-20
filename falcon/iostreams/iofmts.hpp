@@ -1,13 +1,18 @@
 #ifndef FALCON_IOSTREAMS_IOFMTS_HPP
 #define FALCON_IOSTREAMS_IOFMTS_HPP
 
-#include <ostream>
+#include <falcon/type_traits/static_const.hpp>
+
+#include <ios>
 #include <istream>
 
 namespace falcon {
 namespace iostreams {
 
-namespace _aux {
+#define FALCON_IOSTREAMS_GLOBAL_OBJECT_(name, type) \
+  } FALCON_GLOBAL_OBJECT(name, iostreams::type); namespace iostreams {
+
+namespace aux_ {
   struct io_flags_saver
   {
     std::ios_base & io_;
@@ -147,133 +152,133 @@ namespace _aux {
     mask() const noexcept
     { return mask_; }
   };
+
+  template<class CharT, class Traits, class T, class F>
+  std::basic_ostream<CharT, Traits> &
+  operator<<(std::basic_ostream<CharT, Traits> & os, ioflags<T, F> && x)
+  {
+    io_flags_saver saver(os, x.flags());
+    return os << x.x;
+  }
+
+  template<class CharT, class Traits, class T, class F>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, ioflags<T, F> && x)
+  {
+    io_flags_saver saver(is, x.flags());
+    return is >> std::forward<T>(x.x);
+  }
+
+
+  template<class CharT, class Traits, class T, class F>
+  std::basic_ostream<CharT, Traits> &
+  operator<<(std::basic_ostream<CharT, Traits> & os, iosetf<T, F> && x)
+  {
+    io_flags_saver saver(os);
+    os.setf(x.flags());
+    return os << x.x;
+  }
+
+  template<class CharT, class Traits, class T, class F>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, iosetf<T, F> && x)
+  {
+    io_flags_saver saver(is);
+    is.setf(x.flags());
+    return is >> std::forward<T>(x.x);
+  }
+
+
+  template<class CharT, class Traits, class T, class F>
+  std::basic_ostream<CharT, Traits> &
+  operator<<(std::basic_ostream<CharT, Traits> & os, iounsetf<T, F> && x)
+  {
+    io_flags_saver saver(os);
+    os.unsetf(x.flags());
+    return os << x.x;
+  }
+
+  template<class CharT, class Traits, class T, class F>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, iounsetf<T, F> && x)
+  {
+    io_flags_saver saver(is);
+    is.unsetf(x.flags());
+    return is >> std::forward<T>(x.x);
+  }
+
+
+  template<class CharT, class Traits, class T, class M, class F>
+  std::basic_ostream<CharT, Traits> &
+  operator<<(std::basic_ostream<CharT, Traits> & os, iosetflags<T, M, F> && x)
+  {
+    io_flags_saver saver(os, x.flags());
+    os.setf(x.flags(), x.mask());
+    return os << x.x;
+  }
+
+  template<class CharT, class Traits, class T, class M, class F>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, iosetflags<T, M, F> && x)
+  {
+    io_flags_saver saver(is, x.flags());
+    is.setf(x.flags(), x.mask());
+    return is >> std::forward<T>(x.x);
+  }
 }
 
 
-constexpr struct ioflags_t {
-  template<class T>
-  _aux::ioflags<T>
-  operator()(
-    T && x
-  , std::ios_base::fmtflags flags)
-  const noexcept
-  { return {flags, std::forward<T>(x)}; }
-} ioflags;
-
-constexpr struct iosetflags_t {
-template<class T>
-  _aux::iosetf<T>
-  operator()(
-    T && x
-  , std::ios_base::fmtflags flags)
-  const noexcept
-  { return {flags, std::forward<T>(x)}; }
+struct ioflags_fn {
+  constexpr ioflags_fn() noexcept {}
 
   template<class T>
-  _aux::iosetflags<T>
+  aux_::ioflags<T&&>
+  operator()(T && x, std::ios_base::fmtflags flags) const noexcept
+  { return {flags, std::forward<T>(x)}; }
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(ioflags, ioflags_fn);
+
+struct iosetflags_fn {
+  constexpr iosetflags_fn() noexcept {}
+
+  template<class T>
+  aux_::iosetf<T&&>
+  operator()(T && x, std::ios_base::fmtflags flags) const noexcept
+  { return {flags, std::forward<T>(x)}; }
+
+  template<class T>
+  aux_::iosetflags<T&&>
   operator()(
     T && x
   , std::ios_base::fmtflags flags
   , std::ios_base::fmtflags mask)
   const noexcept
   { return {flags, mask, std::forward<T>(x)}; }
-} iosetflags;
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetflags, iosetflags_fn);
 
-constexpr struct iounsetflags_t {
+struct iounsetflags_fn {
+  constexpr iounsetflags_fn() noexcept {}
+
   template<class T>
-  _aux::iounsetf<T>
-  operator()(
-    T && x
-  , std::ios_base::fmtflags flags)
-  const noexcept
+  aux_::iounsetf<T&&>
+  operator()(T && x, std::ios_base::fmtflags flags) const noexcept
   { return {flags, std::forward<T>(x)}; }
-} iounsetflags;
-
-
-template<class CharT, class Traits, class T, class F>
-std::basic_ostream<CharT, Traits> &
-operator<<(std::basic_ostream<CharT, Traits> & os, _aux::ioflags<T, F> && x)
-{
-  _aux::io_flags_saver saver(os, x.flags());
-  return os << x.x;
-}
-
-template<class CharT, class Traits, class T, class F>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::ioflags<T, F> && x)
-{
-  _aux::io_flags_saver saver(is, x.flags());
-  return is >> x.x;
-}
-
-
-template<class CharT, class Traits, class T, class F>
-std::basic_ostream<CharT, Traits> &
-operator<<(std::basic_ostream<CharT, Traits> & os, _aux::iosetf<T, F> && x)
-{
-  _aux::io_flags_saver saver(os);
-  os.setf(x.flags());
-  return os << x.x;
-}
-
-template<class CharT, class Traits, class T, class F>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::iosetf<T, F> && x)
-{
-  _aux::io_flags_saver saver(is);
-  is.setf(x.flags());
-  return is >> x.x;
-}
-
-
-template<class CharT, class Traits, class T, class F>
-std::basic_ostream<CharT, Traits> &
-operator<<(std::basic_ostream<CharT, Traits> & os, _aux::iounsetf<T, F> && x)
-{
-  _aux::io_flags_saver saver(os);
-  os.unsetf(x.flags());
-  return os << x.x;
-}
-
-template<class CharT, class Traits, class T, class F>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::iounsetf<T, F> && x)
-{
-  _aux::io_flags_saver saver(is);
-  is.unsetf(x.flags());
-  return is >> x.x;
-}
-
-
-template<class CharT, class Traits, class T, class M, class F>
-std::basic_ostream<CharT, Traits> &
-operator<<(std::basic_ostream<CharT, Traits> & os, _aux::iosetflags<T, M, F> && x)
-{
-  _aux::io_flags_saver saver(os, x.flags());
-  os.setf(x.flags(), x.mask());
-  return os << x.x;
-}
-
-template<class CharT, class Traits, class T, class M, class F>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::iosetflags<T, M, F> && x)
-{
-  _aux::io_flags_saver saver(is, x.flags());
-  is.setf(x.flags(), x.mask());
-  return is >> x.x;
-}
-
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iounsetflags, iounsetflags_fn);
 
 #define FALCON_IOFMT(name, mask)                    \
-  constexpr struct io##name##_t {                   \
+  struct io##name##_fn {                            \
+    constexpr io##name##_fn() noexcept {}           \
     template<class T>                               \
-    _aux::iosetflags<                               \
-      T                                             \
-    , _aux::fmtflags_constant<mask>                 \
-    , _aux::fmtflags_constant<std::ios_base::name>> \
+    aux_::iosetflags<                               \
+      T &&                                          \
+    , aux_::fmtflags_constant<mask>                 \
+    , aux_::fmtflags_constant<std::ios_base::name>> \
     operator()(T && x) const noexcept               \
     { return {std::forward<T>(x)}; }                \
-  } io##name;
+  };                                                \
+  FALCON_IOSTREAMS_GLOBAL_OBJECT_(io##name, io##name##_fn);
 
 FALCON_IOFMT(dec, std::ios_base::basefield)
 FALCON_IOFMT(oct, std::ios_base::basefield)
@@ -289,20 +294,24 @@ FALCON_IOFMT(fixed, std::ios_base::floatfield)
 
 # undef FALCON_IOFMT
 
-#define FALCON_IOFMT(name)                                          \
-  constexpr struct io##name##_t {                                   \
-    template<class T>                                               \
-    _aux::iosetf<T, _aux::fmtflags_constant<std::ios_base::name>>   \
-    operator()(T && x) const noexcept                               \
-    { return {std::forward<T>(x)}; }                                \
-  } io##name;                                                       \
-                                                                    \
-  constexpr struct iono##name##_t {                                 \
-    template<class T>                                               \
-    _aux::iounsetf<T, _aux::fmtflags_constant<std::ios_base::name>> \
-    operator()(T && x) const noexcept                               \
-    { return {std::forward<T>(x)}; }                                \
-  } iono##name;
+#define FALCON_IOFMT(name)                                            \
+  struct io##name##_fn {                                              \
+    constexpr io##name##_fn() noexcept {}                             \
+    template<class T>                                                 \
+    aux_::iosetf<T&&, aux_::fmtflags_constant<std::ios_base::name>>   \
+    operator()(T && x) const noexcept                                 \
+    { return {std::forward<T>(x)}; }                                  \
+  };                                                                  \
+  FALCON_IOSTREAMS_GLOBAL_OBJECT_(io##name, io##name##_fn);           \
+                                                                      \
+  struct iono##name##_fn {                                            \
+    constexpr iono##name##_fn() noexcept {}                           \
+    template<class T>                                                 \
+    aux_::iounsetf<T&&, aux_::fmtflags_constant<std::ios_base::name>> \
+    operator()(T && x) const noexcept                                 \
+    { return {std::forward<T>(x)}; }                                  \
+  };                                                                  \
+  FALCON_IOSTREAMS_GLOBAL_OBJECT_(iono##name, iono##name##_fn);       \
 
 FALCON_IOFMT(basefield)
 FALCON_IOFMT(adjustfield)
@@ -319,9 +328,11 @@ FALCON_IOFMT(uppercase)
 
 #undef FALCON_IOFMT
 
-constexpr struct  iosetbase_t {
+struct iosetbase_fn {
+  constexpr iosetbase_fn() noexcept {}
+
   template<class T>
-  _aux::iosetflags<T, _aux::fmtflags_constant<std::ios_base::basefield>>
+  aux_::iosetflags<T&&, aux_::fmtflags_constant<std::ios_base::basefield>>
   operator()(int base, T && x) const noexcept
   {
     return {base ==  8 ? std::ios_base::oct :
@@ -329,10 +340,11 @@ constexpr struct  iosetbase_t {
     base == 16 ? std::ios_base::hex :
     std::ios_base::fmtflags(0), std::forward<T>(x)};
   }
-} iosetbase;
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetbase, iosetbase_fn);
 
 
-namespace _aux {
+namespace aux_ {
   template<class CharT, class T>
   struct iosetfill
   { CharT c ; T x; };
@@ -348,138 +360,142 @@ namespace _aux {
   template<class T>
   struct iows
   { T x; };
+
+
+  template<class CharT, class Traits, typename CharT2, class T>
+  std::basic_ostream<CharT, Traits> &
+  operator<<(std::basic_ostream<CharT, Traits> & os, iosetfill<CharT2, T> && x)
+  {
+    aux_::io_fill_saver<CharT, Traits> saver(os, x.c);
+    return os << x.x;
+  }
+
+  template<class CharT, class Traits, typename CharT2, class T>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, iosetfill<CharT2, T> && x)
+  {
+    aux_::io_fill_saver<CharT, Traits> saver(is, x.c);
+    return is >> std::forward<T>(x.x);
+  }
+
+  template<class CharT, class Traits, class T>
+  std::basic_ostream<CharT, Traits> &
+  operator<<(std::basic_ostream<CharT, Traits> & os, iosetprecision<T> && x)
+  {
+    io_precision_saver saver(os, x.n);
+    return os << x.x;
+  }
+
+  template<class CharT, class Traits, class T>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, iosetprecision<T> && x)
+  {
+    io_precision_saver saver(is, x.n);
+    return is >> std::forward<T>(x.x);
+  }
+
+
+  template<class CharT, class Traits, class T>
+  std::basic_ostream<CharT, Traits> &
+  operator<<(std::basic_ostream<CharT, Traits> & os, iosetwidth<T> && x)
+  {
+    os.width(x.n);
+    return os << x.x;
+  }
+
+  template<class CharT, class Traits, class T>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, iosetwidth<T> && x)
+  {
+    is.width(x.n);
+    return is >> std::forward<T>(x.x);
+  }
+
+
+  template<class CharT, class Traits, class T>
+  std::basic_istream<CharT, Traits> &
+  operator>>(std::basic_istream<CharT, Traits> & is, iows<T> && x)
+  { return is >> std::ws >> std::forward<T>(x.x); }
 }
 
 
-constexpr struct iosetfill_t {
+struct iosetfill_fn {
+  constexpr iosetfill_fn() noexcept {}
+
   template<class CharT, class T>
-  _aux::iosetfill<CharT, T>
-  operator()(
-    T && x
-  , CharT c)
-  const noexcept
+  aux_::iosetfill<CharT, T&&>
+  operator()(T && x, CharT c) const noexcept
   { return {c, std::forward<T>(x)}; }
-} iosetfill;
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetfill, iosetfill_fn);
 
-constexpr struct iosetprecision_t {
+struct iosetprecision_fn {
+  constexpr iosetprecision_fn() noexcept {}
+
   template<class CharT, class T>
-  _aux::iosetprecision<T>
-  operator()(
-    T && x
-  , std::streamsize n)
-  const noexcept
+  aux_::iosetprecision<T&&>
+  operator()(T && x, std::streamsize n) const noexcept
   { return {n, std::forward<T>(x)}; }
-} iosetprecision;
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetprecision, iosetprecision_fn);
 
-constexpr struct iosetw_t {
+struct iosetw_fn {
+  constexpr iosetw_fn() noexcept {}
+
   template<class T>
-  _aux::iosetwidth<T>
-  operator()(
-    T && x
-  , std::streamsize n)
-  const noexcept
+  aux_::iosetwidth<T&&>
+  operator()(T && x, std::streamsize n) const noexcept
   { return {n, std::forward<T>(x)}; }
-} iosetw;
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetw, iosetw_fn);
 
-constexpr struct iows_t {
+struct iows_fn {
+  constexpr iows_fn() noexcept {}
+
   template<class T>
-  _aux::iows<T>
-  operator()(T && x)
-  const noexcept
+  aux_::iows<T&&>
+  operator()(T && x) const noexcept
   { return {std::forward<T>(x)}; }
-} iows;
-
-
-template<class CharT, class Traits, typename CharT2, class T>
-std::basic_ostream<CharT, Traits> &
-operator<<(std::basic_ostream<CharT, Traits> & os, _aux::iosetfill<CharT2, T> && x)
-{
-  _aux::io_fill_saver<CharT, Traits> saver(os, x.c);
-  return os << x.x;
-}
-
-template<class CharT, class Traits, typename CharT2, class T>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::iosetfill<CharT2, T> && x)
-{
-  _aux::io_fill_saver<CharT, Traits> saver(is, x.c);
-  return is >> x.x;
-}
-
-
-template<class CharT, class Traits, class T>
-std::basic_ostream<CharT, Traits> &
-operator<<(std::basic_ostream<CharT, Traits> & os, _aux::iosetprecision<T> && x)
-{
-  _aux::io_precision_saver saver(os, x.n);
-  return os << x.x;
-}
-
-template<class CharT, class Traits, class T>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::iosetprecision<T> && x)
-{
-  _aux::io_precision_saver saver(is, x.n);
-  return is >> x.x;
-}
-
-
-template<class CharT, class Traits, class T>
-std::basic_ostream<CharT, Traits> &
-operator<<(std::basic_ostream<CharT, Traits> & os, _aux::iosetwidth<T> && x)
-{
-  os.width(x.n);
-  return os << x.x;
-}
-
-template<class CharT, class Traits, class T>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::iosetwidth<T> && x)
-{
-  is.width(x.n);
-  return is >> x.x;
-}
-
-
-template<class CharT, class Traits, class T>
-std::basic_istream<CharT, Traits> &
-operator>>(std::basic_istream<CharT, Traits> & is, _aux::iows<T> && x)
-{ return is >> std::ws >> x.x; }
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iows, iows_fn);
 
 
 template<std::ios_base::fmtflags F>
 struct iofmt
 {
   template<class T>
-  _aux::ioflags<T, _aux::fmtflags_constant<F>> operator()(T && x) const  noexcept
+  aux_::ioflags<T&&, aux_::fmtflags_constant<F>>
+  operator()(T && x) const noexcept
   { return {std::forward<T>(x)}; }
 
   template<class T>
-  _aux::ioflags<T> operator()(std::ios_base::fmtflags flags, T && x) const  noexcept
+  aux_::ioflags<T&&>
+  operator()(std::ios_base::fmtflags flags, T && x) const noexcept
   { return {F|flags, std::forward<T>(x)}; }
 };
 
 
-template<std::ios_base::fmtflags F
+template<
+  std::ios_base::fmtflags F
 , std::ios_base::fmtflags M = std::ios_base::fmtflags(0)>
 struct iosetfmt
 {
   template<class T>
-  _aux::iosetflags<T, _aux::fmtflags_constant<M>, _aux::fmtflags_constant<F>>
-  operator()(T && x) const  noexcept
+  aux_::iosetflags<T&&, aux_::fmtflags_constant<M>, aux_::fmtflags_constant<F>>
+  operator()(T && x) const noexcept
   { return {std::forward<T>(x)}; }
 
   template<class T>
-  _aux::iosetflags<T, _aux::fmtflags_constant<M>>
-  operator()(T && x, std::ios_base::fmtflags flags) const  noexcept
+  aux_::iosetflags<T&&, aux_::fmtflags_constant<M>>
+  operator()(T && x, std::ios_base::fmtflags flags) const noexcept
   { return {F|flags, std::forward<T>(x)}; }
 
   template<class T>
-  _aux::iosetflags<T>
+  aux_::iosetflags<T&&>
   operator()(
     T && x
   , std::ios_base::fmtflags mask
-  , std::ios_base::fmtflags flags) const  noexcept
+  , std::ios_base::fmtflags flags) const noexcept
   { return {F|flags, M|mask, std::forward<T>(x)}; }
 };
 
@@ -488,65 +504,68 @@ template<std::ios_base::fmtflags F>
 struct iounsetfmt
 {
   template<class T>
-  _aux::iounsetf<T, _aux::fmtflags_constant<F>> operator()(T && x) const  noexcept
+  aux_::iounsetf<T&&, aux_::fmtflags_constant<F>>
+  operator()(T && x) const noexcept
   { return {std::forward<T>(x)}; }
 
   template<class T>
-  _aux::iounsetf<T> operator()(T && x, std::ios_base::fmtflags flags) const  noexcept
+  aux_::iounsetf<T&&>
+  operator()(T && x, std::ios_base::fmtflags flags) const noexcept
   { return {F|flags, std::forward<T>(x)}; }
 };
 
+#undef FALCON_IOSTREAMS_GLOBAL_OBJECT_
 
 namespace iofmts {
-  constexpr ::falcon::iostreams::ioflags_t flags;
-  constexpr ::falcon::iostreams::iosetflags_t setflags;
-  constexpr ::falcon::iostreams::iounsetflags_t unsetflags;
+  constexpr auto const & flags = ioflags;
+  constexpr auto const & setflags = iosetflags;
+  constexpr auto const & unsetflags = iounsetflags;
 
-  constexpr ::falcon::iostreams::iodec_t dec;
-  constexpr ::falcon::iostreams::iooct_t oct;
-  constexpr ::falcon::iostreams::iohex_t hex;
-  constexpr ::falcon::iostreams::ioleft_t left;
-  constexpr ::falcon::iostreams::ioright_t right;
-  constexpr ::falcon::iostreams::iointernal_t internal;
-  constexpr ::falcon::iostreams::ioscientific_t scientific;
-  constexpr ::falcon::iostreams::iofixed_t fixed;
-  constexpr ::falcon::iostreams::iosetbase_t setbase;
-  constexpr ::falcon::iostreams::iosetfill_t setfill;
-  constexpr ::falcon::iostreams::iosetprecision_t setprecision;
-  constexpr ::falcon::iostreams::iosetw_t setw;
-  constexpr ::falcon::iostreams::iows_t ws;
+  constexpr auto const & dec = iodec;
+  constexpr auto const & oct = iooct;
+  constexpr auto const & hex = iohex;
+  constexpr auto const & left = ioleft;
+  constexpr auto const & right = ioright;
+  constexpr auto const & internal = iointernal;
+  constexpr auto const & scientific = ioscientific;
+  constexpr auto const & fixed = iofixed;
+  constexpr auto const & setbase = iosetbase;
+  constexpr auto const & setfill = iosetfill;
+  constexpr auto const & setprecision = iosetprecision;
+  constexpr auto const & setw = iosetw;
+  constexpr auto const & ws = iows;
 
-  constexpr ::falcon::iostreams::iobasefield_t basefield;
-  constexpr ::falcon::iostreams::ioadjustfield_t adjustfield;
-  constexpr ::falcon::iostreams::iofloatfield_t floatfield;
-  constexpr ::falcon::iostreams::ioboolalpha_t boolalpha;
-  constexpr ::falcon::iostreams::ioshowbase_t showbase;
-  constexpr ::falcon::iostreams::ioshowpoint_t showpoint;
-  constexpr ::falcon::iostreams::ioshowpos_t showpos;
-  constexpr ::falcon::iostreams::ioskipws_t skipws;
-  constexpr ::falcon::iostreams::iounitbuf_t unitbuf;
-  constexpr ::falcon::iostreams::iouppercase_t uppercase;
+  constexpr auto const & basefield = iobasefield;
+  constexpr auto const & adjustfield = ioadjustfield;
+  constexpr auto const & floatfield = iofloatfield;
+  constexpr auto const & boolalpha = ioboolalpha;
+  constexpr auto const & showbase = ioshowbase;
+  constexpr auto const & showpoint = ioshowpoint;
+  constexpr auto const & showpos = ioshowpos;
+  constexpr auto const & skipws = ioskipws;
+  constexpr auto const & unitbuf = iounitbuf;
+  constexpr auto const & uppercase = iouppercase;
 
-  constexpr ::falcon::iostreams::ionobasefield_t nobasefield;
-  constexpr ::falcon::iostreams::ionoadjustfield_t noadjustfield;
-  constexpr ::falcon::iostreams::ionofloatfield_t nofloatfield;
-  constexpr ::falcon::iostreams::ionoboolalpha_t noboolalpha;
-  constexpr ::falcon::iostreams::ionoshowbase_t noshowbase;
-  constexpr ::falcon::iostreams::ionoshowpoint_t noshowpoint;
-  constexpr ::falcon::iostreams::ionoshowpos_t noshowpos;
-  constexpr ::falcon::iostreams::ionoskipws_t noskipws;
-  constexpr ::falcon::iostreams::ionounitbuf_t nounitbuf;
-  constexpr ::falcon::iostreams::ionouppercase_t nouppercase;
+  constexpr auto const & nobasefield = ionobasefield;
+  constexpr auto const & noadjustfield = ionoadjustfield;
+  constexpr auto const & nofloatfield = ionofloatfield;
+  constexpr auto const & noboolalpha = ionoboolalpha;
+  constexpr auto const & noshowbase = ionoshowbase;
+  constexpr auto const & noshowpoint = ionoshowpoint;
+  constexpr auto const & noshowpos = ionoshowpos;
+  constexpr auto const & noskipws = ionoskipws;
+  constexpr auto const & nounitbuf = ionounitbuf;
+  constexpr auto const & nouppercase = ionouppercase;
 
   template<std::ios_base::fmtflags F>
-  using iofmt = ::falcon::iostreams::iofmt<F>;
+  using fmt = iostreams::iofmt<F>;
 
   template<std::ios_base::fmtflags F
   , std::ios_base::fmtflags M = std::ios_base::fmtflags(0)>
-  using iosetfmt = ::falcon::iostreams::iosetfmt<F, M>;
+  using setfmt = iostreams::iosetfmt<F, M>;
 
   template<std::ios_base::fmtflags F>
-  using iounsetfmt = ::falcon::iostreams::iounsetfmt<F>;
+  using unsetfmt = iostreams::iounsetfmt<F>;
 }
 
 }
