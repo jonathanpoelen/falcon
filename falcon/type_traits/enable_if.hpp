@@ -18,6 +18,12 @@ struct enable_if_c
 : enable_if<C::value, T>
 {};
 
+template <bool C, class T>
+using enable_if_t = typename enable_if<C, T>::type;
+
+template <class C, class T>
+using enable_if_c_t = typename enable_if_c<C, T>::type;
+
 }
 
 #endif

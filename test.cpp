@@ -65,11 +65,30 @@
 // };
 
 #include <iostream>
-#include <falcon/iostreams/sput.hpp>
+#include <sstream>
+#include <falcon/iostreams/iofmts.hpp>
+#include <falcon/functional/invoker.hpp>
+#include <test/A.h>
+
+namespace iofmts {
+  using namespace falcon::iostreams::iofmts;
+}
 
 int main()
 {
-  falcon::iostreams::sput(std::cout, 1, "]");
+  auto xx = falcon::make_invoker(iofmts::hex, A(1));
+//   auto x = iofmts::store(111, iofmts::hex);
+  using namespace falcon::iostreams::iofmts;
+  std::cout << 111 << ' ' << iofmts::hex(111) << ' ' << 111 << '\n';
+  std::cout << 111 << ' ' << hex(111) << ' ' << 111 << '\n';
+  std::cout << 111 << ' ' << std::hex << 111 << ' ' << 111 << '\n';
+  std::cout << xx() << '\n';
+
+  int i = 0;
+  const auto x = iofmts::hex(i);
+  //   auto x = iofmts::store(111, iofmts::hex);
+  std::istringstream("12") >> x;
+  std::cout << i;
 
 //   falcon::retain_free_object_allocator<int> allocator;
 //   allocator.deallocate(allocator.allocate(2), 2);

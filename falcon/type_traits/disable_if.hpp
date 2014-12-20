@@ -5,15 +5,21 @@
 
 namespace falcon {
 
-template<bool C, typename _Tp = void>
+template<bool C, class T = void>
 struct disable_if
-: enable_if<!C, _Tp>
+: enable_if<!C, T>
 {};
 
-template<class C, typename _Tp = void>
+template<class C, class T = void>
 struct disable_if_c
-: enable_if<!C::value, _Tp>
+: enable_if<!C::value, T>
 {};
+
+template <bool C, class T>
+using disable_if_t = typename disable_if<C, T>::type;
+
+template <class C, class T>
+using disable_if_c_t = typename disable_if_c<C, T>::type;
 
 }
 

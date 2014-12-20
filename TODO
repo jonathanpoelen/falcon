@@ -365,3 +365,4 @@ un objet qui retourne data() si objet, le pointeur sinon + une fonction qui reto
 inject(f, inject_param(',')) -> pour chaque param où le traits inject_param est validé (inject_param::template test<T>::value) ajouter ','.
 
 
+

@@ -26,8 +26,9 @@ public:
   : streambuf_base(), m_mode(mode)
   { }
 
-  basic_membuf(CharT * memory, std::size_t len,
-               std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+  basic_membuf(
+    CharT * memory, std::size_t len
+  , std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
   : streambuf_base(), m_mode(mode)
   { mem(memory, len); }
 
@@ -46,7 +47,7 @@ public:
   void mem(char_type* s, std::streamsize n)
   { _assign(s, s+n); }
 
-  std::size_t size()
+  std::ptrdiff_t size() const
   { return this->egptr() - this->eback(); }
 
 protected:
