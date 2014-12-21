@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_IOSTREAMS_MEMBUF_HPP
+#define FALCON_TEST_IOSTREAMS_MEMBUF_HPP
+
+void membuf_test();
+
+#endif

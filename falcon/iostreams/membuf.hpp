@@ -30,22 +30,7 @@ public:
     CharT * memory, std::size_t len
   , std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
   : streambuf_base(), m_mode(mode)
-  { mem(memory, len); }
-
-#if cplusplus >= 201103L
-  basic_membuf(const basic_membuf& other)
-  : streambuf_base(other)
-  {}
-
-  basic_membuf & operator=(const basic_membuf& other)
-  {
-    streambuf_base::operator=(other);
-    return *this;
-  }
-#endif
-
-  void mem(char_type* s, std::streamsize n)
-  { _assign(s, s+n); }
+  { _assign(memory, memory + std::streamsize(len)); }
 
   std::ptrdiff_t size() const
   { return this->egptr() - this->eback(); }
@@ -60,18 +45,18 @@ protected:
   virtual std::streamsize showmanyc()
   {
     std::streamsize ret = -1;
-    if (m_mode & std::ios_base::in)
-    {
+    if (m_mode & std::ios_base::in) {
       _update_egptr();
       ret = this->egptr() - this->gptr();
     }
     return ret;
   }
 
-  virtual pos_type seekoff(off_type off, std::ios_base::seekdir way,
-                           std::ios_base::openmode mode)
+  virtual pos_type seekoff(
+    off_type off, std::ios_base::seekdir way
+  , std::ios_base::openmode mode)
   {
-    pos_type ret =  pos_type(off_type(-1));
+    pos_type ret = pos_type(off_type(-1));
     bool testin = (std::ios_base::in & m_mode & mode) != 0;
     bool testout = (std::ios_base::out & m_mode & mode) != 0;
     const bool testboth = testin && testout && way != std::ios_base::cur;
@@ -85,8 +70,7 @@ protected:
 
       off_type newoffi = off;
       off_type newoffo = newoffi;
-      if (way == std::ios_base::cur)
-      {
+      if (way == std::ios_base::cur) {
         newoffi += this->gptr() - beg;
         newoffo += this->pptr() - beg;
       }
@@ -96,15 +80,15 @@ protected:
 
       if ((testin || testboth)
         && newoffi >= 0
-        && this->egptr() - beg >= newoffi)
-      {
+        && this->egptr() - beg >= newoffi
+      ) {
         this->setg(this->eback(), this->eback() + newoffi, this->egptr());
         ret = pos_type(newoffi);
       }
       if ((testout || testboth)
         && newoffo >= 0
-        && this->egptr() - beg >= newoffo)
-      {
+        && this->egptr() - beg >= newoffo
+      ) {
         _pbump(newoffo);
         ret = pos_type(newoffo);
       }
@@ -114,19 +98,17 @@ protected:
 
   virtual pos_type seekpos(pos_type sp, std::ios_base::openmode mode)
   {
-    pos_type ret =  pos_type(off_type(-1));
+    pos_type ret = pos_type(off_type(-1));
     const bool testin = (std::ios_base::in & m_mode & mode) != 0;
     const bool testout = (std::ios_base::out & m_mode & mode) != 0;
 
     const char_type* beg = testin ? this->eback() : this->pbase();
-    if ((beg || !off_type(sp)) && (testin || testout))
-    {
+    if ((beg || !off_type(sp)) && (testin || testout)) {
       _update_egptr();
 
       const off_type pos(sp);
       const bool testpos = (0 <= pos && pos <= this->egptr() - beg);
-      if (testpos)
-      {
+      if (testpos) {
         if (testin) {
           this->setg(this->eback(), this->eback() + pos, this->egptr());
         }
@@ -142,32 +124,54 @@ protected:
   virtual int_type pbackfail(int_type c)
   {
     int_type ret = traits_type::eof();
-    if (this->eback() < this->gptr())
-    {
+    if (this->eback() < this->gptr()) {
       // Try to put back c into input sequence in one of three ways.
       // Order these tests done in is unspecified by the standard.
       const bool testeof = traits_type::eq_int_type(c, ret);
-      if (!testeof)
-      {
-        const bool testeq = traits_type::eq(traits_type::
-        to_char_type(c),
-        this->gptr()[-1]);
-        const bool testout = m_mode & std::ios_base::out;
-        if (testeq || testout)
-        {
+      if (!testeof) {
+        const bool testeq = traits_type::eq(
+          traits_type::to_char_type(c)
+        , this->gptr()[-1]);
+        if (testeq || (m_mode & std::ios_base::out)) {
           this->gbump(-1);
-          if (!testeq)
-          *this->gptr() = traits_type::to_char_type(c);
+          if (!testeq) {
+            *this->gptr() = traits_type::to_char_type(c);
+          }
           ret = c;
         }
       }
-      else
-      {
+      else {
         this->gbump(-1);
         ret = traits_type::not_eof(c);
       }
     }
     return ret;
+  }
+
+  virtual std::streamsize
+  xsgetn(char_type* s, std::streamsize n)
+  {
+    const std::streamsize buf_len = this->egptr() - this->gptr();
+    const std::streamsize len = std::min(buf_len, n);
+    if (len) {
+      traits_type::copy(s, this->gptr(), std::size_t(len));
+      s += len;
+      this->gbump(int(len));
+    }
+    return len;
+  }
+
+  virtual std::streamsize
+  xsputn(const char_type* s, std::streamsize n)
+  {
+    const std::streamsize buf_len = this->epptr() - this->pptr();
+    const std::streamsize len = std::min(buf_len, n);
+    if (len) {
+      traits_type::copy(this->pptr(), s, std::size_t(len));
+      s += len;
+      this->pbump(int(len));
+    }
+    return len;
   }
 
 private:
@@ -195,8 +199,7 @@ private:
   {
     this->setp(this->pbase(), this->epptr());
 
-    while (off > std::numeric_limits<int>::max())
-    {
+    while (off > std::numeric_limits<int>::max()) {
       this->pbump(std::numeric_limits<int>::max());
       off -= std::numeric_limits<int>::max();
     }
