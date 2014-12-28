@@ -5,22 +5,22 @@
 
 #if __cplusplus >= 201103L
 
-#define CPP_DELETE_COPY_CONSTUCTIBLE(class_name) \
+#define CPP_DELETE_COPY_CONSTUCTOR(class_name) \
   class_name(const class_name&) = delete
-#define CPP_DELETE_ASSIGNABLE(class_name) \
+#define CPP_DELETE_COPY_ASSIGNABLE(class_name) \
   class_name& operator=(const class_name&) = delete
 
 #else
 
-#define CPP_DELETE_COPY_CONSTUCTIBLE(class_name) \
+#define CPP_DELETE_COPY_CONSTUCTOR(class_name) \
   private: class_name(const class_name&);
-#define CPP_DELETE_ASSIGNABLE(class_name) \
+#define CPP_DELETE_COPY_ASSIGNABLE(class_name) \
   private: class_name& operator=(const class_name&);
 
 #endif
 
 #define CPP_DELETE_SGI_ASSIGNABLE(class_name)\
-	CPP_DELETE_COPY_CONSTUCTIBLE(class_name);\
-	CPP_DELETE_ASSIGNABLE(class_name)
+	CPP_DELETE_COPY_CONSTUCTOR(class_name);\
+	CPP_DELETE_COPY_ASSIGNABLE(class_name)
 
 #endif

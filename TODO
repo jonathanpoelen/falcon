@@ -95,7 +95,6 @@ fonction pour simplifier les operations sur buffer (renvoit false si eof):
 	sgetn: bool sgetn(buffer, s, n)
 	sgetc: bool sgetc(buffer, &c)
 	ios/streambuf.hpp
-intrusive data stream (eback, gptr, egptr, pbase, pptrm epptr). Retourne les valeurs interne de ces pointeurs (mettre dans ios/)
 
 classe wrapper pour __m128, __m128d, __m256, __m256d et autres type de (/usr/lib/gcc/x86_64-linux-gnu/4.7/include/{avxintrin,avx2intrin,emmintrin,xmmintrin,...}.h). (header different pour vs++ ?). Voir boost.simd
 
@@ -364,5 +363,9 @@ un objet qui retourne data() si objet, le pointeur sinon + une fonction qui reto
 
 inject(f, inject_param(',')) -> pour chaque param où le traits inject_param est validé (inject_param::template test<T>::value) ajouter ','.
 
+fn::exchange
+
+macro FALCON_NOT_COPYABLE et FALCON_MOVABLE_BUT_NOT_COPYABLE
+modifier c++11/assignable et le melanger avec les macros au-dessus
 
 

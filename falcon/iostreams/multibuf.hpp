@@ -1,70 +1,82 @@
 #ifndef FALCON_IOSTREAMULTIBUF_HPP
 #define FALCON_IOSTREAMULTIBUF_HPP
 
-#include <ios>
+#include <falcon/c++1x/assignable.hpp>
+#include <falcon/utility/exchange.hpp>
+#include <falcon/iostreams/intrusive_data_streambuf.hpp>
+
 #include <streambuf>
 #include <vector>
+#include <ios>
 
 namespace falcon {
 namespace iostreams {
 
-template<class CharT, class Traits>
-class basic_streambuf_generator
+template<class CharT, class Traits = std::char_traits<CharT>>
+struct basic_multibuf_generator
 {
-public:
   typedef std::basic_streambuf<CharT, Traits> streambuf_type;
   typedef streambuf_type* value_type;
 
-  std::vector<streambuf_type *> vector;
-  std::size_t position;
+  CPP1X_DEFAULT_SGI_CONSTRUCTOR(basic_multibuf_generator);
 
-public:
-#if __cplusplus >= 201103L
-  basic_streambuf_generator() = default;
-  basic_streambuf_generator(const basic_streambuf_generator&) = default;
-  basic_streambuf_generator(basic_streambuf_generator&&) = default;
-
-  basic_streambuf_generator(std::initializer_list<streambuf_type*> l)
+  basic_multibuf_generator(std::initializer_list<streambuf_type *> l)
   : vector(l)
-  , position(0)
-  {}
-#else
-  basic_streambuf_generator()
-  : vector()
-  , position(0)
   {}
 
-  basic_streambuf_generator(const basic_streambuf_generator& other)
-  : vector(other.vector)
-  , position(0)
+  basic_multibuf_generator(std::vector<streambuf_type *> buffers) noexcept
+  : vector(std::move(buffers))
   {}
-#endif
 
   template<class InputIterator>
-  basic_streambuf_generator(InputIterator first, InputIterator last)
+  basic_multibuf_generator(InputIterator first, InputIterator last)
   : vector(first, last)
-  , position(0)
   {}
 
-  streambuf_type * operator()()
+  CPP1X_DEFAULT_SGI_ASSIGNABLE(basic_multibuf_generator);
+
+  basic_multibuf_generator& operator=(std::initializer_list<streambuf_type *> l)
   {
-    if (position < vector.size()) {
-      return vector[position++];
-    }
-    return 0;
+    vector = l;
+    gpos = ppos = 0;
+    return *this;
   }
 
-  void push(streambuf_type * buf)
-  { vector.push_back(buf); }
+  basic_multibuf_generator&
+  operator=(std::vector<streambuf_type *> buffers) noexcept
+  {
+    vector = std::move(buffers);
+    gpos = ppos = 0;
+    return *this;
+  }
 
-  template<typename InputIterator>
-  void push(InputIterator first, InputIterator last)
-  { vector.insert(vector.end(), first, last); }
+  /// \return next streambuf for the input sequence
+  streambuf_type * gnext() noexcept
+  {
+    if (gpos < vector.size()) {
+      return vector[gpos++];
+    }
+    return nullptr;
+  }
+
+  /// \return next streambuf for the output sequence
+  streambuf_type * pnext() noexcept
+  {
+    if (ppos < vector.size()) {
+      return vector[ppos++];
+    }
+    return nullptr;
+  }
+
+private:
+  std::vector<streambuf_type *> vector;
+  std::size_t gpos = 0;
+  std::size_t ppos = 0;
 };
 
 
 template<typename CharT, typename Traits = std::char_traits<CharT>,
-  typename Generator = basic_streambuf_generator<CharT, Traits> >
+  typename Generator = basic_multibuf_generator<CharT, Traits> >
 class basic_multibuf
 : public std::basic_streambuf<CharT, Traits>
 {
@@ -78,175 +90,401 @@ public:
   typedef typename streambuf_type::off_type off_type;
   typedef Generator streambuf_generator;
 
-public:
-  basic_multibuf()
-  : streambuf_type()
-  , m_gen()
-  , m_sb(0)
-  , m_set_loc(0)
+
+  basic_multibuf() = default;
+
+  basic_multibuf(streambuf_generator const& sbs)
+  : gen_(sbs)
   {}
 
-  basic_multibuf(const streambuf_generator& sbs)
-  : streambuf_type()
-  , m_gen(sbs)
-  , m_sb(m_gen())
-  , m_set_loc(0)
+  basic_multibuf(streambuf_generator && sbs)
+  : gen_(std::move(sbs))
   {}
 
-#if __cplusplus >= 201103L
-  basic_multibuf(streambuf_generator&& sbs)
-  : streambuf_type()
-  , m_gen(std::forward<streambuf_generator>(sbs))
-  , m_sb(m_gen())
-  , m_set_loc(0)
-  {}
+  streambuf_generator & get_generator() noexcept
+  { return gen_; }
 
-#endif
+  streambuf_generator const& get_generator() const noexcept
+  { return gen_; }
 
-  virtual ~basic_multibuf()
-  {}
+  void get_generator(streambuf_generator const& gen)
+  { gen_ = gen; }
 
-  streambuf_generator& generator_streambuf()
-  { return m_gen; }
+  void get_generator(streambuf_generator && gen)
+  { gen_ = std::move(gen); }
 
-  const streambuf_generator& generator_streambuf() const
-  { return m_gen; }
-
-  void generator_streambuf(const streambuf_generator& gen)
-  { m_gen = gen; }
-
-#if __cplusplus >= 201103L
-void generator_streambuf(streambuf_generator&& gen)
-  { m_gen = std::move(gen); }
-#endif
-
-  streambuf_type * rdbuf() const
-  { return m_sb; }
-
-  streambuf_type * rdbuf(streambuf_type * sb)
+  streambuf_type * gsbuf() const noexcept
   {
-    streambuf_type * ret = m_sb;
-    m_sb = sb;
-    return m_sb;
+    syncgptr();
+    return gsb_;
+  }
+
+  streambuf_type * psbuf() const noexcept
+  {
+    syncpptr();
+    return psb_;
+  }
+
+  void syncgptr() const noexcept
+  {
+    if (gsb_) {
+      safe_syncgptr_();
+    }
+  }
+
+  void syncpptr() const noexcept
+  {
+    if (psb_) {
+      safe_syncpptr_();
+    }
+  }
+
+  void update_gptr() noexcept
+  {
+    if (gsb_) {
+      safe_update_gptr_();
+    }
+  }
+
+  void update_pptr() noexcept
+  {
+    if (psb_) {
+      safe_update_pptr_();
+    }
+  }
+
+  /// \brief next input sequence
+  bool gnext()
+  {
+    if (gsb_) {
+      safe_syncgptr_();
+      this->setg(0, 0, 0);
+      gsb_ = nullptr;
+      return true;
+    }
+    else {
+      return gen_.gnext();
+    }
+  }
+
+  /// \brief next output sequence
+  bool pnext()
+  {
+    if (psb_) {
+      safe_syncpptr_();
+      this->setp(0, 0);
+      psb_ = nullptr;
+      return true;
+    }
+    else {
+      return gen_.pnext();
+    }
   }
 
 protected:
   virtual void
-  imbue(const std::locale& loc)
+  imbue(std::locale const& loc)
   {
-    m_set_loc = true;
+    set_loc_ = true;
     streambuf_type::imbue(loc);
-    if (m_sb)
-      m_sb->pubimbue(loc);
+    if (gsb_) {
+      gsb_->pubimbue(loc);
+    }
+    if (psb_) {
+      psb_->pubimbue(loc);
+    }
   }
 
   virtual basic_multibuf*
   setbuf(char_type* s, std::streamsize n)
   {
-    if (m_sb)
-      m_sb->pubsetbuf(s, n);
+    set_buf_ = s;
+    set_buf_len_ = n;
+    if (gsb_ || psb_) {
+      safe_syncgptr_();
+      safe_syncpptr_();
+      if (gsb_) {
+        gsb_->pubsetbuf(s, n);
+        safe_update_gptr_();
+      }
+      if (psb_) {
+        psb_->pubsetbuf(s, n);
+        safe_update_pptr_();
+      }
+    }
     return this;
   }
 
-  virtual pos_type
-  seekoff(off_type off, std::ios_base::seekdir way,
-          std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-  { return m_sb ? m_sb->pubseekoff(off, way, mode) : pos_type(off_type(-1)); }
-
-  virtual pos_type
-  seekpos(pos_type pos,
-          std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-  { return m_sb ? m_sb->pubseekpos(pos, mode) : pos_type(off_type(-1)); }
-
+  /**
+   * \brief Synchronizes the buffer arrays with the controlled sequences.
+   * \return -1 on failure.
+   *
+   * \note failure if failure with the input or output sequence.
+   */
   virtual int
   sync()
-  { return m_sb ? m_sb->pubsync() : -1; }
+  {
+    int const gret = gsb_ ? gsb_->pubsync() : 0;
+    if (gsb_ == psb_) {
+      return gret;
+    }
+    int const pret = psb_ ? psb_->pubsync() : 0;
+    return (pret == -1 || gret == -1) ? -1 : 0;
+  }
+
+  /**
+   * \brief Synchronizes the buffer arrays with the controlled input sequences.
+   * \return -1 on failure.
+   */
+  int gsync()
+  { return gsb_ ? gsb_->pubsync() : -1; }
+
+  /**
+   * \brief Synchronizes the buffer arrays with the controlled output sequences.
+   * \return -1 on failure.
+   */
+  int psync()
+  { return psb_ ? psb_->pubsync() : -1; }
 
   virtual std::streamsize
   showmanyc()
-  { return m_sb ? m_sb->in_avail() : -1; }
+  { return gsb_ ? gsb_->in_avail() : -1; }
 
   virtual std::streamsize
   xsgetn(char_type* s, std::streamsize n)
   {
     std::streamsize ret = 0;
-    while (m_sb && n) {
-      std::streamsize tmp = m_sb->sgetn(s, n);
-      ret += tmp;
-      if (tmp != n)
-        next_stream();
-      s += tmp;
-      n -= tmp;
+    if (const std::streamsize buf_len = this->egptr() - this->gptr())
+    {
+      ret = std::min(buf_len, n);
+      traits_type::copy(s, this->gptr(), static_cast<std::size_t>(ret));
+      this->gbump(static_cast<int>(ret));
     }
-    this->setg(0,0,0);
+
+    if (ret < n) {
+      s += ret;
+      syncpptr();
+      this->setp(0, 0);
+
+      if (!gsb_ || traits_type::eq_int_type(
+        gintrusive().underflow(), traits_type::eof()
+      )) {
+        gnext_buf();
+      }
+
+      while (gsb_ && ret < n) {
+        std::streamsize const tmp = gsb_->sgetn(s, n - ret);
+        if (tmp <= 0) {
+          gnext_buf();
+          continue;
+        }
+        if (tmp != n) {
+          gnext_buf();
+        }
+        s += tmp;
+        ret += tmp;
+      }
+
+      update_gptr();
+      update_pptr();
+    }
+
     return ret;
   }
 
   virtual int_type
   underflow()
   {
-      int_type ret = traits_type::eof();
-      while (m_sb && traits_type::eq_int_type(ret = m_sb->sbumpc(), traits_type::eof()))
-        next_stream();
-      ic = traits_type::to_char_type(ret);
-      this->setg(&ic, &ic, &ic + 1);
-      return ret;
+    const int_type eof = traits_type::eof();
+    int_type ret = eof;
+
+    if (gsb_)
+    {
+      syncpptr();
+      safe_syncgptr_();
+      auto & interbuf = gintrusive();
+      //interbuf.gbump(this->egptr() - this->eback());
+      ret = interbuf.underflow();
+      if (!traits_type::eq_int_type(ret, eof)) {
+        safe_update_gptr_();
+        update_pptr();
+        return ret;
+      }
+      this->setp(0, 0);
+      this->setg(0, 0, 0);
+    }
+
+    bool is_eof = true;
+    while (gnext_buf()
+      && (is_eof = traits_type::eq_int_type(ret = gsb_->sgetc(), eof))
+    );
+
+    if (!is_eof) {
+      if (gsb_ && gintrusive().gptr() < gintrusive().egptr()) {
+        safe_update_gptr_();
+      }
+      else {
+        ic_ = traits_type::to_char_type(ret);
+        this->setg(&ic_, &ic_, &ic_ + 1);
+      }
+    }
+    update_pptr();
+
+    return ret;
   }
 
   virtual int_type
   pbackfail(int_type c = traits_type::eof())
   {
-      return m_sb
-      ? m_sb->sputbackc(traits_type::to_char_type(c))
-      : traits_type::eof();
+    return gsb_
+    ? gsb_->sputbackc(traits_type::to_char_type(c))
+    : traits_type::eof();
   }
 
   virtual std::streamsize
-  xsputn(const char_type* s, std::streamsize n)
+  xsputn(char_type const * s, std::streamsize n)
   {
     std::streamsize ret = 0;
-    while (m_sb && n) {
-      std::streamsize tmp = m_sb->sputn(s, n);
-      ret += tmp;
-      if (tmp != n)
-        next_stream();
-      s += tmp;
-      n -= tmp;
+    if (const std::streamsize buf_len = this->epptr() - this->pptr())
+    {
+      ret = std::min(buf_len, n);
+      traits_type::copy(this->pptr(), s, static_cast<std::size_t>(ret));
+      this->pbump(static_cast<int>(ret));
     }
-    this->setp(0,0);
+
+    if (ret < n) {
+      s += ret;
+      syncgptr();
+      this->setg(0, 0, 0);
+
+      if (!psb_ || traits_type::eq_int_type(
+        pintrusive().overflow(), traits_type::eof()
+      )) {
+        pnext_buf();
+      }
+
+      while (psb_ && ret < n) {
+        std::streamsize const tmp = psb_->sputn(s, n - ret);
+        if (tmp <= 0) {
+          pnext_buf();
+          continue;
+        }
+        if (tmp != n) {
+          pnext_buf();
+        }
+        s += tmp;
+        ret += tmp;
+      }
+
+      update_gptr();
+      update_pptr();
+    }
+
     return ret;
   }
 
   virtual int_type
   overflow(int_type c = traits_type::eof())
   {
-    int_type ret = traits_type::eof();
-    while (m_sb && traits_type::eq_int_type(ret = m_sb->sputc(traits_type::to_char_type(c)), traits_type::eof()))
-      next_stream();
-    oc = traits_type::to_char_type(ret);
-    this->setp(&oc, &oc + 1);
+    const int_type eof = traits_type::eof();
+    int_type ret = eof;
+
+    if (psb_)
+    {
+      syncgptr();
+      safe_syncpptr_();
+      auto & interbuf = pintrusive();
+      //interbuf.pbump(this->epptr() - this->pbase());
+      ret = interbuf.overflow(c);
+      if (!traits_type::eq_int_type(ret, eof)) {
+        safe_update_pptr_();
+        update_gptr();
+        return ret;
+      }
+      this->setp(0, 0);
+      this->setg(0, 0, 0);
+    }
+
+    bool is_eof = true;
+    const char_type conv = traits_type::to_char_type(c);
+    while (pnext_buf()
+      && (is_eof = traits_type::eq_int_type(ret = psb_->sputc(conv), eof))
+    );
+
+    if (!is_eof) {
+      if (psb_ && pintrusive().pbase() < pintrusive().epptr()) {
+        safe_update_pptr_();
+      }
+      else {
+        oc_ = traits_type::to_char_type(ret);
+        this->setp(&oc_, &oc_ + 1);
+      }
+    }
+    update_gptr();
+
     return ret;
   }
 
-  bool next_stream()
+private:
+  bool next_buf(streambuf_type * & oldsb, streambuf_type * newsb)
   {
-    m_sb = m_gen();
-    if (m_set_loc && m_sb)
-      m_sb->pubimbue(streambuf_type::getloc());
-    return m_sb;
+    oldsb = newsb;
+    if (oldsb) {
+      if (set_loc_) {
+        oldsb->pubimbue(streambuf_type::getloc());
+      }
+      if (set_buf_) {
+        oldsb->pubsetbuf(set_buf_, set_buf_len_);
+      }
+    }
+    return oldsb;
   }
 
+  bool gnext_buf()
+  { return next_buf(gsb_, gen_.gnext()); }
 
-private:
-  streambuf_generator m_gen;
-  streambuf_type* m_sb;
-  bool m_set_loc;
-  char_type ic;
-  char_type oc;
+  bool pnext_buf()
+  { return next_buf(psb_, gen_.pnext()); }
+
+  intrusive_data_streambuf<CharT, Traits>& gintrusive() const noexcept
+  { return intrusive_streambuf(*gsb_); }
+
+  intrusive_data_streambuf<CharT, Traits>& pintrusive() const noexcept
+  { return intrusive_streambuf(*psb_); }
+
+  void safe_syncgptr_() const noexcept
+  { gintrusive().setg(this->eback(), this->gptr(), this->egptr()); }
+
+  void safe_syncpptr_() const noexcept
+  { pintrusive().setp(this->pptr(), this->epptr()); }
+
+  void safe_update_gptr_() noexcept
+  {
+    auto & interbuf = gintrusive();
+    this->setg(interbuf.eback(), interbuf.gptr(), interbuf.egptr());
+  }
+
+  void safe_update_pptr_() noexcept
+  {
+    auto & interbuf = pintrusive();
+    this->setp(interbuf.pptr(), interbuf.epptr());
+  }
+
+  streambuf_generator gen_;
+  streambuf_type * gsb_ = nullptr;
+  streambuf_type * psb_ = nullptr;
+  char_type * set_buf_ = nullptr;
+  std::streamsize set_buf_len_;
+  char_type ic_;
+  char_type oc_;
+  bool set_loc_ = false;
 };
 
-typedef basic_multibuf<char> multistreambuf;
-typedef basic_multibuf<wchar_t> wmultistreambuf;
+typedef basic_multibuf<char> multibuf;
+typedef basic_multibuf<wchar_t> wmultibuf;
+
+typedef basic_multibuf_generator<char> multibuf_generator;
+typedef basic_multibuf_generator<wchar_t> wmultibuf_generator;
 
 }
 }
