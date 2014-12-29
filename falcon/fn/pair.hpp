@@ -5,8 +5,9 @@
 #include <falcon/tuple/get.hpp>
 #include <utility>
 
-namespace falcon
-{
+namespace falcon {
+namespace fn {
+
   namespace adl_
   {
     template<class P>
@@ -50,6 +51,7 @@ namespace falcon
     constexpr auto const & first = static_const<first_fn>::value;
     constexpr auto const & second = static_const<second_fn>::value;
   }
+}
 }
 
 #endif

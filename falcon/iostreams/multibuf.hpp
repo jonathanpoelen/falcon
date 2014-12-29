@@ -13,39 +13,39 @@ namespace falcon {
 namespace iostreams {
 
 template<class CharT, class Traits = std::char_traits<CharT>>
-struct basic_multibuf_generator
+struct basic_streambuf_generator
 {
   typedef std::basic_streambuf<CharT, Traits> streambuf_type;
-  typedef streambuf_type* value_type;
 
-  CPP1X_DEFAULT_SGI_CONSTRUCTOR(basic_multibuf_generator);
+  CPP1X_DEFAULT_SGI_CONSTRUCTOR(basic_streambuf_generator);
 
-  basic_multibuf_generator(std::initializer_list<streambuf_type *> l)
-  : vector(l)
+  basic_streambuf_generator(std::initializer_list<streambuf_type *> l)
+  : bufs(l)
   {}
 
-  basic_multibuf_generator(std::vector<streambuf_type *> buffers) noexcept
-  : vector(std::move(buffers))
+  basic_streambuf_generator(std::vector<streambuf_type *> buffers) noexcept
+  : bufs(std::move(buffers))
   {}
 
   template<class InputIterator>
-  basic_multibuf_generator(InputIterator first, InputIterator last)
-  : vector(first, last)
+  basic_streambuf_generator(InputIterator first, InputIterator last)
+  : bufs(first, last)
   {}
 
-  CPP1X_DEFAULT_SGI_ASSIGNABLE(basic_multibuf_generator);
+  CPP1X_DEFAULT_SGI_ASSIGNABLE(basic_streambuf_generator);
 
-  basic_multibuf_generator& operator=(std::initializer_list<streambuf_type *> l)
+  basic_streambuf_generator&
+  operator=(std::initializer_list<streambuf_type *> l)
   {
-    vector = l;
+    bufs = l;
     gpos = ppos = 0;
     return *this;
   }
 
-  basic_multibuf_generator&
+  basic_streambuf_generator&
   operator=(std::vector<streambuf_type *> buffers) noexcept
   {
-    vector = std::move(buffers);
+    bufs = std::move(buffers);
     gpos = ppos = 0;
     return *this;
   }
@@ -53,8 +53,8 @@ struct basic_multibuf_generator
   /// \return next streambuf for the input sequence
   streambuf_type * gnext() noexcept
   {
-    if (gpos < vector.size()) {
-      return vector[gpos++];
+    if (gpos < bufs.size()) {
+      return bufs[gpos++];
     }
     return nullptr;
   }
@@ -62,33 +62,35 @@ struct basic_multibuf_generator
   /// \return next streambuf for the output sequence
   streambuf_type * pnext() noexcept
   {
-    if (ppos < vector.size()) {
-      return vector[ppos++];
+    if (ppos < bufs.size()) {
+      return bufs[ppos++];
     }
     return nullptr;
   }
 
 private:
-  std::vector<streambuf_type *> vector;
+  std::vector<streambuf_type *> bufs;
   std::size_t gpos = 0;
   std::size_t ppos = 0;
 };
 
 
 template<typename CharT, typename Traits = std::char_traits<CharT>,
-  typename Generator = basic_multibuf_generator<CharT, Traits> >
+  typename Generator = basic_streambuf_generator<CharT, Traits> >
 class basic_multibuf
 : public std::basic_streambuf<CharT, Traits>
 {
-  typedef std::basic_streambuf<CharT, Traits> streambuf_type;
+  typedef std::basic_streambuf<CharT, Traits> inherit_streambuf_type_;
 
 public:
-  typedef typename streambuf_type::char_type char_type;
-  typedef typename streambuf_type::traits_type traits_type;
-  typedef typename streambuf_type::int_type int_type;
-  typedef typename streambuf_type::pos_type pos_type;
-  typedef typename streambuf_type::off_type off_type;
+  typedef typename inherit_streambuf_type_::char_type char_type;
+  typedef typename inherit_streambuf_type_::traits_type traits_type;
+  typedef typename inherit_streambuf_type_::int_type int_type;
+  typedef typename inherit_streambuf_type_::pos_type pos_type;
+  typedef typename inherit_streambuf_type_::off_type off_type;
+
   typedef Generator streambuf_generator;
+  typedef typename streambuf_generator::streambuf_type streambuf_type;
 
 
   basic_multibuf() = default;
@@ -186,7 +188,7 @@ protected:
   imbue(std::locale const& loc)
   {
     set_loc_ = true;
-    streambuf_type::imbue(loc);
+    inherit_streambuf_type_::imbue(loc);
     if (gsb_) {
       gsb_->pubimbue(loc);
     }
@@ -431,7 +433,7 @@ private:
     oldsb = newsb;
     if (oldsb) {
       if (set_loc_) {
-        oldsb->pubimbue(streambuf_type::getloc());
+        oldsb->pubimbue(inherit_streambuf_type_::getloc());
       }
       if (set_buf_) {
         oldsb->pubsetbuf(set_buf_, set_buf_len_);
@@ -483,8 +485,8 @@ private:
 typedef basic_multibuf<char> multibuf;
 typedef basic_multibuf<wchar_t> wmultibuf;
 
-typedef basic_multibuf_generator<char> multibuf_generator;
-typedef basic_multibuf_generator<wchar_t> wmultibuf_generator;
+typedef basic_streambuf_generator<char> multibuf_generator;
+typedef basic_streambuf_generator<wchar_t> wmultibuf_generator;
 
 }
 }

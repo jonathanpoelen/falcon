@@ -359,7 +359,7 @@ une fonction qui propage les éléments d'une tuple ou d'un range dans une fonct
 
 déplacer tuple_get dans le dossier tuple/ et renommer en la classe en 't' ?
 
-un objet qui retourne data() si objet, le pointeur sinon + une fonction qui retourne size() si objet, std::char_traits<CharT>::length(s) sinon + un wrapper. L'utiliser dans set/get_file_contents
+un objet qui retourne data() si objet, le pointeur sinon + une fonction qui retourne size() si objet, std::char_traits<CharT>::length(s) sinon + un wrapper. L'utiliser dans set/get_file_contents et mfilebuf
 
 inject(f, inject_param(',')) -> pour chaque param où le traits inject_param est validé (inject_param::template test<T>::value) ajouter ','.
 
