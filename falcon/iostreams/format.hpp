@@ -121,7 +121,7 @@ private:
              std::basic_istream<CharT, Traits> & is, Args&... args) const {
     for (const item_type & e: elems) {
       if (e.pptr != e.epptr) {
-        if (!istream::ignore(is, e.pptr, e.epptr)) {
+        if (!ignore(is, e.pptr, e.epptr)) {
           break;
         }
       }
@@ -206,7 +206,7 @@ void putgetf(::falcon::parameter_index<Indexes...>, Stream & ss,
              const typename Stream::char_type * fmt,
              Size fmtlen, Args&&... args)
 {
-  static_assert(sizeof...(args) < 1000, "too many arguments (the limit is 999)");
+  static_assert(sizeof...(args) < 100, "too many arguments (the limit is 99)");
   using Traits = typename Stream::traits_type;
   using CharT = typename Stream::char_type;
   using const_pointer = const CharT *;
@@ -221,11 +221,11 @@ void putgetf(::falcon::parameter_index<Indexes...>, Stream & ss,
         break;
       }
 
-      if ((test = Traits::eq(*first, '%')) || !(n = *first - zero)) {
+      if ((test = Traits::eq(*first, '%')) || !(n = Size(*first - zero))) {
         if (++first == last) {
           break ;
         }
-        const const_pointer tmp = first-(test ? 1 : 2);
+        const const_pointer tmp = first - (test ? 1 : 2);
         if (pos != tmp) {
           FormatTraits::send(ss, pos, tmp);
         }
@@ -240,21 +240,15 @@ void putgetf(::falcon::parameter_index<Indexes...>, Stream & ss,
       if (++first != last && std::isdigit(*first)) {
         n *= 10;
         if (sizeof...(args) > 9) {
-          n += *first - zero;
+          n += Size(*first - zero);
           if (++first != last && std::isdigit(*first)) {
             n *= 10;
-            if (sizeof...(args) > 99) {
-              n += *first - zero;
-              if (++first != last && std::isdigit(*first)) {
-                n *= 10;
-              }
-            }
           }
         }
       }
 
       if (n > sizeof...(args)) {
-        throw std::runtime_error("too many arguments");
+        throw std::length_error("too many arguments");
       }
 
       pos = first;
@@ -287,7 +281,7 @@ struct getf_traits {
   template <typename CharT, typename Traits>
   static void send(std::basic_istream<CharT, Traits> & is,
                    const CharT * first, const CharT * last) {
-    falcon::istream::ignore(is, first, last);
+    ignore(is, first, last);
   }
 
   template <typename CharT, typename Traits, typename T>

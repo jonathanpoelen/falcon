@@ -357,13 +357,7 @@ ne pas oublier noexcept pour les fonction swap
 
 une fonction qui propage les éléments d'une tuple ou d'un range dans une fonction (dispatch ?)
 
-déplacer tuple_get dans le dossier tuple/ et renommer en la classe en 't' ?
-
-un objet qui retourne data() si objet, le pointeur sinon + une fonction qui retourne size() si objet, std::char_traits<CharT>::length(s) sinon + un wrapper. L'utiliser dans set/get_file_contents et mfilebuf
-
 inject(f, inject_param(',')) -> pour chaque param où le traits inject_param est validé (inject_param::template test<T>::value) ajouter ','.
-
-fn::exchange
 
 macro FALCON_NOT_COPYABLE et FALCON_MOVABLE_BUT_NOT_COPYABLE
 modifier c++11/assignable et le melanger avec les macros au-dessus

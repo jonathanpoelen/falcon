@@ -9,7 +9,7 @@ namespace falcon {
 using std::exchange;
 #else
 /// Assign @p new_val to @p obj and return its previous value.
-template <typename T, typename U = T>
+template <class T, class U = T>
 T exchange(T & obj, U && new_val)
 {
   T old_val = std::move(obj);

@@ -4,6 +4,7 @@
 #include <falcon/c++1x/assignable.hpp>
 #include <falcon/iostreams/multibuf.hpp>
 #include <falcon/fn/pair.hpp>
+#include <falcon/fn/c_str.hpp>
 
 #include <fstream>
 #include <vector>
@@ -89,23 +90,17 @@ private:
         if (!bufs) {
           bufs.reset(new typename decltype(bufs)::element_type);
         }
-        get(*bufs.get()).close();
-        if (get(*bufs.get()).open(filename(files[pos].name), files[pos].mode)) {
+        streambuf_type & buf = get(*bufs.get());
+        buf.close();
+        if (buf.open(fn::c_str(files[pos].name), files[pos].mode)) {
           ++pos;
-          return &get(*bufs.get());
+          return &buf;
         }
       }
       ++pos;
     }
     return nullptr;
   }
-
-  static const char * filename(const char * s) noexcept
-  { return s; }
-
-  template<class T>
-  static const char * filename(T const & o) noexcept
-  { return o.data(); }
 
   std::vector<file> files;
   std::unique_ptr<std::pair<streambuf_type, streambuf_type>> bufs;

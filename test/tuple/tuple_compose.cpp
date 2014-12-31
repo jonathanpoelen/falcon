@@ -1,7 +1,8 @@
 #include <test/test.hpp>
 #include <falcon/tuple/tuple_compose.hpp>
-#include <falcon/iostreams/put.hpp>
+#include <falcon/iostreams/sput.hpp>
 #include <falcon/utility/maker.hpp>
+#include <falcon/functional/invoker.hpp>
 #include "tuple_compose.hpp"
 
 #include <sstream>
@@ -9,20 +10,20 @@
 
 struct unless_functor
 {
-	template<typename... _Args>
-	void operator()(const _Args&... args) const
+	template<class... Args>
+	void operator()(const Args&... args) const
 	{ STATIC_ASSERT(sizeof...(args) == 2); }
 };
 
 void tuple_compose_test()
 {
 	std::ostringstream os;
+
+	auto put = falcon::make_invoker(falcon::iostreams::sput, std::ref(os));
+
 	falcon::tuple_compose(
 		unless_functor(),
-		std::make_tuple(
-			falcon::iostreams::make_ostream_function(os),
-			falcon::iostreams::make_ostream_function(os)
-		),
+		std::make_tuple(put, put),
 		std::make_tuple(5, ' ', 55)
 	);
 
@@ -32,10 +33,7 @@ void tuple_compose_test()
   falcon::tuple_compose(
     falcon::parameter_index<0,1,2>(),
     unless_functor(),
-    std::make_tuple(
-      falcon::iostreams::make_ostream_function(os),
-      falcon::iostreams::make_ostream_function(os)
-    ),
+    std::make_tuple(put, put),
     std::make_tuple(5, ' ', 55)
   );
 
@@ -43,7 +41,7 @@ void tuple_compose_test()
 
 	{
 		os.str("");
-		auto fos = falcon::iostreams::make_ostream_function(os);
+		auto fos = put;
 		auto tuple = std::make_tuple(5, ' ', 55);
 		unless_functor f;
 		falcon::tuple_compose(

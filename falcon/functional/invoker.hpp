@@ -4,10 +4,10 @@
 #include <falcon/c++1x/syntax.hpp>
 #include <falcon/functional/invoke.hpp>
 #include <falcon/tuple/parameter_index.hpp>
+#include <falcon/type_traits/decay_and_strip.hpp>
 
 #include <tuple>
 #include <utility>
-#include <type_traits>
 
 namespace falcon {
 
@@ -22,6 +22,10 @@ public:
   template<class TFunc>
   constexpr invoker(TFunc && func)
   : tuple_t_(std::forward<TFunc>(func))
+  {}
+
+  constexpr invoker(Args && ... args)
+  : tuple_t_(Func(), std::forward<Args>(args)...)
   {}
 
   template<class TFunc, class... TArgs>
@@ -68,8 +72,8 @@ noexcept(noexcept(a.swap(b)))
 
 template <class Func, class... Args>
 constexpr invoker<
-  typename std::decay<Func>::type
-, typename std::decay<Args>::type...
+  typename decay_and_strip<Func>::type
+, typename decay_and_strip<Args>::type...
 > make_invoker(Func && func, Args&&... args)
 { return {std::forward<Func>(func), std::forward<Args>(args)...}; }
 

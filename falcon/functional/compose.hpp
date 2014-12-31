@@ -2,6 +2,7 @@
 #define FALCON_FUNCTIONAL_COMPOSE_HPP
 
 #include <falcon/c++1x/syntax.hpp>
+#include <falcon/functional/invoke.hpp>
 #include <falcon/parameter/parameter_index.hpp>
 
 #include <tuple>
@@ -41,8 +42,9 @@ class compose
     template<class... Args>
     static constexpr CPP1X_DELEGATE_FUNCTION(
       impl(tuple_t_ const & t, Rs && ... args, Args && ... fn_args)
-    , std::get<0>(t)(
-        std::forward<Rs>(args) FALCON_IF_NOT_IN_IDE_PARSER(...)
+    , invoke(
+        std::get<0>(t)
+      , std::forward<Rs>(args) FALCON_IF_NOT_IN_IDE_PARSER(...)
       , std::get<sizeof...(Fns)>(t)(std::forward<Args>(fn_args)...)
       )
     )
@@ -53,7 +55,7 @@ class compose
     impl_(parameter_index<Indexes...>, Args && ... args) const
   , impl_last<decltype(std::get<Indexes+1>(this->tuple_())(args...))...>::impl(
       this->tuple_()
-    , std::get<Indexes+1>(this->tuple_())(args...)
+    , invoke(std::get<Indexes+1>(this->tuple_()), args...)
       FALCON_IF_NOT_IN_IDE_PARSER(...)
     , std::forward<Args>(args)...
     )
