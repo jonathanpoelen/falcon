@@ -151,6 +151,12 @@ faire un hash constexpressive spécialisé pour cstring en C++14.
 
 faire des fonctions spéciliasées pour retourner des objets ou faire des algos constexpressive en c++14 pour cstring et format.
 https://github.com/cppformat/cppformat
+string format(local, str, ...)
+istream& format(istream, str, ...)
+ostream& format(ostream, str, ...)
+void format(streambuf, str, ...)
+string format(str, ...)
++ classe qui sauvegarde l'état de parsing
 
 C++14: utilisé integer_sequence à la place de parameter_index.
 
@@ -360,6 +366,34 @@ une fonction qui propage les éléments d'une tuple ou d'un range dans une fonct
 inject(f, inject_param(',')) -> pour chaque param où le traits inject_param est validé (inject_param::template test<T>::value) ajouter ','.
 
 macro FALCON_NOT_COPYABLE et FALCON_MOVABLE_BUT_NOT_COPYABLE
+macro FALCON_COPYABLE, FALCON_MOVABLE et FALCON_COPYABLE_AND_MOVABLE
 modifier c++11/assignable et le melanger avec les macros au-dessus
 
+try_finally, except_try_finally
 
+os << pad(T,unsigned,Char=' ') = os << width(fill(T,Char),unsigned)
+
+dans format, ajouter un fmt_modifier pour ajouter ' ' si positif + en faire un modifier normal
+
+format: {[pos][:[option]]} option: ' ',+,-, o,x,b,X <,>,^,= a,e,f, ., 0, % h, p, c, n
+X: x + std::uppercase
+<: std::left
+>: std::left
+^: center
+=: padding after sign
+e: std:scientific
+E: e + std:uppercase
+f: std::fixed
+a: std::hexfloat = e+f
+A: a + std:uppercase
+.: set::setprecision
+0: complète avec des 0 entre sign et valeur
+%: pourcentage (*100 + '%')
+h: std::noshowpoint
+a: std::boolalpha
+n: number of characters written
+s{...}: complete avec si > n
+std::fill -> c suivit d'un char ?
+separateur pour les conteneurs r{...}
+format_context
+unsafe_format (check + format)

@@ -342,7 +342,7 @@ struct iosetbase_fn {
     decltype(std::forward<T>(x))
   , aux_::fmtflags_constant<std::ios_base::basefield>>
   {
-    return {base ==  8 ? std::ios_base::oct :
+    return {base == 8 ? std::ios_base::oct :
     base == 10 ? std::ios_base::dec :
     base == 16 ? std::ios_base::hex :
     std::ios_base::fmtflags(0), std::forward<T>(x)};

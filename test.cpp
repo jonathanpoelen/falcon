@@ -64,9 +64,24 @@
 //   }
 // };
 
+#include <falcon/iostreams/showspace.hpp>
+#include <iostream>
+#include <iomanip>
 
 int main()
 {
+  using falcon::iostreams::showspace;
+
+  void const * p = "";
+  std::cout
+    << std::left << std::setw(6) << showspace(12) << "]\n"
+    << std::left << std::setw(6) << showspace(-12) << "]\n"
+    << std::left << std::setw(6) << showspace(12.2) << "]\n"
+    << std::left << std::setw(6) << showspace(-12.2) << "]\n"
+    << std::left << std::setw(6) << showspace( 12u) << "]\n"
+    << std::left << std::setw(6) << showspace("") << "]\n"
+    << std::left << std::setw(10) << p << "]\n"
+  ;
 
 
 //   falcon::retain_free_object_allocator<int> allocator;
