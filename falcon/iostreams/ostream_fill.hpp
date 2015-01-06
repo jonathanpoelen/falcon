@@ -11,11 +11,11 @@ ostream_fill(std::basic_ostream<CharT, Traits>& out, std::streamsize n, CharT c)
 {
 	typedef std::basic_ostream<CharT, Traits> ostream_type;
 	typedef typename ostream_type::ios_base ios_base;
+	typedef typename ostream_type::int_type int_type;
 
-  for (std::streamsize i = 0; i < n; ++i)
-	{
-		if (Traits::eq_int_type(out.rdbuf()->sputc(c), Traits::eof()))
-		{
+	const int_type eof = Traits::eof();
+	for (std::streamsize i = 0; i < n; ++i) {
+		if (Traits::eq_int_type(out.rdbuf()->sputc(c), eof)) {
 			out.setstate(ios_base::badbit);
 			break;
 		}

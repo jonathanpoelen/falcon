@@ -68,19 +68,28 @@
 #include <iostream>
 #include <iomanip>
 
+struct SS { int i = 0; };
+std::ostream &operator <<(std::ostream &os, SS const&) { return os << "ok"; }
+
+struct S { int i = 10; operator SS () const { return {}; } };
+
 int main()
 {
   using falcon::iostreams::showspace;
 
-  void const * p = "";
+  const void * p = 0; p = static_cast<const char*>(p)+3232;
   std::cout
-    << std::left << std::setw(6) << showspace(12) << "]\n"
-    << std::left << std::setw(6) << showspace(-12) << "]\n"
-    << std::left << std::setw(6) << showspace(12.2) << "]\n"
-    << std::left << std::setw(6) << showspace(-12.2) << "]\n"
-    << std::left << std::setw(6) << showspace( 12u) << "]\n"
-    << std::left << std::setw(6) << showspace("") << "]\n"
-    << std::left << std::setw(10) << p << "]\n"
+//     << std::left << std::setw(6) << showspace(S()) << "]\n"
+    << std::left << std::setw(6) << showspace(p) << "]\n"
+    << std::left << std::setw(6) << p << "]\n"
+//     << std::left << std::setw(6) << 1 << "]\n"
+//     << std::left << std::setw(6) << showspace('a') << "]\n"
+//     << std::left << std::setw(6) << showspace(-12) << "]\n"
+//     << std::left << std::setw(6) << showspace(12.2) << "]\n"
+//     << std::left << std::setw(6) << showspace(-12.2) << "]\n"
+//     << std::left << std::setw(6) << showspace( 12u) << "]\n"
+//     << std::left << std::setw(6) << showspace("") << "]\n"
+//     << std::left << std::setw(10) << p << "]\n"
   ;
 
 

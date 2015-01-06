@@ -15,7 +15,7 @@ ostream_insert(
 	typedef std::basic_ostream<CharT, Traits> ostream_type;
 	typedef typename ostream_type::ios_base ios_base;
 
-	class ostream_type::sentry cerb(out);
+	typename ostream_type::sentry cerb(out);
 	if (cerb)
 	{
 		const std::streamsize w = out.width();

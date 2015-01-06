@@ -1,15 +1,15 @@
 #ifndef FALCON_IOSTREAM_SHOWSPACE_HPP
 #define FALCON_IOSTREAM_SHOWSPACE_HPP
 
-#include <falcon/iostreams/ostream_insert.hpp>
+#include <falcon/iostreams/ostream_write.hpp>
 #include <falcon/iostreams/ostream_fill.hpp>
 #include <falcon/type_traits/is_string.hpp>
 #include <falcon/type_traits/eval_if.hpp>
 #include <falcon/type_traits/if.hpp>
+#include <falcon/type_traits/use.hpp>
 #include <falcon/c++/empty_class.hpp>
 
-#include <ios>
-#include <cmath>
+#include <cmath> // std:signbit
 #include <limits>
 #include <sstream>
 #include <type_traits>
@@ -24,10 +24,19 @@ struct showspace_t {
   T x_;
 };
 
+CPP_EMPTY_CLASS(char_showspace_tag);
 CPP_EMPTY_CLASS(str_showspace_tag);
 CPP_EMPTY_CLASS(signed_showspace_tag);
 CPP_EMPTY_CLASS(unsigned_showspace_tag);
 CPP_EMPTY_CLASS(unknow_showspace_tag);
+
+template<class CharT, class Traits, class T>
+std::basic_ostream<CharT, Traits>&
+showspace_impl(
+  char_showspace_tag
+, std::basic_ostream<CharT, Traits>& os
+, T x)
+{ return os << x; }
 
 template<class CharT, class Traits, class T>
 std::basic_ostream<CharT, Traits>&
@@ -82,7 +91,7 @@ showspace_with_fill(std::basic_ostream<CharT, Traits>& os, T const & x)
     os << os.widen(' ');
 
     if (sz <= decltype(sz)(buflen)) {
-      ostream_insert(os, buf, sz);
+      ostream_write(os, buf, sz);
     }
     else {
       auto str = oss.str();
@@ -99,7 +108,7 @@ showspace_with_fill(std::basic_ostream<CharT, Traits>& os, T const & x)
     os << os.widen(' ');
 
     if (sz <= decltype(sz)(buflen)) {
-      ostream_insert(os, buf, sz);
+      ostream_write(os, buf, sz);
     }
     else {
       os << oss.str();
@@ -139,22 +148,149 @@ showspace_impl(
   return os << os.widen(' ') << x;
 }
 
+template<class CharT, class Traits>
+std::basic_ostream<CharT, Traits>&
+showspace_impl(
+  unsigned_showspace_tag
+, std::basic_ostream<CharT, Traits>& os
+, bool x
+) {
+  if (os.flags() & std::ios::boolalpha) {
+    return os << x;
+  }
+  if (os.width()) {
+    if (os.flags() & std::ios::left) {
+      const std::streamsize w = os.width(0);
+      os << os.widen(' ');
+      os.width(w-1);
+      return os << x;
+    }
+    os.width(os.width()-1);
+  }
+  return os << os.widen(' ') << x;
+}
+
+template<class CharT, class Traits, class T>
+std::basic_ostream<CharT, Traits>&
+showspace_impl_unknow(
+  std::false_type
+, std::basic_ostream<CharT, Traits>& os
+, T const & x)
+// TODO 
+{ return os << x; }
+
+
+#define MAKE_SHOWSPACE_IMPL_CAST(type, tag) \
+  template<class CharT, class Traits>       \
+  void showspace_impl_cast(                 \
+    std::basic_ostream<CharT, Traits>& os   \
+  , type x)                                 \
+  { showspace_impl(tag (), os, x); }
+
+MAKE_SHOWSPACE_IMPL_CAST(bool, unsigned_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(unsigned char, unsigned_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(unsigned short, unsigned_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(unsigned, unsigned_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(unsigned long, unsigned_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(unsigned long long, unsigned_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(signed char, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(short, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(long, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(long long, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(float, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(double, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(long double, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(char const *, str_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(volatile char const *, str_showspace_tag)
+
+#undef MAKE_SHOWSPACE_IMPL_CAST
+
+template<class CharT, class Traits>
+void showspace_impl_cast(
+  std::basic_ostream<CharT, Traits>& os
+, char x)
+{ os << x; }
+
+template<class Traits>
+void showspace_impl_cast(
+  std::basic_ostream<char, Traits>& os
+, unsigned char x)
+{ os << x; }
+
+template<class Traits>
+void showspace_impl_cast(
+  std::basic_ostream<char, Traits>& os
+, signed char x)
+{ os << x; }
+
+#define MAKE_SHOWSPACE_IMPL_CAST(type) \
+template<class Traits>                 \
+void showspace_impl_cast(              \
+  std::basic_ostream<char, Traits>& os \
+, type const * x)                      \
+{ showspace_impl(str_showspace_tag(), os, x); }
+
+MAKE_SHOWSPACE_IMPL_CAST(signed char)
+MAKE_SHOWSPACE_IMPL_CAST(volatile signed char)
+MAKE_SHOWSPACE_IMPL_CAST(unsigned char)
+MAKE_SHOWSPACE_IMPL_CAST(volatile unsigned char)
+
+#undef MAKE_SHOWSPACE_IMPL_CAST
+
+template<class CharT, class Traits>
+void showspace_impl_cast(
+  std::basic_ostream<CharT, Traits>& os
+, CharT const * x)
+{ showspace_impl(str_showspace_tag(), os, x); }
+
+template<class CharT, class Traits>
+void showspace_impl_cast(
+  std::basic_ostream<CharT, Traits>& os
+, volatile CharT const * x)
+{ showspace_impl(str_showspace_tag(), os, x); }
+
+
+template<class CharT, class Traits, class T>
+std::basic_ostream<CharT, Traits>&
+showspace_impl_unknow(
+  std::true_type
+, std::basic_ostream<CharT, Traits>& os
+, T const & x)
+{
+  showspace_impl_cast(os, x);
+  return os;
+}
+
 template<class CharT, class Traits, class T>
 std::basic_ostream<CharT, Traits>&
 showspace_impl(
   unknow_showspace_tag
 , std::basic_ostream<CharT, Traits>& os
-, T const & x
-) {
-  // TODO unimplemented (check a implicit cast)
-  return os << x;
-}
+, T const & x)
+{ return showspace_impl_unknow(std::is_convertible<T, bool>(), os, x); }
 
-template<class T>
-eval_if_c_t<
-  std::is_arithmetic<T>
-, if_c<std::is_signed<T>, signed_showspace_tag, unsigned_showspace_tag>
-, if_c<is_string<T>, str_showspace_tag, unknow_showspace_tag>
+template<class CharT, class Traits, class T>
+std::basic_ostream<CharT, Traits>&
+showspace_impl(
+  unknow_showspace_tag
+, std::basic_ostream<CharT, Traits>& os
+, T * x)
+{ return os << x; }
+
+template<class CharT, class T>
+eval_if_t<
+  (std::is_same<CharT, T>::value || std::is_same<char, T>::value
+  || (std::is_same<CharT, char>::value
+    && (std::is_same<T, signed char>::value
+     || std::is_same<T, unsigned char>::value)
+   )
+  )
+, use<char_showspace_tag>
+, eval_if_c<
+    std::is_arithmetic<T>
+  , if_c<std::is_signed<T>, signed_showspace_tag, unsigned_showspace_tag>
+  , if_c<is_string<T>, str_showspace_tag, unknow_showspace_tag>
+  >
 >
 showspace_impl_tag(T const &)
 { return {}; }
@@ -171,7 +307,7 @@ operator<<(std::basic_ostream<CharT, Traits>& os, showspace_t<T> const & x)
   )) {
     return os << x.x_;
   }
-  return showspace_impl(showspace_impl_tag(x.x_), os, x.x_);
+  return showspace_impl(showspace_impl_tag<CharT>(x.x_), os, x.x_);
 }
 
 template<class CharT, class Traits, class T>
