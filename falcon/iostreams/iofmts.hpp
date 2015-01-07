@@ -6,6 +6,7 @@
 #define FALCON_IOSTREAMS_IOFMTS_HPP
 
 #include <falcon/type_traits/static_const.hpp>
+#include <falcon/io/ios_state.hpp>
 
 #include <ios>
 #include <istream>
@@ -17,54 +18,6 @@ namespace iostreams {
   } FALCON_GLOBAL_OBJECT(name, iostreams::type) namespace iostreams {
 
 namespace aux_ {
-  struct io_flags_saver
-  {
-    std::ios_base & io_;
-    std::ios_base::fmtflags flags_;
-
-    io_flags_saver(std::ios_base & io) noexcept
-    : io_(io)
-    , flags_(io.flags())
-    {}
-
-    io_flags_saver(std::ios_base & io, std::ios_base::fmtflags flags) noexcept
-    : io_(io)
-    , flags_(io.flags(flags))
-    {}
-
-    ~io_flags_saver()
-    { io_.flags(flags_); }
-  };
-
-  template<class CharT, class Traits>
-  struct io_fill_saver
-  {
-    std::basic_ios<CharT, Traits> & io_;
-    CharT c_;
-
-    io_fill_saver(std::basic_ios<CharT, Traits> & io, CharT c) noexcept
-    : io_(io)
-    , c_(io.fill(std::move(c)))
-    {}
-
-    ~io_fill_saver()
-    { io_.fill(std::move(c_)); }
-  };
-
-  struct io_precision_saver
-  {
-    std::ios_base & io_;
-    std::streamsize p_;
-
-    io_precision_saver(std::ios_base & io, std::streamsize p) noexcept
-    : io_(io)
-    , p_(io.precision(p))
-    {}
-
-    ~io_precision_saver()
-    { io_.precision(p_); }
-  };
-
   template<class Tag, class T, class F = void>
   struct basic_ioflags
   {
@@ -154,7 +107,7 @@ namespace aux_ {
   std::basic_ostream<CharT, Traits> &
   operator<<(std::basic_ostream<CharT, Traits> & os, ioflags<T, F> const & x)
   {
-    io_flags_saver saver(os, x.flags());
+    ::falcon::io::ios_flags_saver saver(os, x.flags());
     return os << x.x;
   }
 
@@ -162,7 +115,7 @@ namespace aux_ {
   std::basic_istream<CharT, Traits> &
   operator>>(std::basic_istream<CharT, Traits> & is, ioflags<T, F> const & x)
   {
-    io_flags_saver saver(is, x.flags());
+    ::falcon::io::ios_flags_saver saver(is, x.flags());
     return is >> std::forward<T>(x.x);
   }
 
@@ -171,7 +124,7 @@ namespace aux_ {
   std::basic_ostream<CharT, Traits> &
   operator<<(std::basic_ostream<CharT, Traits> & os, iosetf<T, F> const & x)
   {
-    io_flags_saver saver(os);
+    ::falcon::io::ios_flags_saver saver(os);
     os.setf(x.flags());
     return os << x.x;
   }
@@ -180,7 +133,7 @@ namespace aux_ {
   std::basic_istream<CharT, Traits> &
   operator>>(std::basic_istream<CharT, Traits> & is, iosetf<T, F> const & x)
   {
-    io_flags_saver saver(is);
+    ::falcon::io::ios_flags_saver saver(is);
     is.setf(x.flags());
     return is >> std::forward<T>(x.x);
   }
@@ -190,7 +143,7 @@ namespace aux_ {
   std::basic_ostream<CharT, Traits> &
   operator<<(std::basic_ostream<CharT, Traits> & os, iounsetf<T, F> const & x)
   {
-    io_flags_saver saver(os);
+    ::falcon::io::ios_flags_saver saver(os);
     os.unsetf(x.flags());
     return os << x.x;
   }
@@ -199,7 +152,7 @@ namespace aux_ {
   std::basic_istream<CharT, Traits> &
   operator>>(std::basic_istream<CharT, Traits> & is, iounsetf<T, F> const & x)
   {
-    io_flags_saver saver(is);
+    ::falcon::io::ios_flags_saver saver(is);
     is.unsetf(x.flags());
     return is >> std::forward<T>(x.x);
   }
@@ -209,7 +162,7 @@ namespace aux_ {
   std::basic_ostream<CharT, Traits> &
   operator<<(std::basic_ostream<CharT, Traits> & os, iosetflags<T, M, F> const & x)
   {
-    io_flags_saver saver(os, x.flags());
+    ::falcon::io::ios_flags_saver saver(os, x.flags());
     os.setf(x.flags(), x.mask());
     return os << x.x;
   }
@@ -218,7 +171,7 @@ namespace aux_ {
   std::basic_istream<CharT, Traits> &
   operator>>(std::basic_istream<CharT, Traits> & is, iosetflags<T, M, F> const & x)
   {
-    io_flags_saver saver(is, x.flags());
+    ::falcon::io::ios_flags_saver saver(is, x.flags());
     is.setf(x.flags(), x.mask());
     return is >> std::forward<T>(x.x);
   }
@@ -373,7 +326,7 @@ namespace aux_ {
   std::basic_ostream<CharT, Traits> &
   operator<<(std::basic_ostream<CharT, Traits> & os, iosetfill<CharT2, T> const & x)
   {
-    aux_::io_fill_saver<CharT, Traits> saver(os, x.c);
+    ::falcon::io::basic_ios_fill_saver<CharT, Traits> saver(os, x.c);
     return os << x.x;
   }
 
@@ -381,7 +334,7 @@ namespace aux_ {
   std::basic_istream<CharT, Traits> &
   operator>>(std::basic_istream<CharT, Traits> & is, iosetfill<CharT2, T> const & x)
   {
-    aux_::io_fill_saver<CharT, Traits> saver(is, x.c);
+    ::falcon::io::basic_ios_fill_saver<CharT, Traits> saver(is, x.c);
     return is >> std::forward<T>(x.x);
   }
 
@@ -389,7 +342,7 @@ namespace aux_ {
   std::basic_ostream<CharT, Traits> &
   operator<<(std::basic_ostream<CharT, Traits> & os, iosetprecision<T> const & x)
   {
-    io_precision_saver saver(os, x.n);
+    ::falcon::io::ios_precision_saver saver(os, x.n);
     return os << x.x;
   }
 
@@ -397,7 +350,7 @@ namespace aux_ {
   std::basic_istream<CharT, Traits> &
   operator>>(std::basic_istream<CharT, Traits> & is, iosetprecision<T> const & x)
   {
-    io_precision_saver saver(is, x.n);
+    ::falcon::io::ios_precision_saver saver(is, x.n);
     return is >> std::forward<T>(x.x);
   }
 
