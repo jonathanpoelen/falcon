@@ -372,10 +372,11 @@ modifier c++11/assignable et le melanger avec les macros au-dessus
 try_finally, except_try_finally
 
 os << pad(T,unsigned,Char=' ') = os << width(fill(T,Char),unsigned)
+os << hexu(T) = os << std:uppercase + std::hex
 
 dans format, ajouter un fmt_modifier pour ajouter ' ' si positif + en faire un modifier normal
 
-format: {[pos][:[option]]} option: ' ',+,-, o,x,b,X <,>,^,= a,e,f, ., 0, % h, p, c, n
+format: {[pos][:[option]]} option: ' ',+,-, o,x,b,X <,>,^,= a,e,f, ., 0, % n, a, c, *
 X: x + std::uppercase
 <: std::left
 >: std::left
@@ -389,11 +390,15 @@ A: a + std:uppercase
 .: set::setprecision
 0: complète avec des 0 entre sign et valeur
 %: pourcentage (*100 + '%')
-h: std::noshowpoint
+n: std::noshowpoint
 a: std::boolalpha
-n: number of characters written
+*: number of characters written
 s{...}: complete avec si > n
 std::fill -> c suivit d'un char ?
 separateur pour les conteneurs r{...}
 format_context
 unsafe_format (check + format)
+
+quoted qui prend en compte std::left
+
+quoted,iofmts,showspace,pad: T const &. ne plus utiliser forward

@@ -87,6 +87,7 @@ int main()
     << std::left << std::setw(6) << showspace(S()) << "]\n"
     << std::left << std::setw(6) << showspace(2) << "]\n"
     << std::left << std::setw(6) << showspace(2, '#') << "]\n"
+    << std::left << std::setw(6) << showspace(showspace(2, '#')) << "]\n"
 //     << std::left << std::setw(6) << 1 << "]\n"
 //     << std::left << std::setw(6) << showspace('a') << "]\n"
 //     << std::left << std::setw(6) << showspace(-12) << "]\n"
