@@ -176,7 +176,7 @@ showspace_impl_unknow(
   std::false_type
 , std::basic_ostream<CharT, Traits>& os
 , T const & x)
-// TODO 
+// TODO
 { return os << x; }
 
 
@@ -195,6 +195,7 @@ MAKE_SHOWSPACE_IMPL_CAST(unsigned long, unsigned_showspace_tag)
 MAKE_SHOWSPACE_IMPL_CAST(unsigned long long, unsigned_showspace_tag)
 MAKE_SHOWSPACE_IMPL_CAST(signed char, signed_showspace_tag)
 MAKE_SHOWSPACE_IMPL_CAST(short, signed_showspace_tag)
+MAKE_SHOWSPACE_IMPL_CAST(int, signed_showspace_tag)
 MAKE_SHOWSPACE_IMPL_CAST(long, signed_showspace_tag)
 MAKE_SHOWSPACE_IMPL_CAST(long long, signed_showspace_tag)
 MAKE_SHOWSPACE_IMPL_CAST(float, signed_showspace_tag)
@@ -261,13 +262,27 @@ showspace_impl_unknow(
   return os;
 }
 
+template<class OStream, class T, class = OStream&>
+struct showspace_ostream_is_overload
+: std::is_convertible<T, bool>
+{};
+
+template<class OStream, class T>
+struct showspace_ostream_is_overload<
+  OStream, T
+, decltype(operator<<(std::declval<OStream&>(), std::declval<T const &>()))
+> : std::false_type
+{};
+
 template<class CharT, class Traits, class T>
 std::basic_ostream<CharT, Traits>&
 showspace_impl(
   unknow_showspace_tag
 , std::basic_ostream<CharT, Traits>& os
 , T const & x)
-{ return showspace_impl_unknow(std::is_convertible<T, bool>(), os, x); }
+{ return showspace_impl_unknow(
+  showspace_ostream_is_overload<decltype(os), T>()
+, os, x); }
 
 template<class CharT, class Traits, class T>
 std::basic_ostream<CharT, Traits>&

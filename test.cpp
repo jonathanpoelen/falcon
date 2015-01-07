@@ -68,10 +68,12 @@
 #include <iostream>
 #include <iomanip>
 
-struct SS { int i = 0; };
-std::ostream &operator <<(std::ostream &os, SS const&) { return os << "ok"; }
 
-struct S { int i = 10; operator SS () const { return {}; } };
+struct S {
+  int i = 1;
+  operator int () const { return i; }
+};
+std::ostream &operator <<(std::ostream &os, S const&) { return os << "ok"; }
 
 int main()
 {
@@ -81,7 +83,8 @@ int main()
   std::cout
 //     << std::left << std::setw(6) << showspace(S()) << "]\n"
     << std::left << std::setw(6) << showspace(p) << "]\n"
-    << std::left << std::setw(6) << p << "]\n"
+    << std::left << std::setw(6) << showspace(p) << "]\n"
+    << std::left << std::setw(6) << showspace(S()) << "]\n"
 //     << std::left << std::setw(6) << 1 << "]\n"
 //     << std::left << std::setw(6) << showspace('a') << "]\n"
 //     << std::left << std::setw(6) << showspace(-12) << "]\n"
