@@ -66,6 +66,7 @@
 
 #include <falcon/iostreams/showspace.hpp>
 #include <falcon/iostreams/pad.hpp>
+#include <falcon/io/hexu.hpp>
 #include <iostream>
 #include <iomanip>
 
@@ -96,7 +97,9 @@ int main()
     << padl(0, 5, '#') << "]\n"
     << pad(std::ios::left, 0, 5, '#') << "]\n"
     << padr(0, 5, '#') << "]\n"
-    << padr(5, '#') << "]\n"
+    << 0xf2 << "]\n"
+    << falcon::io::hexu << 0xf2 << "]\n"
+    << 0xf2 << "]\n"
 //     << std::left << std::setw(6) << 1 << "]\n"
 //     << std::left << std::setw(6) << showspace('a') << "]\n"
 //     << std::left << std::setw(6) << showspace(-12) << "]\n"
