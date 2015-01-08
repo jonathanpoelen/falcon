@@ -369,10 +369,6 @@ modifier c++11/assignable et le melanger avec les macros au-dessus
 
 try_finally, except_try_finally
 
-os << hexu(T) = os << std:uppercase + std::hex
-
-dans format, ajouter un fmt_modifier pour ajouter ' ' si positif + en faire un modifier normal
-
 format: {[pos][:[option]]} option: ' ',+,-, o,x,b,X <,>,^,= a,e,f, ., 0, % n, a, c, *
 X: x + std::uppercase
 <: std::left
@@ -397,11 +393,7 @@ separateur pour les conteneurs r{...}
 format_context
 unsafe_format (check + format)
 
-une fonction qui pernet de couper le nombre de donnée envoyée + une chaine si coupe (optionnelle)
-
 quoted qui prend en compte std::left
 
 quoted,iofmts,showspace,pad: T const &. ne plus utiliser forward
-
-mfilebuf -> multifilebuf + enlever l'allocation dynamique
 

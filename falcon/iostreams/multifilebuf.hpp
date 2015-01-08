@@ -1,5 +1,5 @@
-#ifndef FALCON_IOSTREAM_MFILEBUF_HPP
-#define FALCON_IOSTREAM_MFILEBUF_HPP
+#ifndef FALCON_IOSTREAM_MULTIFILEBUF_HPP
+#define FALCON_IOSTREAM_MULTIFILEBUF_HPP
 
 #include <falcon/c++1x/assignable.hpp>
 #include <falcon/iostreams/multibuf.hpp>
@@ -112,14 +112,14 @@ private:
 template<
   class CharT, class Traits = std::char_traits<CharT>
 , class String = std::string>
-using basic_mfilebuf = basic_multibuf<
+using basic_multifilebuf = basic_multibuf<
   CharT, Traits
 , basic_filebuf_generator<CharT, Traits, String>
 >;
 
 
-typedef basic_mfilebuf<char> mfilebuf;
-typedef basic_mfilebuf<wchar_t> wmfilebuf;
+typedef basic_multifilebuf<char> mfilebuf;
+typedef basic_multifilebuf<wchar_t> wmfilebuf;
 
 }
 }
