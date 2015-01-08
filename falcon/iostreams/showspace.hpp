@@ -87,10 +87,8 @@ showspace_with_fill(
 , T const & x, S const & s)
 {
   constexpr auto buflen
-  = std::is_same<T, bool>::value
-  ? 5
-  : ((std::numeric_limits<T>::digits10
-      ? std::numeric_limits<T>::digits10
+  = ((std::numeric_limits<T>::digits10
+      ? int(std::numeric_limits<T>::digits10 * 1.3 /*thousands_sep*/)
       : std::numeric_limits<int>::digits10
     )
     + (std::is_floating_point<T>::value ? 10 : 0)
@@ -354,13 +352,13 @@ operator>>(std::basic_istream<Ch, Tr>& is, space_proxy<T> const & x)
 template<class T>
 aux_::space_proxy<T const &>
 showspace(T const & x) noexcept
-{ return {std::forward<T>(x)}; }
+{ return {x}; }
 
 /// \brief A character \a c should be left before a positive number (or empty string) produced by a signed conversion.
 template<class T, class Ch>
 aux_::space_proxy<T const &, Ch>
 showspace(T const & x, Ch c) noexcept
-{ return {std::forward<T>(x), std::move(c)}; }
+{ return {x, std::move(c)}; }
 
 }
 }

@@ -210,8 +210,6 @@ adaptater -> view ? Pas pour tous. Les transformer en vues si possible
 
 range_allocator fonctionnel avec std::set (ou autre) ?
 
-fixed_grid_cross, grid_cross -> grid_cross_view
-
 allocator qui alloue plusieurs bloc.
 
 max_size dans les allocateurs est le nombre max d'element que alloc() peut théoriquement faire.
@@ -379,7 +377,7 @@ dans format, ajouter un fmt_modifier pour ajouter ' ' si positif + en faire un m
 format: {[pos][:[option]]} option: ' ',+,-, o,x,b,X <,>,^,= a,e,f, ., 0, % n, a, c, *
 X: x + std::uppercase
 <: std::left
->: std::left
+>: std::right
 ^: center
 =: padding after sign
 e: std:scientific
@@ -402,3 +400,6 @@ unsafe_format (check + format)
 quoted qui prend en compte std::left
 
 quoted,iofmts,showspace,pad: T const &. ne plus utiliser forward
+
+mfilebuf -> multifilebuf + enlever l'allocation dynamique
+

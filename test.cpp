@@ -65,6 +65,7 @@
 // };
 
 #include <falcon/iostreams/showspace.hpp>
+#include <falcon/iostreams/pad.hpp>
 #include <iostream>
 #include <iomanip>
 
@@ -78,16 +79,24 @@ std::ostream &operator <<(std::ostream &os, S const&) { return os << "ok"; }
 int main()
 {
   using falcon::iostreams::showspace;
+  using falcon::iostreams::pad;
+  using falcon::iostreams::padl;
+  using falcon::iostreams::padr;
 
   const void * p = 0; p = static_cast<const char*>(p)+3232;
   std::cout
 //     << std::left << std::setw(6) << showspace(S()) << "]\n"
-    << std::left << std::setw(6) << showspace(p) << "]\n"
+    << std::left << std::setw(6) << std::setiosflags(std::ios::boolalpha) <<  showspace(false) << "]\n"
     << std::left << std::setw(6) << showspace(p) << "]\n"
     << std::left << std::setw(6) << showspace(S()) << "]\n"
     << std::left << std::setw(6) << showspace(2) << "]\n"
     << std::left << std::setw(6) << showspace(2, '#') << "]\n"
     << std::left << std::setw(6) << showspace(showspace(2, '#')) << "]\n"
+    << pad(0, 5, '#') << "]\n"
+    << padl(0, 5, '#') << "]\n"
+    << pad(std::ios::left, 0, 5, '#') << "]\n"
+    << padr(0, 5, '#') << "]\n"
+    << padr(5, '#') << "]\n"
 //     << std::left << std::setw(6) << 1 << "]\n"
 //     << std::left << std::setw(6) << showspace('a') << "]\n"
 //     << std::left << std::setw(6) << showspace(-12) << "]\n"
