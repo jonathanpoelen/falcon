@@ -285,6 +285,18 @@ FALCON_IOFMT(uppercase)
 
 #undef FALCON_IOFMT
 
+struct iohexu_fn {
+  constexpr iohexu_fn() noexcept {}
+  template<class T>
+  auto operator()(T && x) const noexcept
+  -> aux_::iosetflags<
+    decltype(std::forward<T>(x))
+  , aux_::fmtflags_constant<(std::ios::basefield | std::ios::uppercase)>
+  , aux_::fmtflags_constant<(std::ios::hex | std::ios::uppercase)>>
+  { return {std::forward<T>(x)}; }
+};
+FALCON_IOSTREAMS_GLOBAL_OBJECT_(iohexu, iohexu_fn)
+
 struct iosetbase_fn {
   constexpr iosetbase_fn() noexcept {}
 
@@ -486,6 +498,7 @@ namespace iofmts {
   constexpr auto const & dec = iodec;
   constexpr auto const & oct = iooct;
   constexpr auto const & hex = iohex;
+  constexpr auto const & hexu = iohexu;
   constexpr auto const & left = ioleft;
   constexpr auto const & right = ioright;
   constexpr auto const & internal = iointernal;
