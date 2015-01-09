@@ -92,6 +92,11 @@ operator<<(std::basic_ostream<Ch, Tr>& os, pad_proxy<Tag, T, C> const & x)
   return os << x.x_;
 }
 
+template<class Ch, class Tr, class Tag, class T, class C>
+std::basic_istream<Ch, Tr>&
+operator<<(std::basic_istream<Ch, Tr>& is, pad_proxy<Tag, T &, C> const & x)
+{ return is >> x.x_; }
+
 }
 
 
@@ -105,6 +110,16 @@ aux_::pad_proxy<void, T const &, Ch>
 pad(T const & x, unsigned n, Ch c) noexcept
 { return {n, x, c}; }
 
+template<class T>
+aux_::pad_proxy<void, T &>
+pad(T & x, unsigned n) noexcept
+{ return {n, x}; }
+
+template<class T, class Ch>
+aux_::pad_proxy<void, T &, Ch>
+pad(T & x, unsigned n, Ch c) noexcept
+{ return {n, x, c}; }
+
 
 template<class T>
 aux_::pad_proxy<aux_::pad_specified, T const &>
@@ -114,6 +129,16 @@ pad(std::ios::fmtflags adjustfield, T const & x, unsigned n) noexcept
 template<class T, class Ch>
 aux_::pad_proxy<aux_::pad_specified, T const &, Ch>
 pad(std::ios::fmtflags adjustfield, T const & x, unsigned n, Ch c) noexcept
+{ return {n, x, adjustfield, c}; }
+
+template<class T>
+aux_::pad_proxy<aux_::pad_specified, T &>
+pad(std::ios::fmtflags adjustfield, T & x, unsigned n) noexcept
+{ return {n, x, adjustfield}; }
+
+template<class T, class Ch>
+aux_::pad_proxy<aux_::pad_specified, T &, Ch>
+pad(std::ios::fmtflags adjustfield, T & x, unsigned n, Ch c) noexcept
 { return {n, x, adjustfield, c}; }
 
 
@@ -127,6 +152,16 @@ aux_::pad_proxy<aux_::pad_left, T const &, Ch>
 padl(T const & x, unsigned n, Ch c) noexcept
 { return {n, x, c}; }
 
+template<class T>
+aux_::pad_proxy<aux_::pad_left, T &>
+padl(T & x, unsigned n) noexcept
+{ return {n, x}; }
+
+template<class T, class Ch>
+aux_::pad_proxy<aux_::pad_left, T &, Ch>
+padl(T & x, unsigned n, Ch c) noexcept
+{ return {n, x, c}; }
+
 
 template<class T>
 aux_::pad_proxy<aux_::pad_right, T const &>
@@ -136,6 +171,16 @@ padr(T const & x, unsigned n) noexcept
 template<class T, class Ch>
 aux_::pad_proxy<aux_::pad_right, T const &, Ch>
 padr(T const & x, unsigned n, Ch c) noexcept
+{ return {n, x, c}; }
+
+template<class T>
+aux_::pad_proxy<aux_::pad_right, T &>
+padr(T & x, unsigned n) noexcept
+{ return {n, x}; }
+
+template<class T, class Ch>
+aux_::pad_proxy<aux_::pad_right, T &, Ch>
+padr(T & x, unsigned n, Ch c) noexcept
 { return {n, x, c}; }
 
 }

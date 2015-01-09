@@ -118,8 +118,8 @@ using basic_multifilebuf = basic_multibuf<
 >;
 
 
-typedef basic_multifilebuf<char> mfilebuf;
-typedef basic_multifilebuf<wchar_t> wmfilebuf;
+typedef basic_multifilebuf<char> multifilebuf;
+typedef basic_multifilebuf<wchar_t> wmultifilebuf;
 
 }
 }

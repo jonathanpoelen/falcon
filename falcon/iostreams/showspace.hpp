@@ -344,7 +344,7 @@ operator<<(std::basic_ostream<Ch, Tr>& os, space_proxy<T, C> const & x)
 template<class Ch, class Tr, class T>
 std::basic_istream<Ch, Tr>&
 operator>>(std::basic_istream<Ch, Tr>& is, space_proxy<T> const & x)
-{ return is >> std::forward<T>(x.x_); }
+{ return is >> x.x_; }
 
 }
 
@@ -354,10 +354,20 @@ aux_::space_proxy<T const &>
 showspace(T const & x) noexcept
 { return {x}; }
 
+template<class T>
+aux_::space_proxy<T &>
+showspace(T & x) noexcept
+{ return {x}; }
+
 /// \brief A character \a c should be left before a positive number (or empty string) produced by a signed conversion.
 template<class T, class Ch>
 aux_::space_proxy<T const &, Ch>
 showspace(T const & x, Ch c) noexcept
+{ return {x, std::move(c)}; }
+
+template<class T, class Ch>
+aux_::space_proxy<T &, Ch>
+showspace(T & x, Ch c) noexcept
 { return {x, std::move(c)}; }
 
 }
