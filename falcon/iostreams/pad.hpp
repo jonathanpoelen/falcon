@@ -14,174 +14,158 @@ class pad_specified;
 class pad_right;
 class pad_left;
 
-template<class Tag, class T, class Ch = void>
+template<class Tag = void, class Ch = void>
 struct pad_proxy {
   std::streamsize n_;
-  T x_;
   Ch c_;
 };
 
-template<class Tag, class T>
-struct pad_proxy<Tag, T, void> {
+template<class Tag>
+struct pad_proxy<Tag, void> {
   std::streamsize n_;
-  T x_;
 };
 
-template<class T, class Ch>
-struct pad_proxy<pad_specified, T, Ch> {
+template<class Ch>
+struct pad_proxy<pad_specified, Ch> {
   std::streamsize n_;
-  T x_;
-  std::ios::fmtflags adjustfield_;
+  std::ios_base::fmtflags adjustfield_;
   Ch c_;
 };
 
-template<class T>
-struct pad_proxy<pad_specified, T, void> {
-  T x_;
-  std::ios::fmtflags adjustfield_;
+template<>
+struct pad_proxy<pad_specified, void> {
   std::streamsize n_;
+  std::ios_base::fmtflags adjustfield_;
 };
 
-template<class Ch, class Tr, class Tag, class T>
-Ch pad_getc(std::basic_ostream<Ch, Tr>& os, pad_proxy<Tag, T> const &)
+template<class Ch, class Tr, class Tag>
+Ch pad_getc(std::basic_ios<Ch, Tr>& os, pad_proxy<Tag> const &)
 { return os.widen(' '); }
 
-template<class Ch, class Tr, class Tag, class T>
-Ch const& pad_getc(std::basic_ostream<Ch, Tr>&, pad_proxy<Tag, T, Ch> const & p)
+template<class Ch, class Tr, class Tag>
+Ch const& pad_getc(std::basic_ios<Ch, Tr>&, pad_proxy<Tag, Ch> const & p)
 { return p.c_; }
 
-
-template<class Ch, class Tr, class T, class C>
-std::basic_ostream<Ch, Tr>&
-operator<<(std::basic_ostream<Ch, Tr>& os, pad_proxy<void, T, C> const & x)
+template<class Ch, class Tr, class Tag, class C>
+void pad_impl(std::basic_ios<Ch, Tr> & io, pad_proxy<Tag, C> const & x)
 {
-  io::basic_ios_fill_saver<Ch, Tr> fill_saver(os, pad_getc(os, x));
-  os.width(std::streamsize(x.n_));
-  return os << x.x_;
+  io.fill(pad_getc(io, x));
+  io.width(std::streamsize(x.n_));
 }
 
-template<class Ch, class Tr, class T, class C>
+template<class Ch, class Tr, class Tag, class C>
+void pad_impl(
+  std::basic_ios<Ch, Tr> & io
+, pad_proxy<Tag, C> const & x
+, bool is_left)
+{
+  io.fill(pad_getc(io, x));
+  io.width(std::streamsize(x.n_));
+  io.setf(
+    is_left ? std::ios_base::left : std::ios_base::right
+  , std::ios_base::adjustfield);
+}
+
+
+template<class Ch, class Tr, class C>
+std::basic_ostream<Ch, Tr>&
+operator<<(std::basic_ostream<Ch, Tr>& os, pad_proxy<void, C> const & x)
+{
+  pad_impl(os, x);
+  return os;
+}
+
+template<class Ch, class Tr, class C>
+std::basic_istream<Ch, Tr>&
+operator>>(std::basic_istream<Ch, Tr>& is, pad_proxy<void, C> const & x)
+{
+  pad_impl(is, x);
+  return is;
+}
+
+
+template<class Ch, class Tr, class C>
 std::basic_ostream<Ch, Tr>&
 operator<<(
   std::basic_ostream<Ch, Tr>& os
-, pad_proxy<pad_specified, T, C> const & x)
+, pad_proxy<pad_specified, C> const & x)
 {
-  io::basic_ios_fill_saver<Ch, Tr> fill_saver(os, pad_getc(os, x));
-  os.width(std::streamsize(x.n_));
-  if (x.adjustfield_ == std::ios::left) {
-    std::right(os);
-  }
-  else {
-    std::left(os);
-  }
-  return os << x.x_;
+  pad_impl(os, x, x.adjustfield_ == std::ios_base::left);
+  return os;
 }
 
-template<class Ch, class Tr, class Tag, class T, class C>
-std::basic_ostream<Ch, Tr>&
-operator<<(std::basic_ostream<Ch, Tr>& os, pad_proxy<Tag, T, C> const & x)
-{
-  io::basic_ios_fill_saver<Ch, Tr> fill_saver(os, pad_getc(os, x));
-  os.width(std::streamsize(x.n_));
-  if (std::is_same<Tag, pad_left>::value) {
-    std::right(os);
-  }
-  else {
-    std::left(os);
-  }
-  return os << x.x_;
-}
-
-template<class Ch, class Tr, class Tag, class T, class C>
+template<class Ch, class Tr, class C>
 std::basic_istream<Ch, Tr>&
-operator<<(std::basic_istream<Ch, Tr>& is, pad_proxy<Tag, T &, C> const & x)
-{ return is >> x.x_; }
+operator<<(
+  std::basic_istream<Ch, Tr>& is
+, pad_proxy<pad_specified, C> const & x)
+{
+  pad_impl(is, x, x.adjustfield_ == std::ios_base::left);
+  return is;
+}
+
+
+template<class Ch, class Tr, class Tag, class C>
+std::basic_ostream<Ch, Tr>&
+operator<<(std::basic_ostream<Ch, Tr>& os, pad_proxy<Tag, C> const & x)
+{
+  pad_impl(os, x, std::is_same<Tag, pad_left>::value);
+  return os;
+}
+
+template<class Ch, class Tr, class Tag, class C>
+std::basic_istream<Ch, Tr>&
+operator<<(std::basic_istream<Ch, Tr>& is, pad_proxy<Tag, C> const & x)
+{
+  pad_impl(is, x, std::is_same<Tag, pad_left>::value);
+  return is;
+}
 
 }
 
 
-template<class T>
-aux_::pad_proxy<void, T const &>
-pad(T const & x, unsigned n) noexcept
-{ return {n, x}; }
+inline
+aux_::pad_proxy<>
+pad(unsigned n) noexcept
+{ return {n}; }
 
-template<class T, class Ch>
-aux_::pad_proxy<void, T const &, Ch>
-pad(T const & x, unsigned n, Ch c) noexcept
-{ return {n, x, c}; }
+template<class Ch>
+aux_::pad_proxy<void, Ch>
+pad(unsigned n, Ch c) noexcept
+{ return {n, c}; }
 
-template<class T>
-aux_::pad_proxy<void, T &>
-pad(T & x, unsigned n) noexcept
-{ return {n, x}; }
+inline
+aux_::pad_proxy<aux_::pad_specified>
+pad(std::ios_base::fmtflags adjustfield, unsigned n) noexcept
+{ return {n, adjustfield}; }
 
-template<class T, class Ch>
-aux_::pad_proxy<void, T &, Ch>
-pad(T & x, unsigned n, Ch c) noexcept
-{ return {n, x, c}; }
-
-
-template<class T>
-aux_::pad_proxy<aux_::pad_specified, T const &>
-pad(std::ios::fmtflags adjustfield, T const & x, unsigned n) noexcept
-{ return {n, x, adjustfield}; }
-
-template<class T, class Ch>
-aux_::pad_proxy<aux_::pad_specified, T const &, Ch>
-pad(std::ios::fmtflags adjustfield, T const & x, unsigned n, Ch c) noexcept
-{ return {n, x, adjustfield, c}; }
-
-template<class T>
-aux_::pad_proxy<aux_::pad_specified, T &>
-pad(std::ios::fmtflags adjustfield, T & x, unsigned n) noexcept
-{ return {n, x, adjustfield}; }
-
-template<class T, class Ch>
-aux_::pad_proxy<aux_::pad_specified, T &, Ch>
-pad(std::ios::fmtflags adjustfield, T & x, unsigned n, Ch c) noexcept
-{ return {n, x, adjustfield, c}; }
+template<class Ch>
+aux_::pad_proxy<aux_::pad_specified, Ch>
+pad(std::ios_base::fmtflags adjustfield, unsigned n, Ch c) noexcept
+{ return {n, adjustfield, c}; }
 
 
-template<class T>
-aux_::pad_proxy<aux_::pad_left, T const &>
-padl(T const & x, unsigned n) noexcept
-{ return {n, x}; }
+inline
+aux_::pad_proxy<aux_::pad_left>
+padl(unsigned n) noexcept
+{ return {n}; }
 
-template<class T, class Ch>
-aux_::pad_proxy<aux_::pad_left, T const &, Ch>
-padl(T const & x, unsigned n, Ch c) noexcept
-{ return {n, x, c}; }
-
-template<class T>
-aux_::pad_proxy<aux_::pad_left, T &>
-padl(T & x, unsigned n) noexcept
-{ return {n, x}; }
-
-template<class T, class Ch>
-aux_::pad_proxy<aux_::pad_left, T &, Ch>
-padl(T & x, unsigned n, Ch c) noexcept
-{ return {n, x, c}; }
+template<class Ch>
+aux_::pad_proxy<aux_::pad_left, Ch>
+padl(unsigned n, Ch c) noexcept
+{ return {n, c}; }
 
 
-template<class T>
-aux_::pad_proxy<aux_::pad_right, T const &>
-padr(T const & x, unsigned n) noexcept
-{ return {n, x}; }
+inline
+aux_::pad_proxy<aux_::pad_right>
+padr(unsigned n) noexcept
+{ return {n}; }
 
-template<class T, class Ch>
-aux_::pad_proxy<aux_::pad_right, T const &, Ch>
-padr(T const & x, unsigned n, Ch c) noexcept
-{ return {n, x, c}; }
+template<class Ch>
+aux_::pad_proxy<aux_::pad_right, Ch>
+padr(unsigned n, Ch c) noexcept
+{ return {n, c}; }
 
-template<class T>
-aux_::pad_proxy<aux_::pad_right, T &>
-padr(T & x, unsigned n) noexcept
-{ return {n, x}; }
-
-template<class T, class Ch>
-aux_::pad_proxy<aux_::pad_right, T &, Ch>
-padr(T & x, unsigned n, Ch c) noexcept
-{ return {n, x, c}; }
 
 }
 }
