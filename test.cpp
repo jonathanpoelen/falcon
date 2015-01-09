@@ -66,6 +66,7 @@
 
 #include <falcon/iostreams/showspace.hpp>
 #include <falcon/iostreams/pad.hpp>
+#include <falcon/iostreams/quoted.hpp>
 #include <falcon/io/hexu.hpp>
 #include <iostream>
 #include <iomanip>
@@ -83,6 +84,7 @@ int main()
   using falcon::iostreams::pad;
   using falcon::iostreams::padl;
   using falcon::iostreams::padr;
+  using falcon::iostreams::quoted;
 
   const void * p = 0; p = static_cast<const char*>(p)+3232;
   std::cout
@@ -97,9 +99,7 @@ int main()
     << padl(0, 5, '#') << "]\n"
     << pad(std::ios::left, 0, 5, '#') << "]\n"
     << padr(0, 5, '#') << "]\n"
-    << 0xf2 << "]\n"
-    << falcon::io::hexu << 0xf2 << "]\n"
-    << 0xf2 << "]\n"
+    << std::right << std::setw(12) << quoted("plo\"p\"") << "]\n"
 //     << std::left << std::setw(6) << 1 << "]\n"
 //     << std::left << std::setw(6) << showspace('a') << "]\n"
 //     << std::left << std::setw(6) << showspace(-12) << "]\n"
