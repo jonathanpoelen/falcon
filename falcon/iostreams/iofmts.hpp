@@ -5,7 +5,9 @@
 #ifndef FALCON_IOSTREAMS_IOFMTS_HPP
 #define FALCON_IOSTREAMS_IOFMTS_HPP
 
+#include <falcon/iostreams/fmt_manipulator.hpp>
 #include <falcon/type_traits/static_const.hpp>
+#include <falcon/type_traits/enable_type.hpp>
 #include <falcon/io/ios_state.hpp>
 
 #include <ios>
@@ -18,21 +20,31 @@ namespace iostreams {
   } FALCON_GLOBAL_OBJECT(name, iostreams::type) namespace iostreams {
 
 namespace aux_ {
-  template<class Tag, class T, class F = void>
+  template<class Saver, class T, class F = void>
   struct basic_ioflags
   {
-    T x;
+    T x_;
+
+    using fmt_lock = Saver;
+
+    T value() const noexcept
+    { return x_; }
 
     constexpr std::ios_base::fmtflags
     flags() const noexcept
     { return F::value; }
   };
 
-  template<class Tag, class T>
-  struct basic_ioflags<Tag, T, void>
+  template<class Saver, class T>
+  struct basic_ioflags<Saver, T, void>
   {
     std::ios_base::fmtflags flags_;
-    T x;
+    T x_;
+
+    using fmt_lock = Saver;
+
+    T value() const noexcept
+    { return x_; }
 
     std::ios_base::fmtflags
     flags() const noexcept
@@ -40,34 +52,66 @@ namespace aux_ {
   };
 
 
+  struct ioflags_saver
+  {
+    io::ios_flags_saver saver_;
+
+    template<class IOFlag>
+    ioflags_saver(std::ios_base & state, IOFlag const & x)
+    : saver_(state, x.flags())
+    {}
+
+    ioflags_saver(ioflags_saver const &) = delete;
+  };
+
+  struct iosetflags_saver1
+  {
+    io::ios_flags_saver saver_;
+
+    template<class IOFlag>
+    iosetflags_saver1(std::ios_base & state, IOFlag const & x)
+    : saver_(state)
+    { state.setf(x.flags()); }
+
+    iosetflags_saver1(iosetflags_saver1 const &) = delete;
+  };
+
+  struct iounsetflags_saver
+  {
+    io::ios_flags_saver saver_;
+
+    template<class IOFlag>
+    iounsetflags_saver(std::ios_base & state, IOFlag const & x)
+    : saver_(state)
+    { state.unsetf(x.flags()); }
+
+    iounsetflags_saver(iounsetflags_saver const &) = delete;
+  };
+
+  template<class T, class F = void>
+  using ioflags = basic_ioflags<ioflags_saver, T, F>;
+
+  template<class T, class F = void>
+  using iosetf = basic_ioflags<iosetflags_saver1, T, F>;
+
+  template<class T, class F = void>
+  using iounsetf = basic_ioflags<iounsetflags_saver, T, F>;
+
+
   template<std::ios_base::fmtflags F>
   using fmtflags_constant = std::integral_constant<std::ios_base::fmtflags, F>;
 
 
-  struct flags_tag {};
-  struct setf_tag {};
-  struct unsetf_tag {};
-
-  template<class T, class F = void>
-  using ioflags = basic_ioflags<flags_tag, T, F>;
-
-  template<class T, class F = void>
-  using iosetf = basic_ioflags<setf_tag, T, F>;
-
-  template<class T, class F = void>
-  using iounsetf = basic_ioflags<unsetf_tag, T, F>;
-
-
-  template<class SetFlags>
-  struct iosetflags_saver
+  struct iosetflags_saver2
   {
     io::ios_flags_saver saver_;
 
-    iosetflags_saver(std::ios_base & state, SetFlags const & x)
+    template<class IOFlag>
+    iosetflags_saver2(std::ios_base & state, IOFlag const & x)
     : saver_(state)
     { state.setf(x.flags(), x.mask()); }
 
-    iosetflags_saver(iosetflags_saver const &) = delete;
+    iosetflags_saver2(iosetflags_saver2 const &) = delete;
   };
 
   template<class T, class M = void, class F = void>
@@ -75,7 +119,7 @@ namespace aux_ {
   {
     T x_;
 
-    using fmt_lock = iosetflags_saver<iosetflags>;
+    using fmt_lock = iosetflags_saver2;
 
     T value() const noexcept
     { return x_; }
@@ -95,7 +139,7 @@ namespace aux_ {
     std::ios_base::fmtflags flags_;
     T x_;
 
-    using fmt_lock = iosetflags_saver<iosetflags>;
+    using fmt_lock = iosetflags_saver2;
 
     T value() const noexcept
     { return x_; }
@@ -116,7 +160,7 @@ namespace aux_ {
     std::ios_base::fmtflags mask_;
     T x_;
 
-    using fmt_lock = iosetflags_saver<iosetflags>;
+    using fmt_lock = iosetflags_saver2;
 
     T value() const noexcept
     { return x_; }
@@ -130,75 +174,93 @@ namespace aux_ {
     { return mask_; }
   };
 
-  template<class CharT, class Traits, class T, class F>
-  std::basic_ostream<CharT, Traits> &
-  operator<<(std::basic_ostream<CharT, Traits> & os, ioflags<T, F> const & x)
+
+  template<class Ch, class T>
+  struct iosetfill
   {
-    ::falcon::io::ios_flags_saver saver(os, x.flags());
-    return os << x.x;
-  }
+    Ch c_;
+    T x_;
 
-  template<class CharT, class Traits, class T, class F>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, ioflags<T, F> const & x)
+    template<class Ch2, class Tr>
+    struct fmt_lock
+    {
+      io::basic_ios_fill_saver<Ch2, Tr> saver_;
+
+      fmt_lock(std::basic_ios<Ch2, Tr> & state, iosetfill const & x)
+      : saver_(state, x.c_)
+      {}
+
+      fmt_lock(fmt_lock const &) = delete;
+    };
+
+    T value() const noexcept
+    { return x_; }
+  };
+
+  template<class T, class Saver>
+  struct iosetn
   {
-    ::falcon::io::ios_flags_saver saver(is, x.flags());
-    return is >> x.x;
-  }
+    std::streamsize n_;
+    T x_;
 
+    struct fmt_lock
+    {
+      Saver saver_;
 
-  template<class CharT, class Traits, class T, class F>
-  std::basic_ostream<CharT, Traits> &
-  operator<<(std::basic_ostream<CharT, Traits> & os, iosetf<T, F> const & x)
+      fmt_lock(std::ios_base & state, iosetn const & x)
+      : saver_(state, x.n_)
+      {}
+
+      fmt_lock(fmt_lock const &) = delete;
+    };
+
+    T value() const noexcept
+    { return x_; }
+  };
+
+  template<class T>
+  using iosetprecision = iosetn<T, io::ios_precision_saver>;
+
+  template<class T>
+  using iosetwidth = iosetn<T, io::ios_width_saver>;
+
+  template<class T>
+  struct iows
   {
-    ::falcon::io::ios_flags_saver saver(os);
-    os.setf(x.flags());
-    return os << x.x;
-  }
+    T x_;
 
-  template<class CharT, class Traits, class T, class F>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, iosetf<T, F> const & x)
+    struct fmt_lock
+    {
+      template<class IStream>
+      fmt_lock(IStream & is, iows const &)
+      { std::ws(is); }
+
+      fmt_lock(fmt_lock const &) = delete;
+    };
+
+    T value() const noexcept
+    { return x_; }
+  };
+
+  template<class Ch, class Tr, class T>
+  std::basic_ostream<Ch, Tr> &
+  operator<<(std::basic_ostream<Ch, Tr> &, iows<T> const &) = delete;
+
+
+  template<class Ch, class Tr, class Fmt>
+  enable_type_t<fmt_lock<Fmt, Ch, Tr>, std::basic_ostream<Ch, Tr> &>
+  operator<<(std::basic_ostream<Ch, Tr> & os, Fmt const & x)
   {
-    ::falcon::io::ios_flags_saver saver(is);
-    is.setf(x.flags());
-    return is >> x.x;
-  }
-
-
-  template<class CharT, class Traits, class T, class F>
-  std::basic_ostream<CharT, Traits> &
-  operator<<(std::basic_ostream<CharT, Traits> & os, iounsetf<T, F> const & x)
-  {
-    ::falcon::io::ios_flags_saver saver(os);
-    os.unsetf(x.flags());
-    return os << x.x;
-  }
-
-  template<class CharT, class Traits, class T, class F>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, iounsetf<T, F> const & x)
-  {
-    ::falcon::io::ios_flags_saver saver(is);
-    is.unsetf(x.flags());
-    return is >> x.x;
-  }
-
-
-  template<class CharT, class Traits, class T, class M, class F>
-  std::basic_ostream<CharT, Traits> &
-  operator<<(std::basic_ostream<CharT, Traits> & os, iosetflags<T, M, F> const & x)
-  {
-    typename iosetflags<T, M, F>::fmt_lock saver(os, x);
+    fmt_lock<Fmt, Ch, Tr> saver(os, x);
     return os << x.value();
   }
 
-  template<class CharT, class Traits, class T, class M, class F>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, iosetflags<T, M, F> const & x)
+  template<class Ch, class Tr, class Fmt>
+  enable_type_t<fmt_lock<Fmt, Ch, Tr>, std::basic_istream<Ch, Tr> &>
+  operator>>(std::basic_istream<Ch, Tr> & is, Fmt const & x)
   {
-    typename iosetflags<T, M, F>::fmt_lock saver(is, x);
-    return is >> x.value();
+    fmt_lock<Fmt, Ch, Tr> saver(is, x);
+    return is << x.value();
   }
 }
 
@@ -406,93 +468,17 @@ private:
 };
 FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetbase, iosetbase_fn)
 
-
-namespace aux_ {
-  template<class CharT, class T>
-  struct iosetfill
-  { CharT c ; T x; };
-
-  template<class T>
-  struct iosetprecision
-  { std::streamsize n ; T x; };
-
-  template<class T>
-  struct iosetwidth
-  { std::streamsize n ; T x; };
-
-  template<class T>
-  struct iows
-  { T x; };
-
-
-  template<class CharT, class Traits, typename CharT2, class T>
-  std::basic_ostream<CharT, Traits> &
-  operator<<(std::basic_ostream<CharT, Traits> & os, iosetfill<CharT2, T> const & x)
-  {
-    ::falcon::io::basic_ios_fill_saver<CharT, Traits> saver(os, x.c);
-    return os << x.x;
-  }
-
-  template<class CharT, class Traits, typename CharT2, class T>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, iosetfill<CharT2, T> const & x)
-  {
-    ::falcon::io::basic_ios_fill_saver<CharT, Traits> saver(is, x.c);
-    return is >> x.x;
-  }
-
-  template<class CharT, class Traits, class T>
-  std::basic_ostream<CharT, Traits> &
-  operator<<(std::basic_ostream<CharT, Traits> & os, iosetprecision<T> const & x)
-  {
-    ::falcon::io::ios_precision_saver saver(os, x.n);
-    return os << x.x;
-  }
-
-  template<class CharT, class Traits, class T>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, iosetprecision<T> const & x)
-  {
-    ::falcon::io::ios_precision_saver saver(is, x.n);
-    return is >> x.x;
-  }
-
-
-  template<class CharT, class Traits, class T>
-  std::basic_ostream<CharT, Traits> &
-  operator<<(std::basic_ostream<CharT, Traits> & os, iosetwidth<T> const & x)
-  {
-    os.width(x.n);
-    return os << x.x;
-  }
-
-  template<class CharT, class Traits, class T>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, iosetwidth<T> const & x)
-  {
-    is.width(x.n);
-    return is >> x.x;
-  }
-
-
-  template<class CharT, class Traits, class T>
-  std::basic_istream<CharT, Traits> &
-  operator>>(std::basic_istream<CharT, Traits> & is, iows<T> const & x)
-  { return std::ws(is) >> x.x; }
-}
-
-
 struct iosetfill_fn {
   constexpr iosetfill_fn() noexcept {}
 
-  template<class CharT, class T>
-  aux_::iosetfill<CharT, T const &>
-  operator()(T const & x, CharT c) const noexcept
+  template<class Ch, class T>
+  aux_::iosetfill<Ch, T const &>
+  operator()(T const & x, Ch c) const noexcept
   { return {c, x}; }
 
-  template<class CharT, class T>
-  aux_::iosetfill<CharT, T &>
-  operator()(T & x, CharT c) const noexcept
+  template<class Ch, class T>
+  aux_::iosetfill<Ch, T &>
+  operator()(T & x, Ch c) const noexcept
   { return {c, x}; }
 };
 FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetfill, iosetfill_fn)
@@ -500,12 +486,12 @@ FALCON_IOSTREAMS_GLOBAL_OBJECT_(iosetfill, iosetfill_fn)
 struct iosetprecision_fn {
   constexpr iosetprecision_fn() noexcept {}
 
-  template<class CharT, class T>
+  template<class Ch, class T>
   aux_::iosetprecision<T const &>
   operator()(T const & x, std::streamsize n) const noexcept
   { return {n, x}; }
 
-  template<class CharT, class T>
+  template<class Ch, class T>
   aux_::iosetprecision<T &>
   operator()(T & x, std::streamsize n) const noexcept
   { return {n, x}; }

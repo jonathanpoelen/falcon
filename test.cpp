@@ -104,6 +104,7 @@ int main()
     << padr(5, '#') << 0 << "]\n"
     << pad(std::ios::left, 5, '#') << 0 << "]\n"
     << pad(5, '#') << 0 << "]\n"
+    << iofmts::setfill(5, '#') << 0 << "]\n"
     << std::right << std::setw(12) << quoted("plo\"p\"") << "]\n"
     << iofmts::right(iofmts::setw(quoted("plo\"p\""), 12)) << "]\n"
   ;
