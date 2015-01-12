@@ -58,10 +58,27 @@ namespace aux_ {
   using iounsetf = basic_ioflags<unsetf_tag, T, F>;
 
 
+  template<class SetFlags>
+  struct iosetflags_saver
+  {
+    io::ios_flags_saver saver_;
+
+    iosetflags_saver(std::ios_base & state, SetFlags const & x)
+    : saver_(state)
+    { state.setf(x.flags(), x.mask()); }
+
+    iosetflags_saver(iosetflags_saver const &) = delete;
+  };
+
   template<class T, class M = void, class F = void>
   struct iosetflags
   {
-    T x;
+    T x_;
+
+    using fmt_lock = iosetflags_saver<iosetflags>;
+
+    T value() const noexcept
+    { return x_; }
 
     constexpr std::ios_base::fmtflags
     flags() const noexcept
@@ -76,7 +93,12 @@ namespace aux_ {
   struct iosetflags<T, M, void>
   {
     std::ios_base::fmtflags flags_;
-    T x;
+    T x_;
+
+    using fmt_lock = iosetflags_saver<iosetflags>;
+
+    T value() const noexcept
+    { return x_; }
 
     std::ios_base::fmtflags
     flags() const noexcept
@@ -92,7 +114,12 @@ namespace aux_ {
   {
     std::ios_base::fmtflags flags_;
     std::ios_base::fmtflags mask_;
-    T x;
+    T x_;
+
+    using fmt_lock = iosetflags_saver<iosetflags>;
+
+    T value() const noexcept
+    { return x_; }
 
     std::ios_base::fmtflags
     flags() const noexcept
@@ -162,18 +189,16 @@ namespace aux_ {
   std::basic_ostream<CharT, Traits> &
   operator<<(std::basic_ostream<CharT, Traits> & os, iosetflags<T, M, F> const & x)
   {
-    ::falcon::io::ios_flags_saver saver(os, x.flags());
-    os.setf(x.flags(), x.mask());
-    return os << x.x;
+    typename iosetflags<T, M, F>::fmt_lock saver(os, x);
+    return os << x.value();
   }
 
   template<class CharT, class Traits, class T, class M, class F>
   std::basic_istream<CharT, Traits> &
   operator>>(std::basic_istream<CharT, Traits> & is, iosetflags<T, M, F> const & x)
   {
-    ::falcon::io::ios_flags_saver saver(is, x.flags());
-    is.setf(x.flags(), x.mask());
-    return is >> x.x;
+    typename iosetflags<T, M, F>::fmt_lock saver(is, x);
+    return is >> x.value();
   }
 }
 

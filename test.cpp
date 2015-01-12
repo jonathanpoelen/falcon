@@ -67,6 +67,7 @@
 #include <falcon/iostreams/showspace.hpp>
 #include <falcon/iostreams/pad.hpp>
 #include <falcon/iostreams/quoted.hpp>
+#include <falcon/iostreams/iofmts.hpp>
 #include <falcon/io/hexu.hpp>
 #include <iostream>
 #include <iomanip>
@@ -77,6 +78,10 @@ struct S {
   operator int () const { return i; }
 };
 std::ostream &operator <<(std::ostream &os, S const&) { return os << "ok"; }
+
+namespace iofmts {
+  using namespace falcon::iostreams::iofmts;
+}
 
 int main()
 {
@@ -100,6 +105,17 @@ int main()
     << pad(std::ios::left, 5, '#') << 0 << "]\n"
     << pad(5, '#') << 0 << "]\n"
     << std::right << std::setw(12) << quoted("plo\"p\"") << "]\n"
+    << iofmts::right(iofmts::setw(quoted("plo\"p\""), 12)) << "]\n"
+  ;
+
+  std::string s("plo\"p\"");
+  /*std::cout <<
+   falcon::iostreams::is_fmt_manipulator<
+     decltype(iofmts::right(s))//::template fmt_lock<void>
+    >::value*/;
+  std::cout << quoted(iofmts::right(s)) << "]\n";
+//   std::cout << quoted(iofmts::right(iofmts::setw(s, 12))) << "]\n";
+
 //     << std::left << std::setw(6) << 1 << "]\n"
 //     << std::left << std::setw(6) << showspace('a') << "]\n"
 //     << std::left << std::setw(6) << showspace(-12) << "]\n"

@@ -393,8 +393,7 @@ separateur pour les conteneurs r{...}
 format_context
 unsafe_format (check + format)
 
-quoted,iofmts,showspace,pad: T const &. ne plus utiliser forward
+escape un sous-ensemble de quoted
 
-rendre compatible showspace et pad avec les iofmts (utiliser des structure publique ? de la restropection de type (showspace(pad) devient pad(showspace) ; idem pour showspace(iofmts::xxx)) ?)
-
+iofmts: par les copies les fmt, par reference le reste, value retourne une cref
 
