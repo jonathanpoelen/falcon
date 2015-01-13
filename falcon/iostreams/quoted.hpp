@@ -97,10 +97,10 @@ struct count_none {
   operator int () const noexcept { return 0; }
 };
 
-template <class Ch, class Tr, class Alloc, class CountAdded = count_none>
+template <class Ch, class Tr, class String, class CountAdded = count_none>
 std::streamsize safe_quoted_impl(
   std::basic_streambuf<Ch, Tr> & buf
-, std::basic_string<Ch, Tr, Alloc> const & string
+, String const & string
 , Ch escape, Ch delim
 , CountAdded count_added = CountAdded{})
 {
@@ -110,15 +110,19 @@ std::streamsize safe_quoted_impl(
     return 0;
   }
 
-  for (Ch const & c : string) {
-    if (c == delim || c == escape) {
-      if (buf.sputc(escape) == eof) {
+  {
+    auto first = string.begin();
+    auto last = string.end();
+    for (; first != last; ++first) {
+      if (*first == delim || *first == escape) {
+        if (buf.sputc(escape) == eof) {
+          return 0;
+        }
+        ++count_added;
+      }
+      if (buf.sputc(*first) == eof) {
         return 0;
       }
-      ++count_added;
-    }
-    if (buf.sputc(c) == eof) {
-      return 0;
     }
   }
 
@@ -128,6 +132,80 @@ std::streamsize safe_quoted_impl(
 
   return count_added + 2;
 }
+
+
+struct range_cstr_null_terminated {};
+
+template<class Ch, class Tr>
+struct range_cstr
+{
+  Ch const * str;
+
+  Ch const * begin() const noexcept { return str; }
+
+  range_cstr_null_terminated end() const noexcept { return {}; }
+
+  std::size_t size() const noexcept
+  { return Tr::length(str); }
+};
+
+template<class Ch>
+bool operator!=(Ch const * p, range_cstr_null_terminated)
+{ return *p; }
+
+
+template <bool IsPtr, class Ch, class Tr, class String>
+std::basic_ostream<Ch, Tr> & real_quoted_impl(
+  std::basic_ostream<Ch, Tr> & os
+, String const & string
+, Ch escape, Ch delim)
+{
+  typename std::basic_ostream<Ch, Tr>::sentry cerb(os);
+  if (cerb) {
+    const std::streamsize w = IsPtr ? os.width() : os.width(0);
+    if (w > (IsPtr ? 0 : std::streamsize(string.size()))) {
+      const bool left
+        = ((os.flags() & std::ios_base::adjustfield) == std::ios_base::left);
+      if (!left) {
+        std::streamsize sz = 2 + (IsPtr ? 0 : std::streamsize(string.size()));
+        {
+          auto first = string.begin();
+          auto last = string.end();
+          for (; first != last; ++first) {
+            if (*first == delim || *first == escape) {
+              ++sz;
+            }
+            if (IsPtr) {
+              ++sz;
+            }
+          }
+        }
+        if (!ostream_fill(os, w - sz)
+         || !safe_quoted_impl(*os.rdbuf(), string, escape, delim)) {
+          os.setstate(std::ios_base::badbit);
+        }
+      }
+      else if (std::streamsize count_escape = safe_quoted_impl(
+        *os.rdbuf(), string, escape, delim, 0
+      )){
+        ostream_fill(
+          os, w - (count_escape + std::streamsize(string.size())));
+      }
+      else {
+        os.setstate(std::ios_base::badbit);
+      }
+
+      if (IsPtr) {
+        os.width(0);
+      }
+    }
+    else if (!safe_quoted_impl(*os.rdbuf(), string, escape, delim)) {
+      os.setstate(std::ios_base::badbit);
+    }
+  }
+  return os;
+}
+
 
 template <class Ch, class Tr, class Alloc>
 std::basic_ostream<Ch, Tr> &
@@ -135,120 +213,17 @@ quoted_impl(
   std::basic_ostream<Ch, Tr> & os
 , std::basic_string<Ch, Tr, Alloc> const & string
 , Ch escape, Ch delim)
-{
-  typename std::basic_ostream<Ch, Tr>::sentry cerb(os);
-  if (cerb) {
-    const std::streamsize w = os.width();
-    if (w > std::streamsize(string.size())) {
-      const bool left
-        = ((os.flags() & std::ios_base::adjustfield) == std::ios_base::left);
-      if (!left) {
-        std::streamsize count_escape = 0;
-        for (Ch const & c : string) {
-          if (c == delim || c == escape) {
-            ++count_escape;
-          }
-        }
-        if (!ostream_fill(
-            os, w - (count_escape + std::streamsize(string.size()))
-         )
-         || !safe_quoted_impl(*os.rdbuf(), string, escape, delim)) {
-          os.setstate(std::ios_base::badbit);
-        }
-      }
-      else if (std::streamsize count_escape
-        = safe_quoted_impl(*os.rdbuf(), string, escape, delim, 0)
-      ){
-        ostream_fill(os, w - (count_escape + std::streamsize(string.size())));
-      }
-      else {
-        os.setstate(std::ios_base::badbit);
-      }
-    }
-    else if (!safe_quoted_impl(*os.rdbuf(), string, escape, delim)) {
-      os.setstate(std::ios_base::badbit);
-    }
-    os.width(0);
-  }
-  return os;
-}
-
-
-template <class Ch, class Tr, class CountAdded = count_none>
-std::streamsize safe_quoted_impl(
-  std::basic_streambuf<Ch, Tr> & buf
-, Ch const * string
-, Ch escape, Ch delim
-, CountAdded count_added = CountAdded{})
-{
-  constexpr auto eof = Tr::eof();
-
-  if (buf.sputc(delim) == eof) {
-    return 0;
-  }
-
-  for (Ch const * p = string; *p; ++p) {
-    if (*p == delim || *p == escape) {
-      if (buf.sputc(escape) == eof) {
-        return 0;
-      }
-      ++count_added;
-    }
-    if (buf.sputc(*p) == eof) {
-      return 0;
-    }
-  }
-
-  if (buf.sputc(delim) == eof) {
-    return 0;
-  }
-
-  return count_added + 2;
-}
+{ return real_quoted_impl<false>(os, string, escape, delim); }
 
 template <class Ch, class Tr>
-std::basic_ostream<Ch, Tr> & quoted_impl(
+std::basic_ostream<Ch, Tr> &
+quoted_impl(
   std::basic_ostream<Ch, Tr> & os
 , Ch const * string
 , Ch escape, Ch delim)
-{
-  typename std::basic_ostream<Ch, Tr>::sentry cerb(os);
-  if (cerb) {
-    const std::streamsize w = os.width();
-    if (w > 0) {
-      const bool left
-        = ((os.flags() & std::ios_base::adjustfield) == std::ios_base::left);
-      if (!left) {
-        std::streamsize count_escape = 0;
-        std::streamsize sz = 0;
-        for (Ch const * p = string; *p; ++p) {
-          if (*p == delim || *p == escape) {
-            ++count_escape;
-          }
-          ++sz;
-        }
-        if (!ostream_fill(os, w - (count_escape + sz + 2))
-         || !safe_quoted_impl(*os.rdbuf(), string, escape, delim)) {
-          os.setstate(std::ios_base::badbit);
-        }
-      }
-      else if (auto count_escape = safe_quoted_impl(
-        *os.rdbuf(), string, escape, delim, 0
-      )){
-        ostream_fill(
-          os, w - (count_escape + std::streamsize(Tr::length(string))));
-      }
-      else {
-        os.setstate(std::ios_base::badbit);
-      }
-      os.width(0);
-    }
-    else if (!safe_quoted_impl(*os.rdbuf(), string, escape, delim)) {
-      os.setstate(std::ios_base::badbit);
-    }
-  }
-  return os;
-}
+{ return real_quoted_impl<true>(
+  os, range_cstr<Ch, Tr>{string}, escape, delim
+); }
 
 
 template<class Quoted>

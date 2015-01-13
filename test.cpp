@@ -114,7 +114,10 @@ int main()
    falcon::iostreams::is_fmt_manipulator<
      decltype(iofmts::right(s))//::template fmt_lock<void>
     >::value*/;
-  std::cout << quoted(iofmts::right(s)) << "]\n";
+  std::cout
+    << quoted(iofmts::right(s)) << "]\n"
+    << quoted(iofmts::setfill(iofmts::setw(s, 10), '%')) << "]\n"
+  ;
 //   std::cout << quoted(iofmts::right(iofmts::setw(s, 12))) << "]\n";
 
 //     << std::left << std::setw(6) << 1 << "]\n"
