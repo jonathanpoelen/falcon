@@ -119,6 +119,8 @@ int main()
     << quoted(iofmts::right(s)) << "]\n"
     << quoted(iofmts::setfill(iofmts::setw(s, 10), '%')) << "]\n"
   ;
+  std::string aa;
+  std::cin >> falcon::iostreams::squoted(aa);
 //   std::cout << quoted(iofmts::right(iofmts::setw(s, 12))) << "]\n";
 
 //     << std::left << std::setw(6) << 1 << "]\n"
