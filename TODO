@@ -397,3 +397,4 @@ escape un sous-ensemble de quoted
 
 iofmts: par les copies les fmt, par reference le reste, value retourne une cref
 
+quoted pour les nombres et toute valeurs. Quote dynamique avec (ou non) des valeurs restreintes (exemple squoted -> "..." ou '...').

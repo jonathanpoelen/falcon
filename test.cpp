@@ -109,12 +109,13 @@ int main()
     << iofmts::right(iofmts::setw(quoted("plo\"p\""), 12)) << "]\n"
   ;
 
-  std::string s("plo\"p\"");
+  const std::string s("plo\"p\"");
   /*std::cout <<
    falcon::iostreams::is_fmt_manipulator<
      decltype(iofmts::right(s))//::template fmt_lock<void>
     >::value*/;
   std::cout
+    << quoted(s) << "]\n"
     << quoted(iofmts::right(s)) << "]\n"
     << quoted(iofmts::setfill(iofmts::setw(s, 10), '%')) << "]\n"
   ;

@@ -226,40 +226,16 @@ quoted_impl(
 ); }
 
 
-template<class Quoted>
-struct quoted_fmt_proxy
-{
-  Quoted const & quoted;
-
-  quoted_fmt_proxy& operator=(const quoted_fmt_proxy&) = delete;
-
-  template<class Stream, class T>
-  void operator()(Stream & stream, T const & x) const
-  { quoted_impl(stream, x, quoted.escape, quoted.delim); }
-};
-
-template<class Quoted>
-quoted_fmt_proxy<Quoted>
-make_quoted_fmt(Quoted const & quoted) noexcept
-{ return {quoted}; }
-
-template <class Ch, class Tr, class T>
-std::basic_ostream<Ch, Tr> & operator<<(
-  std::basic_ostream<Ch, Tr> & os
-, quoted_proxy<T, Ch> const & proxy)
-{ return apply_fmt_manipulator(make_quoted_fmt(proxy), os, proxy.string); }
-
-
-template <class Ch, class Tr, class Alloc>
-std::basic_istream<Ch, Tr> &
-operator>>(
+template <bool EscapeIsDelim, class Ch, class Tr, class String>
+std::basic_istream<Ch, Tr> & real_quoted_impl(
   std::basic_istream<Ch, Tr> & is
-, quoted_proxy<std::basic_string<Ch, Tr, Alloc> &, Ch> const & proxy)
+, String & string
+, Ch escape, Ch delim)
 {
   typedef std::basic_istream<Ch, Tr>      istream_type;
   typedef typename istream_type::int_type int_type;
 
-  proxy.string.clear();
+  string.clear();
 
   typename istream_type::sentry cerb(is);
   if (cerb) {
@@ -275,8 +251,8 @@ operator>>(
     }
 
     Ch c = Tr::to_char_type(cb);
-    if (c != proxy.delim) {
-      is >> proxy.string;
+    if (EscapeIsDelim ? (c != escape) : (c != delim)) {
+      is >> string;
       return is;
     }
 
@@ -291,24 +267,73 @@ operator>>(
       }
 
       c = Tr::to_char_type(cb);
-      if (c == proxy.escape) {
+      if (c == escape) {
         cb = buf.sbumpc();
         if (Tr::eq_int_type(cb, eof)) {
-          is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+          if (!EscapeIsDelim) {
+            is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+          }
           break;
         }
         c = Tr::to_char_type(cb);
+        if (EscapeIsDelim && c != escape) {
+          break;
+        }
       }
-      else if (c == proxy.delim) {
+      else if (!EscapeIsDelim && c == delim) {
         break;
       }
 
-      proxy.string += c;
+      string += c;
     }
   }
 
   return is;
 }
+
+template <class Ch, class Tr, class Alloc>
+std::basic_istream<Ch, Tr> &
+quoted_impl(
+  std::basic_istream<Ch, Tr> & is
+, std::basic_string<Ch, Tr, Alloc> & string
+, Ch escape, Ch delim)
+{
+  if (delim == escape) {
+    return real_quoted_impl<true>(is, string, escape, escape);
+  }
+  return real_quoted_impl<false>(is, string, escape, delim);
+}
+
+
+template<class Quoted>
+struct quoted_fmt_proxy
+{
+  Quoted const & quoted;
+
+  quoted_fmt_proxy& operator=(const quoted_fmt_proxy&) = delete;
+
+  template<class Stream, class T>
+  void operator()(Stream & stream, T & x) const
+  { quoted_impl(stream, x, quoted.escape, quoted.delim); }
+};
+
+template<class Quoted>
+quoted_fmt_proxy<Quoted>
+make_quoted_fmt(Quoted const & quoted) noexcept
+{ return {quoted}; }
+
+template <class Ch, class Tr, class T>
+std::basic_ostream<Ch, Tr> & operator<<(
+  std::basic_ostream<Ch, Tr> & os
+, quoted_proxy<T, Ch> const & proxy)
+{ return apply_fmt_manipulator(make_quoted_fmt(proxy), os, proxy.string); }
+
+template <class Ch, class Tr, class Alloc>
+std::basic_istream<Ch, Tr> &
+operator>>(
+  std::basic_istream<Ch, Tr> & is
+, quoted_proxy<std::basic_string<Ch, Tr, Alloc> &, Ch> const & proxy)
+{ return apply_fmt_manipulator(make_quoted_fmt(proxy), is, proxy.string); }
 
 } // aux_
 
