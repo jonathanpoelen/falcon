@@ -15,21 +15,82 @@ namespace aux_ {
 template<class Str, class Ch, int Opt = 0>
 struct quoted_proxy;
 
+template<class Tag, int Opt, class Str, class... Ts>
+struct extquoted_proxy;
+
+class dynquoted_tag;
+template<class Str, class Ch, class IsDelim, int Opt = 0>
+using dynquoted_proxy = extquoted_proxy<dynquoted_tag, Opt, Str, Ch, IsDelim>;
+
+class qquoted_tag;
+template<class Str, class Ch, int Opt = 0>
+using qquoted_proxy = extquoted_proxy<qquoted_tag, Opt, Str, Ch>;
+
+class tquoted_tag;
+template<class Str, class Policy>
+using tquoted_proxy = extquoted_proxy<tquoted_tag, 0, Str, Policy>;
+
 enum quoted_options {
   DEFAULT_QUOTED
 , ALWAYS_QUOTED = 1 << 0
 , DUPESC_QUOTED = 1 << 1
+, UNIQUE_QUOTED = 1 << 2
+, NOLEFT_QUOTED = 1 << 3
 };
 
-template<class Str, class Ch, class Policy, int Opt = 0>
-struct dynquoted_proxy;
-
-struct string_dynquoted {
-  constexpr string_dynquoted() noexcept {}
+struct dynquoted_string {
+  constexpr dynquoted_string() noexcept {}
 
   template<class Ch>
   constexpr bool operator()(Ch c) const noexcept
   { return c == Ch('\'') || c == Ch('"'); }
+};
+
+struct tquoted_policy
+{
+  constexpr tquoted_policy() noexcept {}
+
+  static constexpr char escape() noexcept
+  { return '\\'; }
+
+  static constexpr bool always_quoted() noexcept
+  { return false; }
+
+  template<class Ch>
+  static constexpr bool is_simple_delimiter(Ch c) noexcept
+  { return c == Ch('\''); }
+
+  template<class Ch>
+  static constexpr bool is_interpret_delimiter(Ch c) noexcept
+  { return c == Ch('"'); }
+
+  template<class String, class Ch>
+  static void simple_char(String & str, Ch c) noexcept
+  { str += c; }
+
+  template<class String, class Ch, class Buf>
+  static void interpret_char(String & str, Ch c, Buf const &) noexcept
+  {
+    switch (c) {
+      case 'n': str += '\n'; break;
+      case 't': str += '\t'; break;
+      case 'r': str += '\r'; break;
+      default: str += Ch('\\'); str += c;
+    }
+  }
+
+  struct validator
+  {
+    template<class Ch>
+    constexpr bool operator()(Ch const &) const noexcept
+    { return true; }
+  };
+
+  static validator simple_checker() noexcept
+  { return {}; }
+
+  static validator interpret_checker() noexcept
+  { return {}; }
 };
 
 template <class T, bool = is_fmt_manipulator<T>::value>
@@ -64,33 +125,36 @@ quoted(
 { return {s, escape, delim}; }
 
 
-// escape_string(s, delim) == quoted(s, delim, delim)
+///\brief  escape_string(s, delim) == quoted(s, delim, delim)
 template<class T, class Ch>
 auto escape_string(T & s, Ch delim='\"')
 ->decltype(quoted(s, delim, delim))
 { return quoted(s, delim, delim); }
 
 
+///\brief  force the presence of \a escape
 template<class Ch, class Tr, class Alloc>
 aux_::quoted_proxy<std::basic_string<Ch, Tr, Alloc> &, Ch, aux_::ALWAYS_QUOTED>
 aquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\"', Ch delim='\"')
 { return {s, escape, delim}; }
 
 
+/// \brief  the delimiter is ' or "
 template<class Ch, class Tr, class Alloc>
 aux_::dynquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, Ch, aux_::string_dynquoted>
+, Ch, aux_::dynquoted_string>
 squoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\\')
-{ return {s, escape, aux_::string_dynquoted{}}; }
+{ return {s, escape, aux_::dynquoted_string{}}; }
 
 
+/// \brief  force the presence of delimiter ' or "
 template<class Ch, class Tr, class Alloc>
 aux_::dynquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, Ch, aux_::string_dynquoted, aux_::ALWAYS_QUOTED>
+, Ch, aux_::dynquoted_string, aux_::ALWAYS_QUOTED>
 asquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\\')
-{ return {s, escape, aux_::string_dynquoted{}}; }
+{ return {s, escape, aux_::dynquoted_string{}}; }
 
 
 template<class Ch, class Tr, class Alloc, class IsDelim>
@@ -101,12 +165,45 @@ dquoted(std::basic_string<Ch, Tr, Alloc> & s, IsDelim is_delim, Ch escape='\\')
 { return {s, escape, is_delim}; }
 
 
+///\brief  the stream is malformed if \a is_delim(c) not return false, true, 0 or 1
 template<class Ch, class Tr, class Alloc, class IsDelim>
 aux_::dynquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, Ch, IsDelim>
+, Ch, IsDelim, aux_::ALWAYS_QUOTED>
 adquoted(std::basic_string<Ch, Tr, Alloc> & s, IsDelim is_delim, Ch escape='\\')
 { return {s, escape, is_delim}; }
+
+
+template<class Ch, class Tr, class Alloc>
+aux_::qquoted_proxy<
+  std::basic_string<Ch, Tr, Alloc> &
+, Ch>
+qquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
+{ return {s, left_delim, right_delim}; }
+
+
+template<class Ch, class Tr, class Alloc>
+aux_::qquoted_proxy<
+  std::basic_string<Ch, Tr, Alloc> &
+, Ch, (aux_::UNIQUE_QUOTED | aux_::NOLEFT_QUOTED)>
+tag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
+{ return {s, left_delim, right_delim}; }
+
+
+template<class Ch, class Tr, class Alloc>
+aux_::qquoted_proxy<
+  std::basic_string<Ch, Tr, Alloc> &
+, Ch, aux_::UNIQUE_QUOTED>
+qtag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
+{ return {s, left_delim, right_delim}; }
+
+
+template<class Ch, class Tr, class Alloc, class Policy = aux_::tquoted_policy>
+aux_::tquoted_proxy<
+  std::basic_string<Ch, Tr, Alloc> &
+, Policy>
+tquoted(std::basic_string<Ch, Tr, Alloc> & s, Policy policy = Policy())
+{ return {s, policy}; }
 
 
 namespace aux_ {
@@ -156,16 +253,39 @@ struct quoted_proxy
   constexpr static int opt() { return Opt; }
 };
 
-template <class Str, class Ch, class Policy, int Opt>
-struct dynquoted_proxy
+template <int Opt, class Str, class Ch, class IsDelim>
+struct extquoted_proxy<dynquoted_tag, Opt, Str, Ch, IsDelim>
 {
   Str string;
   Ch  escape;
-  Policy policy;
+  IsDelim is_delim;
 
-  dynquoted_proxy& operator=(const dynquoted_proxy&) = delete;
+  extquoted_proxy& operator=(const extquoted_proxy&) = delete;
 
   constexpr static int opt() { return Opt; }
+};
+
+template <int Opt, class Str, class Ch>
+struct extquoted_proxy<qquoted_tag, Opt, Str, Ch>
+{
+  Str string;
+  Ch  left;
+  Ch  right;
+
+  extquoted_proxy& operator=(const extquoted_proxy&) = delete;
+
+  constexpr static int opt() { return Opt; }
+};
+
+template <class Str, class Policy>
+struct extquoted_proxy<tquoted_tag, 0, Str, Policy>
+{
+  Str string;
+  Policy policy;
+
+  extquoted_proxy& operator=(const extquoted_proxy&) = delete;
+
+  constexpr static int opt() { return 0; }
 };
 
 struct count_none {
@@ -302,13 +422,25 @@ quoted_impl(
   os, range_cstr<Ch, Tr>{string}, escape, delim
 ); }
 
+struct escape_quoted_back_insert {
+  template<class String, class Ch>
+  void operator()(String & str, Ch c) const
+  { str += c; }
+};
 
-template <int opt, class Ch, class Tr, class String>
-std::basic_istream<Ch, Tr> & escape_quoted_impl(
+using escape_quoted_validator = tquoted_policy::validator;
+
+template <
+  int opt, class Ch, class Tr, class String
+, class BackInsert = escape_quoted_back_insert
+, class IsValid = escape_quoted_validator>
+std::basic_istream<Ch, Tr> &
+escape_quoted_impl(
   std::basic_istream<Ch, Tr> & is
 , std::basic_streambuf<Ch, Tr> & buf
 , String & string
-, Ch escape, Ch delim)
+, Ch escape, Ch delim
+, BackInsert back_insert = BackInsert(), IsValid is_valid = IsValid())
 {
   typedef std::basic_istream<Ch, Tr>      istream_type;
   typedef typename istream_type::int_type int_type;
@@ -336,8 +468,15 @@ std::basic_istream<Ch, Tr> & escape_quoted_impl(
       if ((opt & DUPESC_QUOTED) && c != escape) {
         break;
       }
+      back_insert(string, c);
+      continue;
     }
     else if (!(opt & DUPESC_QUOTED) && c == delim) {
+      break;
+    }
+
+    if (!is_valid(c)) {
+      is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
       break;
     }
 
@@ -360,14 +499,12 @@ std::basic_istream<Ch, Tr> & real_quoted_impl(
 
   typename istream_type::sentry cerb(is);
   if (cerb) {
-    constexpr auto eof = Tr::eof();
-
     std::basic_streambuf<Ch, Tr> & buf = *is.rdbuf();
 
     {
       const int_type cb = buf.sgetc();
 
-      if (Tr::eq_int_type(cb, eof)) {
+      if (Tr::eq_int_type(cb, Tr::eof())) {
         is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
         return is;
       }
@@ -391,24 +528,11 @@ std::basic_istream<Ch, Tr> & real_quoted_impl(
   return is;
 }
 
-template <int opt, class Ch, class Tr, class Alloc>
-std::basic_istream<Ch, Tr> &
-quoted_impl(
-  std::basic_istream<Ch, Tr> & is
-, std::basic_string<Ch, Tr, Alloc> & string
-, Ch escape, Ch delim)
-{
-  if ((opt & DUPESC_QUOTED) || delim == escape) {
-    return real_quoted_impl<opt | DUPESC_QUOTED>(is, string, escape, escape);
-  }
-  return real_quoted_impl<opt>(is, string, escape, delim);
-}
 
-
-template <int opt, class Ch, class Tr, class String, class Policy>
+template <int opt, class Ch, class Tr, class String, class IsDelim>
 std::basic_istream<Ch, Tr> & dynquoted_impl(
   std::basic_istream<Ch, Tr> & is
-, String & string, Ch escape, Policy const & policy)
+, String & string, Ch escape, IsDelim const & is_delim)
 {
   typedef std::basic_istream<Ch, Tr>      istream_type;
   typedef typename istream_type::int_type int_type;
@@ -417,21 +541,19 @@ std::basic_istream<Ch, Tr> & dynquoted_impl(
 
   typename istream_type::sentry cerb(is);
   if (cerb) {
-    constexpr auto eof = Tr::eof();
-
     std::basic_streambuf<Ch, Tr> & buf = *is.rdbuf();
 
     const int_type cb = buf.sgetc();
 
-    if (Tr::eq_int_type(cb, eof)) {
+    if (Tr::eq_int_type(cb, Tr::eof())) {
       is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
       return is;
     }
 
     const Ch c = Tr::to_char_type(cb);
-    if (const auto is_delim = policy(c)) {
+    if (const auto res_delim = is_delim(c)) {
       if (c == escape) {
-        if ((opt & DUPESC_QUOTED) || is_delim == 1) {
+        if ((opt & DUPESC_QUOTED) || res_delim == 1) {
           buf.sbumpc();
           escape_quoted_impl<opt | DUPESC_QUOTED>(is, buf, string, escape, c);
         }
@@ -455,6 +577,132 @@ std::basic_istream<Ch, Tr> & dynquoted_impl(
 }
 
 
+template <int opt, class Ch, class Tr, class String>
+std::basic_istream<Ch, Tr> & qquoted_impl(
+  std::basic_istream<Ch, Tr> & is
+, String & string, Ch left, Ch right)
+{
+  typedef std::basic_istream<Ch, Tr>      istream_type;
+  typedef typename istream_type::int_type int_type;
+
+  string.clear();
+
+  typename istream_type::sentry cerb(is);
+  if (cerb) {
+    constexpr auto eof = Tr::eof();
+
+    std::basic_streambuf<Ch, Tr> & buf = *is.rdbuf();
+
+    int_type cb = buf.sgetc();
+
+    if (Tr::eq_int_type(cb, eof)) {
+      is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+      return is;
+    }
+
+    Ch c = Tr::to_char_type(cb);
+    if (c != left) {
+        is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+        return is;
+    }
+
+    buf.sbumpc();
+
+    for (unsigned depth = 1;;)
+    {
+      cb = buf.sbumpc();
+      if (Tr::eq_int_type(cb, eof)) {
+        is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+        break;
+      }
+
+      c = Tr::to_char_type(cb);
+      if (c == right) {
+        if ((opt & UNIQUE_QUOTED) || !--depth) {
+          break;
+        }
+      }
+      else if (!(opt & UNIQUE_QUOTED) && c == left) {
+        ++depth;
+      }
+      else if ((opt & NOLEFT_QUOTED) && c == left) {
+        is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+        break;
+      }
+
+      string += c;
+    }
+  }
+  return is;
+}
+
+
+template <class Ch, class Tr, class String, class Policy>
+std::basic_istream<Ch, Tr> & tquoted_impl(
+  std::basic_istream<Ch, Tr> & is
+, String & string, Policy const & policy)
+{
+  typedef std::basic_istream<Ch, Tr>      istream_type;
+  typedef typename istream_type::int_type int_type;
+
+  string.clear();
+
+  typename istream_type::sentry cerb(is);
+  if (cerb) {
+    std::basic_streambuf<Ch, Tr> & buf = *is.rdbuf();
+
+    const int_type cb = buf.sgetc();
+
+    if (Tr::eq_int_type(cb, Tr::eof())) {
+      is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+      return is;
+    }
+
+    const Ch escape(policy.escape());
+    const Ch c = Tr::to_char_type(cb);
+    if (policy.is_simple_delimiter(c)) {
+      buf.sbumpc();
+      auto inserter = [&policy](String & str, Ch c) {
+        policy.simple_char(str, c);
+      };
+      if (c == escape) {
+        escape_quoted_impl<DUPESC_QUOTED>(
+          is, buf, string, escape, c, inserter, policy.simple_checker()
+        );
+      }
+      else {
+        escape_quoted_impl<0>(
+          is, buf, string, escape, c, inserter, policy.simple_checker()
+        );
+      }
+    }
+    else if (policy.is_interpret_delimiter(c)) {
+      buf.sbumpc();
+      auto inserter = [&buf, &policy](String & str, Ch c) {
+        policy.interpret_char(str, c, buf);
+      };
+      if (c == escape) {
+        escape_quoted_impl<DUPESC_QUOTED>(
+          is, buf, string, escape, c, inserter, policy.interpret_checker()
+        );
+      }
+      else {
+        escape_quoted_impl<0>(
+          is, buf, string, escape, c, inserter, policy.interpret_checker()
+        );
+      }
+    }
+    else if (policy.always_quoted()) {
+      is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+    }
+    else {
+      is >> string;
+    }
+  }
+  return is;
+}
+
+
 template<class Quoted>
 struct quoted_fmt_proxy
 {
@@ -468,7 +716,16 @@ struct quoted_fmt_proxy
 
   template<class Ch, class Tr, class T>
   void operator()(std::basic_istream<Ch, Tr> & is, T & x) const
-  { quoted_impl<Quoted::opt()>(is, x, quoted.escape, quoted.delim); }
+  {
+    if ((Quoted::opt() & DUPESC_QUOTED) || quoted.delim == quoted.escape) {
+      real_quoted_impl<Quoted::opt() | DUPESC_QUOTED>(
+        is, x, quoted.escape, quoted.escape
+      );
+    }
+    else {
+      real_quoted_impl<Quoted::opt()>(is, x, quoted.escape, quoted.delim);
+    }
+  }
 };
 
 template<class Quoted>
@@ -476,25 +733,25 @@ quoted_fmt_proxy<Quoted>
 make_quoted_fmt(Quoted const & quoted) noexcept
 { return {quoted}; }
 
-template <class Ch, class Tr, class T, int Opt>
+template <class Str, class Ch, class Tr, int Opt>
 std::basic_ostream<Ch, Tr> &
 operator<<(
   std::basic_ostream<Ch, Tr> & os
-, quoted_proxy<T, Ch, Opt> const & proxy)
+, quoted_proxy<Str, Ch, Opt> const & proxy)
 { return apply_fmt_manipulator(make_quoted_fmt(proxy), os, proxy.string); }
 
-template <class T, class Ch, class Tr>
+template <class Str, class Ch, class Tr, int Opt>
 std::basic_istream<Ch, Tr> &
 operator>>(
   std::basic_istream<Ch, Tr> & is
-, quoted_proxy<T, Ch> const & proxy)
+, quoted_proxy<Str, Ch, Opt> const & proxy)
 { return apply_fmt_manipulator(make_quoted_fmt(proxy), is, proxy.string); }
 
-template <class T, class Ch, class Tr>
+template <class Ch, class Tr, class Tag, int Opt, class Str, class ... Ts>
 std::basic_istream<Ch, Tr> &
 operator>>(
   std::basic_istream<Ch, Tr> & is
-, quoted_proxy<T, Ch, aux_::ALWAYS_QUOTED> const & proxy)
+, extquoted_proxy<Tag, Opt, Str, Ts...> const & proxy)
 { return apply_fmt_manipulator(make_quoted_fmt(proxy), is, proxy.string); }
 
 
@@ -507,20 +764,58 @@ struct dynquoted_fmt_proxy
 
   template<class Ch, class Tr, class T>
   void operator()(std::basic_istream<Ch, Tr> & is, T & x) const
-  { dynquoted_impl<Quoted::opt()>(is, x, quoted.escape, quoted.policy); }
+  { dynquoted_impl<Quoted::opt()>(is, x, quoted.escape, quoted.is_delim); }
 };
 
-template<class Quoted>
-dynquoted_fmt_proxy<Quoted>
-make_dynquoted_fmt(Quoted const & quoted) noexcept
+template<class Str, class Ch, class IsDelim, int Opt>
+dynquoted_fmt_proxy<dynquoted_proxy<Str, Ch, IsDelim, Opt>>
+make_quoted_fmt(dynquoted_proxy<Str, Ch, IsDelim, Opt> const & quoted) noexcept
 { return {quoted}; }
 
-template <class T, class Ch, class Tr, class Policy, int Opt>
-std::basic_istream<Ch, Tr> &
-operator>>(
-  std::basic_istream<Ch, Tr> & is
-, dynquoted_proxy<T, Ch, Policy, Opt> const & proxy)
-{ return apply_fmt_manipulator(make_dynquoted_fmt(proxy), is, proxy.string); }
+
+template<class Quoted>
+struct qquoted_fmt_proxy
+{
+  Quoted const & quoted;
+
+  qquoted_fmt_proxy& operator=(const qquoted_fmt_proxy&) = delete;
+
+  template<class Ch, class Tr, class T>
+  void operator()(std::basic_istream<Ch, Tr> & is, T & x) const
+  {
+    if ((Quoted::opt() & UNIQUE_QUOTED) || quoted.left == quoted.right) {
+      qquoted_impl<Quoted::opt() | UNIQUE_QUOTED>(
+        is, x, quoted.left, quoted.right
+      );
+    }
+    else {
+      qquoted_impl<Quoted::opt()>(is, x, quoted.left, quoted.right);
+    }
+  }
+};
+
+template<int Opt, class Str, class Ch>
+qquoted_fmt_proxy<qquoted_proxy<Str, Ch, Opt>>
+make_quoted_fmt(qquoted_proxy<Str, Ch, Opt> const & quoted) noexcept
+{ return {quoted}; }
+
+
+template<class Quoted>
+struct tquoted_fmt_proxy
+{
+  Quoted const & quoted;
+
+  tquoted_fmt_proxy& operator=(const tquoted_fmt_proxy&) = delete;
+
+  template<class Ch, class Tr, class T>
+  void operator()(std::basic_istream<Ch, Tr> & is, T & x) const
+  { tquoted_impl(is, x, quoted.policy); }
+};
+
+template<class Str, class Policy>
+tquoted_fmt_proxy<tquoted_proxy<Str, Policy>>
+make_quoted_fmt(tquoted_proxy<Str, Policy> const & quoted) noexcept
+{ return {quoted}; }
 
 } // aux_
 
