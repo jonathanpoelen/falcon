@@ -393,12 +393,15 @@ separateur pour les conteneurs r{...}
 format_context
 unsafe_format (check + format)
 
-iofmts: par les copies les fmt, par reference le reste, value retourne une cref
-
-fonction escape_string(x,c) = quoted(x,c,c) ; (faire un objet specifique pour eviter la comparaison ?)
+simplifié les functions dans intrusive_data_streambuf en les utilisant avec un stream (xxx(stream, val_a_modifie):bool)
 
 quoted pour les nombres et toute valeurs (faire un quotedbuf ?).
 
 iomanip.quoted2: fonctionne comme quoted sauf que le délimiteur est séparé en 2 (debut, fin) (quoted2(s,'[',']','\\')). Faire aussi tquoted2.
 
 un quoted qui supporte les options always_quoted, string_quoted, count_quoted ou default_quoted. Un quoted générique (mais complexe ?) peut se faire avec le quoted2 dynamique à double interpretation.
+
+un quoted qui ne prend pas en compte le premier délimiter (une fonction ?). unquoted(delim, quoted<T>) (delim n'est pas toujours obligatoire. Baser unquoted sur tquoted ?)
+
+
+
