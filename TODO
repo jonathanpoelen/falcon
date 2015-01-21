@@ -403,5 +403,14 @@ un quoted qui supporte les options always_quoted, string_quoted, count_quoted ou
 
 un quoted qui ne prend pas en compte le premier délimiter (une fonction ?). unquoted(delim, quoted<T>) (delim n'est pas toujours obligatoire. Baser unquoted sur tquoted ?)
 
+quoted avec des chaînes comme délimiteur quoted(s, R"(""")") (droite et gauche). Ajouter un can_have_long_delimiter et des lecteurs pour doite/gauche policy.get_range_long_delimiter_[right/left]
+
+prendre en compte ios_base::width() dans quoted
+
+réimplementé le >>string pour ne pas faire unget et les op inutiles.
+
+quoted lance-t-il une exception si le flag est activé ?
+Le state est-il bien set si le streambuf lance une exception ?
+
 
 
