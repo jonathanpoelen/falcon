@@ -76,6 +76,12 @@ struct escape_policy_base
     return true;
   }
 
+  static constexpr bool simple_char_is_valid(Ch const &) noexcept
+  { return true; }
+
+  static constexpr bool interpret_char_is_valid(Ch const &) noexcept
+  { return true; }
+
 private:
   Ch right_;
   Ch escape_;
@@ -162,6 +168,68 @@ template<class Ch, bool Can = true>
 using pquoted_cannot_be_escape_policy_base
   = pquoted_can_be_escape_policy<pquoted_policy_base<Ch>, !Can>;
 
+template<class Policy>
+struct pquoted_return_interpret_push_back_is_true_policy
+: Policy
+{
+  USING_POLICY_CTOR(pquoted_return_interpret_push_back_is_true_policy);
+
+  template<class String, class Ch, class Buf>
+  bool interpret_push_back(String & str, Ch c, Buf const & buf) const
+  {
+    Policy::policy(str, c, buf);
+    return true;
+  }
+};
+
+template<class Ch>
+using pquoted_return_interpret_push_back_is_true_policy_base
+  = pquoted_return_interpret_push_back_is_true_policy<pquoted_policy_base<Ch>>;
+
+template<class Policy, bool Keep = true>
+struct pquoted_simple_keep_escape_policy
+: Policy
+{
+  USING_POLICY_CTOR(pquoted_simple_keep_escape_policy);
+
+  static constexpr bool simple_keep_escape() noexcept
+  { return Keep; }
+};
+
+template<class Ch, bool Keep = true>
+using pquoted_simple_keep_escape_policy_base
+  = pquoted_simple_keep_escape_policy<pquoted_policy_base<Ch>, Keep>;
+
+template<class Policy, bool Keep = false>
+using pquoted_simple_nokeep_escape_policy
+  = pquoted_simple_keep_escape_policy<Policy, !Keep>;
+
+template<class Ch, bool Keep = false>
+using pquoted_simple_nokeep_escape_policy_base
+  = pquoted_simple_keep_escape_policy_base<Ch, !Keep>;
+
+template<class Policy, bool Keep = true>
+struct pquoted_interpret_keep_escape_policy
+: Policy
+{
+  USING_POLICY_CTOR(pquoted_interpret_keep_escape_policy);
+
+  static constexpr bool interpret_keep_escape() noexcept
+  { return Keep; }
+};
+
+template<class Ch, bool Keep = true>
+using pquoted_interpret_keep_escape_policy_base
+  = pquoted_interpret_keep_escape_policy<pquoted_policy_base<Ch>, Keep>;
+
+template<class Policy, bool Keep = false>
+using pquoted_interpret_nokeep_escape_policy
+  = pquoted_interpret_keep_escape_policy<Policy, !Keep>;
+
+template<class Ch, bool Keep = false>
+using pquoted_interpret_nokeep_escape_policy_base
+  = pquoted_interpret_keep_escape_policy_base<Ch, !Keep>;
+
 
 template<class Ch>
 struct tquoted_policy_base
@@ -202,6 +270,12 @@ struct tquoted_policy_base
     }
     return true;
   }
+
+  static constexpr bool simple_char_is_valid(Ch const &) noexcept
+  { return true; }
+
+  static constexpr bool interpret_char_is_valid(Ch const &) noexcept
+  { return true; }
 
 private:
   Ch escape_;
@@ -294,6 +368,10 @@ private:
   FuncDelim fdelim_;
 };
 
+template<class FuncDelim, class Ch>
+using funcdelim_quoted_policy_base
+  = funcdelim_quoted_policy<FuncDelim, tquoted_policy_base<Ch>>;
+
 template<class Policy>
 struct tquoted_policy_to_pquoted_policy
 : pquoted_can_be_escape_policy<pquoted_noleft_policy<Policy>>
@@ -326,7 +404,7 @@ struct tquoted_policy_to_pquoted_policy
 #undef USING_POLICY_COPY_CTOR
 
 
-template<class Policy>
+template<class Policy, bool KeepEscape>
 class escaped_char_base
 {
 protected:
@@ -352,13 +430,20 @@ public:
 
   constexpr bool noleft() const noexcept
   { return policy.noleft(); }
+
+  static constexpr bool keep_escape() noexcept
+  { return KeepEscape; }
 };
 
 template<class Policy, bool KeepEscape = true>
 struct escaped_simple_char
-: escaped_char_base<Policy>
+: escaped_char_base<Policy, KeepEscape>
 {
-  using escaped_char_base<Policy>::escaped_char_base;
+  using escaped_char_base<Policy, KeepEscape>::escaped_char_base;
+
+  template<class Ch>
+  constexpr bool is_valid(Ch c) const noexcept
+  { return this->policy.simple_char_is_valid(c); }
 
   template<class String, class Ch>
   void push_back(String & str, Ch c) const
@@ -381,15 +466,18 @@ template<
   class Policy, bool KeepEscape = true
 , class Ch = char, class Tr = std::char_traits<Ch>>
 struct escaped_interpret_char
-: escaped_char_base<Policy>
+: escaped_char_base<Policy, KeepEscape>
 {
   constexpr escaped_interpret_char(
     Policy const & policy
   , std::basic_streambuf<Ch, Tr> & buf
   ) noexcept
-  : escaped_char_base<Policy>(policy)
+  : escaped_char_base<Policy, KeepEscape>(policy)
   , buf(buf)
   {}
+
+  constexpr bool is_valid(Ch c) const noexcept
+  { return this->policy.interpret_char_is_valid(c); }
 
   template<class Alloc>
   void push_back(std::basic_string<Ch, Tr, Alloc> & str, Ch c) const
@@ -487,7 +575,7 @@ template<class Ch, class Tr, class Alloc, class IsDelim>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
 , aux_::tquoted_policy_to_pquoted_policy<
-    aux_::funcdelim_quoted_policy<IsDelim, aux_::tquoted_policy_base<Ch>>
+    aux_::funcdelim_quoted_policy_base<IsDelim, Ch>
 >>
 dquoted(std::basic_string<Ch, Tr, Alloc> & s, IsDelim is_delim, Ch escape='\\')
 { return {s, {is_delim, escape}}; }
@@ -805,12 +893,26 @@ void escape_pquoted_impl(
         break;
       }
 
-      if (policy.interpret_mode() && policy.is_right(c)) {
+      if (policy.interpret_mode()) {
+        if (policy.is_right(c)) {
+          string += c;
+        }
+        else if (policy.keep_escape()) {
+          policy.push_back(string, c);
+        }
+      }
+      else if (!policy.keep_escape() || !policy.is_right(c)) {
+        policy.push_back(string, c);
+      }
+
+      if ((policy.interpret_mode() || policy.keep_escape())
+       && policy.is_right(c)) {
         string += c;
       }
       else {
         policy.push_back(string, c);
       }
+
       continue;
     }
     else if ((can_be_escaped ? !delim_is_escape : 1) && policy.is_right(c)) {
@@ -822,6 +924,11 @@ void escape_pquoted_impl(
       ++depth;
     }
     else if (noleft && c == left) {
+      is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+      break;
+    }
+
+    if (!policy.is_valid(c)) {
       is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
       break;
     }
