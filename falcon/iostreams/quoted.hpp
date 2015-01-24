@@ -25,17 +25,44 @@ using pescaped_proxy = pquoted_proxy<Str, Policy, escape_mode::simple>;
 template<class Str, class Policy>
 using ipescaped_proxy = pquoted_proxy<Str, Policy, escape_mode::interpret>;
 
+template <class T, bool = is_fmt_manipulator<T>::value>
+struct make_quoted_with_fmt {};
+}
+
+namespace quoted_policies {
+
+namespace aux_ {
+  template <class Ch>
+  struct is_valid_and_interpret_push_back_policy_base
+  {
+    template<class String, class Buf>
+    static bool interpret_push_back(String & str, Ch c, Buf const &)
+    {
+      switch (c) {
+        case 'n': str += '\n'; break;
+        case 't': str += '\t'; break;
+        case 'r': str += '\r'; break;
+        default: return false;
+      }
+      return true;
+    }
+
+    static constexpr bool simple_char_is_valid(Ch const &) noexcept
+    { return true; }
+
+    static constexpr bool interpret_char_is_valid(Ch const &) noexcept
+    { return true; }
+  };
+}
 
 template<class Ch>
-struct escape_policy_base
+struct escaped_policy_base
+: aux_::is_valid_and_interpret_push_back_policy_base<Ch>
 {
-  constexpr escape_policy_base(Ch right, Ch escape = Ch{}) noexcept
+  constexpr escaped_policy_base(Ch right, Ch escape = Ch{}) noexcept
   : right_(right)
   , escape_(escape)
   {}
-
-  static constexpr bool always_quoted() noexcept
-  { return true; }
 
   constexpr bool can_be_escaped() const noexcept
   { return Ch{} != escape_; }
@@ -64,37 +91,23 @@ struct escape_policy_base
   static constexpr bool interpret_keep_escape() noexcept
   { return true; }
 
-  template<class String, class Buf>
-  bool interpret_push_back(String & str, Ch c, Buf const &) const
-  {
-    switch (c) {
-      case 'n': str += '\n'; break;
-      case 't': str += '\t'; break;
-      case 'r': str += '\r'; break;
-      default: return false;
-    }
-    return true;
-  }
-
-  static constexpr bool simple_char_is_valid(Ch const &) noexcept
-  { return true; }
-
-  static constexpr bool interpret_char_is_valid(Ch const &) noexcept
-  { return true; }
-
 private:
   Ch right_;
   Ch escape_;
 };
 
+
 template<class Ch>
-struct pquoted_policy_base
-: escape_policy_base<Ch>
+struct quoted_policy_base
+: escaped_policy_base<Ch>
 {
-  constexpr pquoted_policy_base(Ch left, Ch right, Ch escape = Ch{}) noexcept
-  : escape_policy_base<Ch>(right, escape)
+  constexpr quoted_policy_base(Ch left, Ch right, Ch escape = Ch{}) noexcept
+  : escaped_policy_base<Ch>(right, escape)
   , left_(left)
   {}
+
+  static constexpr bool always_quoted() noexcept
+  { return true; }
 
   constexpr bool is_simple_left(Ch c) const noexcept
   { return c == left_; }
@@ -115,64 +128,51 @@ private:
   using Policy::Policy
 
 template<class Policy>
-struct pquoted_nodepth_policy
+struct nodepth_policy
 : Policy
 {
-  USING_POLICY_CTOR(pquoted_nodepth_policy);
+  USING_POLICY_CTOR(nodepth_policy);
 
   static constexpr bool with_depth() noexcept
   { return false; }
 };
 
-template<class Ch>
-using pquoted_nodepth_policy_base
-  = pquoted_nodepth_policy<pquoted_policy_base<Ch>>;
 
 template<class Policy>
-struct pquoted_noleft_policy
-: pquoted_nodepth_policy<Policy>
+struct noleft_policy
+: nodepth_policy<Policy>
 {
   USING_POLICY_COPY_CTOR(
-    pquoted_noleft_policy
-  , pquoted_nodepth_policy<Policy>
+    noleft_policy
+  , nodepth_policy<Policy>
   , Policy);
-  using pquoted_nodepth_policy<Policy>::pquoted_nodepth_policy;
+  using nodepth_policy<Policy>::nodepth_policy;
 
   static constexpr bool noleft() noexcept
   { return true; }
 };
 
-template<class Ch>
-using pquoted_noleft_policy_base
-  = pquoted_noleft_policy<pquoted_policy_base<Ch>>;
 
 template<class Policy, bool Can = true>
-struct pquoted_can_be_escape_policy
+struct can_be_escaped_policy
 : Policy
 {
-  USING_POLICY_CTOR(pquoted_can_be_escape_policy);
+  USING_POLICY_CTOR(can_be_escaped_policy);
 
   static constexpr bool can_be_escaped() noexcept
   { return Can; }
 };
 
 template<class Ch, bool Can = true>
-using pquoted_can_be_escape_policy_base
-  = pquoted_can_be_escape_policy<pquoted_policy_base<Ch>, Can>;
+using cannot_be_escape_policy
+  = can_be_escaped_policy<quoted_policy_base<Ch>, !Can>;
 
-template<class Ch, bool Can = true>
-using pquoted_cannot_be_escape_policy
-  = pquoted_can_be_escape_policy<pquoted_policy_base<Ch>, !Can>;
-
-template<class Ch, bool Can = true>
-using pquoted_cannot_be_escape_policy_base
-  = pquoted_can_be_escape_policy<pquoted_policy_base<Ch>, !Can>;
 
 template<class Policy>
-struct pquoted_return_interpret_push_back_is_true_policy
+struct interpret_push_back_return_always_true_policy
 : Policy
 {
-  USING_POLICY_CTOR(pquoted_return_interpret_push_back_is_true_policy);
+  USING_POLICY_CTOR(interpret_push_back_return_always_true_policy);
 
   template<class String, class Ch, class Buf>
   bool interpret_push_back(String & str, Ch c, Buf const & buf) const
@@ -182,59 +182,61 @@ struct pquoted_return_interpret_push_back_is_true_policy
   }
 };
 
-template<class Ch>
-using pquoted_return_interpret_push_back_is_true_policy_base
-  = pquoted_return_interpret_push_back_is_true_policy<pquoted_policy_base<Ch>>;
 
 template<class Policy, bool Keep = true>
-struct pquoted_simple_keep_escape_policy
+struct simple_keep_escape_policy
 : Policy
 {
-  USING_POLICY_CTOR(pquoted_simple_keep_escape_policy);
+  USING_POLICY_CTOR(simple_keep_escape_policy);
 
   static constexpr bool simple_keep_escape() noexcept
   { return Keep; }
 };
 
-template<class Ch, bool Keep = true>
-using pquoted_simple_keep_escape_policy_base
-  = pquoted_simple_keep_escape_policy<pquoted_policy_base<Ch>, Keep>;
-
 template<class Policy, bool Keep = false>
-using pquoted_simple_nokeep_escape_policy
-  = pquoted_simple_keep_escape_policy<Policy, !Keep>;
+using simple_nokeep_escape_policy
+  = simple_keep_escape_policy<Policy, !Keep>;
 
-template<class Ch, bool Keep = false>
-using pquoted_simple_nokeep_escape_policy_base
-  = pquoted_simple_keep_escape_policy_base<Ch, !Keep>;
 
 template<class Policy, bool Keep = true>
-struct pquoted_interpret_keep_escape_policy
+struct interpret_keep_escape_policy
 : Policy
 {
-  USING_POLICY_CTOR(pquoted_interpret_keep_escape_policy);
+  USING_POLICY_CTOR(interpret_keep_escape_policy);
 
   static constexpr bool interpret_keep_escape() noexcept
   { return Keep; }
 };
 
-template<class Ch, bool Keep = true>
-using pquoted_interpret_keep_escape_policy_base
-  = pquoted_interpret_keep_escape_policy<pquoted_policy_base<Ch>, Keep>;
+template<class Policy, bool Keep = false>
+using interpret_nokeep_escape_policy
+  = interpret_keep_escape_policy<Policy, !Keep>;
+
+
+template<class Policy, bool Keep = true>
+struct keep_escape_policy
+: Policy
+{
+  USING_POLICY_CTOR(keep_escape_policy);
+
+  static constexpr bool simple_keep_escape() noexcept
+  { return Keep; }
+
+  static constexpr bool interpret_keep_escape() noexcept
+  { return Keep; }
+};
+
 
 template<class Policy, bool Keep = false>
-using pquoted_interpret_nokeep_escape_policy
-  = pquoted_interpret_keep_escape_policy<Policy, !Keep>;
-
-template<class Ch, bool Keep = false>
-using pquoted_interpret_nokeep_escape_policy_base
-  = pquoted_interpret_keep_escape_policy_base<Ch, !Keep>;
+using nokeep_escape_policy
+  = keep_escape_policy<Policy, !Keep>;
 
 
 template<class Ch>
-struct tquoted_policy_base
+struct normal_quoted_policy_base
+: aux_::is_valid_and_interpret_push_back_policy_base<Ch>
 {
-  constexpr tquoted_policy_base(Ch escape = '\\') noexcept
+  constexpr normal_quoted_policy_base(Ch escape = '\\') noexcept
   : escape_(escape)
   {}
 
@@ -259,26 +261,74 @@ struct tquoted_policy_base
   static constexpr bool interpret_keep_escape() noexcept
   { return false; }
 
-  template<class String, class Buf>
-  bool interpret_push_back(String & str, Ch c, Buf const &) const
-  {
-    switch (c) {
-      case 'n': str += '\n'; break;
-      case 't': str += '\t'; break;
-      case 'r': str += '\r'; break;
-      default: return false;
-    }
-    return true;
-  }
-
-  static constexpr bool simple_char_is_valid(Ch const &) noexcept
-  { return true; }
-
-  static constexpr bool interpret_char_is_valid(Ch const &) noexcept
-  { return true; }
-
 private:
   Ch escape_;
+};
+
+
+template<class Policy>
+struct simple_is_delimiter_be_is_left_and_right_policy
+: Policy
+{
+  USING_POLICY_CTOR(simple_is_delimiter_be_is_left_and_right_policy);
+
+  template<class Ch>
+  constexpr bool is_simple_left(Ch c) const noexcept
+  { return Policy::is_simple_delimiter(c); }
+
+  template<class Ch>
+  constexpr bool is_simple_right(Ch c) const noexcept
+  { return Policy::is_simple_delimiter(c); }
+};
+
+
+template<class Policy>
+struct interpret_is_delimiter_be_is_left_and_right_policy
+: Policy
+{
+  USING_POLICY_CTOR(interpret_is_delimiter_be_is_left_and_right_policy);
+
+  template<class Ch>
+  constexpr bool is_interpret_left(Ch c) const noexcept
+  { return Policy::is_interpret_delimiter(c); }
+
+  template<class Ch>
+  constexpr bool is_interpret_right(Ch c) const noexcept
+  { return Policy::is_interpret_delimiter(c); }
+};
+
+
+template<class Policy>
+using is_delimiter_be_is_left_and_right_policy
+= simple_is_delimiter_be_is_left_and_right_policy<
+    interpret_is_delimiter_be_is_left_and_right_policy<
+      Policy
+    >
+>;
+
+
+template<class Policy>
+struct uninterpretable_policy
+: Policy
+{
+  USING_POLICY_CTOR(uninterpretable_policy);
+
+  template<class Ch>
+  static constexpr bool is_interpret_delimiter(Ch) noexcept
+  { return false; }
+};
+
+
+template<class Ch>
+struct simple_quoted_policy_base
+: normal_quoted_policy_base<Ch>
+{
+  constexpr simple_quoted_policy_base(Ch escape = '\\') noexcept
+  : normal_quoted_policy_base<Ch>(escape)
+  {}
+
+  static constexpr bool is_interpret_delimiter(Ch) noexcept
+  { return false; }
 };
 
 
@@ -292,118 +342,82 @@ struct always_quoted_policy
   { return true; }
 };
 
-template<class Ch>
-using always_quoted_policy_base = always_quoted_policy<tquoted_policy_base<Ch>>;
 
-
-template<class Policy>
-struct delimiter_cannot_be_escape_policy
+template<class Policy, bool Can = true>
+struct delimiter_can_be_escape_policy
 : Policy
 {
-  USING_POLICY_CTOR(delimiter_cannot_be_escape_policy);
+  USING_POLICY_CTOR(delimiter_can_be_escape_policy);
 
   static constexpr bool delimiter_can_be_escape() noexcept
-  { return false; }
+  { return Can; }
 };
 
-template<class Ch>
-using delimiter_cannot_be_escape_policy_base
-  = delimiter_cannot_be_escape_policy<tquoted_policy_base<Ch>>;
+template<class Policy, bool Can = true>
+using delimiter_cannot_be_escape_policy
+  = delimiter_can_be_escape_policy<Policy, !Can>;
 
 
-template<class Ch, class Policy>
-struct delim_quoted_policy
-: Policy
-{
-  template<class... Ts>
-  constexpr delim_quoted_policy(Ch c, Ts && ... args)
-  : Policy(std::forward<Ts>(args)...)
-  , delim_(c)
-  {}
-
-  delim_quoted_policy() = default;
-  delim_quoted_policy(delim_quoted_policy const &) = default;
-  delim_quoted_policy(delim_quoted_policy &&) = default;
-  USING_POLICY_COPY_CTOR(delim_quoted_policy, Policy, Policy)
-
-  constexpr bool is_simple_delimiter(Ch c) const noexcept
-  { return delim_ == c; }
-
-  static constexpr bool is_interpret_delimiter(Ch) noexcept
-  { return false; }
-
-private:
-  Ch delim_;
-};
-
-template<class Ch>
-using delim_quoted_policy_base
-  = delim_quoted_policy<Ch, tquoted_policy_base<Ch>>;
-
-
-template<class FuncDelim, class Policy>
-struct funcdelim_quoted_policy
+template<class IsDelim, class Policy>
+struct is_simple_delimiter_policy
 : Policy
 {
   template<class Func, class... Ts>
-  constexpr funcdelim_quoted_policy(Func && f, Ts && ... args)
+  constexpr is_simple_delimiter_policy(Func && f, Ts && ... args)
   : Policy(std::forward<Ts>(args)...)
-  , fdelim_(std::forward<Func>(f))
+  , fdelim_{std::forward<Func>(f)}
   {}
 
-  funcdelim_quoted_policy() = default;
-  funcdelim_quoted_policy(funcdelim_quoted_policy const &) = default;
-  funcdelim_quoted_policy(funcdelim_quoted_policy &&) = default;
-  USING_POLICY_COPY_CTOR(funcdelim_quoted_policy, Policy, Policy)
+  is_simple_delimiter_policy() = default;
+  is_simple_delimiter_policy(is_simple_delimiter_policy const &) = default;
+  is_simple_delimiter_policy(is_simple_delimiter_policy &&) = default;
+  USING_POLICY_COPY_CTOR(is_simple_delimiter_policy, Policy, Policy)
 
   template<class Ch>
   constexpr bool is_simple_delimiter(Ch c) const noexcept
   { return fdelim_(c); }
 
-  template<class Ch>
-  static constexpr bool is_interpret_delimiter(Ch) noexcept
-  { return false; }
-
 private:
-  FuncDelim fdelim_;
+  IsDelim fdelim_;
 };
 
-template<class FuncDelim, class Ch>
-using funcdelim_quoted_policy_base
-  = funcdelim_quoted_policy<FuncDelim, tquoted_policy_base<Ch>>;
+
+namespace aux_ {
+template<class Ch>
+struct cmp_1 {
+  Ch c_;
+  constexpr bool operator()(Ch c) const noexcept
+  { return c_ == c; }
+};
+}
+
+template<class Ch, class Policy>
+using simple_delimiter_policy
+  = is_simple_delimiter_policy<aux_::cmp_1<Ch>, Policy>;
+
 
 template<class Policy>
-struct tquoted_policy_to_pquoted_policy
-: pquoted_can_be_escape_policy<pquoted_noleft_policy<Policy>>
+struct normal_quoted_policy_to_quoted_policy
+: is_delimiter_be_is_left_and_right_policy<
+  can_be_escaped_policy<noleft_policy<Policy>>
+>
 {
   USING_POLICY_COPY_CTOR(
-    tquoted_policy_to_pquoted_policy
-  , pquoted_can_be_escape_policy<pquoted_noleft_policy<Policy>>
+    normal_quoted_policy_to_quoted_policy
+  , is_delimiter_be_is_left_and_right_policy<
+    can_be_escaped_policy<noleft_policy<Policy>>
+  >
   , Policy)
-  using pquoted_can_be_escape_policy<pquoted_noleft_policy<Policy>>
-    ::pquoted_can_be_escape_policy;
-
-  template<class Ch>
-  constexpr bool is_simple_left(Ch c) const noexcept
-  { return this->is_simple_delimiter(c); }
-
-  template<class Ch>
-  constexpr bool is_interpret_left(Ch c) const noexcept
-  { return this->is_interpret_delimiter(c); }
-
-  template<class Ch>
-  constexpr bool is_simple_right(Ch c) const noexcept
-  { return this->is_simple_delimiter(c); }
-
-  template<class Ch>
-  constexpr bool is_interpret_right(Ch c) const noexcept
-  { return this->is_interpret_delimiter(c); }
+  using is_delimiter_be_is_left_and_right_policy<
+    can_be_escaped_policy<noleft_policy<Policy>>
+  >::is_delimiter_be_is_left_and_right_policy;
 };
 
 #undef USING_POLICY_CTOR
 #undef USING_POLICY_COPY_CTOR
+}
 
-
+namespace aux_ {
 template<class Policy, bool KeepEscape>
 class escaped_char_base
 {
@@ -498,9 +512,6 @@ private:
   std::basic_streambuf<Ch, Tr> & buf;
 };
 
-
-template <class T, bool = is_fmt_manipulator<T>::value>
-struct make_quoted_with_fmt {};
 }
 
 //  manipulator for const std::basic_string&
@@ -544,9 +555,12 @@ auto escaped_string(T & s, Ch delim='\"')
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::tquoted_policy_to_pquoted_policy<
-    aux_::delim_quoted_policy<Ch, aux_::always_quoted_policy_base<Ch>>
->>
+, quoted_policies::normal_quoted_policy_to_quoted_policy<
+    quoted_policies::simple_delimiter_policy<
+      Ch
+    , quoted_policies::always_quoted_policy<
+        quoted_policies::simple_quoted_policy_base<Ch>
+>>>>
 aquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\"', Ch delim='\"')
 { return {s, {delim, escape}}; }
 
@@ -555,7 +569,9 @@ aquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\"', Ch delim='\"')
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::tquoted_policy_to_pquoted_policy<aux_::tquoted_policy_base<Ch>>>
+, quoted_policies::normal_quoted_policy_to_quoted_policy<
+    quoted_policies::normal_quoted_policy_base<Ch>
+>>
 squoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\\')
 { return {s, escape}; }
 
@@ -564,8 +580,8 @@ squoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\\')
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::tquoted_policy_to_pquoted_policy<
-    aux_::always_quoted_policy_base<Ch>
+, quoted_policies::normal_quoted_policy_to_quoted_policy<
+    quoted_policies::always_quoted_policy<quoted_policies::normal_quoted_policy_base<Ch>>
 >>
 asquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\\')
 { return {s, escape}; }
@@ -574,9 +590,11 @@ asquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch escape='\\')
 template<class Ch, class Tr, class Alloc, class IsDelim>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::tquoted_policy_to_pquoted_policy<
-    aux_::funcdelim_quoted_policy_base<IsDelim, Ch>
->>
+, quoted_policies::normal_quoted_policy_to_quoted_policy<
+    quoted_policies::is_simple_delimiter_policy<
+      IsDelim
+    , quoted_policies::simple_quoted_policy_base<Ch>
+>>>
 dquoted(std::basic_string<Ch, Tr, Alloc> & s, IsDelim is_delim, Ch escape='\\')
 { return {s, {is_delim, escape}}; }
 
@@ -584,19 +602,22 @@ dquoted(std::basic_string<Ch, Tr, Alloc> & s, IsDelim is_delim, Ch escape='\\')
 template<class Ch, class Tr, class Alloc, class IsDelim>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::tquoted_policy_to_pquoted_policy<
-    aux_::funcdelim_quoted_policy<IsDelim, aux_::always_quoted_policy_base<Ch>>
->>
+, quoted_policies::normal_quoted_policy_to_quoted_policy<
+    quoted_policies::is_simple_delimiter_policy<
+      IsDelim
+    , quoted_policies::always_quoted_policy<
+        quoted_policies::simple_quoted_policy_base<Ch>
+>>>>
 adquoted(std::basic_string<Ch, Tr, Alloc> & s, IsDelim is_delim, Ch escape='\\')
 { return {s, {is_delim, escape}}; }
 
 
 template<
   class Ch, class Tr, class Alloc
-, class Policy = aux_::tquoted_policy_base<Ch>>
+, class Policy = quoted_policies::normal_quoted_policy_base<Ch>>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::tquoted_policy_to_pquoted_policy<Policy>>
+, quoted_policies::normal_quoted_policy_to_quoted_policy<Policy>>
 tquoted(std::basic_string<Ch, Tr, Alloc> & s, Policy policy = Policy())
 { return {s, policy}; }
 
@@ -604,7 +625,7 @@ tquoted(std::basic_string<Ch, Tr, Alloc> & s, Policy policy = Policy())
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::pquoted_cannot_be_escape_policy_base<Ch>>
+, quoted_policies::cannot_be_escape_policy<quoted_policies::quoted_policy_base<Ch>>>
 qquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 { return {s, {left_delim, right_delim}}; }
 
@@ -612,8 +633,8 @@ qquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::pquoted_cannot_be_escape_policy<
-    aux_::pquoted_noleft_policy_base<Ch>
+, quoted_policies::cannot_be_escape_policy<
+    quoted_policies::noleft_policy<quoted_policies::quoted_policy_base<Ch>>
 >>
 tag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 { return {s, {left_delim, right_delim}}; }
@@ -622,8 +643,8 @@ tag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::pquoted_cannot_be_escape_policy<
-    aux_::pquoted_nodepth_policy_base<Ch>
+, quoted_policies::cannot_be_escape_policy<
+    quoted_policies::nodepth_policy<quoted_policies::quoted_policy_base<Ch>>
 >>
 qtag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 { return {s, {left_delim, right_delim}}; }
@@ -632,8 +653,8 @@ qtag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 template<class Ch, class Tr, class Alloc>
 aux_::pescaped_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::pquoted_cannot_be_escape_policy<
-    aux_::pquoted_nodepth_policy<aux_::escape_policy_base<Ch>>
+, quoted_policies::cannot_be_escape_policy<
+    quoted_policies::nodepth_policy<quoted_policies::escaped_policy_base<Ch>>
 >>
 escaped(std::basic_string<Ch, Tr, Alloc> & s, Ch delim, Ch escape = '\\')
 { return {s, {delim, escape}}; }
@@ -642,8 +663,8 @@ escaped(std::basic_string<Ch, Tr, Alloc> & s, Ch delim, Ch escape = '\\')
 template<class Ch, class Tr, class Alloc>
 aux_::ipescaped_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, aux_::pquoted_cannot_be_escape_policy<
-    aux_::pquoted_nodepth_policy<aux_::escape_policy_base<Ch>>
+, quoted_policies::cannot_be_escape_policy<
+    quoted_policies::nodepth_policy<quoted_policies::escaped_policy_base<Ch>>
 >>
 iescaped(std::basic_string<Ch, Tr, Alloc> & s, Ch delim, Ch escape = '\\')
 { return {s, {delim, escape}}; }
@@ -893,18 +914,6 @@ void escape_pquoted_impl(
         break;
       }
 
-      if (policy.interpret_mode()) {
-        if (policy.is_right(c)) {
-          string += c;
-        }
-        else if (policy.keep_escape()) {
-          policy.push_back(string, c);
-        }
-      }
-      else if (!policy.keep_escape() || !policy.is_right(c)) {
-        policy.push_back(string, c);
-      }
-
       if ((policy.interpret_mode() || policy.keep_escape())
        && policy.is_right(c)) {
         string += c;
@@ -1066,14 +1075,16 @@ struct quoted_fmt_proxy
   template<class Ch, class Tr, class T>
   void operator()(std::basic_istream<Ch, Tr> & is, T & x) const
   {
-    using policy_type = tquoted_policy_to_pquoted_policy<
-      delim_quoted_policy_base<Ch>
-    >;
+    using policy_type = quoted_policies::normal_quoted_policy_to_quoted_policy<
+      quoted_policies::simple_delimiter_policy<
+        Ch, quoted_policies::simple_quoted_policy_base<Ch>
+    >>;
     if (quoted.delim == quoted.escape) {
       pquoted_impl(is, x, policy_type{quoted.escape, quoted.escape});
     }
     else {
-      using policy_type2 = delimiter_cannot_be_escape_policy<policy_type>;
+      using policy_type2
+        = quoted_policies::delimiter_cannot_be_escape_policy<policy_type>;
       pquoted_impl(is, x, policy_type2{quoted.delim, quoted.escape});
     }
   }
@@ -1122,12 +1133,14 @@ struct pescaped_fmt_proxy
     if (Escaped::mode == escape_mode::simple) {
       if (escaped.policy.simple_keep_escape()) {
         escaped_impl(
-          is, *is.rdbuf(), x, escaped_simple_char<policy, true>{escaped.policy}
+          is, *is.rdbuf(), x
+        , escaped_simple_char<policy, true>{escaped.policy}
         , get_left<Ch>(escaped.policy, 1));
       }
       else {
         escaped_impl(
-          is, *is.rdbuf(), x, escaped_simple_char<policy, false>{escaped.policy}
+          is, *is.rdbuf(), x
+        , escaped_simple_char<policy, false>{escaped.policy}
         , get_left<Ch>(escaped.policy, 1));
       }
     }

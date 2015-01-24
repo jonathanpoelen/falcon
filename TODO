@@ -412,5 +412,5 @@ réimplementé le >>string pour ne pas faire unget et les op inutiles.
 quoted lance-t-il une exception si le flag est activé ?
 Le state est-il bien set si le streambuf lance une exception ?
 
-
+split_expression(F, fb1,fb2) = F(bool_<fb1()>,bool_<fb2()>) pour fb{1,2} non constant (ou des boolean directement).
 
