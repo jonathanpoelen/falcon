@@ -34,7 +34,7 @@ namespace falcon {
  * }
  * @endcode
  */
-template <typename Functor>
+template <class Functor>
 struct finally
 {
 	finally()
@@ -76,15 +76,70 @@ private:
   Functor functor_;
 };
 
-#if __cplusplus >= 201103L
 template<typename Functor>
 finally<Functor> make_finally(Functor&& func)
 { return {std::forward<Functor>(func)}; }
-#else
-template<typename Functor>
-finally<Functor> make_finally(Functor func)
-{ return finally<Functor>(func); }
-#endif
+
+
+/// \attention finally must not throw an exception
+template<class F, class Finally>
+auto try_except(F&& f, Finally && finally)
+-> decltype(f())
+{
+  finally<Finally&> d{finally};
+  return f();
+}
+
+namespace aux_ {
+  template<class F, class R = decltype(std::declval<F>()())>
+  struct try_except_result
+  { using no_void_type = R; };
+
+  template<class F>
+  struct try_except_result<F, void>
+  { using void_type = void; };
+}
+
+
+template<class F, class Finally>
+typename aux_::try_except_result<F>::no_void_type
+rethrow_try_except(F&& f, Finally && finally)
+{
+  if (noexcept(finally())) {
+    finally<Finally&> d{finally};
+    return f();
+  }
+
+  decltype(f()) ret;
+  try {
+    ret = f();
+  }
+  catch(...) {
+    finally();
+    throw;
+  }
+  finally();
+  return ret;
+}
+
+template<class F, class Finally>
+typename aux_::try_except_result<F>::void_type
+rethrow_try_except(F&& f, Finally && finally)
+{
+  if (noexcept(finally())) {
+    finally<Finally&> d{finally};
+    return f();
+  }
+
+  try {
+    f();
+  }
+  catch(...) {
+    finally();
+    throw;
+  }
+  finally();
+}
 
 }
 
