@@ -83,7 +83,7 @@ finally<Functor> make_finally(Functor&& func)
 
 /// \attention finally must not throw an exception
 template<class F, class Finally>
-auto try_except(F&& f, Finally && finally)
+auto try_finally(F&& f, Finally && finally)
 -> decltype(f())
 {
   finally<Finally&> d{finally};
@@ -92,18 +92,18 @@ auto try_except(F&& f, Finally && finally)
 
 namespace aux_ {
   template<class F, class R = decltype(std::declval<F>()())>
-  struct try_except_result
+  struct try_finally_result
   { using no_void_type = R; };
 
   template<class F>
-  struct try_except_result<F, void>
+  struct try_finally_result<F, void>
   { using void_type = void; };
 }
 
 
 template<class F, class Finally>
-typename aux_::try_except_result<F>::no_void_type
-rethrow_try_except(F&& f, Finally && finally)
+typename aux_::try_finally_result<F>::no_void_type
+except_try_finally(F&& f, Finally && finally)
 {
   if (noexcept(finally())) {
     finally<Finally&> d{finally};
@@ -123,8 +123,8 @@ rethrow_try_except(F&& f, Finally && finally)
 }
 
 template<class F, class Finally>
-typename aux_::try_except_result<F>::void_type
-rethrow_try_except(F&& f, Finally && finally)
+typename aux_::try_finally_result<F>::void_type
+except_try_finally(F&& f, Finally && finally)
 {
   if (noexcept(finally())) {
     finally<Finally&> d{finally};
