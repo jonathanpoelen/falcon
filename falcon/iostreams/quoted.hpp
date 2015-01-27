@@ -32,6 +32,29 @@ struct make_quoted_with_fmt {};
 
 namespace quoted_policies {
 
+struct quoted_error {
+  static const int good                 = 0;
+  static const int delimiter            = 1 << 0;
+  static const int left_presence        = 1 << 1;
+  static const int invalid_character    = 1 << 2;
+  static const int escape_is_ambiguous  = 1 << 3;
+  static const int eof                  = 1 << 4;
+
+  quoted_error(int mask = good) noexcept
+  : m_(mask)
+  {}
+
+  /// `const &` : disable warning on gcc (-Wconversion)
+  operator int const & () const noexcept
+  { return m_; }
+
+  operator int & () noexcept
+  { return m_; }
+
+private:
+  int m_;
+};
+
 template<class Ch>
 struct escaped_policy_base
 {
@@ -84,6 +107,10 @@ struct escaped_policy_base
 
   static constexpr bool interpret_char_is_valid(Ch const &) noexcept
   { return true; }
+
+  // does nothing
+  void set_error(quoted_error) const noexcept
+  {}
 
 private:
   Ch right_;
@@ -168,6 +195,10 @@ struct delimited_quoted_policy_base
 
   static constexpr bool interpret_char_is_valid(Ch const &) noexcept
   { return true; }
+
+  // does nothing
+  void set_error(quoted_error) const noexcept
+  {}
 
 private:
   Ch escape_;
@@ -812,6 +843,7 @@ void escape_pquoted_impl(
   {
     int_type cb = buf.sbumpc();
     if (Tr::eq_int_type(cb, eof)) {
+      policy.set_error(quoted_policies::quoted_error::eof);
       is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
       break;
     }
@@ -821,6 +853,7 @@ void escape_pquoted_impl(
       cb = buf.sbumpc();
       if (Tr::eq_int_type(cb, eof)) {
         if (!delim_is_escape) {
+          policy.set_error(quoted_policies::quoted_error::eof);
           is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
         }
         break;
@@ -849,11 +882,13 @@ void escape_pquoted_impl(
       ++depth;
     }
     else if (noleft && c == left) {
+      policy.set_error(quoted_policies::quoted_error::left_presence);
       is.setstate(std::ios_base::failbit);
       break;
     }
 
     if (!policy.is_valid(c)) {
+      policy.set_error(quoted_policies::quoted_error::invalid_character);
       is.setstate(std::ios_base::failbit);
       break;
     }
@@ -910,6 +945,7 @@ void escaped_impl(
         escaped_dispath_impl<true, true>(is, buf, string, left, policy);
       }
       else {
+        policy.set_error(quoted_policies::quoted_error::escape_is_ambiguous);
         is.setstate(std::ios_base::failbit);
       }
     }
@@ -952,6 +988,9 @@ public:
 
   static constexpr bool keep_escape() noexcept
   { return KeepEscape; }
+
+  void set_error(quoted_policies::quoted_error e) const
+  { policy.set_error(e); }
 };
 
 template<class Policy, bool KeepEscape = true>
@@ -1035,6 +1074,7 @@ std::basic_istream<Ch, Tr> & pquoted_impl(
     const int_type cb = buf.sgetc();
 
     if (Tr::eq_int_type(cb, eof)) {
+      policy.set_error(quoted_policies::quoted_error::eof);
       is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
       return is;
     }
@@ -1067,6 +1107,7 @@ std::basic_istream<Ch, Tr> & pquoted_impl(
       }
     }
     else if (policy.always_quoted()) {
+      policy.set_error(quoted_policies::quoted_error::delimiter);
       is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
     }
     else {

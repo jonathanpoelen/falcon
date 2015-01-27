@@ -407,11 +407,4 @@ quoted avec des chaînes comme délimiteur quoted(s, R"(""")") (droite et gauche
 
 prendre en compte ios_base::width() dans quoted
 
-réimplementé le >>string pour ne pas faire unget et les op inutiles.
-
-quoted lance-t-il une exception si le flag est activé ?
-Le state est-il bien set si le streambuf lance une exception ?
-
-quoted: erreur plus personnel (trait set_error(enum))
-
 iter_less_iter = iter_fn(fn::less) = compose(fn::less, fn::deref, fn::deref)
