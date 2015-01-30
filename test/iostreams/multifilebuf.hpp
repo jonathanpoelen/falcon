@@ -1,0 +1,6 @@
+#ifndef FALCON_TEST_IOSTREAMS_MULTIFILEBUF_HPP
+#define FALCON_TEST_IOSTREAMS_MULTIFILEBUF_HPP
+
+void multifilebuf_test();
+
+#endif
