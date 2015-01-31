@@ -18,7 +18,7 @@ struct iter_swap_fn {
   { std::iter_swap(std::forward<It1>(a), std::forward<It2>(b)); }
 };
 
-FALCON_GLOBAL_OBJECT(iter_swap, iter_swap_fn);
+FALCON_GLOBAL_OBJECT(iter_swap, iter_swap_fn)
 
 }
 }

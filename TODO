@@ -397,7 +397,7 @@ simplifié les functions dans intrusive_data_streambuf en les utilisant avec un 
 
 quoted pour les nombres et toute valeurs (faire un quotedbuf ?).
 
-long_quoted qui prend comme délimiteur une chaine: long_quoted(s, R"(""")") (droite et gauche).
+long_quoted qui prend comme délimiteur une chaine: long_quoted(s, R"(""")") (droite et gauche). Utilise long_escaped.
 
 iter_less_iter = iter_fn(fn::less) = compose(fn::less, fn::deref, fn::deref)
 

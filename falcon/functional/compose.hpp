@@ -29,19 +29,17 @@ namespace falcon {
  */
 template <class Fn, class... Fns>
 class compose
-: std::tuple<Fn, Fns...>
 {
   using tuple_t_ = std::tuple<Fn, Fns...>;
 
-  tuple_t_ const & tuple_() const noexcept
-  { return static_cast<tuple_t_ const &> (*this); }
+  tuple_t_ t_;
 
-  template <class... Rs>
+  template <class... Args>
   struct impl_last
   {
-    template<class... Args>
+    template<class... Rs>
     static constexpr CPP1X_DELEGATE_FUNCTION(
-      impl(tuple_t_ const & t, Rs && ... args, Args && ... fn_args)
+      impl(tuple_t_ const & t, Args && ... fn_args, Rs && ... args)
     , invoke(
         std::get<0>(t)
       , std::forward<Rs>(args) FALCON_IF_NOT_IN_IDE_PARSER(...)
@@ -53,11 +51,10 @@ class compose
   template<std::size_t... Indexes, class... Args>
   constexpr CPP1X_DELEGATE_FUNCTION(
     impl_(parameter_index<Indexes...>, Args && ... args) const
-  , impl_last<decltype(std::get<Indexes+1>(this->tuple_())(args...))...>::impl(
-      this->tuple_()
-    , invoke(std::get<Indexes+1>(this->tuple_()), args...)
-      FALCON_IF_NOT_IN_IDE_PARSER(...)
-    , std::forward<Args>(args)...
+  , impl_last<Args...>::impl(
+      this->t_
+    , std::forward<Args>(args) FALCON_IF_NOT_IN_IDE_PARSER(...)
+    , invoke(std::get<Indexes+1>(this->t_), args...)...
     )
   )
 
@@ -70,14 +67,14 @@ public:
     class TFn
   , class = typename std::enable_if<std::is_convertible<TFn, Fn>::value>::type>
   constexpr compose(TFn && func)
-  : tuple_t_(std::forward<TFn>(func), Fns()...)
+  : t_(std::forward<TFn>(func), Fns()...)
   {}
 
   template<
     class TFn, class... TFns
   , class = typename std::enable_if<std::is_convertible<TFn, Fn>::value>::type>
   constexpr compose(TFn && func, TFns && ... funcs)
-  : tuple_t_(std::forward<TFn>(func), std::forward<TFns>(funcs)...)
+  : t_(std::forward<TFn>(func), std::forward<TFns>(funcs)...)
   {}
 
   template<typename... Args>
