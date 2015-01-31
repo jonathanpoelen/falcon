@@ -261,7 +261,7 @@ synchronizer: une vue
 
 un objet transaction qui dans son destructeur fait un commit si aucune exception n'est lancée, sinon un rollback (std::uncaught_exception())
 
-comment le type interne des bucket des containers std::unordered_* ?
+comment changer le type interne des bucket des containers std::unordered_* ?
 
 iterator: posibilité de compararer avec l'itérateur interne
 
@@ -397,14 +397,8 @@ simplifié les functions dans intrusive_data_streambuf en les utilisant avec un 
 
 quoted pour les nombres et toute valeurs (faire un quotedbuf ?).
 
-iomanip.quoted2: fonctionne comme quoted sauf que le délimiteur est séparé en 2 (debut, fin) (quoted2(s,'[',']','\\')). Faire aussi tquoted2.
-
-un quoted qui supporte les options always_quoted, string_quoted, count_quoted ou default_quoted. Un quoted générique (mais complexe ?) peut se faire avec le quoted2 dynamique à double interpretation.
-
-un quoted qui ne prend pas en compte le premier délimiter (une fonction ?). unquoted(delim, quoted<T>) (delim n'est pas toujours obligatoire. Baser unquoted sur tquoted ?)
-
-quoted avec des chaînes comme délimiteur quoted(s, R"(""")") (droite et gauche). Ajouter un can_have_long_delimiter et des lecteurs pour doite/gauche policy.get_range_long_delimiter_[right/left]
-
-prendre en compte ios_base::width() dans quoted
+long_quoted qui prend comme délimiteur une chaine: long_quoted(s, R"(""")") (droite et gauche).
 
 iter_less_iter = iter_fn(fn::less) = compose(fn::less, fn::deref, fn::deref)
+
+deplacer les manipulater dans io

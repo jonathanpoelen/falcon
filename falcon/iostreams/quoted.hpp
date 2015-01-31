@@ -33,26 +33,26 @@ struct make_quoted_with_fmt {};
 namespace quoted_policies {
 
 struct quoted_error {
-  static const int good                 = 0;
-  static const int delimiter            = 1 << 0;
-  static const int left_presence        = 1 << 1;
-  static const int invalid_character    = 1 << 2;
-  static const int escape_is_ambiguous  = 1 << 3;
-  static const int eof                  = 1 << 4;
+  static const unsigned good                 = 0;
+  static const unsigned delimiter            = 1 << 0;
+  static const unsigned left_presence        = 1 << 1;
+  static const unsigned invalid_character    = 1 << 2;
+  static const unsigned escape_is_ambiguous  = 1 << 3;
+  static const unsigned eof                  = 1 << 4;
 
-  quoted_error(int mask = good) noexcept
+  quoted_error(unsigned mask = good) noexcept
   : m_(mask)
   {}
 
   /// `const &` : disable warning on gcc (-Wconversion)
-  operator int const & () const noexcept
+  operator unsigned const & () const noexcept
   { return m_; }
 
-  operator int & () noexcept
+  operator unsigned & () noexcept
   { return m_; }
 
 private:
-  int m_;
+  unsigned m_;
 };
 
 template<class Ch>
@@ -128,7 +128,7 @@ struct quoted_policy_base
   {}
 
   static constexpr bool always_quoted() noexcept
-  { return true; }
+  { return false; }
 
   constexpr bool is_simple_left(Ch c) const noexcept
   { return c == left_; }
@@ -142,9 +142,9 @@ private:
 
 
 template<class Ch>
-struct delimited_quoted_policy_base
+struct normal_quoted_policy_base
 {
-  constexpr delimited_quoted_policy_base(Ch escape = '\\') noexcept
+  constexpr normal_quoted_policy_base(Ch escape = '\\') noexcept
   : escape_(escape)
   {}
 
@@ -166,10 +166,16 @@ struct delimited_quoted_policy_base
   static constexpr bool noleft() noexcept
   { return false; }
 
-  static constexpr bool is_simple_delimiter(Ch c) noexcept
+  static constexpr bool is_simple_left(Ch c) noexcept
   { return c == Ch('\''); }
 
-  static constexpr bool is_interpret_delimiter(Ch c) noexcept
+  static constexpr bool is_interpret_left(Ch c) noexcept
+  { return c == Ch('"'); }
+
+  static constexpr bool is_simple_right(Ch c) noexcept
+  { return c == Ch('\''); }
+
+  static constexpr bool is_interpret_right(Ch c) noexcept
   { return c == Ch('"'); }
 
   static constexpr bool simple_keep_escape() noexcept
@@ -205,6 +211,70 @@ private:
 };
 
 
+template<class Ch>
+struct delimite_quoted_policy_base
+: normal_quoted_policy_base<Ch>
+{
+  constexpr delimite_quoted_policy_base(
+    Ch simple_delim = '\'', Ch interpret_delim = '"', Ch escape = '\\') noexcept
+  : normal_quoted_policy_base<Ch>(escape)
+  , simple_delim_(simple_delim)
+  , interpret_delim_(interpret_delim)
+  {}
+
+  constexpr bool is_simple_left(Ch c) const noexcept
+  { return c == simple_delim_; }
+
+  constexpr bool is_simple_right(Ch c) const noexcept
+  { return c == simple_delim_; }
+
+  constexpr bool is_interpret_left(Ch c) const noexcept
+  { return c == interpret_delim_; }
+
+  constexpr bool is_interpret_right(Ch c) const noexcept
+  { return c == interpret_delim_; }
+
+private:
+  Ch simple_delim_;
+  Ch interpret_delim_;
+};
+
+
+template<class Ch>
+struct delimite_quoted2_policy_base
+: normal_quoted_policy_base<Ch>
+{
+  constexpr delimite_quoted2_policy_base(
+    Ch simple_left, Ch simple_right
+  , Ch interpret_left, Ch interpret_right
+  , Ch escape = '\\') noexcept
+  : normal_quoted_policy_base<Ch>(escape)
+  , simple_left_(simple_left)
+  , simple_right_(simple_right)
+  , interpret_left_(interpret_left)
+  , interpret_right_(interpret_right)
+  {}
+
+  constexpr bool is_simple_left(Ch c) const noexcept
+  { return c == simple_left_; }
+
+  constexpr bool is_simple_right(Ch c) const noexcept
+  { return c == simple_right_; }
+
+  constexpr bool is_interpret_left(Ch c) const noexcept
+  { return c == interpret_left_; }
+
+  constexpr bool is_interpret_right(Ch c) const noexcept
+  { return c == interpret_right_; }
+
+private:
+  Ch simple_left_;
+  Ch simple_right_;
+  Ch interpret_left_;
+  Ch interpret_right_;
+};
+
+
 #define USING_POLICY_COPY_CTOR(class_name, inherit, policy_name) \
   class_name(policy_name const & policy) : inherit(policy) {}    \
   class_name(policy_name && policy) : inherit(std::move(policy)) {}
@@ -215,10 +285,10 @@ private:
 
 
 template<class Policy>
-struct simple_is_delimiter_be_is_left_and_right_policy
+struct is_simple_delimiter_be_is_left_and_right_policy
 : Policy
 {
-  USING_POLICY_CTOR(simple_is_delimiter_be_is_left_and_right_policy);
+  USING_POLICY_CTOR(is_simple_delimiter_be_is_left_and_right_policy);
 
   template<class Ch>
   constexpr bool is_simple_left(Ch c) const noexcept
@@ -231,10 +301,10 @@ struct simple_is_delimiter_be_is_left_and_right_policy
 
 
 template<class Policy>
-struct interpret_is_delimiter_be_is_left_and_right_policy
+struct is_interpret_delimiter_be_is_left_and_right_policy
 : Policy
 {
-  USING_POLICY_CTOR(interpret_is_delimiter_be_is_left_and_right_policy);
+  USING_POLICY_CTOR(is_interpret_delimiter_be_is_left_and_right_policy);
 
   template<class Ch>
   constexpr bool is_interpret_left(Ch c) const noexcept
@@ -248,16 +318,10 @@ struct interpret_is_delimiter_be_is_left_and_right_policy
 
 template<class Policy>
 using is_delimiter_be_is_left_and_right_policy
-= simple_is_delimiter_be_is_left_and_right_policy<
-    interpret_is_delimiter_be_is_left_and_right_policy<
+= is_simple_delimiter_be_is_left_and_right_policy<
+    is_interpret_delimiter_be_is_left_and_right_policy<
       Policy
     >
->;
-
-
-template<class Ch>
-using normal_quoted_policy_base = is_delimiter_be_is_left_and_right_policy<
-  delimited_quoted_policy_base<Ch>
 >;
 
 
@@ -268,7 +332,11 @@ struct uninterpretable_policy
   USING_POLICY_CTOR(uninterpretable_policy);
 
   template<class Ch>
-  static constexpr bool is_interpret_delimiter(Ch) noexcept
+  static constexpr bool is_interpret_left(Ch) noexcept
+  { return false; }
+
+  template<class Ch>
+  static constexpr bool is_interpret_right(Ch) noexcept
   { return false; }
 };
 
@@ -313,7 +381,26 @@ using simple_escaped_policy_base
 
 
 template<class Policy>
+struct tag_policy
+: Policy
+{
+  USING_POLICY_CTOR(tag_policy);
+
+  static constexpr bool can_be_escaped() noexcept
+  { return false; }
+
+  static constexpr bool always_quoted() noexcept
+  { return true; }
+};
+
+
+template<class Ch>
+using tag_policy_base = tag_policy<quoted_policy_base<Ch>>;
+
+
+template<class Policy>
 struct noleft_policy
+: Policy
 {
   USING_POLICY_CTOR(noleft_policy);
 
@@ -551,20 +638,23 @@ adquoted(std::basic_string<Ch, Tr, Alloc> & s, IsDelim is_delim, Ch escape='\\')
 
 template<
   class Ch, class Tr, class Alloc
-, class Policy = quoted_policies::delimited_quoted_policy_base<Ch>>
-aux_::pquoted_proxy<
-  std::basic_string<Ch, Tr, Alloc> &
-, quoted_policies::is_delimiter_be_is_left_and_right_policy<Policy>>
+, class Policy = quoted_policies::delimite_quoted_policy_base<Ch>>
+aux_::pquoted_proxy<std::basic_string<Ch, Tr, Alloc> &, Policy>
 tquoted(std::basic_string<Ch, Tr, Alloc> & s, Policy policy = Policy())
+{ return {s, policy}; }
+
+template<
+  class Ch, class Tr, class Alloc
+, class Policy = quoted_policies::delimite_quoted2_policy_base<Ch>>
+aux_::pquoted_proxy<std::basic_string<Ch, Tr, Alloc> &, Policy>
+tquoted2(std::basic_string<Ch, Tr, Alloc> & s, Policy policy = Policy())
 { return {s, policy}; }
 
 
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, quoted_policies::cannot_be_escape_policy<
-    quoted_policies::quoted_policy_base<Ch>>
->
+, quoted_policies::tag_policy_base<Ch>>
 qquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 { return {s, {left_delim, right_delim}}; }
 
@@ -572,9 +662,7 @@ qquoted(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, quoted_policies::cannot_be_escape_policy<
-    quoted_policies::noleft_policy<quoted_policies::quoted_policy_base<Ch>>
->>
+, quoted_policies::noleft_policy<quoted_policies::tag_policy_base<Ch>>>
 tag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 { return {s, {left_delim, right_delim}}; }
 
@@ -582,9 +670,7 @@ tag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 template<class Ch, class Tr, class Alloc>
 aux_::pquoted_proxy<
   std::basic_string<Ch, Tr, Alloc> &
-, quoted_policies::cannot_be_escape_policy<
-    quoted_policies::nodepth_policy<quoted_policies::quoted_policy_base<Ch>>
->>
+, quoted_policies::nodepth_policy<quoted_policies::tag_policy_base<Ch>>>
 qtag(std::basic_string<Ch, Tr, Alloc> & s, Ch left_delim, Ch right_delim)
 { return {s, {left_delim, right_delim}}; }
 
