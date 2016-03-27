@@ -64,63 +64,64 @@
 //   }
 // };
 
-#include <falcon/iostreams/showspace.hpp>
-#include <falcon/iostreams/pad.hpp>
+// #include <falcon/iostreams/showspace.hpp>
+// #include <falcon/iostreams/pad.hpp>
 #include <falcon/iostreams/quoted.hpp>
-#include <falcon/iostreams/iofmts.hpp>
-#include <falcon/io/hexu.hpp>
+// #include <falcon/iostreams/iofmts.hpp>
+// #include <falcon/io/hexu.hpp>
 #include <iostream>
-#include <iomanip>
+// #include <iomanip>
 
 
-struct S {
-  int i = 1;
-  operator int () const { return i; }
-};
-std::ostream &operator <<(std::ostream &os, S const&) { return os << "ok"; }
-
-namespace iofmts {
-  using namespace falcon::iostreams::iofmts;
-}
+// struct S {
+//   int i = 1;
+//   operator int () const { return i; }
+// };
+// std::ostream &operator <<(std::ostream &os, S const&) { return os << "ok"; }
+//
+// namespace iofmts {
+//   using namespace falcon::iostreams::iofmts;
+// }
 
 int main()
 {
-  using falcon::iostreams::showspace;
-  using falcon::iostreams::pad;
-  using falcon::iostreams::padl;
-  using falcon::iostreams::padr;
-  using falcon::iostreams::quoted;
-
-  const void * p = 0; p = static_cast<const char*>(p)+3232;
-  std::cout
+//   using falcon::iostreams::showspace;
+//   using falcon::iostreams::pad;
+//   using falcon::iostreams::padl;
+//   using falcon::iostreams::padr;
+//   using falcon::iostreams::quoted;
+//
+//   const void * p = 0; p = static_cast<const char*>(p)+3232;
+//   std::cout
+// //     << std::left << std::setw(6) << showspace(S()) << "]\n"
+//     << std::left << std::setw(6) << std::setiosflags(std::ios::boolalpha) <<  showspace(false) << "]\n"
+//     << std::left << std::setw(6) << showspace(p) << "]\n"
 //     << std::left << std::setw(6) << showspace(S()) << "]\n"
-    << std::left << std::setw(6) << std::setiosflags(std::ios::boolalpha) <<  showspace(false) << "]\n"
-    << std::left << std::setw(6) << showspace(p) << "]\n"
-    << std::left << std::setw(6) << showspace(S()) << "]\n"
-    << std::left << std::setw(6) << showspace(2) << "]\n"
-    << std::left << std::setw(6) << showspace(2, '#') << "]\n"
-    << std::left << std::setw(6) << showspace(showspace(2, '#')) << "]\n"
-    << padl(5, '#') << 0 << "]\n"
-    << padr(5, '#') << 0 << "]\n"
-    << pad(std::ios::left, 5, '#') << 0 << "]\n"
-    << pad(5, '#') << 0 << "]\n"
-    << iofmts::setfill(5, '#') << 0 << "]\n"
-    << std::right << std::setw(12) << quoted("plo\"p\"") << "]\n"
-    << iofmts::right(iofmts::setw(quoted("plo\"p\""), 12)) << "]\n"
-  ;
-
-  const std::string s("plo\"p\"");
-  /*std::cout <<
-   falcon::iostreams::is_fmt_manipulator<
-     decltype(iofmts::right(s))//::template fmt_lock<void>
-    >::value*/;
-  std::cout
-    << quoted(s) << "]\n"
-    << quoted(iofmts::right(s)) << "]\n"
-    << quoted(iofmts::setfill(iofmts::setw(s, 10), '%')) << "]\n"
-  ;
+//     << std::left << std::setw(6) << showspace(2) << "]\n"
+//     << std::left << std::setw(6) << showspace(2, '#') << "]\n"
+//     << std::left << std::setw(6) << showspace(showspace(2, '#')) << "]\n"
+//     << padl(5, '#') << 0 << "]\n"
+//     << padr(5, '#') << 0 << "]\n"
+//     << pad(std::ios::left, 5, '#') << 0 << "]\n"
+//     << pad(5, '#') << 0 << "]\n"
+//     << iofmts::setfill(5, '#') << 0 << "]\n"
+//     << std::right << std::setw(12) << quoted("plo\"p\"") << "]\n"
+//     << iofmts::right(iofmts::setw(quoted("plo\"p\""), 12)) << "]\n"
+//   ;
+//
+//   const std::string s("plo\"p\"");
+//   /*std::cout <<
+//    falcon::iostreams::is_fmt_manipulator<
+//      decltype(iofmts::right(s))//::template fmt_lock<void>
+//     >::value*/;
+//   std::cout
+//     << quoted(s) << "]\n"
+//     << quoted(iofmts::right(s)) << "]\n"
+//     << quoted(iofmts::setfill(iofmts::setw(s, 10), '%')) << "]\n"
+//   ;
   std::string aa;
   std::cin >> falcon::iostreams::squoted(aa);
+  std::cin >> falcon::iostreams::quoted(aa);
 //   std::cout << quoted(iofmts::right(iofmts::setw(s, 12))) << "]\n";
 
 //     << std::left << std::setw(6) << 1 << "]\n"

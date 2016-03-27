@@ -399,6 +399,134 @@ quoted pour les nombres et toute valeurs (faire un quotedbuf ?).
 
 long_quoted qui prend comme délimiteur une chaine: long_quoted(s, R"(""")") (droite et gauche). Utilise long_escaped.
 
-iter_less_iter = iter_fn(fn::less) = compose(fn::less, fn::deref, fn::deref)
+iter_less_iter = iter2_fn(fn::less) = compose(fn::less, compose(fn::deref,a0), compose(fn::deref,a1))
+
+la::make(la::plus(la::deref(_1), la::deref(_2), la::deref(_3)))(x,y,z) = la::make(la::plus(la::each(la::deref)))(x,y,z) = *x+*y+*z. la::make optionnel
 
 deplacer les manipulater dans io
+
+manipulator pour recuperer les lettres temps qu'un pattern est valide (une politique speciale de quoted ? no_escape = yes)
+
+
+long_escaped
+    else if (policy.is_long_right()) {
+      auto const & s = policy.long_right();
+      using std::begin;
+      using std::end;
+      auto first = begin(s);
+      auto it = first;
+      auto last = end(s);
+      if (it != last && c != *it) {
+        for (; it != last; ++it) {
+          cb = buf.sgetc();
+          if (Tr::eq_int_type(cb, eof)) {
+            policy.set_error(quoted_policies::quoted_error::eof);
+            is.setstate(std::ios_base::eofbit | std::ios_base::failbit);
+            break;
+          }
+          c = Tr::to_char_type(cb);
+          if (c != *it) {
+            break;
+          }
+          buf.sbumpc();
+        }
+      }
+
+      if (it == last) {
+        break;
+      }
+
+      string.assign(string.begin(), first, it);
+      continue;
+    }
+
+separer les politiques de quoted en 4 parties: {normal,expanded}_{long_,}quoted
+l'existance de l'une des politiques se fait via un type interne et leurs récupération à travers des fontions membres {normal,expanded,}_{long_,}policy.
+Cetaines fonctions sont dans la politique maître (set_error, etc)
+Si pas de type de politique alors considerer la politique comme possèdans toute les fonctions membres
+
+manque stdexcept dans range/range.hpp
+
+namespace op pour les operateurs
+
+faire un tuple interne a falcon qui permet un héritage privé pour faire de ECO
+
+static_string<N> = basic_string<CharT, Traits, special_allocator>
++ fixed_string (pas du tout dynamique)
+
+FALCON_GLOBAL_OBJECT -> inverser type et nom (mettre type en premier)
+
+faire un variant (comme boost_variant) mais qui supporte les lambdas généralisées. Posibilité de contrôle avec un allocator ? autre type ?
+
+fn::mk(args...) (foncteur qui copies les valeurs pour la création). Pas de paramètre
+
+
+foldr, foldl: http://en.wikipedia.org/wiki/Fold_(higher-order_function)
+
+
+
+a<n>() -> nth<n>() ?
+
+utility: make_range_sequence<Beg,End,Step>, make_integral_sequence<T, Beg, Next<Int>>
+fn: first -> use_first. précéder les fonctions-objets qui font appel à des membres de `use_` (+ autre namespace)
+helper: use_first_type -> first_type_from ou enable_first_type
+tuple: apply_from_tuple (note: ([Ints, ]Fn, Tuple[, TransformFn] -> si Transform fn alors retourne une tuple, sinon Fn), make_from_tuple (note: void -> std::ignore ou pas de cellule)
+type_traits: is_lambda_conversion[_v], remove_reference_wrapper[_t], type_from = T::type
+functional: invoke permet-il de crée une tuple avec un appel direct au constructeur (sans fonction intermédiaire) ? Le faire avec une autre fonction qui construit un type plutôt que faire appel à une fonction (invoke_from<T> ou invoke_from<Temp<...>>).
+algorithm: binary_find : binary_search qui retourne un iterator
+
+fn::[first,second] -> [fst,snd]
+
+un objet qui prend && ou & et initialise un membre is_movable en fonction
+
+find_nth et d'autre algo
+
+static_if
+
+namespace mpl::matching ?
+match: retourne un type si possible, sinon void
+match/*<result_type>*/(xxx)
+| case<2>() = val(7)
+| case<4>() = []{}
+| case([]{ return 2; }) = []{ action(2,4); }
+match sans paramètre permet de mettre dans une lambda
+
+match_value ?
+| case<2>() = 7
+
+select(x)
+| [](explicit_<int>){ }
+| [](float){ }
+| [](char const *){ }
+| [](auto) {}
+;
+
+
+transform_remove(first, last, xxx, transform(first, last):last):last
+transform_remove(first, last, xxx, transform(first, last):value):last
+transform_remove_if(first, last, remove, transform(first, last):last):last
+transform_remove_if(first, last, remove, transform(first, last):value):last
+
+std::tie (espèce d'équivalent sans tuple (compare?)) qui fait une comparaison optimisé (utilise compare quand dispo): {s1,s2} < {s3,s4} => s1.compare(s3) ... s2 < s4
+Comment faire pour inverser la comparaison (x < 0) -> (x > 0) ?
+Le faire juste pour 1 membre (cmp(cmp_policy(x, fn::gt)) -> comparer<comparator_policy<T, fn:gt_gn>>) ?
+
+maker<CastType, T = CastType>
+
+bits/enable_special_members.h
+enable_copy_move<copy, copyassignment, move, moveassignment, tag=void>
+enable_special_members<default, destructor, copy, copyassignment, move, moveassignment, tag=void>
+enable_default_constructor
+enable_destructor
+
+la::mut -> mutable variable (ex: std::generate(rng, la::mut(0)++)) -> la::var ?
+
+final_<T>
+noexcept_<T> = noexcept_ctor<T> + noexcept_assignment<T>
+explicit_<T>
+mutable_<T> = mut_<T>
+const_<T>
+volatile_<T>
+cv_<T>
+
+strong_type<T, tag>
