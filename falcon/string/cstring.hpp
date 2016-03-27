@@ -147,6 +147,8 @@ public:
   , m_capacity(0)
   {}
 
+  CPP_CONSTEXPR basic_string(basic_string &&) = default;
+
 #if __cplusplus >= 201103L
   constexpr basic_string(std::nullptr_t) noexcept
   : m_begin(0)
@@ -220,6 +222,8 @@ public:
   , m_size(str.m_size)
   , m_capacity(str.m_capacity)
   {}
+
+  basic_string& operator=(basic_string&&) = default;
 
   basic_string& operator=(const basic_string& str) CPP_NOEXCEPT
   {
@@ -526,7 +530,7 @@ public:
   basic_string& assign(pointer s, size_type len) CPP_NOEXCEPT
   {
     if (len >= this->capacity())
-      throw std::length_error("basic_string::append");
+      throw std::length_error("basic_string::assign");
     priv_assign(m_begin, s, len);
     priv_set_length(len);
     return *this;
@@ -1925,6 +1929,8 @@ public:
   , m_size(0)
   {}
 
+  CPP_CONSTEXPR basic_string(basic_string &&) = default;
+
 #if __cplusplus >= 201103L
   constexpr basic_string(std::nullptr_t) noexcept
   : m_begin(0)
@@ -1975,6 +1981,8 @@ public:
   : m_begin(str.data())
   , m_size(str.size())
   {}
+
+  basic_string& operator=(basic_string&&) = default;
 
   basic_string& operator=(const basic_string& str) CPP_NOEXCEPT
   { return assign(str); }

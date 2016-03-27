@@ -8,6 +8,7 @@
 #include <falcon/type_traits/enable_if.hpp>
 #include <falcon/container/range_access.hpp>
 
+#include <stdexcept>
 #include <algorithm>
 #include <iterator>
 #include <cassert>
@@ -253,7 +254,7 @@ bool operator==(
 #if __cplusplus > 201103L
   return std::equal(l.begin(), l.end(), r.begin(), r.end());
 #else
-  aux_::iterator_range::equal(
+  return aux_::iterator_range::equal(
     l.begin(), l.end(), r.begin(), r.end(),
     typename std::iterator_traits<Iterator1>::iterator_category(),
     typename std::iterator_traits<Iterator2>::iterator_category()
